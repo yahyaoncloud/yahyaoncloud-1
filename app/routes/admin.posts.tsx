@@ -34,7 +34,7 @@ export async function action({ request }: ActionFunctionArgs) {
     try {
       await fetch(`${environment.GO_BACKEND_URL}/posts/${postId}`, {
         method: "DELETE",
-      });   
+      });
       return json({ success: "Post deleted" });
     } catch (error) {
       return json({ error: "Failed to delete post" }, { status: 500 });
