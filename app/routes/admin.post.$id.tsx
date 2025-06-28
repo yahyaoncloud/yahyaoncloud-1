@@ -3,11 +3,11 @@ import { useTheme } from "../Contexts/ThemeContext";
 import { Link, useLoaderData, Form } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { environment } from "~/environments/environment";
+import { environment } from "../environments/environment";
 import { Edit, Trash2 } from "lucide-react";
 import { marked } from "marked";
 import { useEffect, useState } from "react";
-import dummyImage from "~/assets/yahya_glass.png";
+import dummyImage from "../assets/yahya_glass.png";
 
 // Configure marked for safe markdown rendering
 marked.setOptions({

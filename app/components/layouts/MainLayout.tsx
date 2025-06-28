@@ -1,8 +1,8 @@
 import { useLocation } from "@remix-run/react";
 import { motion } from "framer-motion";
-import { ThemeProvider } from "~/Contexts/ThemeContext";
+import { ThemeProvider } from "../Contexts/ThemeContext";
 import Header from "../Header";
-import Footer from "~/components/Footer";
+import Footer from "../components/Footer";
 
 interface MainLayoutProps {
   children: React.ReactNode;

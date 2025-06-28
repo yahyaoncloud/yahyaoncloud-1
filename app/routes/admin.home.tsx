@@ -16,7 +16,7 @@ import {
   HandHeart,
 } from "lucide-react";
 import ArticleCard from "../components/ArticleCard";
-import { environment } from "~/environments/environment";
+import { environment } from "../environments/environment";
 import type { Category, Post } from "../Types/types";
 import dummyImage from "../assets/yahya_glass.png";
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { json, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { environment } from "~/environments/environment";
+import { environment } from "../environments/environment";
 import { useTheme } from "../Contexts/ThemeContext";
 
 import type {

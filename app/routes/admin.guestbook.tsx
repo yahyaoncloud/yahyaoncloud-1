@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { useTheme } from "~/contexts/ThemeContext";
+import { useTheme } from "../Contexts/ThemeContext";
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";

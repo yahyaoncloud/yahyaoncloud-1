@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import { useTheme } from "~/contexts/ThemeContext";
+import { useTheme } from "../Contexts/ThemeContext";
 import type { ActionFunctionArgs, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Post, Category, Tag, MediaAsset } from "~/Types/types";
-import { environment } from "~/environments/environment";
+import { Post, Category, Tag, MediaAsset } from "../Types/types";
+import { environment } from "../environments/environment";
 
 // Utility to generate a random ID (replacement for UUID/ObjectId)
 function generateId(): string {

@@ -5,7 +5,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import ArticleCard from "../components/ArticleCard";
 import { Edit, Trash2 } from "lucide-react";
-import { environment } from "~/environments/environment";
+import { environment } from "../environments/environment";
 
 // Loader: Fetch posts from Go backend
 export async function loader({ request }: LoaderFunctionArgs) {
