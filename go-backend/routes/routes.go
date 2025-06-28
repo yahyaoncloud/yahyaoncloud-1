@@ -35,4 +35,8 @@ func RegisterRoutes(r *mux.Router) {
     api.HandleFunc("/tags", handlers.CreateTag).Methods("POST")
     api.HandleFunc("/tags", handlers.UpdateTag).Methods("PUT")
     api.HandleFunc("/tags", handlers.DeleteTag).Methods("DELETE")
+
+    // Portfolio
+    api.HandleFunc("/portfolio", handlers.GetPortfolio).Methods("GET")
+    api.HandleFunc("/portfolio", handlers.UpdatePortfolio).Methods("PUT")
 }

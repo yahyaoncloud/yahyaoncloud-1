@@ -1,5 +1,14 @@
 basePath: /api
 definitions:
+  models.Achievement:
+    properties:
+      description:
+        type: string
+      organizer:
+        type: string
+      title:
+        type: string
+    type: object
   models.Category:
     properties:
       catID:
@@ -9,6 +18,55 @@ definitions:
       name:
         type: string
       slug:
+        type: string
+    type: object
+  models.Certification:
+    properties:
+      issuer:
+        type: string
+      title:
+        type: string
+      year:
+        type: string
+    type: object
+  models.Contact:
+    properties:
+      email:
+        type: string
+      linkedin:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.CurrentWork:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  models.Education:
+    properties:
+      courses:
+        items:
+          type: string
+        type: array
+      degree:
+        type: string
+      institution:
+        type: string
+    type: object
+  models.Experience:
+    properties:
+      description:
+        items:
+          type: string
+        type: array
+      location:
+        type: string
+      period:
+        type: string
+      title:
         type: string
     type: object
   models.MediaAsset:
@@ -26,6 +84,47 @@ definitions:
       uploadedBy:
         type: string
       url:
+        type: string
+    type: object
+  models.Portfolio:
+    properties:
+      _id:
+        type: string
+      achievements:
+        items:
+          $ref: '#/definitions/models.Achievement'
+        type: array
+      bio:
+        type: string
+      certifications:
+        items:
+          $ref: '#/definitions/models.Certification'
+        type: array
+      contact:
+        $ref: '#/definitions/models.Contact'
+      createdAt:
+        type: string
+      currentWorks:
+        items:
+          $ref: '#/definitions/models.CurrentWork'
+        type: array
+      education:
+        $ref: '#/definitions/models.Education'
+      experiences:
+        items:
+          $ref: '#/definitions/models.Experience'
+        type: array
+      location:
+        type: string
+      name:
+        type: string
+      portraitUrl:
+        type: string
+      skills:
+        $ref: '#/definitions/models.Skills'
+      title:
+        type: string
+      updatedAt:
         type: string
     type: object
   models.Post:
@@ -61,6 +160,41 @@ definitions:
         type: string
       updatedAt:
         type: string
+    type: object
+  models.Skills:
+    properties:
+      cloud:
+        items:
+          type: string
+        type: array
+      devops:
+        items:
+          type: string
+        type: array
+      monitoring:
+        items:
+          type: string
+        type: array
+      networking:
+        items:
+          type: string
+        type: array
+      scripting:
+        items:
+          type: string
+        type: array
+      security:
+        items:
+          type: string
+        type: array
+      systems:
+        items:
+          type: string
+        type: array
+      virtualization:
+        items:
+          type: string
+        type: array
     type: object
   models.Tag:
     properties:
@@ -200,6 +334,52 @@ paths:
       summary: Update a category
       tags:
       - categories
+  /portfolio:
+    get:
+      description: Returns the portfolio data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Portfolio'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get portfolio
+      tags:
+      - portfolio
+    put:
+      consumes:
+      - application/json
+      description: Update a portfolio by ID
+      parameters:
+      - description: Portfolio data
+        in: body
+        name: portfolio
+        required: true
+        schema:
+          $ref: '#/definitions/models.Portfolio'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Portfolio'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update portfolio
+      tags:
+      - portfolio
   /posts:
     get:
       description: Returns a list of all blog posts

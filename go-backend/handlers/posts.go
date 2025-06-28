@@ -98,6 +98,8 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Failed to update", http.StatusInternalServerError)
         return
     }
+    
+    w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
     json.NewEncoder(w).Encode(post)
 }   
@@ -159,6 +161,8 @@ func GetPostByID(w http.ResponseWriter, r *http.Request) {
         }
         return
     }
+
+    w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
     json.NewEncoder(w).Encode(post)
 }

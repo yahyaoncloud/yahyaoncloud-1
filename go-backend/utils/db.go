@@ -12,6 +12,7 @@ import (
 
 var MongoClient *mongo.Client
 var MongoDB *mongo.Database
+var PortfolioCollection *mongo.Collection // ✅ ADD THIS
 
 func ConnectDB() {
     uri := os.Getenv("MONGO_URI")
@@ -33,6 +34,9 @@ func ConnectDB() {
 
     MongoClient = client
     MongoDB = client.Database(dbName)
+
+    	PortfolioCollection = MongoDB.Collection("portfolio")
+
 
     log.Println("Connected to MongoDB:", dbName)
 }

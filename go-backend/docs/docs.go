@@ -197,6 +197,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/portfolio": {
+            "get": {
+                "description": "Returns the portfolio data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "portfolio"
+                ],
+                "summary": "Get portfolio",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Portfolio"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a portfolio by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "portfolio"
+                ],
+                "summary": "Update portfolio",
+                "parameters": [
+                    {
+                        "description": "Portfolio data",
+                        "name": "portfolio",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Portfolio"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Portfolio"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/posts": {
             "get": {
                 "description": "Returns a list of all blog posts",
@@ -540,6 +610,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Achievement": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "organizer": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Category": {
             "type": "object",
             "properties": {
@@ -553,6 +637,82 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Certification": {
+            "type": "object",
+            "properties": {
+                "issuer": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Contact": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "linkedin": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CurrentWork": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Education": {
+            "type": "object",
+            "properties": {
+                "courses": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "degree": {
+                    "type": "string"
+                },
+                "institution": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Experience": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "location": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -579,6 +739,68 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Portfolio": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "achievements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Achievement"
+                    }
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "certifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Certification"
+                    }
+                },
+                "contact": {
+                    "$ref": "#/definitions/models.Contact"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "currentWorks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CurrentWork"
+                    }
+                },
+                "education": {
+                    "$ref": "#/definitions/models.Education"
+                },
+                "experiences": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Experience"
+                    }
+                },
+                "location": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "portraitUrl": {
+                    "type": "string"
+                },
+                "skills": {
+                    "$ref": "#/definitions/models.Skills"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -631,6 +853,59 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Skills": {
+            "type": "object",
+            "properties": {
+                "cloud": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "devops": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "monitoring": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "networking": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "scripting": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "security": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "systems": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "virtualization": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

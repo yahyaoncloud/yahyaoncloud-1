@@ -5,19 +5,32 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { environment } from "~/environments/environment";
 import { Edit, Trash2 } from "lucide-react";
-import dummyImage from "~/assets/yahya_glass.png"; // Adjust the path as necessary
+import { marked } from "marked";
+import { useEffect, useState } from "react";
+import dummyImage from "~/assets/yahya_glass.png";
 
-// Loader for fetching post details
+// Configure marked for safe markdown rendering
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+  sanitize: true,
+});
+
+// Loader for fetching post details with explicit UTF-8 encoding
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) return json({ error: "Post ID is required" }, { status: 400 });
 
   try {
-    const res = await fetch(`${environment.GO_BACKEND_URL}/posts/${id}`);
+    const res = await fetch(`${environment.GO_BACKEND_URL}/posts/${id}`, {
+      headers: { "Accept-Charset": "utf-8" },
+    });
     if (!res.ok) throw new Error("Post not found");
-    const post = await res.json();
+    const text = await res.text();
+    const post = JSON.parse(text);
     return json({ post });
-  } catch {
+  } catch (error) {
+    console.error("Loader error:", error);
     return json({ error: "Failed to load post" }, { status: 500 });
   }
 }
@@ -25,6 +38,22 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function AdminPostDetail() {
   const { theme } = useTheme();
   const { post, error } = useLoaderData<typeof loader>();
+  const [markdownContent, setMarkdownContent] = useState<string>("");
+
+  // Convert markdown content to HTML with encoding handling
+  useEffect(() => {
+    if (post?.content) {
+      try {
+        const htmlContent = marked.parse(post.content);
+        setMarkdownContent(htmlContent);
+      } catch (err) {
+        console.error("Markdown parsing error:", err);
+        setMarkdownContent("<p>Error rendering content</p>");
+      }
+    } else {
+      setMarkdownContent("<p>No content available</p>");
+    }
+  }, [post]);
 
   if (error) {
     return (
@@ -42,11 +71,13 @@ export default function AdminPostDetail() {
   }
 
   const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    dateStr
+      ? new Date(dateStr).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "Date not available";
 
   return (
     <div
@@ -61,7 +92,7 @@ export default function AdminPostDetail() {
               theme === "dark" ? "text-white" : "text-gray-900"
             }`}
           >
-            {post.title}
+            {post.title || "Untitled Post"}
           </h1>
           <div className="flex space-x-2">
             <Link
@@ -97,7 +128,7 @@ export default function AdminPostDetail() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`rounded-lg p-6 shadow ${
+          className={`rounded-lg p-6 shadow overflow-clip ${
             theme === "dark"
               ? "bg-gray-800 text-gray-100"
               : "bg-white text-gray-900"
@@ -106,7 +137,7 @@ export default function AdminPostDetail() {
           {post.coverImage?.url && (
             <img
               src={post.coverImage.url || dummyImage}
-              alt={post.coverImage.altText || post.title}
+              alt={post.coverImage.altText || post.title || "Post image"}
               className="w-full h-64 object-cover rounded mb-4"
             />
           )}
@@ -116,24 +147,30 @@ export default function AdminPostDetail() {
             {post.categoryId || "Uncategorized"}
           </div>
 
-          <p className="mb-4 whitespace-pre-line">{post.summary}</p>
+          <p className="mb-4 whitespace-pre-line">
+            {post.summary || "No summary available"}
+          </p>
 
-          <div className="mb-4 whitespace-pre-line text-sm leading-relaxed">
-            {post.content}
-          </div>
+          <div
+            className={`prose-sm max-w-none flex-wrap break-words ${
+              theme === "dark" ? "text-gray-100" : "text-gray-900 prose-light"
+            }`}
+            style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
+            dangerouslySetInnerHTML={{ __html: markdownContent }}
+          />
 
           {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-4">
               {post.tags.map((tag: any) => (
                 <span
-                  key={tag.id || tag.name}
+                  key={tag.id || tag.name || Math.random()}
                   className={`px-2 py-1 rounded text-xs font-medium ${
                     theme === "dark"
                       ? "bg-gray-700 text-gray-200"
                       : "bg-gray-200 text-gray-700"
                   }`}
                 >
-                  #{tag.name}
+                  #{tag.name || "Unknown"}
                 </span>
               ))}
             </div>
@@ -152,9 +189,9 @@ export default function AdminPostDetail() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {post.gallery.map((img: any) => (
                 <img
-                  key={img.id}
+                  key={img.id || Math.random()}
                   src={img.url || dummyImage}
-                  alt={img.altText}
+                  alt={img.altText || "Gallery image"}
                   className="w-full object-cover rounded-lg shadow"
                 />
               ))}

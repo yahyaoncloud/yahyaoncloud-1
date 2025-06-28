@@ -23,6 +23,8 @@ import (
 	"github.com/rs/cors"
 )
 
+
+
 func main() {
     // Load environment variables from .env
     if err := godotenv.Load(); err != nil {
@@ -49,6 +51,12 @@ func main() {
     // Register Swagger docs route before starting the server
     r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
-    handler := cors.Default().Handler(r)
+    handler := cors.New(cors.Options{
+    AllowedOrigins:   []string{"http://localhost:5173"},
+    AllowCredentials: true,
+}).Handler(r)
+
     log.Fatal(http.ListenAndServe(":"+port, handler))
+
+    
 }

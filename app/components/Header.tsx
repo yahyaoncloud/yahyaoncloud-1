@@ -2,7 +2,7 @@ import { Link } from "@remix-run/react";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme } from "../Contexts/ThemeContext";
-import Logo from "../assets/yoc.png";
+import Logo from "../assets/yoc-logo.png";
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
@@ -35,8 +35,8 @@ export default function Header() {
 
   const navLinks = [
     { name: "Blog", href: "/admin/home" },
-    { name: "Posts", href: "/admin/posts" },
-    { name: "Create", href: "/admin/create" },
+    // { name: "Posts", href: "/admin/posts" },
+    // { name: "Create", href: "/admin/create" },
     { name: "About", href: "/admin/about" },
     { name: "Contact", href: "/admin/contact" },
     { name: "Guestbook", href: "/admin/guestbook" },
