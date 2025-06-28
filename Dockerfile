@@ -14,9 +14,11 @@ RUN npm run build
 RUN rm -rf node_modules .cache
 
 # --- Stage 2: Build Go Backend ---
-FROM golang:1.22-alpine as go-builder
+FROM golang:1.22.4-alpine3.20 as go-builder
 
 WORKDIR /backend
+
+RUN apk --no-cache add ca-certificates
 
 COPY go-backend go-backend
 WORKDIR /backend/go-backend
