@@ -1,31 +1,88 @@
+/**
+ * Project: yahyaoncloud Official Blog Platform
+ * File: app/root.tsx
+ * Description: Main root layout for the entire application
+ */
+
 import {
-  Meta,
   Links,
+  LiveReload,
+  Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  LiveReload,
+  useLoaderData,
 } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Toaster } from "sonner";
+import { useEffect } from "react";
+import AOS from "aos";
 
-// Optional: Global CSS via import (e.g., Tailwind)
+// Import styles
 import "./styles/tailwind.css";
+import { ThemeProvider } from "./Contexts/ThemeContext";
 
-export const meta: MetaFunction = () => [
-  { title: "My Remix App" },
-  { name: "viewport", content: "width=device-width, initial-scale=1" },
-  { name: "description", content: "A Remix application" },
-];
+export const meta: MetaFunction = () => {
+  return [
+    { title: "YahyaOnCloud Blog" },
+    {
+      name: "description",
+      content: "yahyaoncloud Official Blog Platform built with RemixJS",
+    },
+    { name: "viewport", content: "width=device-width,initial-scale=1" },
+    { property: "og:title", content: "yahyaoncloud Official Blog" },
+    {
+      property: "og:description",
+      content: "yahyaoncloud Official Blog Platform built with RemixJS",
+    },
+    { property: "og:type", content: "website" },
+  ];
+};
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  // You can add server-side logic here to determine theme
+  // For now, we'll default to dark mode
+  return json({
+    theme: "dark",
+  });
+}
 
 export default function App() {
+  const { theme } = useLoaderData<typeof loader>();
+
+  // Initialize AOS (Animate on Scroll)
+  useEffect(() => {
+    AOS.init({
+      once: true,
+      duration: 700,
+      easing: "ease-out-cubic",
+    });
+  }, []);
+
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
+    <html lang="en" className={theme}>
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white transition-colors">
-        <Outlet />
+      <body
+        className={`${
+          theme === "dark"
+            ? "bg-dark-900 text-dark-100"
+            : "bg-white text-dark-800"
+        } min-h-screen transition-colors duration-300`}
+      >
+        <ThemeProvider>
+          <Outlet />
+        </ThemeProvider>
+        <Toaster position="top-right" richColors />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
