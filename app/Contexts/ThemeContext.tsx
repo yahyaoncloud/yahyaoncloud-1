@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   type ReactNode,
+  useMemo,
 } from "react";
 
 type Theme = "light" | "dark";
@@ -14,59 +15,55 @@ interface ThemeContextType {
   setTheme: (theme: Theme) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType | null>(null);
 
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
-export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
+const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const [theme, setTheme] = useState<Theme>("light");
 
+  // Set theme only on client
   useEffect(() => {
-    // Only run on client
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    const systemTheme: Theme = window.matchMedia("(prefers-color-scheme: dark)")
+    const saved = localStorage.getItem("theme") as Theme | null;
+    const system: Theme = window.matchMedia?.("(prefers-color-scheme: dark)")
       .matches
       ? "dark"
       : "light";
-    const initialTheme: Theme = savedTheme || systemTheme;
+    const initial = saved || system;
 
-    setThemeState(initialTheme);
-    setMounted(true);
+    setTheme(initial);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-
-    const root = document.documentElement;
-    root.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle("dark", theme === "dark");
     localStorage.setItem("theme", theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
-  const toggleTheme = () => {
-    setThemeState((prev) => (prev === "light" ? "dark" : "light"));
-  };
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-  };
-
-  const value: ThemeContextType = { theme, toggleTheme, setTheme };
-
-  // ⚠️ Block rendering until mounted on client — avoids SSR crash
-  if (!mounted) return null;
+  const value = useMemo(
+    () => ({
+      theme,
+      toggleTheme,
+      setTheme,
+    }),
+    [theme]
+  );
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
-}
+};
 
-export function useTheme(): ThemeContextType {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
+const useTheme = (): ThemeContextType => {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
-  return context;
-}
+  return ctx;
+};
+
+export { ThemeProvider, useTheme };

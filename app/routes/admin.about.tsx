@@ -98,7 +98,6 @@ export default function AdminAbout() {
         >
           About Yahya
         </h1>
-        
       </header>
 
       <div className="max-w-5xl mx-auto">

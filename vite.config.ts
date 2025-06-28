@@ -21,10 +21,4 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
-  // ssr: {
-  //   noExternal: ["mongoose", "react-syntax-highlighter"],
-  // },
-  // optimizeDeps: {
-  //   include: ["react-syntax-highlighter"],
-  // },
 });
