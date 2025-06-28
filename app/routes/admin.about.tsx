@@ -19,7 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const res = await fetch(`${environment.GO_BACKEND_URL}/portfolio`);
   if (!res.ok) throw new Error("Failed to fetch portfolio");
   const data: Portfolio = await res.json();
-  console.log(data, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>..");
+  console.log(data.portraitUrl, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>..");
   console.log("Calling API:", `${environment.GO_BACKEND_URL}/portfolio`);
 
   return json(data);
@@ -36,8 +36,8 @@ export default function AdminAbout() {
         theme === "dark" ? "bg-gray-900" : "bg-white"
       }`}
     >
-      <div className="max-w-7xl mx-auto p-5">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 min-h-screen items-center">
+      <div className="max-w-7xl mx-auto p-10 h-full flex items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 min-h-screen items-start ">
           {/* Left Side - Profile */}
           <motion.div
             className="flex flex-col items-center lg:items-start text-center lg:text-left"

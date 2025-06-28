@@ -58,7 +58,7 @@ export default function Header() {
             <span
               className={`${
                 scrolled ? "md:text-xl text-lg" : "md:text-3xl text-xl"
-              } transition-all ease-in-out mrs-saint-delafield-regular font-thin  text-gray-900 dark:text-white group-hover:text-navy-600 dark:group-hover:text-copper-400 duration-400`}
+              } transition-all ease-in-out mrs-saint-delafield-regular font-thin  text-gray-900 dark:text-white group-hover:text-navy-600 dark:group-hover:text-blue-400 duration-400`}
             >
               Yahya On Cloud
             </span>
@@ -70,10 +70,10 @@ export default function Header() {
               <Link
                 key={link.name}
                 to={link.href}
-                className="text-gray-600 hover:text-navy-600 dark:text-gray-300 dark:hover:text-copper-400 font-medium transition-colors duration-200 relative group"
+                className="text-gray-600 hover:text-navy-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors duration-200 relative group"
               >
                 {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-navy-600 dark:bg-copper-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-navy-600 dark:hover:text-blue-400  group-hover:w-full transition-all duration-300"></span>
               </Link>
             ))}
           </nav>

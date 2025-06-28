@@ -253,7 +253,7 @@ export const PalestineSupportSection = ({ theme }: Props) => {
 
   return (
     <section
-      className={`max-w-7xl mx-auto p-8 ${bg} rounded-xl shadow-sm mb-8`}
+      className={`max-w-7xl mx-auto p-8 ${bg} rounded-xl shadow-sm pb-8`}
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         {/* Text Block */}
@@ -312,7 +312,7 @@ export default function Homepage() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${
+      className={`min-h-screen transition-colors duration-300  pb-8 ${
         theme === "dark" ? "bg-gray-900" : "bg-gray-50"
       }`}
     >
