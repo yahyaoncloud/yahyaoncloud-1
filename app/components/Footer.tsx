@@ -14,18 +14,20 @@ import {
 
 import Logo from "../assets/yoc.png";
 import { useEffect, useState } from "react";
+import { useTheme } from "../Contexts/ThemeContext";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [scrolled, setScrolled] = useState(false);
+  const { theme } = useTheme();
 
   const navLinks = [
-    { name: "Blog", href: "/blog" },
+    { name: "Home", href: "/blog" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
     { name: "Guestbook", href: "/guestbook" },
     { name: "Privacy", href: "/privacy" },
-    { name: "RSS", href: "/rss.xml" },
+    // { name: "RSS", href: "/rss.xml" },
   ];
 
   const socialLinks = [
@@ -37,7 +39,7 @@ export default function Footer() {
     { name: "GitHub", href: "https://github.com/yahyaoncloud", icon: Github },
     {
       name: "LinkedIn",
-      href: "https://linkedin.com/in/yahyaoncloud",
+      href: "https://linkedin.com/in/ykinwork1",
       icon: Linkedin,
     },
     {
@@ -120,7 +122,7 @@ export default function Footer() {
               </a>
             </div>
 
-            <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+            {/* <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
               <Rss size={16} />
               <Link
                 to="/rss.xml"
@@ -128,7 +130,7 @@ export default function Footer() {
               >
                 Subscribe to RSS feed
               </Link>
-            </div>
+            </div> */}
           </div>
 
           {/* Quick Links */}
@@ -152,7 +154,11 @@ export default function Footer() {
 
           {/* Social Links */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+            <h3
+              className={`font-semibold mb-4 ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
               Connect
             </h3>
             <div className="grid grid-cols-3 gap-3">
@@ -164,8 +170,12 @@ export default function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-gray-100 hover:bg-navy-100 dark:bg-gray-800 dark:hover:bg-copper-900/20 text-gray-600 hover:text-navy-600 dark:text-gray-400 dark:hover:text-copper-400 transition-all duration-200 group"
-                    aria-label={social.name}
+                    className={`p-2 items-center justify-center flex rounded-lg transition-all duration-200 group ${
+                      theme === "dark"
+                        ? "bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-blue-400"
+                        : "bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600"
+                    }`}
+                    aria-label={`Connect on ${social.name}`}
                   >
                     <IconComponent
                       size={20}

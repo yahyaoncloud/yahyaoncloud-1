@@ -1,4 +1,47 @@
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+
+// Work in progress animation variants
+const variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7 } },
+};
+
+export default function Guestbook() {
+  return (
+    <div className="min-h-screen flex items-center  justify-center bg-gray-100 dark:bg-gray-900">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={variants}
+        className="items-center gap-4 absolute top-50% left-50% "
+      >
+        <div className="flex flex-col items-center space-y-4 p-20">
+          <Loader2 size={48} className="text-blue-500 animate-spin" />
+          <motion.h1
+            className="text-2xl font-bold text-gray-900 dark:text-gray-100"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Work in progress
+          </motion.h1>
+          <motion.p
+            className="text-gray-600 dark:text-gray-400"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            This page is under construction. Please check back soon!
+          </motion.p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/*
+import { motion } from "framer-motion";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useTheme } from "../Contexts/ThemeContext";
 import { useState } from "react";
@@ -102,120 +145,9 @@ export default function Guestbook() {
   return (
     <div className={`min-h-screen ${bg} font-sans`}>
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
-        {/* Header */}
-        <header>
-          <h1
-            className={`text-3xl font-bold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
-            }`}
-          >
-            GuestBook
-          </h1>
-          <p
-            className={`mt-2 text-base ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            Welcome to my guestbook! Feel free to leave a message, share your
-            thoughts, or just say hello. I appreciate your feedback and enjoy
-            hearing from visitors.
-          </p>
-        </header>
-
-        {/* Messages */}
-        <div className="space-y-4">
-          {comments.length === 0 ? (
-            <p className={`text-sm text-center ${subtext}`}>No messages yet.</p>
-          ) : (
-            comments.map((c) => (
-              <motion.div
-                key={c.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex gap-3"
-              >
-                <div className="w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
-                  {c.author.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${text}`}>
-                      {c.author.name}
-                    </span>
-                    <span className={`text-xs ${subtext}`}>
-                      {formatTime(c.createdAt)}
-                    </span>
-                  </div>
-                  <p className={`text-sm ${text}`}>{c.content}</p>
-                </div>
-              </motion.div>
-            ))
-          )}
-        </div>
-
-        {/* Comment box */}
-        <div className={`pt-6 border-t ${border}`}>
-          {user ? (
-            <Form method="post" className="flex items-start gap-3">
-              <textarea
-                name="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={2}
-                placeholder="Write your message..."
-                className={`flex-1 p-2 rounded-md text-sm border ${border} ${bg} ${text} focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    e.currentTarget.form?.requestSubmit();
-                  }
-                }}
-              />
-              <motion.button
-                type="submit"
-                disabled={!content.trim()}
-                whileHover={content.trim() ? { scale: 1.05 } : {}}
-                whileTap={content.trim() ? { scale: 0.95 } : {}}
-                className={`p-2 mt-1 rounded-md ${
-                  content.trim()
-                    ? "bg-blue-500 hover:bg-blue-600 text-white"
-                    : "bg-gray-300 text-gray-500"
-                }`}
-              >
-                <Send size={16} />
-              </motion.button>
-            </Form>
-          ) : (
-            <a
-              href="/auth/github"
-              className={`inline-flex items-center gap-2 border ${border} rounded-md px-3 py-2 text-sm ${text} hover:bg-blue-50`}
-            >
-              <Github size={16} />
-              Sign in with GitHub to post
-            </a>
-          )}
-
-          {/* Feedback */}
-          {actionData?.error && (
-            <motion.p
-              className="text-xs text-red-500 mt-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {actionData.error}
-            </motion.p>
-          )}
-          {actionData?.success && (
-            <motion.p
-              className="text-xs text-green-500 mt-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {actionData.success}
-            </motion.p>
-          )}
-        </div>
+        // ...rest of the original code
       </div>
     </div>
   );
 }
+*/

@@ -29,3 +29,12 @@ export interface CurrentWork {
   title: string;
   description: string;
 }
+
+export interface SocialLinks {
+  linkedin: string;
+  github: string;
+  twitter: string;
+  youtube: string;
+  instagram: string;
+  email: string;
+}

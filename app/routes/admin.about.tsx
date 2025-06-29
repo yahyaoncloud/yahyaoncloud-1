@@ -13,6 +13,7 @@ import type {
   Skills,
   Education,
   Achievement,
+  SocialLinks,
 } from "../Types/portfolio";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -49,13 +50,13 @@ export default function AdminAbout() {
               <img
                 src={portraitUrl}
                 alt={name}
-                className="w-64 h-64 lg:w-80 lg:h-80 rounded-2xl object-cover shadow-2xl"
+                className="w-64 h-64 lg:w-80 lg:h-80 rounded-2xl object-cover border border-blue-500"
               />
             </div>
 
             <div className="max-w-md">
               <h1
-                className={`text-4xl lg:text-5xl font-light mb-6 ${
+                className={`text-4xl lg:text-5xl prose mb-6 ${
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}
               >
@@ -69,6 +70,11 @@ export default function AdminAbout() {
               >
                 {bio}
               </p>
+            </div>
+            {/* Social Links */}
+            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
+              
+
             </div>
           </motion.div>
 
@@ -86,7 +92,7 @@ export default function AdminAbout() {
                 transition={{ duration: 0.6, delay: 0.8 }}
               >
                 <h2
-                  className={`text-3xl font-light mb-8 ${
+                  className={`text-3xl prose mb-8 ${
                     theme === "dark" ? "text-white" : "text-gray-900"
                   }`}
                 >
@@ -140,6 +146,50 @@ export default function AdminAbout() {
                           {exp.description}
                         </p>
                       )}
+                    </div>
+                  ))}
+                </div>
+              </motion.section>
+            )}
+            {/* Current Focus */}
+            {currentWorks && currentWorks.length > 0 && (
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+              >
+                <h2
+                  className={`text-3xl prose mb-8 ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  Currently Working On
+                </h2>
+
+                <div className="space-y-4">
+                  {currentWorks.slice(0, 2).map((work, index) => (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-xl border transition-colors ${
+                        theme === "dark"
+                          ? "border-gray-800 bg-gray-800/30"
+                          : "border-gray-200 bg-gray-50/50"
+                      }`}
+                    >
+                      <h3
+                        className={`font-medium text-md mb-2 ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {work.title || work.name}
+                      </h3>
+                      <p
+                        className={`text-sm ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {work.description}
+                      </p>
                     </div>
                   ))}
                 </div>

@@ -12,6 +12,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
 } from "@remix-run/react";
 import type {
   LinksFunction,
@@ -26,6 +27,7 @@ import AOS from "aos";
 // Import styles
 import "./styles/tailwind.css";
 import { ThemeProvider } from "./Contexts/ThemeContext";
+import NotFound from "./routes/404";
 
 export const meta: MetaFunction = () => {
   return [
@@ -86,6 +88,36 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+      </body>
+    </html>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  let status = 500;
+  let statusText = "Something went wrong";
+
+  if (
+    error &&
+    typeof error === "object" &&
+    "status" in error &&
+    "statusText" in error
+  ) {
+    status = (error as any).status;
+    statusText = (error as any).statusText;
+  }
+
+  return (
+    <html lang="en">
+      <head>
+        <title>{status} - Not Found</title>
+      </head>
+      <body>
+        <NotFound />
+        <main className="flex flex-col items-center justify-center h-screen text-center"></main>
+        <Scripts />
       </body>
     </html>
   );

@@ -15,6 +15,7 @@ import {
   Globe,
   HandHeart,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
 import ArticleCard from "../components/ArticleCard";
 import { environment } from "../environments/environment";
 import type { Category, Post } from "../Types/types";
@@ -43,27 +44,51 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 // Hero Section - Main introduction banner
 const HeroSection = () => {
+  // Animation variants for the hero section
+  const heroVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
+
   return (
-    <section
+    <motion.section
       className="text-center py-20 relative text-white"
       style={{
         backgroundImage: `url(${dummyImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
+      initial="hidden"
+      animate="onscreen"
     >
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/70 via-cyan-900/60 to-indigo-900/80 dark:from-black/10 dark:via-gray-900/70 dark:to-black" />
-      <div className="relative max-w-4xl mx-auto px-4">
-        <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-          Welcome to Yahya&apos;s Engineering Hub
-        </h1>
-        <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 leading-relaxed">
+      <motion.div
+        className="relative max-w-4xl mx-auto px-4"
+        initial="hidden"
+        animate="visible"
+        variants={heroVariants}
+      >
+        <motion.h1
+          className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight"
+          variants={heroVariants}
+        >
+          Welcome to Yahya's Engineering Hub
+        </motion.h1>
+        <motion.p
+          className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 leading-relaxed"
+          variants={heroVariants}
+          transition={{ delay: 0.2 }}
+        >
           Sharing Experiences, Engineering ideas, networks, and cloud automation
           — discover posts crafted with detail and technical expertise.
-        </p>
-      </div>
-    </section>
+        </motion.p>
+      </motion.div>
+    </motion.section>
   );
 };
 
@@ -81,56 +106,85 @@ const CategoryFilterSection = ({
 }) => {
   const [showFilters, setShowFilters] = useState(false);
 
+  // Animation variants for filter buttons
+  const buttonVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      x: 0,
+      transition: { delay: i * 0.1, duration: 0.4, ease: "easeOut" },
+    }),
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
       {/* Mobile filter toggle */}
-      <div className="md:hidden flex justify-center mb-6">
-        <button
+      <motion.div
+        className="md:hidden flex justify-center mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.button
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           <Filter size={16} />
           <span className="font-medium">
             {showFilters ? "Hide Categories" : "Show Categories"}
           </span>
           {showFilters ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Category filter buttons */}
-      <div
-        className={`flex-wrap gap-3 items-center justify-center md:flex ${
-          showFilters ? "flex" : "hidden"
-        } md:!flex`}
-      >
-        <button
-          onClick={() => setSelectedCategory(null)}
-          className={`px-6 py-3 text-sm font-semibold rounded-full border-2 transition-all duration-200 ${
-            selectedCategory === null
-              ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-700 dark:border-blue-500 shadow-lg"
-              : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-          }`}
+      <AnimatePresence>
+        <motion.div
+          className={`flex-wrap gap-3 items-center justify-center md:flex ${
+            showFilters ? "flex" : "hidden"
+          } md:!flex`}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
         >
-          All Posts
-        </button>
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() =>
-              setSelectedCategory(
-                selectedCategory === cat.name ? null : cat.name
-              )
-            }
+          <motion.button
+            custom={0}
+            variants={buttonVariants}
+            whileHover="hover"
+            onClick={() => setSelectedCategory(null)}
             className={`px-6 py-3 text-sm font-semibold rounded-full border-2 transition-all duration-200 ${
-              selectedCategory === cat.name
+              selectedCategory === null
                 ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-700 dark:border-blue-500 shadow-lg"
                 : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
             }`}
           >
-            {cat.name}
-          </button>
-        ))}
-      </div>
+            All Posts
+          </motion.button>
+          {categories.map((cat, index) => (
+            <motion.button
+              key={cat.id}
+              custom={index + 1}
+              variants={buttonVariants}
+              whileHover="hover"
+              onClick={() =>
+                setSelectedCategory(
+                  selectedCategory === cat.name ? null : cat.name
+                )
+              }
+              className={`px-6 py-3 text-sm font-semibold rounded-full border-2 transition-all duration-200 ${
+                selectedCategory === cat.name
+                  ? "bg-blue-600 text-white border-blue-600 dark:bg-blue-700 dark:border-blue-500 shadow-lg"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+              }`}
+            >
+              {cat.name}
+            </motion.button>
+          ))}
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 };
@@ -145,55 +199,83 @@ const ArticlesGridSection = ({
   categories: Category[];
   theme: string;
 }) => {
+  // Animation variants for article cards
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" },
+    }),
+    hover: { scale: 1.02, transition: { duration: 0.3 } },
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-4 py-12">
       {/* Section header */}
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+      <motion.div
+        className="text-center mb-12"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2 className="text-4xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           Latest Articles
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Dive into technical insights, cloud automation, and engineering
           solutions
         </p>
-      </div>
+      </motion.div>
 
       {/* Posts grid */}
       <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((article, index) => {
-          // Every 6th item spans 2 columns on large screens for visual variety
-          const spanClass = index % 6 === 0 ? "lg:col-span-2" : "lg:col-span-1";
+        <AnimatePresence>
+          {posts.map((article, index) => {
+            const spanClass =
+              index % 6 === 0 ? "lg:col-span-2" : "lg:col-span-1";
 
-          return (
-            <div
-              key={article.id}
-              className={`group transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl min-h-[280px] ${spanClass}`}
-            >
-              <ArticleCard
-                post={{
-                  _id: article.id,
-                  title: article.title,
-                  slug: article.slug ?? article.id,
-                  summary: article.summary,
-                  excerpt: article.summary,
-                  coverImage: article.coverImage?.url || dummyImage,
-                  createdAt: article.createdAt,
-                  category:
-                    categories.find((c: Category) => c.id === article.catID)
-                      ?.name || "Uncategorized",
-                  tags: article.tags?.map((tagObj) =>
-                    typeof tagObj === "string" ? tagObj : tagObj.name
-                  ),
-                }}
-              />
-            </div>
-          );
-        })}
+            return (
+              <motion.div
+                key={article.id}
+                custom={index}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                className={`group min-h-[280px] ${spanClass}`}
+              >
+                <ArticleCard
+                  post={{
+                    _id: article.id,
+                    title: article.title,
+                    slug: article.slug ?? article.id,
+                    summary: article.summary,
+                    excerpt: article.summary,
+                    coverImage: article.coverImage?.url || dummyImage,
+                    createdAt: article.createdAt,
+                    category:
+                      categories.find((c: Category) => c.id === article.catID)
+                        ?.name || "Uncategorized",
+                    tags: article.tags?.map((tagObj) =>
+                      typeof tagObj === "string" ? tagObj : tagObj.name
+                    ),
+                  }}
+                />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       {/* Empty state */}
       {posts.length === 0 && (
-        <div className="text-center py-16">
+        <motion.div
+          className="text-center py-16"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="text-gray-400 dark:text-gray-600 mb-4">
             <Star size={48} className="mx-auto mb-4" />
           </div>
@@ -204,7 +286,7 @@ const ArticlesGridSection = ({
             Try selecting a different category or check back later for new
             content.
           </p>
-        </div>
+        </motion.div>
       )}
     </section>
   );
@@ -251,13 +333,32 @@ export const PalestineSupportSection = ({ theme }: Props) => {
       ? "bg-gray-700 hover:bg-gray-600 text-white"
       : "bg-gray-100 hover:bg-gray-200 text-gray-900";
 
+  // Animation variants for support links
+  const linkVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      x: 0,
+      transition: { delay: i * 0.1, duration: 0.4, ease: "easeOut" },
+    }),
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+  };
+
   return (
-    <section
+    <motion.section
       className={`max-w-7xl mx-auto p-8 ${bg} rounded-xl shadow-sm pb-8`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         {/* Text Block */}
-        <div className="md:w-1/3">
+        <motion.div
+          className="md:w-1/3"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="flex items-center gap-2 mb-2 text-sm font-medium">
             <HandHeart size={16} className="text-red-500" />
             <span className={textAccent}>Solidarity</span>
@@ -268,34 +369,40 @@ export const PalestineSupportSection = ({ theme }: Props) => {
           <p className={`text-sm mt-1 ${textSecondary}`}>
             Every link makes a difference — donate or learn more.
           </p>
-        </div>
+        </motion.div>
 
         {/* Support Links */}
         <div className="md:w-2/3 flex flex-wrap gap-3">
-          {supportLinks.map((link) => {
+          {supportLinks.map((link, index) => {
             const Icon = link.icon;
             const iconColor =
               link.type === "donation" ? "text-red-500" : "text-blue-500";
 
             return (
-              <a
+              <motion.a
                 key={link.name}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                custom={index}
+                variants={linkVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors ${linkBg}`}
               >
                 <Icon size={16} className={iconColor} />
                 <span>{link.name}</span>
                 <ExternalLink size={12} className="opacity-70" />
-              </a>
+              </motion.a>
             );
           })}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };
+
 // Main Homepage Component
 export default function Homepage() {
   const { theme } = useTheme();
@@ -312,7 +419,7 @@ export default function Homepage() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300  pb-8 ${
+      className={`min-h-screen transition-colors duration-300 pb-8 ${
         theme === "dark" ? "bg-gray-900" : "bg-gray-50"
       }`}
     >
@@ -334,7 +441,7 @@ export default function Homepage() {
         theme={theme}
       />
 
-      {/* 4. Palestine Support Section - Solidarity section (moved to end) */}
+      {/* 4. Palestine Support Section - Solidarity section */}
       <PalestineSupportSection theme={theme} />
     </div>
   );

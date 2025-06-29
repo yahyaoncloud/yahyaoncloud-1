@@ -94,9 +94,9 @@ export default function AdminPostDetail() {
           >
             {post.title || "Untitled Post"}
           </h1>
-          <div className="flex space-x-2">
+          {/* <div className="flex space-x-2">
             <Link
-              to={`/admin/edit/${post.id}`}
+              to={`/admin/update/${post.id}`}
               className={`p-2 rounded-md ${
                 theme === "dark"
                   ? "bg-blue-600 hover:bg-blue-700"
@@ -121,7 +121,7 @@ export default function AdminPostDetail() {
                 <Trash2 size={16} />
               </motion.button>
             </Form>
-          </div>
+          </div> */}
         </header>
 
         <motion.div
@@ -201,7 +201,7 @@ export default function AdminPostDetail() {
 
         <div className="mt-8">
           <Link
-            to="/admin/posts"
+            to="/admin/home"
             className={`inline-block px-4 py-2 rounded-md font-medium mt-4 ${
               theme === "dark"
                 ? "bg-green-600 hover:bg-green-700 text-white"
