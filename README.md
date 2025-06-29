@@ -37,11 +37,12 @@ project-root/
 
 Blog homepage:
 
-![Blog Homepage](./snapshot/blog-home.png)
+![Blog Homepage](./snapshots/blog-home.png)
 
 ## Features
 
 ### Blog System
+
 - Markdown-based content with image embedding
 - Cover image upload with live preview
 - SEO metadata (title, slug, description, keywords)
@@ -49,12 +50,14 @@ Blog homepage:
 - Public read-only access to all published content
 
 ### Admin Interface
+
 - Protected routes under `/admin`
 - Access restricted to GitHub user `tunkstun` or email `ykinwork1@gmail.com`
 - Blog post management (Create, Read, Update, Delete)
 - Real-time image drag-and-drop embedding
 
 ### Portfolio
+
 - View and edit personal info, experience, skills, and certifications
 - Data managed through secure backend endpoints
 
@@ -69,14 +72,14 @@ Blog homepage:
 
 ### Example API Endpoints
 
-| Method | Endpoint             | Description               |
-|--------|----------------------|---------------------------|
-| GET    | `/api/posts`         | List all blog posts       |
-| POST   | `/api/posts`         | Create a blog post        |
-| PUT    | `/api/posts/:id`     | Update a blog post        |
-| DELETE | `/api/posts/:id`     | Delete a blog post        |
-| GET    | `/portfolio`         | Retrieve portfolio data   |
-| PUT    | `/portfolio`         | Update portfolio data     |
+| Method | Endpoint         | Description             |
+| ------ | ---------------- | ----------------------- |
+| GET    | `/api/posts`     | List all blog posts     |
+| POST   | `/api/posts`     | Create a blog post      |
+| PUT    | `/api/posts/:id` | Update a blog post      |
+| DELETE | `/api/posts/:id` | Delete a blog post      |
+| GET    | `/portfolio`     | Retrieve portfolio data |
+| PUT    | `/portfolio`     | Update portfolio data   |
 
 Swagger documentation is available at `/swagger/index.html`.
 
@@ -96,6 +99,7 @@ Swagger documentation is available at `/swagger/index.html`.
 - **Storage:** Images stored on [Firebase Storage](https://firebase.google.com/products/storage)
 
 ### Local Development
+
 To run the application locally:
 
 ```bash
