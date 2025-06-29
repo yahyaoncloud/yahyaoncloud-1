@@ -74,7 +74,7 @@ type CurrentWork struct {
 }
 
 type SocialLinks struct {
-	LinkedIn string `json:"linkedin" bson:"linkedin"`
+	LinkedIn  string `json:"linkedin" bson:"linkedin"`
 	GitHub    string `json:"github" bson:"github"`
 	Website   string `json:"website" bson:"website"`
 	Twitter   string `json:"twitter" bson:"twitter"`
