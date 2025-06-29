@@ -17,13 +17,91 @@ import type {
 } from "../Types/portfolio";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const res = await fetch(`${environment.GO_BACKEND_URL}/portfolio`);
-  if (!res.ok) throw new Error("Failed to fetch portfolio");
-  const data: Portfolio = await res.json();
-  console.log(data.portraitUrl, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>..");
-  console.log("Calling API:", `${environment.GO_BACKEND_URL}/portfolio`);
+  try {
+    const res = await fetch(`${environment.GO_BACKEND_URL}/portfolio`);
+    console.log("Portfolio data loaded:", res);
+    if (!res.ok)
+      throw new Error(`Failed to fetch portfolio: ${res.statusText}`);
+    const data: Portfolio = await res.json();
 
-  return json(data);
+    // Sanitize data to remove circular references
+    const sanitizedData: Portfolio = {
+      name: data.name || "Unknown",
+      bio: data.bio || "No bio available",
+      portraitUrl: data.portraitUrl || "/default-portrait.jpg",
+      experiences: Array.isArray(data.experiences)
+        ? data.experiences.map((exp) => ({
+            title: exp.title || "",
+            period: exp.period || "",
+            description: Array.isArray(exp.description)
+              ? exp.description.slice(0) // Clone to avoid references
+              : exp.description
+              ? [String(exp.description)]
+              : [],
+          }))
+        : [],
+      skills: Array.isArray(data.skills)
+        ? data.skills.map((skill) => String(skill))
+        : Object.values(data.skills || {})
+            .flat()
+            .map((skill) =>
+              typeof skill === "string"
+                ? skill
+                : skill.name || skill.title || ""
+            )
+            .filter(Boolean),
+      currentWorks: Array.isArray(data.currentWorks)
+        ? data.currentWorks.map((work) => ({
+            title: work.title || work.name || "",
+            description: String(work.description || ""),
+          }))
+        : [],
+      certifications: Array.isArray(data.certifications)
+        ? data.certifications.map((cert) => ({
+            title: cert.title || cert.name || "",
+            issuer: cert.issuer || "",
+            year: cert.year || cert.date || "",
+          }))
+        : [],
+      hobbies: Array.isArray(data.hobbies)
+        ? data.hobbies.map((hobby) =>
+            typeof hobby === "string" ? hobby : hobby.name || hobby.title || ""
+          )
+        : [],
+      socialLinks: {
+        linkedin: String(data.socialLinks?.linkedin || ""),
+        github: String(data.socialLinks?.github || ""),
+        twitter: String(data.socialLinks?.twitter || ""),
+        youtube: String(data.socialLinks?.youtube || ""),
+        instagram: String(data.socialLinks?.instagram || ""),
+        email: String(data.socialLinks?.email || ""),
+      },
+    };
+
+    // Verify data is serializable
+    try {
+      JSON.stringify(sanitizedData);
+    } catch (e) {
+      console.error("Serialization error in portfolio data:", e);
+      throw new Error("Invalid portfolio data structure");
+    }
+
+    return json(sanitizedData);
+  } catch (error) {
+    console.error("Loader error:", error);
+    return json(
+      {
+        name: "",
+        bio: "",
+        portraitUrl: "",
+        experiences: [],
+        skills: [],
+        currentWorks: [],
+        socialLinks: {},
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export default function AdminAbout() {
@@ -72,10 +150,7 @@ export default function AdminAbout() {
               </p>
             </div>
             {/* Social Links */}
-            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-              
-
-            </div>
+            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4"></div>
           </motion.div>
 
           {/* Right Side - Experience */}

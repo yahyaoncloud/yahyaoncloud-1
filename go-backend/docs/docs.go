@@ -797,6 +797,9 @@ const docTemplate = `{
                 "skills": {
                     "$ref": "#/definitions/models.Skills"
                 },
+                "socialLinks": {
+                    "$ref": "#/definitions/models.SocialLinks"
+                },
                 "title": {
                     "type": "string"
                 },
@@ -906,6 +909,26 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "models.SocialLinks": {
+            "type": "object",
+            "properties": {
+                "github": {
+                    "type": "string"
+                },
+                "instagram": {
+                    "type": "string"
+                },
+                "linkedin": {
+                    "type": "string"
+                },
+                "twitter": {
+                    "type": "string"
+                },
+                "website": {
+                    "type": "string"
                 }
             }
         },

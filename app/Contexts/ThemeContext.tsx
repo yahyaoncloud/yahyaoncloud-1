@@ -21,34 +21,58 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
+const getInitialTheme = (): Theme => {
+  // Only run on client side
+  if (typeof window === "undefined") return "light";
+
+  const saved = localStorage.getItem("theme") as Theme | null;
+  if (saved) return saved;
+
+  // Check system preference
+  const system: Theme = window.matchMedia?.("(prefers-color-scheme: dark)")
+    .matches
+    ? "dark"
+    : "light";
+
+  return system;
+};
+
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [theme, setTheme] = useState<Theme>("light");
+  // Initialize with the correct theme immediately
+  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Set theme only on client
+  // Handle initial theme setup
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as Theme | null;
-    const system: Theme = window.matchMedia?.("(prefers-color-scheme: dark)")
-      .matches
-      ? "dark"
-      : "light";
-    const initial = saved || system;
+    const initialTheme = getInitialTheme();
+    setTheme(initialTheme);
 
-    setTheme(initial);
+    // Apply theme to document immediately
+    document.documentElement.classList.toggle("dark", initialTheme === "dark");
+
+    setIsInitialized(true);
   }, []);
 
+  // Handle theme changes after initialization
   useEffect(() => {
+    if (!isInitialized) return;
+
     document.documentElement.classList.toggle("dark", theme === "dark");
     localStorage.setItem("theme", theme);
-  }, [theme]);
+  }, [theme, isInitialized]);
 
   const toggleTheme = () =>
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
+
+  const handleSetTheme = (newTheme: Theme) => {
+    setTheme(newTheme);
+  };
 
   const value = useMemo(
     () => ({
       theme,
       toggleTheme,
-      setTheme,
+      setTheme: handleSetTheme,
     }),
     [theme]
   );

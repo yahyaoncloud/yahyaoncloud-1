@@ -5,7 +5,9 @@ export interface Portfolio {
   experiences: Experience[];
   certifications: Certification[];
   hobbies: Hobby[];
+  skills: string[];
   currentWorks: CurrentWork[];
+  socialLinks: SocialLinks;
 }
 
 export interface Experience {

@@ -18,6 +18,7 @@ type Portfolio struct {
 	Certifications []Certification    `json:"certifications" bson:"certifications"`
 	Education      Education          `json:"education" bson:"education"`
 	Skills         Skills             `json:"skills" bson:"skills"`
+	SocialLinks	   SocialLinks        `json:"socialLinks" bson:"socialLinks"`
 	Achievements   []Achievement      `json:"achievements" bson:"achievements"`
 	CurrentWorks   []CurrentWork      `json:"currentWorks" bson:"currentWorks"`
 	CreatedAt 	   time.Time 		  `json:"createdAt" bson:"createdAt"`
@@ -70,4 +71,12 @@ type Achievement struct {
 type CurrentWork struct {
 	Title       string `json:"title" bson:"title"`
 	Description string `json:"description" bson:"description"`
+}
+
+type SocialLinks struct {
+	LinkedIn string `json:"linkedin" bson:"linkedin"`
+	GitHub    string `json:"github" bson:"github"`
+	Website   string `json:"website" bson:"website"`
+	Twitter   string `json:"twitter" bson:"twitter"`
+	Instagram string `json:"instagram" bson:"instagram"`
 }
