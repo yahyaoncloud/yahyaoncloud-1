@@ -433,7 +433,7 @@ export default function AdminAbout() {
           </motion.div>
         </div>
       </div>
-      <style jsx>{`
+      {/* <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
@@ -447,7 +447,7 @@ export default function AdminAbout() {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: ${theme === "dark" ? "#6B7280" : "#9CA3AF"};
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 }
