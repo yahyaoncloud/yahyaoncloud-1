@@ -4,17 +4,13 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { environment } from "../environments/environment";
 import { useTheme } from "../Contexts/ThemeContext";
 import {
-  MapPin,
-  Calendar,
-  Code,
-  Coffee,
-  Linkedin,
-  Github,
-  Twitter,
-  Youtube,
-  Instagram,
-  Mail,
-} from "lucide-react";
+  FaInstagram,
+  FaGithub,
+  FaLinkedin,
+  FaYoutube,
+  FaTwitter,
+} from "react-icons/fa";
+import { MapPin, Calendar, Code, Coffee, Mail } from "lucide-react";
 
 import type {
   Portfolio,
@@ -97,12 +93,12 @@ export default function AdminAbout() {
   const { theme } = useTheme();
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen mx-auto p-10 dark:bg-gray-950">
+      <div className="max-w-7xl mx-auto ">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Profile */}
           <motion.div
-            className="flex flex-col rounded-2xl py-8 bg-slate-100 dark:bg-slate-800 items-center text-center lg:col-span-1"
+            className="flex flex-col rounded-2xl py-8 border border-gray-500 bg-slate-100 dark:bg-slate-900 items-center text-center lg:col-span-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -122,13 +118,13 @@ export default function AdminAbout() {
               {name}
             </h1>
             <p
-              className={`text-sm text-justify lg:text-base leading-relaxed px-4 ${
+              className={`text-sm/8 text-justify  leading-relaxed   lg:px-12 px-6 ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >
               {bio}
             </p>
-            <div className="mt-6 flex items-center space-x-4 text-sm">
+            {/* <div className="mt-6 flex items-center space-x-4 text-base">
               <div
                 className={`flex items-center space-x-1 ${
                   theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -145,7 +141,7 @@ export default function AdminAbout() {
                 <Coffee size={14} />
                 <span>Available</span>
               </div>
-            </div>
+            </div> */}
             {socialLinks && (
               <div className="mt-6 flex justify-center space-x-3">
                 {socialLinks.linkedin && (
@@ -159,7 +155,7 @@ export default function AdminAbout() {
                         : "bg-gray-100/80 hover:bg-blue-50 text-gray-600 hover:text-blue-600"
                     }`}
                   >
-                    <Linkedin size={18} />
+                    <FaLinkedin size={18} />
                   </a>
                 )}
                 {socialLinks.github && (
@@ -173,7 +169,7 @@ export default function AdminAbout() {
                         : "bg-gray-100/80 hover:bg-gray-200 text-gray-600 hover:text-black"
                     }`}
                   >
-                    <Github size={18} />
+                    <FaGithub size={18} />
                   </a>
                 )}
                 {socialLinks.twitter && (
@@ -187,7 +183,7 @@ export default function AdminAbout() {
                         : "bg-gray-100/80 hover:bg-blue-50 text-gray-600 hover:text-blue-500"
                     }`}
                   >
-                    <Twitter size={18} />
+                    <FaTwitter size={18} />
                   </a>
                 )}
                 {socialLinks.youtube && (
@@ -201,7 +197,7 @@ export default function AdminAbout() {
                         : "bg-gray-100/80 hover:bg-red-50 text-gray-600 hover:text-red-600"
                     }`}
                   >
-                    <Youtube size={18} />
+                    <FaYoutube size={18} />
                   </a>
                 )}
                 {socialLinks.instagram && (
@@ -215,7 +211,7 @@ export default function AdminAbout() {
                         : "bg-gray-100/80 hover:bg-pink-50 text-gray-600 hover:text-pink-600"
                     }`}
                   >
-                    <Instagram size={18} />
+                    <FaInstagram size={18} />
                   </a>
                 )}
                 {socialLinks.email && (
@@ -233,7 +229,6 @@ export default function AdminAbout() {
               </div>
             )}
           </motion.div>
-
           {/* Middle Column - Experience */}
           <motion.div
             className="lg:col-span-1 space-y-6"
@@ -248,7 +243,7 @@ export default function AdminAbout() {
                 }`}
               />
               <h2
-                className={`text-xl font-bold ${
+                className={`text-2xl font-bold ${
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}
               >
@@ -259,34 +254,34 @@ export default function AdminAbout() {
               {experiences?.slice(0, 4).map((exp, index) => (
                 <motion.div
                   key={exp.title + index} // Use unique key
-                  className={`relative p-4 rounded-2xl transition-all duration-300 ${
+                  className={`relative p-4 rounded-lg transition-all duration-300 ${
                     theme === "dark"
-                      ? "bg-gray-800/50 hover:bg-gray-800/70 border border-gray-700/50"
-                      : "bg-gray-50/80 hover:bg-gray-100/80 border border-gray-200/50"
+                      ? "bg-gray-800/50 hover:bg-gray-800/70 border border-gray-500"
+                      : "bg-gray-50/80 hover:bg-gray-100/80 border border-gray-500"
                   }`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                 >
                   <div
-                    className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-blue-600 rounded-l-2xl`}
+                    className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-blue-600 rounded-l-3xl`}
                   ></div>
                   <h3
-                    className={`font-semibold text-sm mb-1 ${
+                    className={`font-semibold text-base mb-1 ${
                       theme === "dark" ? "text-white" : "text-gray-900"
                     }`}
                   >
                     {exp.title}
                   </h3>
                   <p
-                    className={`text-xs mb-2 ${
+                    className={`text-sm mb-2 ${
                       theme === "dark" ? "text-blue-400" : "text-blue-600"
                     }`}
                   >
                     {exp.period}
                   </p>
                   <p
-                    className={`text-xs leading-relaxed ${
+                    className={`text-sm leading-relaxed ${
                       theme === "dark" ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
@@ -306,7 +301,7 @@ export default function AdminAbout() {
                     }`}
                   />
                   <h2
-                    className={`text-xl font-bold ${
+                    className={`text-2xl font-bold ${
                       theme === "dark" ? "text-white" : "text-gray-900"
                     }`}
                   >
@@ -319,15 +314,15 @@ export default function AdminAbout() {
                       key={work.title + index}
                       className={`p-4 rounded-2xl transition-all duration-300 ${
                         theme === "dark"
-                          ? "bg-gradient-to-br from-emerald-900/30 to-green-900/30 border border-emerald-700/30"
-                          : "bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200/50"
+                          ? "bg-gradient-to-br from-emerald-900/30 to-green-900/30 border border-emerald-500"
+                          : "bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-500"
                       }`}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.5 }}
                     >
                       <h3
-                        className={`font-semibold text-sm mb-2 ${
+                        className={`font-semibold text-base mb-2 ${
                           theme === "dark"
                             ? "text-emerald-300"
                             : "text-emerald-700"
@@ -336,7 +331,7 @@ export default function AdminAbout() {
                         {work.title || work.name}
                       </h3>
                       <p
-                        className={`text-xs leading-relaxed ${
+                        className={`text-sm leading-relaxed ${
                           theme === "dark" ? "text-gray-300" : "text-gray-600"
                         }`}
                       >
@@ -348,46 +343,90 @@ export default function AdminAbout() {
               </div>
             )}
           </motion.div>
-
-          {/* Right Column - Current Work & Skills */}
+          {/* Right Column - Skills */}
+          {/* Right Column - Skills */}
           <motion.div
-            className="lg:col-span-1 space-y-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            className="col-span-1 md:col-span-1 lg:col-span-1"
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: {
+                  duration: 0.6,
+                  when: "beforeChildren",
+                  staggerChildren: 0.1,
+                },
+              },
+            }}
+            initial="hidden"
+            animate="visible"
           >
             {skills && (
-              <div>
-                <h3
-                  className={`text-lg font-bold mb-4 ${
-                    theme === "dark" ? "text-white" : "text-gray-900"
-                  }`}
-                >
+              <div
+                className={`rounded-2xl p-6 shadow-lg border ${
+                  theme === "dark"
+                    ? "bg-gray-800/50 border-gray-700 text-white"
+                    : "bg-white/80 border-gray-200 text-gray-900"
+                } backdrop-blur-sm`}
+              >
+                <h3 className="text-2xl font-semibold mb-6 tracking-tight">
                   Tech Stack
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="space-y-3">
                   {(Array.isArray(skills)
                     ? skills
                     : Object.values(skills).flat()
                   )
                     .slice(0, 12)
-                    .map((skill, index) => (
-                      <motion.span
-                        key={index}
-                        className={`px-3 py-1 text-xs font-medium rounded-full transition-all duration-200 ${
-                          theme === "dark"
-                            ? "bg-gray-700/50 text-gray-300 hover:bg-gray-600/50"
-                            : "bg-gray-200/80 text-gray-700 hover:bg-gray-300/80"
-                        }`}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        {typeof skill === "string"
+                    .map((skill, index) => {
+                      const skillText =
+                        typeof skill === "string"
                           ? skill
-                          : skill.name || skill.title}
-                      </motion.span>
-                    ))}
+                          : skill.name || skill.title;
+                      const isLongSkill = skillText.length > 20; // Determine if skill name is long
+
+                      return (
+                        <motion.div
+                          key={index}
+                          className={`${
+                            isLongSkill
+                              ? "w-full" // Full width for long skills
+                              : "inline-block mr-2 mb-2" // Inline for short skills
+                          }`}
+                          variants={{
+                            hidden: { opacity: 0, scale: 0.8 },
+                            visible: {
+                              opacity: 1,
+                              scale: 1,
+                              transition: {
+                                type: "spring",
+                                stiffness: 100,
+                                damping: 10,
+                              },
+                            },
+                          }}
+                          whileHover={{ scale: isLongSkill ? 1.02 : 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <span
+                            className={`${
+                              isLongSkill
+                                ? "block px-4 py-3 text-sm font-medium rounded-xl" // Block layout for long skills
+                                : "px-3 py-2 text-xs font-medium rounded-full" // Compact for short skills
+                            } text-center cursor-pointer transition-all duration-300 ${
+                              theme === "dark"
+                                ? "bg-gradient-to-r from-gray-700 to-gray-600 text-gray-100 hover:from-gray-600 hover:to-gray-500"
+                                : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-gray-200 hover:to-gray-300"
+                            } hover:shadow-md hover:-translate-y-0.5 ${
+                              isLongSkill ? "w-full" : ""
+                            }`}
+                          >
+                            {skillText}
+                          </span>
+                        </motion.div>
+                      );
+                    })}
                 </div>
               </div>
             )}

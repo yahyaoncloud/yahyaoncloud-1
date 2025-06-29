@@ -95,22 +95,39 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white  dark:bg-gray-950 py-16 px-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950/20 py-16 px-6">
       {/* Floating background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-emerald-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
       <div className="max-w-6xl mx-auto relative">
         {/* Modern Header */}
-        <header className="text-start mb-16">
+        <header className="text-center mb-16">
+          <div className="inline-flex items-center gap-3 mb-6">
+            <div className="relative">
+              <MessageCircle className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+              <Sparkles className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1 animate-pulse" />
+            </div>
+          </div>
           <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-6">
             Let's Connect
           </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Ready to bring your ideas to life? I'm here to help turn your vision
+            into reality.
+            <span className="block mt-2 text-lg text-blue-600 dark:text-blue-400 font-medium">
+              Drop me a line! ✨
+            </span>
+          </p>
         </header>
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-5 gap-8 items-start">
           {/* Contact Form */}
           <div className="lg:col-span-3">
-            <div className="bg-white/70 border-gray-500 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl p-8 lg:p-10 shadow-md border border-white/20 dark:border-gray-700/30 hover:shadow-2xl transition-all duration-200">
+            <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl p-8 lg:p-10 shadow-xl border border-white/20 dark:border-gray-700/30 hover:shadow-2xl transition-all duration-500">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -133,7 +150,7 @@ export default function ContactPage() {
                       type="text"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full p-3 rounded-2xl border-2 border-gray-200/60 dark:border-gray-700/60 bg-gray-100 dark:bg-gray-950/50 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-300 placeholder:text-gray-400"
+                      className="w-full px-5 py-4 rounded-2xl border-2 border-gray-200/60 dark:border-gray-700/60 bg-white/50 dark:bg-gray-950/50 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-300 placeholder:text-gray-400"
                       placeholder="John Doe"
                     />
                   </div>
@@ -150,7 +167,7 @@ export default function ContactPage() {
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full p-3 rounded-2xl border-2  border-gray-200/60 dark:border-gray-700/60 bg-gray-100 dark:bg-gray-950/50 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-300 placeholder:text-gray-400"
+                      className="w-full px-5 py-4 rounded-2xl border-2 border-gray-200/60 dark:border-gray-700/60 bg-white/50 dark:bg-gray-950/50 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-300 placeholder:text-gray-400"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -169,7 +186,7 @@ export default function ContactPage() {
                     rows={6}
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full p-3 rounded-2xl border-2  border-gray-200/60 dark:border-gray-700/60 bg-gray-100 dark:bg-gray-950/50 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-300 resize-none placeholder:text-gray-400"
+                    className="w-full px-5 py-4 rounded-2xl border-2 border-gray-200/60 dark:border-gray-700/60 bg-white/50 dark:bg-gray-950/50 text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all duration-300 resize-none placeholder:text-gray-400"
                     placeholder="Tell me about your project, share an idea, or just say hello! I'd love to hear from you..."
                   />
                 </div>
@@ -229,7 +246,7 @@ export default function ContactPage() {
           {/* Sidebar */}
           <div className="lg:col-span-2 space-y-6">
             {/* Contact Methods */}
-            <div className="bg-white/70 border-gray-500 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/20 dark:border-gray-700/30">
+            <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/20 dark:border-gray-700/30">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 Quick Links
@@ -264,7 +281,7 @@ export default function ContactPage() {
             </div>
 
             {/* Status Card */}
-            <div className="bg-gradient-to-br border-green-500 from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 rounded-3xl p-6 border border-green-200/50 dark:border-green-800/30">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 rounded-3xl p-6 border border-green-200/50 dark:border-green-800/30">
               <div className="text-center">
                 <div className="relative inline-flex items-center justify-center mb-4">
                   <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
@@ -284,7 +301,7 @@ export default function ContactPage() {
             </div>
 
             {/* Location */}
-            <div className="text-center p-6 border-gray-500 bg-white/50 dark:bg-gray-900/50 rounded-3xl border border-gray-200/50 dark:border-gray-700/30">
+            <div className="text-center p-6 bg-white/50 dark:bg-gray-900/50 rounded-3xl border border-gray-200/50 dark:border-gray-700/30">
               <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
                 <MapPin size={16} />
                 <span className="font-medium">Hyderabad, India</span>

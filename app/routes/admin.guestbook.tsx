@@ -1,153 +1,310 @@
-import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
-
-// Work in progress animation variants
-const variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7 } },
-};
-
-export default function Guestbook() {
-  return (
-    <div className="min-h-screen flex items-center  justify-center bg-gray-100 dark:bg-gray-900">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={variants}
-        className="items-center gap-4 absolute top-50% left-50% "
-      >
-        <div className="flex flex-col items-center space-y-4 p-20">
-          <Loader2 size={48} className="text-blue-500 animate-spin" />
-          <motion.h1
-            className="text-2xl font-bold text-gray-900 dark:text-gray-100"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            Work in progress
-          </motion.h1>
-          <motion.p
-            className="text-gray-600 dark:text-gray-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            This page is under construction. Please check back soon!
-          </motion.p>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
-/*
-import { motion } from "framer-motion";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { useTheme } from "../Contexts/ThemeContext";
 import { useState } from "react";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Send, Github } from "lucide-react";
-import { v4 as uuidv4 } from "uuid";
+import { Send, Heart, Star, Clock } from "lucide-react";
+import { FaGithub, FaGoogle, FaTwitter } from "react-icons/fa";
 
-// Placeholder DB/auth logic
-async function getGuestbookCollection() {
-  throw new Error("DB not implemented");
-}
-async function getAuthenticatedUser(request: Request) {
-  return null; // Replace with GitHub auth
-}
+export default function MinimalistGuestbook() {
+  const [formData, setFormData] = useState({
+    name: "",
+    message: "",
+  });
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-const dummyComments: Comment[] = [
-  {
-    id: "1",
-    postId: "guestbook",
-    author: { id: "u1", name: "Alice" },
-    content: "Hey! Love your work 👋",
-    createdAt: "2025-06-25T12:00:00Z",
-    approved: true,
-  },
-  {
-    id: "2",
-    postId: "guestbook",
-    author: { id: "u2", name: "Bob" },
-    content: "Your tutorials helped me land my first job. Thank you!",
-    createdAt: "2025-06-24T15:30:00Z",
-    approved: true,
-  },
-];
+  // Dummy comments
+  const dummyComments = [
+    {
+      id: "1",
+      author: { name: "Sarah Chen", avatar: "SC" },
+      content:
+        "Your tutorials completely changed my approach to React! Thank you for sharing your knowledge.",
+      createdAt: "2025-06-28T14:30:00Z",
+      reactions: { hearts: 12, stars: 8 },
+    },
+    {
+      id: "2",
+      author: { name: "Alex Rodriguez", avatar: "AR" },
+      content:
+        "Just landed my dream job thanks to your JavaScript guide series. Your content is pure gold!",
+      createdAt: "2025-06-27T09:15:00Z",
+      reactions: { hearts: 24, stars: 15 },
+    },
+    {
+      id: "3",
+      author: { name: "Maya Patel", avatar: "MP" },
+      content:
+        "Been following your blog for 2 years now. Every post is a masterpiece! Your coding style is so clean.",
+      createdAt: "2025-06-26T16:45:00Z",
+      reactions: { hearts: 18, stars: 11 },
+    },
+    {
+      id: "4",
+      author: { name: "David Kim", avatar: "DK" },
+      content:
+        "The Three.js tutorial series blew my mind! Never thought I could create 3D experiences on the web.",
+      createdAt: "2025-06-25T11:20:00Z",
+      reactions: { hearts: 31, stars: 22 },
+    },
+  ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const user = await getAuthenticatedUser(request);
-  try {
-    const collection = await getGuestbookCollection();
-    const comments = await collection.find({ approved: true }).toArray();
-    return json({ comments, user });
-  } catch {
-    return json({ comments: dummyComments, user });
-  }
-}
+  const [comments, setComments] = useState(dummyComments);
 
-export async function action({ request }: ActionFunctionArgs) {
-  const user = await getAuthenticatedUser(request);
-  if (!user)
-    return json(
-      { error: "Please sign in with GitHub to post a message." },
-      { status: 401 }
-    );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  const formData = await request.formData();
-  const content = formData.get("content");
+    if (formData.name.trim().length < 2) {
+      setStatus({
+        type: "error",
+        message: "Name must have at least 2 characters.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    if (formData.message.trim().length < 5) {
+      setStatus({
+        type: "error",
+        message: "Message must have at least 5 characters.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
-  if (typeof content !== "string" || content.trim().length < 1) {
-    return json({ error: "Message cannot be empty" }, { status: 400 });
-  }
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  const newComment: Comment = {
-    id: uuidv4(),
-    postId: "guestbook",
-    author: { id: user.id, name: user.name },
-    content: content.trim(),
-    createdAt: new Date().toISOString(),
-    approved: false,
+    // Add new comment to the list
+    const newComment = {
+      id: Date.now().toString(),
+      author: {
+        name: formData.name.trim(),
+        avatar: formData.name
+          .trim()
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2),
+      },
+      content: formData.message.trim(),
+      createdAt: new Date().toISOString(),
+      reactions: { hearts: 0, stars: 0 },
+    };
+
+    setComments((prev) => [newComment, ...prev]);
+
+    setStatus({
+      type: "success",
+      message: "Message added successfully",
+    });
+
+    setTimeout(() => {
+      setFormData({ name: "", message: "" });
+      setStatus({ type: "", message: "" });
+      setIsSubmitting(false);
+    }, 2000);
   };
 
-  try {
-    const collection = await getGuestbookCollection();
-    await collection.insertOne(newComment);
-    return json({ success: "Message submitted for review!" });
-  } catch {
-    return json({ error: "Could not submit your message." }, { status: 500 });
-  }
-}
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+    if (status.message) setStatus({ type: "", message: "" });
+  };
 
-export default function Guestbook() {
-  const { theme } = useTheme();
-  const { comments, user } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
-  const [content, setContent] = useState("");
-
-  const formatTime = (dateStr: string) => {
+  const formatTime = (dateStr) => {
     const d = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
-    if (diffMs < 60000) return "just now";
-    if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
-    if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
-    return `${Math.floor(diffMs / 86400000)}d ago`;
+    if (diffMs < 60000) return "now";
+    if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m`;
+    if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h`;
+    return `${Math.floor(diffMs / 86400000)}d`;
   };
 
-  const bg = theme === "dark" ? "bg-gray-900" : "bg-white";
-  const text = theme === "dark" ? "text-gray-100" : "text-gray-900";
-  const subtext = theme === "dark" ? "text-gray-400" : "text-gray-600";
-  const border = theme === "dark" ? "border-gray-700" : "border-gray-300";
+  const handleReaction = (commentId, type) => {
+    setComments((prev) =>
+      prev.map((comment) =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              reactions: {
+                ...comment.reactions,
+                [type]: comment.reactions[type] + 1,
+              },
+            }
+          : comment
+      )
+    );
+  };
 
   return (
-    <div className={`min-h-screen ${bg} font-sans`}>
-      <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
-        // ...rest of the original code
+    <div className="min-h-screen bg-white dark:bg-gray-950">
+      {/* Header */}
+      <div className="px-6 py-8">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-5xl mt-8 lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-6">
+            Guestbook
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Leave a message and see what others are saying
+          </p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+          {/* Left Side - Message Form */}
+          <div className="space-y-6 border border-gray-500 dark:border-gray-700 rounded-2xl p-10 bg-white dark:bg-gray-900/70">
+            <h2 className="text-xl font-medium text-gray-900 dark:text-white">
+              Leave a message
+            </h2>
+
+            <div className="space-y-4">
+              <div>
+                <input
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your name"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-100 dark:bg-gray-950/70 text-gray-900 dark:text-white placeholder:text-gray-500 focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div>
+                <textarea
+                  name="message"
+                  rows={6}
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Write your message here..."
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-100 dark:bg-gray-950/70 text-gray-900 dark:text-white placeholder:text-gray-500 focus:border-gray-400 dark:focus:border-gray-500 focus:outline-none resize-none transition-colors"
+                />
+              </div>
+
+              {status.message && (
+                <div
+                  className={`text-sm ${
+                    status.type === "error"
+                      ? "text-red-600 dark:text-red-400"
+                      : "text-green-600 dark:text-green-400"
+                  }`}
+                >
+                  {status.message}
+                </div>
+              )}
+
+              <button
+                onClick={handleSubmit}
+                disabled={!formData.name || !formData.message || isSubmitting}
+                className={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                  !formData.name || !formData.message || isSubmitting
+                    ? "bg-gray-100 dark:bg-gray-900 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                    : "bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100"
+                }`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send size={16} />
+                    Submit Message
+                  </>
+                )}
+              </button>
+
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white dark:bg-gray-900/70 px-2 text-gray-500 dark:text-gray-400">
+                      Or sign in with
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <button className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:text-red-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <FaGoogle className="w-5 h-5" />
+                  </button>
+
+                  <button className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:text-black hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <FaGithub className="w-5 h-5" />
+                  </button>
+
+                  <button className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:text-gray-900 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <FaTwitter className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side - Messages List */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-medium text-gray-900 dark:text-white">
+                Messages
+              </h2>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {comments.length} total
+              </span>
+            </div>
+
+            <div className="space-y-6 max-h-[600px] overflow-y-auto">
+              {comments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="border-b border-gray-100 dark:border-gray-800 pb-6 last:border-0"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-900 dark:bg-gray-100 flex items-center justify-center text-white dark:text-gray-900 text-xs font-medium flex-shrink-0">
+                      {comment.author.avatar}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium text-gray-900 dark:text-white text-sm">
+                          {comment.author.name}
+                        </span>
+                        <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                          <Clock size={10} />
+                          {formatTime(comment.createdAt)}
+                        </div>
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-3">
+                        {comment.content}
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleReaction(comment.id, "hearts")}
+                          className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                        >
+                          <Heart size={12} />
+                          {comment.reactions.hearts}
+                        </button>
+                        <button
+                          onClick={() => handleReaction(comment.id, "stars")}
+                          className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors"
+                        >
+                          <Star size={12} />
+                          {comment.reactions.stars}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-*/
