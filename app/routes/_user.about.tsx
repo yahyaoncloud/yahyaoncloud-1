@@ -129,7 +129,7 @@ export default function AdminAbout() {
               </motion.h1>
 
               <motion.p
-                className={`text-lg mb-6 max-w-2xl ${
+                className={`text-md text-justify mb-6 max-w-2xl ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 variants={fadeInUp}
@@ -162,7 +162,7 @@ export default function AdminAbout() {
 
               {/* Social Links - Minimal */}
               <motion.div
-                className="flex justify-center md:justify-start gap-4"
+                className="flex justify-center text-lg md:justify-start gap-4"
                 variants={stagger}
               >
                 {socialLinks.email && (
@@ -177,7 +177,7 @@ export default function AdminAbout() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Mail size={20} />
+                    <Mail size={36} />
                   </motion.a>
                 )}
                 {socialLinks.github && (
@@ -194,7 +194,7 @@ export default function AdminAbout() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <FaGithub size={20} />
+                    <FaGithub size={36} />
                   </motion.a>
                 )}
                 {socialLinks.linkedin && (
@@ -211,7 +211,7 @@ export default function AdminAbout() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <FaLinkedin size={20} />
+                    <FaLinkedin size={36} />
                   </motion.a>
                 )}
                 {socialLinks.twitter && (
@@ -228,7 +228,7 @@ export default function AdminAbout() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <FaTwitter size={20} />
+                    <FaTwitter size={36} />
                   </motion.a>
                 )}
               </motion.div>
@@ -346,7 +346,7 @@ export default function AdminAbout() {
                                 : "text-blue-600 hover:text-blue-700"
                             }`}
                           >
-                            <ExternalLink size={14} />
+                            <ExternalLink size={20} />
                             Live Demo
                           </a>
                         )}
@@ -361,7 +361,7 @@ export default function AdminAbout() {
                                 : "text-gray-600 hover:text-gray-700"
                             }`}
                           >
-                            <Link size={14} />
+                            <Link size={20} />
                             link
                           </a>
                         )}

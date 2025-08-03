@@ -12,7 +12,7 @@ import {
   Coffee,
 } from "lucide-react";
 
-import Logo from "../assets/yoc.png";
+import Logo from "../assets/yoc-logo.png";
 import { useEffect, useState } from "react";
 import { useTheme } from "../Contexts/ThemeContext";
 
