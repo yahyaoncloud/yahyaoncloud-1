@@ -270,7 +270,7 @@ export default function AdminAbout() {
         {/* Projects - Compact Cards */}
         {projects.length > 0 && (
           <motion.section variants={fadeInUp}>
-            <h2 className="text-2xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
+            <h2 className="text-3xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
               Featured Projects
             </h2>
             <motion.div
@@ -496,7 +496,7 @@ export default function AdminAbout() {
           {/* Hobbies */}
           {hobbies.length > 0 && (
             <motion.section variants={fadeInUp}>
-              <h2 className="text-2xl font-semibold mb-6 text-indigo-800 dark:text-indigo-300">
+              <h2 className="text-3xl font-semibold mb-6 text-indigo-800 dark:text-indigo-300">
                 Interests
               </h2>
               <motion.div className="space-y-3" variants={stagger}>
