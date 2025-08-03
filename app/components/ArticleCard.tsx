@@ -9,10 +9,12 @@ interface ArticleCardProps {
     title: string;
     slug?: string;
     summary: string;
+    author: string;
     excerpt?: string;
     coverImage?: string;
-    createdAt: string;
-    category: string;
+    createdAt: Date;
+    categories: string[];
+    types?: string;
     tags?: string[];
   };
   className?: string;
@@ -34,14 +36,14 @@ export default function ArticleCard({
     });
   };
 
-  // Truncate excerpt to approximately two lines (assuming ~100-120 characters for two lines in typical layouts)
   const truncateExcerpt = (text: string) => {
-    const maxLength = 120; // Rough estimate for two lines
+    const maxLength = 120;
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength).trim() + "...";
   };
+
   const truncateTitle = (text: string) => {
-    const maxLength = 50; // Rough estimate for two lines
+    const maxLength = 50;
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength).trim() + "...";
   };
@@ -58,7 +60,7 @@ export default function ArticleCard({
       transition={{ type: "spring", stiffness: 300 }}
       whileHover={{ scale: 1.02 }}
     >
-      <Link to={`/admin/post/${post._id}`} className="block h-full">
+      <Link to={`/blog/post/${post.slug}`} className="block h-full">
         {post.coverImage && (
           <div className="relative h-48 overflow-hidden">
             <img
@@ -66,16 +68,24 @@ export default function ArticleCard({
               alt={post.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            {post.category && (
-              <span
-                className={`absolute top-3 left-3 px-2 py-1 text-xs font-medium rounded-full ${
-                  theme === "dark"
-                    ? "bg-blue-600 text-white"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                {post.category}
-              </span>
+            {post.categories && post.categories.length > 0 && (
+              <div className="absolute top-3 left-3 flex flex-wrap justify-between gap-2">
+                {post.categories.map((cat, index) => (
+                  <>
+                    <span
+                      key={`${cat}-${index}`}
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        theme === "dark"
+                          ? "bg-blue-600 text-white"
+                          : "bg-blue-500 text-white"
+                      }`}
+                    >
+                      {cat}
+                    </span>
+                    {/* <span>{post}</span> */}
+                  </>
+                ))}
+              </div>
             )}
           </div>
         )}
@@ -122,9 +132,9 @@ export default function ArticleCard({
 
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
-              {post.tags.map((tag) => (
+              {post.tags.map((tag, index) => (
                 <span
-                  key={tag}
+                  key={`${tag}-${index}`}
                   className={`text-xs px-2 py-1 rounded-full ${
                     theme === "dark"
                       ? "bg-gray-700 text-gray-300"

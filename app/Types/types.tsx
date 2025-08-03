@@ -1,35 +1,54 @@
+import { PostType } from "../constants/Constants";
 export type Post = {
-  id: string;
+  _id: string;
   title: string;
+  slug: string;
   content: string;
   summary: string;
-  type: "article" | "news" | "tutorial";
-  date: string;
+  date: Date;
+  // author: Author;
   authorId: string;
-  categoryId?: string;
-  tags?: Tag[];
-  coverImage?: MediaAsset;
-  gallery?: MediaAsset[];
+  categories: Category[];
+  tags: Tag[];
+  types: Type;
+  coverImage: string;
+  gallery: MediaAsset[];
+  minuteRead: number;
+  likes: number;
+  views: number;
+  createdAt: Date;
+  updatedAt: Date;
+  commentsCount: number;
+  status: "draft" | "published";
+  seo: SEO;
+};
+
+export type Type = {
+  _id: string;
+  type: PostType;
   createdAt: string;
   updatedAt?: string;
 };
 
 export type Category = {
-  id?: string;
+  _id?: string;
   catID?: string;
   name: string;
   slug?: string;
-  // createdAt?: string;
-  // updatedAt?: string;
+  createdAt: string;
+  updatedAt?: string;
 };
+
 export type Tag = {
-  id: string;
+  _id: string;
   tagID?: string;
   name: string;
+  createdAt: string;
+  updatedAt?: string;
 };
 
 export type Comment = {
-  id: string;
+  _id: string;
   postId: string;
   author: {
     id: string;
@@ -46,6 +65,8 @@ export type SEO = {
   description: string;
   keywords: string[];
   canonicalUrl?: string;
+  createdAt: string;
+  updatedAt?: string;
 };
 
 export type MediaAsset = {
@@ -53,8 +74,39 @@ export type MediaAsset = {
   url: string;
   altText?: string;
   uploadedBy: string;
-  postId?: string; // optional: reverse lookup
+  postId?: string;
   type: "image" | "video" | "file";
   createdAt: string;
+  updatedAt?: string;
 };
 
+export type ContactDetails = {
+  email: string;
+  phone: string;
+  linkedin: string;
+  github: string;
+  twitter: string;
+  website: string;
+  createdAt: string;
+  updatedAt?: string;
+};
+
+export type Author = {
+  _id: string;
+  authorId: string;
+  authorName: string;
+  authorProfession: string;
+  userId: string;
+  contactDetails: {
+    email: string;
+    phone: string;
+    linkedin: string;
+    github: string;
+    twitter: string;
+    website: string;
+    createdAt: string;
+    updatedAt?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+};

@@ -105,12 +105,12 @@ export default function ContactPage() {
       <div className="max-w-6xl mx-auto relative">
         {/* Modern Header */}
         <header className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 mb-6">
+          {/* <div className="inline-flex items-center gap-3 mb-6">
             <div className="relative">
               <MessageCircle className="w-10 h-10 text-blue-600 dark:text-blue-400" />
               <Sparkles className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1 animate-pulse" />
             </div>
-          </div>
+          </div> */}
           <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent mb-6">
             Let's Connect
           </h1>

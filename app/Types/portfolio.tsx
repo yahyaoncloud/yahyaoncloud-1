@@ -2,18 +2,21 @@ export interface Portfolio {
   name: string;
   bio: string;
   portraitUrl: string;
+  location?: string;
   experiences: Experience[];
   certifications: Certification[];
   hobbies: Hobby[];
-  skills: string[];
+  skills: string[] | { [key: string]: string[] };
   currentWorks: CurrentWork[];
-  socialLinks: SocialLinks;
+  projects: Project[];
+  socialLinks: Partial<SocialLinks>;
 }
 
 export interface Experience {
   title: string;
   description: string[];
   period: string;
+  summary: string;
 }
 
 export interface Certification {
@@ -30,6 +33,14 @@ export interface Hobby {
 export interface CurrentWork {
   title: string;
   description: string;
+}
+
+export interface Project {
+  title: string;
+  description: string;
+  url: string;
+  imageUrl: string;
+  duration: string;
 }
 
 export interface SocialLinks {

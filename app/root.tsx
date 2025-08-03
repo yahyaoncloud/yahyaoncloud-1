@@ -27,7 +27,6 @@ import AOS from "aos";
 // Import styles
 import "./styles/tailwind.css";
 import { ThemeProvider } from "./Contexts/ThemeContext";
-import NotFound from "./routes/404";
 
 export const meta: MetaFunction = () => {
   return [
@@ -47,8 +46,6 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  // You can add server-side logic here to determine theme
-  // For now, we'll default to dark mode
   return json({
     theme: "dark",
   });
@@ -67,7 +64,7 @@ export default function App() {
   }, []);
 
   return (
-    <html lang="en" className={theme}>
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -83,11 +80,11 @@ export default function App() {
       >
         <ThemeProvider>
           <Outlet />
+          <Toaster position="top-right" richColors />
+          <ScrollRestoration />
+          <Scripts />
+          {/* <LiveReload /> */}
         </ThemeProvider>
-        <Toaster position="top-right" richColors />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
@@ -95,9 +92,10 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  console.error("ErrorBoundary caught:", error);
 
   let status = 500;
-  let statusText = "Something went wrong";
+  let message = "Something went wrong";
 
   if (
     error &&
@@ -106,17 +104,29 @@ export function ErrorBoundary() {
     "statusText" in error
   ) {
     status = (error as any).status;
-    statusText = (error as any).statusText;
+    message = (error as any).statusText;
   }
 
   return (
     <html lang="en">
       <head>
-        <title>{status} - Not Found</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>{`${status} - ${message}`}</title>
+        <Meta />
+        <Links />
       </head>
-      <body>
-        <NotFound />
-        <main className="flex flex-col items-center justify-center h-screen text-center"></main>
+      <body className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-6xl font-bold text-gray-800">{status}</h1>
+          <p className="text-lg text-gray-500 mt-2">{message}</p>
+          <a
+            href="/"
+            className="mt-4 text-blue-500 hover:text-blue-600 underline"
+          >
+            Back to Home
+          </a>
+        </div>
         <Scripts />
       </body>
     </html>

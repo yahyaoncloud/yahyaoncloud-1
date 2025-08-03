@@ -6,39 +6,120 @@ import { json } from "@remix-run/node";
 import {
   Heart,
   ExternalLink,
-  TrendingUp,
-  Clock,
-  Star,
   Filter,
   ChevronDown,
   ChevronUp,
   Globe,
   HandHeart,
+  Star,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
+import { motion, AnimatePresence } from "framer-motion";
 import ArticleCard from "../components/ArticleCard";
-import { environment } from "../environments/environment";
-import type { Category, Post } from "../Types/types";
+import { Category, Post, Tag, Type } from "../Types/types";
 import dummyImage from "../assets/yahya_glass.png";
+import {
+  getPosts,
+  getAllCategories,
+  getAllTags,
+  getTypeById,
+  getAllTypes,
+} from "../Services/post.server";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.3,
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.2,
+      staggerChildren: 0.05,
+      staggerDirection: -1,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+    scale: 0.95,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut",
+      type: "spring",
+      stiffness: 100,
+      damping: 15,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    scale: 0.95,
+    transition: {
+      duration: 0.3,
+      ease: "easeIn",
+    },
+  },
+  hover: {
+    scale: 1.02,
+    y: -5,
+    transition: {
+      duration: 0.2,
+      type: "spring",
+      stiffness: 300,
+      damping: 25,
+    },
+  },
+};
+
+type LoaderData = {
+  posts: Post[];
+  categories: Category[];
+  tags: Tag[];
+  types: Type[];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
-    const [postsRes, categoriesRes] = await Promise.all([
-      fetch(`${environment.GO_BACKEND_URL}/posts`),
-      fetch(`${environment.GO_BACKEND_URL}/categories`),
-    ]);
+    // Fetch posts and categories directly from the service
+    const posts = await getPosts(); // Fetch published posts, default limit 10, page 1
+    const categories = await getAllCategories();
+    const tags = await getAllTags();
+    const types = await getAllTypes();
 
-    if (!postsRes.ok || !categoriesRes.ok) {
-      throw new Error("Failed to fetch data");
-    }
+    // If you need a specific type by ID, uncomment and use:
+    // const type = await getTypeById(posts.types._id);
 
-    const posts: Post[] = await postsRes.json();
-    const categories: Category[] = await categoriesRes.json();
+    // console.log(types);
 
-    return json({ posts, categories });
+    return json({
+      posts: posts,
+      categories: categories,
+      tags: tags,
+      types: types,
+    });
   } catch (error) {
     console.error("Loader error:", error);
-    return json({ posts: [], categories: [] }, { status: 500 });
+    return json(
+      {
+        posts: [],
+        categories: [],
+        tags: [],
+        types: [],
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -56,14 +137,14 @@ const HeroSection = () => {
 
   return (
     <motion.section
-      className="text-center py-20 relative text-white"
+      className="text-center bg-transparent py-20 relative "
       style={{
         backgroundImage: `url(${dummyImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
       initial="hidden"
-      animate="onscreen"
+      animate="visible"
     >
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/70 via-cyan-900/60 to-indigo-900/80 dark:from-black/10 dark:via-gray-900/70 dark:to-black" />
@@ -97,12 +178,10 @@ const CategoryFilterSection = ({
   categories,
   selectedCategory,
   setSelectedCategory,
-  theme,
 }: {
   categories: Category[];
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
-  theme: string;
 }) => {
   const [showFilters, setShowFilters] = useState(false);
 
@@ -165,7 +244,7 @@ const CategoryFilterSection = ({
           </motion.button>
           {categories.map((cat, index) => (
             <motion.button
-              key={cat.id}
+              key={cat._id}
               custom={index + 1}
               variants={buttonVariants}
               whileHover="hover"
@@ -190,28 +269,9 @@ const CategoryFilterSection = ({
 };
 
 // Articles Grid Section - Display posts in a responsive grid
-const ArticlesGridSection = ({
-  posts,
-  categories,
-  theme,
-}: {
-  posts: Post[];
-  categories: Category[];
-  theme: string;
-}) => {
-  // Animation variants for article cards
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" },
-    }),
-    hover: { scale: 1.02, transition: { duration: 0.3 } },
-  };
-
+const ArticlesGridSection = ({ posts }: { posts: Post[] }) => {
   return (
-    <section className="max-w-7xl mx-auto px-4 py-12">
+    <section className="max-w-6xl mx-auto px-4 py-12">
       {/* Section header */}
       <motion.div
         className="text-center mb-12"
@@ -228,64 +288,84 @@ const ArticlesGridSection = ({
         </p>
       </motion.div>
 
-      {/* Posts grid */}
-      <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence>
+      {/* Posts grid with AnimatePresence for smooth transitions */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={posts.map((p) => p._id).join("-")} // Unique key for different filtered sets
+          className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          layout
+        >
           {posts.map((article, index) => {
             const spanClass =
               index % 6 === 0 ? "lg:col-span-2" : "lg:col-span-1";
 
             return (
               <motion.div
-                key={article.id}
-                custom={index}
+                key={article._id}
                 variants={cardVariants}
-                initial="hidden"
-                animate="visible"
                 whileHover="hover"
+                layout
                 className={`group min-h-[280px] ${spanClass}`}
               >
                 <ArticleCard
                   post={{
-                    _id: article.id,
+                    _id: article._id,
                     title: article.title,
-                    slug: article.slug ?? article.id,
+                    slug: article.slug ?? article._id,
                     summary: article.summary,
                     excerpt: article.summary,
-                    coverImage: article.coverImage?.url || dummyImage,
+                    coverImage: article.coverImages || dummyImage,
                     createdAt: article.createdAt,
-                    category:
-                      categories.find((c: Category) => c.id === article.catID)
-                        ?.name || "Uncategorized",
-                    tags: article.tags?.map((tagObj) =>
-                      typeof tagObj === "string" ? tagObj : tagObj.name
-                    ),
+                    author: article.authorId,
+                    categories:
+                      article.categories?.map((c: Category) => c.name) || [],
+                    tags: article.tags?.map((c: Tag) => c.name) || [],
                   }}
                 />
               </motion.div>
             );
           })}
-        </AnimatePresence>
-      </div>
+        </motion.div>
+      </AnimatePresence>
 
-      {/* Empty state */}
+      {/* Empty state with smooth animation */}
       {posts.length === 0 && (
         <motion.div
-          className="text-center py-16"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
+          className="text-center h-64 p-6"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <div className="text-gray-400 dark:text-gray-600 mb-4">
+          <motion.div
+            className="text-gray-400 dark:text-gray-600 mb-4"
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <Star size={48} className="mx-auto mb-4" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+          </motion.div>
+          <motion.h3
+            className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2"
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             No posts found
-          </h3>
-          <p className="text-gray-500 dark:text-gray-500">
+          </motion.h3>
+          <motion.p
+            className="text-gray-500 dark:text-gray-500"
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
             Try selecting a different category or check back later for new
             content.
-          </p>
+          </motion.p>
         </motion.div>
       )}
     </section>
@@ -344,12 +424,52 @@ export const PalestineSupportSection = ({ theme }: Props) => {
     hover: { scale: 1.05, transition: { duration: 0.2 } },
   };
 
+  const cardVariants = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+      scale: 0.95,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut",
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      scale: 0.95,
+      transition: {
+        duration: 0.3,
+        ease: "easeIn",
+      },
+    },
+    hover: {
+      scale: 1.02,
+      y: -5,
+      transition: {
+        duration: 0.2,
+        type: "spring",
+        stiffness: 300,
+        damping: 25,
+      },
+    },
+  };
+
   return (
     <motion.section
       className={`max-w-7xl mx-auto p-8 ${bg} rounded-xl shadow-sm pb-8`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
+      variants={cardVariants}
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         {/* Text Block */}
@@ -406,21 +526,19 @@ export const PalestineSupportSection = ({ theme }: Props) => {
 // Main Homepage Component
 export default function Homepage() {
   const { theme } = useTheme();
-  const { posts, categories } = useLoaderData<typeof loader>();
+  const { posts, categories } = useLoaderData<LoaderData>();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Filter posts based on selected category
   const filteredPosts = selectedCategory
-    ? posts.filter((p: Post) => {
-        const cat = categories.find((c: Category) => c.id === p.categoryId);
-        return cat?.name === selectedCategory;
-      })
+    ? posts.filter((p: Post) =>
+        p.categories?.some((c: Category) => c.name === selectedCategory)
+      )
     : posts;
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 pb-8 ${
-        theme === "dark" ? "bg-gray-950" : "bg-gray-50"
+      className={`min-h-screen mx-auto max-w-5xl transition-colors duration-300 pb-8
       }`}
     >
       {/* 1. Hero Section - Main banner */}
@@ -431,15 +549,10 @@ export default function Homepage() {
         categories={categories}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
-        theme={theme}
       />
 
       {/* 3. Articles Grid Section - Main content */}
-      <ArticlesGridSection
-        posts={filteredPosts}
-        categories={categories}
-        theme={theme}
-      />
+      <ArticlesGridSection posts={filteredPosts} />
 
       {/* 4. Palestine Support Section - Solidarity section */}
       <PalestineSupportSection theme={theme} />

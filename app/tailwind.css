@@ -1,12 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@400;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
+:root {
+  /* Primary Background Colors */
+  --background: 0 0% 98%; /* Equivalent to bg-gray-50 */
+  --foreground: 0 0% 10%; /* Equivalent to text-gray-900 */
 
-  @media (prefers-color-scheme: dark) {
+  /* Card and Component Backgrounds */
+  --card: 0 0% 100%; /* Equivalent to bg-white */
+  --card-foreground: 0 0% 10%; /* Equivalent to text-gray-900 */
+
+  /* Secondary Backgrounds (e.g., code blocks, hover states) */
+  --secondary: 0 0% 95%; /* Equivalent to bg-gray-100 */
+  --secondary-foreground: 0 0% 20%; /* Equivalent to text-gray-800 */
+
+  /* Accent Colors */
+  --primary: 221 83% 53%; /* Equivalent to blue-600 */
+  --primary-foreground: 0 0% 100%; /* White text for contrast */
+  --accent: 266 77% 51%; /* Equivalent to purple-600 */
+  --accent-foreground: 0 0% 100%; /* White text for contrast */
+
+  /* Border Colors */
+  --border: 0 0% 80%; /* Equivalent to border-gray-200 */
+  --input: 0 0% 80%; /* Equivalent to border-gray-200 */
+
+  /* Muted and Subtle Colors */
+  --muted: 0 0% 90%; /* Equivalent to bg-gray-100 */
+  --muted-foreground: 0 0% 40%; /* Equivalent to text-gray-600 */
+
+  /* Destructive (e.g., liked button states) */
+  --destructive: 0 84% 60%; /* Equivalent to red-500 */
+  --destructive-foreground: 0 0% 100%; /* White text for contrast */
+
+  /* Additional Accent Colors (e.g., teal for list markers, amber for blockquotes) */
+  --teal: 174 60% 51%; /* Equivalent to teal-600 */
+  --amber: 38 92% 50%; /* Equivalent to amber-400 */
+  --fuchsia: 291 64% 42%; /* Equivalent to fuchsia-400 */
+  --emerald: 160 84% 39%; /* Equivalent to emerald-800 */
+
+  /* Ring and Focus Colors */
+  --ring: 221 83% 53%; /* Matches primary (blue-600) */
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Primary Background Colors */
+    --background: 0 0% 6%; /* Equivalent to bg-gray-900 */
+    --foreground: 0 0% 100%; /* Equivalent to text-white */
+
+    /* Card and Component Backgrounds */
+    --card: 0 0% 12%; /* Equivalent to bg-gray-800 */
+    --card-foreground: 0 0% 100%; /* Equivalent to text-white */
+
+    /* Secondary Backgrounds */
+    --secondary: 0 0% 15%; /* Equivalent to bg-gray-700 */
+    --secondary-foreground: 0 0% 90%; /* Equivalent to text-gray-100 */
+
+    /* Accent Colors */
+    --primary: 221 83% 65%; /* Equivalent to blue-400 */
+    --primary-foreground: 0 0% 0%; /* Black text for contrast */
+    --accent: 266 77% 63%; /* Equivalent to purple-400 */
+    --accent-foreground: 0 0% 0%; /* Black text for contrast */
+
+    /* Border Colors */
+    --border: 0 0% 20%; /* Equivalent to border-gray-700 */
+    --input: 0 0% 20%; /* Equivalent to border-gray-700 */
+
+    /* Muted and Subtle Colors */
+    --muted: 0 0% 15%; /* Equivalent to bg-gray-700 */
+    --muted-foreground: 0 0% 70%; /* Equivalent to text-gray-300 */
+
+    /* Destructive */
+    --destructive: 0 84% 70%; /* Equivalent to red-400 */
+    --destructive-foreground: 0 0% 0%; /* Black text for contrast */
+
+    /* Additional Accent Colors */
+    --teal: 174 60% 63%; /* Equivalent to teal-400 */
+    --amber: 38 92% 60%; /* Equivalent to amber-500 */
+    --fuchsia: 291 64% 54%; /* Equivalent to fuchsia-300 */
+    --emerald: 160 84% 51%; /* Equivalent to emerald-200 */
+
+    /* Ring and Focus Colors */
+    --ring: 221 83% 65%; /* Matches primary (blue-400) */
+  }
+}
+
+@layer base {
+  html,
+  body {
+    @apply bg-background text-foreground;
     color-scheme: dark;
+  }
+
+  /* Wide font for h1, h2 */
+  h1,
+  h2 {
+    @apply font-wide;
+  }
+
+  /* Cursive font for h3, h4 */
+  h3,
+  h4 {
+    @apply font-cursive;
+  }
+}
+
+@layer utilities {
+  .font-wide {
+    font-family: "Bebas Neue", sans-serif;
+  }
+
+  .font-cursive {
+    font-family: "Dancing Script", cursive;
   }
 }

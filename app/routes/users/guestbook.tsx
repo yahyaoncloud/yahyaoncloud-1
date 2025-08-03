@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTheme } from "../Contexts/ThemeContext";
+import { useTheme } from "../../Contexts/ThemeContext";
 import { useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -16,9 +16,9 @@ import {
   HandHeart,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
-import ArticleCard from "../components/ArticleCard";
-import { environment } from "../environments/environment";
-import type { Category, Post } from "../Types/types";
+import ArticleCard from "../../components/ArticleCard";
+import { environment } from "../../environments/environment";
+import type { Category, Post } from "../../Types/types";
 import dummyImage from "../assets/yahya_glass.png";
 
 export async function loader({ request }: LoaderFunctionArgs) {

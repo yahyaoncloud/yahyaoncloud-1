@@ -1,15 +1,24 @@
 import { Link, useLocation } from "@remix-run/react";
 import { Sun, Moon, Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
 import Logo from "../assets/yoc-logo.png";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
 
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeIndicator, setActiveIndicator] = useState({ width: 0, left: 0 });
   const location = useLocation();
+  const navRef = useRef<HTMLDivElement>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -36,10 +45,49 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Update active indicator position
+  useEffect(() => {
+    const updateIndicator = () => {
+      if (!navRef.current) return;
+
+      // Find the active link using the improved logic
+      const activeLink = navLinks.find((link) => isActive(link.href));
+
+      if (activeLink) {
+        const activeLinkElement = navRef.current.querySelector(
+          `[data-path="${activeLink.href}"]`
+        ) as HTMLElement;
+
+        if (activeLinkElement) {
+          const navRect = navRef.current.getBoundingClientRect();
+          const linkRect = activeLinkElement.getBoundingClientRect();
+
+          setActiveIndicator({
+            width: linkRect.width,
+            left: linkRect.left - navRect.left,
+          });
+        }
+      } else {
+        // No active link, hide indicator
+        setActiveIndicator({ width: 0, left: 0 });
+      }
+    };
+
+    // Update on mount and route change
+    updateIndicator();
+
+    // Update on window resize
+    window.addEventListener("resize", updateIndicator);
+    return () => window.removeEventListener("resize", updateIndicator);
+  }, [location.pathname]);
+
   // Close mobile menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isMenuOpen && !event.target.closest(".mobile-menu-container")) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMenuOpen &&
+        !(event.target as Element).closest(".mobile-menu-container")
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -59,16 +107,25 @@ export default function Header() {
   }, [isMenuOpen]);
 
   const navLinks = [
-    { name: "Blog", href: "/admin/home" },
-    // { name: "Posts", href: "/admin/posts" },
-    // { name: "Create", href: "/admin/create" },
-    { name: "About", href: "/admin/about" },
-    { name: "Contact", href: "/admin/contact" },
-    { name: "Guestbook", href: "/admin/guestbook" },
+    { name: "Blog", href: "/blog" },
+    // { name: "Posts", href: "/posts" },
+    // { name: "Create", href: "/create" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+    { name: "Guestbook", href: "/guestbook" },
   ];
 
-  const isActive = (href) => {
-    return location.pathname === href;
+  const isActive = (href: string) => {
+    const currentPath = location.pathname;
+
+    // Exact match for home page
+    if (href === "/") {
+      return currentPath === "/";
+    }
+
+    // For other routes, check if current path starts with the href
+    // This handles nested routes like /blog/posts matching /blog
+    return currentPath === href || currentPath.startsWith(href + "/");
   };
 
   return (
@@ -81,10 +138,7 @@ export default function Header() {
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <Link
-                to="/admin/home"
-                className="flex items-center space-x-3 group"
-              >
+              <Link to="/blog" className="flex items-center space-x-3 group">
                 <motion.img
                   src={Logo}
                   alt="yahyaoncloud logo"
@@ -97,55 +151,95 @@ export default function Header() {
                 <span
                   className={`${
                     scrolled ? "md:text-xl text-lg" : "md:text-2xl text-xl"
-                  } transition-all ease-in-out mrs-saint-delafield-regular font-thin bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white bg-clip-text text-transparent group-hover:from-navy-600 group-hover:via-blue-500 group-hover:to-navy-600 dark:group-hover:from-blue-300 dark:group-hover:via-blue-100 dark:group-hover:to-blue-300 duration-500`}
+                  } transition-all ease-in-out mrs-saint-delafield-regular font-thin bg-gradient-to-r py-2 from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white bg-clip-text text-transparent group-hover:from-navy-600 group-hover:via-blue-500 group-hover:to-navy-600 dark:group-hover:from-blue-300 dark:group-hover:via-blue-100 dark:group-hover:to-blue-300 duration-500`}
                 >
                   Yahya On Cloud
                 </span>
               </Link>
             </motion.div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-2">
-              {navLinks.map((link) => (
+            {/* Desktop Navigation with Sliding Indicator */}
+            <nav className="hidden md:flex items-center ">
+              <div
+                ref={navRef}
+                className="relative flex items-center space-x-1  rounded-2xl p-1.5 backdrop-blur-sm"
+              >
+                {/* Sliding background indicator */}
                 <motion.div
-                  key={link.name}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 0 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <Link
-                    to={link.href}
-                    className={`relative px-4 py-2 rounded-xl font-medium transition-all duration-300 group ${
-                      isActive(link.href)
-                        ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
-                        : "text-gray-600 hover:text-navy-600 dark:text-gray-300 dark:hover:text-blue-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50"
-                    }`}
+                  className="absolute left-0 bg-gradient-to-r from-navy-500 to-blue-600 dark:from-blue-500 dark:to-blue-400 rounded-full shadow-lg shadow-blue-500/10"
+                  initial={{
+                    height: "2px",
+                    width: 0,
+                    bottom: 0,
+                    left: 0,
+                  }}
+                  animate={{
+                    height: activeIndicator.isActive ? "100%" : "2px",
+                    width: activeIndicator.width,
+                    x: activeIndicator.left, // Use x for horizontal position
+                    bottom: activeIndicator.isActive ? 0 : 0, // Keep at bottom when inactive
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                  }}
+                />
+
+                {navLinks.map((link) => {
+                  const active = isActive(link.href);
+
+                  return (
+                    <motion.div
+                      key={link.name}
+                      whileHover={{ y: -1 }}
+                      whileTap={{ y: 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Link
+                        to={link.href}
+                        data-path={link.href}
+                        className={`relative z-10 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 ${
+                          active
+                            ? "text-blue-500 dark:text-white"
+                            : "text-gray-600 hover:text-navy-600 dark:text-gray-300 dark:hover:text-blue-400"
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+                {/* <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <motion.button
+                      whileHover={{ y: -1 }}
+                      whileTap={{ y: 0 }}
+                      className="relative z-10 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 text-gray-600 hover:text-navy-600 dark:text-gray-300 dark:hover:text-blue-400"
+                    >
+                      About
+                    </motion.button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="rounded-xl shadow-lg dark:bg-slate-900/95 bg-white/95 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50"
                   >
-                    {link.name}
-
-                    {/* Active indicator */}
-                    {isActive(link.href) && (
-                      <motion.div
-                        className="absolute -bottom-1 left-1/2 w-2 h-2 bg-white dark:bg-blue-100 rounded-full shadow-sm"
-                        layoutId="activeIndicator"
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 30,
-                        }}
-                        style={{ x: "-50%" }}
-                      />
-                    )}
-
-                    {/* Hover effect for non-active links */}
-                    {!isActive(link.href) && (
-                      <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-navy-500/10 to-blue-600/10 dark:from-blue-500/10 dark:to-blue-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    )}
-                  </Link>
-                </motion.div>
-              ))}
+                    <DropdownMenuItem asChild>
+                      <Link to="/about/company">Company</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/about/team">Team</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/about/careers">Careers</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu> */}
+              </div>
             </nav>
 
             {/* Theme Toggle & Mobile Menu */}
@@ -169,15 +263,14 @@ export default function Header() {
               {/* Theme Toggle Button */}
               <motion.button
                 onClick={toggleTheme}
-                className="p-3 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
+                className="p-3 rounded-xl bg-gray-100/80 border border-slate-300 dark:border-slate-600 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
                 aria-label="Toggle theme"
-                whileHover={{ scale: 1.05, rotate: 180 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                transition={{ type: "spring" }}
               >
                 <motion.div
                   initial={false}
-                  animate={{ rotate: theme === "dark" ? 360 : 0 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
                 >
                   {theme === "light" ? (
@@ -194,7 +287,7 @@ export default function Header() {
               {/* Mobile Menu Button */}
               <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden p-3 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md relative z-[60]"
+                className="md:hidden p-3 rounded-xl border  bg-gray-100/80 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md relative z-[60]"
                 aria-label="Toggle menu"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -260,9 +353,19 @@ export default function Header() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.1, duration: 0.3 }}
                 >
-                  <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 dark:from-white dark:to-blue-300 bg-clip-text text-transparent">
-                    Navigation
-                  </span>
+                  <Link
+                    to="/blog"
+                    className="flex items-center space-x-2 group py-8"
+                  >
+                    <img
+                      src={Logo}
+                      alt="yahyaoncloud logo"
+                      className={`rounded-xl object-cover group-hover:scale-105 transition-all duration-200 ${"w-16 h-16"}`}
+                    />
+                    <span className="mrs-saint-delafield-regular text-xl font-thin text-gray-900 dark:text-white">
+                      Yahya On Cloud
+                    </span>
+                  </Link>
                   <motion.button
                     onClick={() => setIsMenuOpen(false)}
                     className="p-2 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 transition-colors duration-200"
@@ -275,59 +378,85 @@ export default function Header() {
                   </motion.button>
                 </motion.div>
 
-                {/* Navigation Links */}
+                {/* Navigation Links with Mobile Sliding Indicator */}
                 <nav className="flex-1 px-4 py-6">
-                  <div className="flex flex-col space-y-2">
-                    {navLinks.map((link, index) => (
+                  <div className="relative flex flex-col space-y-2">
+                    {/* Mobile Sliding Background - positioned absolutely */}
+                    {navLinks.some((link) => isActive(link.href)) && (
                       <motion.div
-                        key={link.name}
-                        initial={{ x: 50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
+                        className="absolute left-2 bg-gradient-to-r from-navy-500 to-blue-600 rounded-2xl shadow-lg shadow-blue-500/25 z-0"
+                        layoutId="mobileActiveIndicator"
                         transition={{
-                          delay: 0.1 + index * 0.1,
-                          duration: 0.4,
                           type: "spring",
-                          stiffness: 100,
-                          damping: 12,
+                          stiffness: 300,
+                          damping: 30,
                         }}
-                      >
+                        style={{
+                          top: `${
+                            navLinks.findIndex((link) => isActive(link.href)) *
+                              72 +
+                            8
+                          }px`, // 72px = height + margin
+                          width: "calc(100% - 16px)",
+                          height: "56px",
+                        }}
+                      />
+                    )}
+
+                    {navLinks.map((link, index) => {
+                      const active = isActive(link.href);
+
+                      return (
                         <motion.div
-                          whileHover={{ x: 8, scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
+                          key={link.name}
+                          initial={{ x: 50, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
                           transition={{
+                            delay: 0.1 + index * 0.1,
+                            duration: 0.4,
                             type: "spring",
-                            stiffness: 400,
-                            damping: 17,
+                            stiffness: 100,
+                            damping: 12,
                           }}
                         >
-                          <Link
-                            to={link.href}
-                            className={`block px-4 py-4 mx-2 rounded-2xl font-semibold transition-all duration-300 ${
-                              isActive(link.href)
-                                ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25"
-                                : "text-gray-700 hover:text-navy-600 dark:text-gray-200 dark:hover:text-blue-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50"
-                            }`}
-                            onClick={() => setIsMenuOpen(false)}
+                          <motion.div
+                            whileHover={{ x: 4, scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 17,
+                            }}
                           >
-                            <div className="flex items-center justify-between">
-                              <span className="text-lg">{link.name}</span>
-                              {isActive(link.href) && (
-                                <motion.div
-                                  className="w-2 h-2 bg-white dark:bg-blue-100 rounded-full"
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  transition={{
-                                    type: "spring",
-                                    stiffness: 500,
-                                    damping: 30,
-                                  }}
-                                />
-                              )}
-                            </div>
-                          </Link>
+                            <Link
+                              to={link.href}
+                              className={`relative z-10 block px-4 py-4 mx-2 rounded-2xl font-semibold transition-all duration-300 ${
+                                active
+                                  ? "text-white"
+                                  : "text-gray-700 hover:text-navy-600 dark:text-gray-200 dark:hover:text-blue-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50"
+                              }`}
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-lg">{link.name}</span>
+                                {active && (
+                                  <motion.div
+                                    className="w-2 h-2 bg-white dark:bg-blue-100 rounded-full"
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{
+                                      type: "spring",
+                                      stiffness: 500,
+                                      damping: 30,
+                                    }}
+                                  />
+                                )}
+                              </div>
+                            </Link>
+                          </motion.div>
                         </motion.div>
-                      </motion.div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </nav>
 
