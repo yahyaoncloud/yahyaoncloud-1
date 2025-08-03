@@ -15,7 +15,7 @@ function LayoutContent({ children, sidebar }: MainLayoutProps) {
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-col bg-background dark:bg-slate-950 min-h-screen">
+    <div className="flex flex-col bg-background dark:bg-slate-950 min-h-screen overflow-x-clip">
       <Header />
       <motion.main
         initial={{ opacity: 0 }}
@@ -23,7 +23,7 @@ function LayoutContent({ children, sidebar }: MainLayoutProps) {
         transition={{ duration: 0.25 }}
         className="flex-grow"
       >
-        <div className=" flex py-4 md:px-8 px-4">
+        <div className=" flex py-4 md:px-8 ">
           {sidebar && (
             <aside className="hidden lg:block max-w-2xl  z-40">
               <div className="sticky top-24 w-72" />

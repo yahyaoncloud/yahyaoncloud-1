@@ -266,15 +266,15 @@ export default function PostPage() {
         )}
 
         {/* Main Content - Mobile Optimized */}
-        <div className="relative bg-gradient-to-t dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 bg-gray-100 via-slate-200 to-slate-100 p-2 rounded">
+        <div className="relative bg-gradient-to-t dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 bg-gray-100 via-slate-200 to-slate-100 md:p-2 p-0 rounded">
           <motion.article
-            className="mx-auto px-3 sm:px-6 lg:px-8 max-w-sm md:max-w-2xl lg:max-w-4xl xl:max-w-5xl  -mt-6 sm:-mt-12 lg:-mt-16 relative z-10"
+            className="mx-auto px-3  lg:px-8 w-auto flex flex-col max-w-sm md:max-w-xl lg:max-w-4xl xl:max-w-5xl  -mt-6 sm:-mt-12 lg:-mt-16 relative z-10"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
             {/* Article Header Card - Mobile First */}
-            <div className="bg-white dark:bg-gray-800 mx-auto rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-4 sm:p-6 lg:p-8 mx-auto w-full">
                 {/* Like and Share Buttons - Alternative Position (if no cover image) */}
                 {!post.coverImage && (
