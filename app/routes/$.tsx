@@ -1,6 +1,6 @@
 // app/routes/$.tsx (for nested routes)
 
-import { NotFound } from "../components/404";
+import NotFound from "../components/404";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
