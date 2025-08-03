@@ -60,7 +60,9 @@ export default function AdminAbout() {
             theme === "dark" ? "text-white" : "text-gray-900"
           }`}
         >
-          <h1 className="text-2xl font-medium mb-2">Portfolio not found</h1>
+          <h1 className="text-2xl font-medium mb-2 text-indigo-800 dark:text-indigo-300">
+            Portfolio not found
+          </h1>
           <p className="text-gray-500">Please check back later.</p>
         </div>
       </div>
@@ -93,15 +95,16 @@ export default function AdminAbout() {
   const currentWorks = getCurrentWorks();
   const socialLinks = getSocialLinks();
   const projects = getProjects();
+  console.log(certifications);
 
   return (
     <motion.div className="min-h-screen" initial="hidden" animate="visible">
       {/* Hero Section - Compact */}
       <motion.section
-        className="my-8 p-10 dark:border-slate-700 dark:bg-slate-900 bg-slate-50 border-slate-300  border rounded-xl"
+        className="my-8 p-10 mx-2 dark:border-slate-700 dark:bg-slate-900 bg-slate-50 border-slate-300 border rounded-xl"
         variants={fadeInUp}
       >
-        <div className="max-w-4xl mx-auto ">
+        <div className="max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-12">
             {/* Profile Image */}
             <motion.div
@@ -119,9 +122,7 @@ export default function AdminAbout() {
             {/* Info */}
             <div className="flex-1 text-center md:text-left">
               <motion.h1
-                className={`text-3xl md:text-4xl font-bold mb-4 ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
+                className="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 dark:text-indigo-300"
                 variants={fadeInUp}
               >
                 {getName()}
@@ -241,11 +242,7 @@ export default function AdminAbout() {
         {/* Skills - Minimal Grid */}
         {skills.length > 0 && (
           <motion.section variants={fadeInUp}>
-            <h2
-              className={`text-2xl font-bold mb-8 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
+            <h2 className="text-2xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
               Skills
             </h2>
             <motion.div
@@ -273,14 +270,13 @@ export default function AdminAbout() {
         {/* Projects - Compact Cards */}
         {projects.length > 0 && (
           <motion.section variants={fadeInUp}>
-            <h2
-              className={`text-2xl font-bold mb-8 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
+            <h2 className="text-2xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
               Featured Projects
             </h2>
-            <motion.div className="grid grid-cols-2 gap-6" variants={stagger}>
+            <motion.div
+              className="grid md:grid-cols-2 gap-6"
+              variants={stagger}
+            >
               {projects.slice(0, 4).map((project, index) => (
                 <motion.div
                   key={`${project.title}-${index}`}
@@ -339,9 +335,9 @@ export default function AdminAbout() {
                         )}
 
                       <div className="flex gap-3">
-                        {project.liveUrl && (
+                        {project.url && (
                           <a
-                            href={project.liveUrl}
+                            href={project.url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`inline-flex items-center gap-1 text-sm ${
@@ -381,11 +377,7 @@ export default function AdminAbout() {
         {/* Experience - Clean Timeline */}
         {experiences.length > 0 && (
           <motion.section variants={fadeInUp}>
-            <h2
-              className={`text-2xl font-bold mb-8 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
+            <h2 className="text-3xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
               Experience
             </h2>
             <motion.div className="space-y-6" variants={stagger}>
@@ -399,14 +391,14 @@ export default function AdminAbout() {
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
                     <h3
-                      className={`text-lg font-semibold ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
+                      className={`text-xl font-semibold ${
+                        theme === "dark" ? "text-indigo-300" : "text-gray-900"
                       }`}
                     >
                       {exp.title}
                     </h3>
                     <span
-                      className={`text-sm ${
+                      className={`text-base leading-relaxed ${
                         theme === "dark" ? "text-gray-400" : "text-gray-600"
                       }`}
                     >
@@ -415,12 +407,12 @@ export default function AdminAbout() {
                   </div>
                   {exp.description && exp.description.length > 0 && (
                     <ul
-                      className={`space-y-1 text-sm ${
+                      className={`space-y-1 text-md ${
                         theme === "dark" ? "text-gray-300" : "text-gray-600"
-                      }`}
+                      } list-disc pl-5`}
                     >
                       {exp.description.slice(0, 2).map((desc, i) => (
-                        <li key={i}>• {desc}</li>
+                        <li key={i}>{desc}</li>
                       ))}
                     </ul>
                   )}
@@ -433,11 +425,7 @@ export default function AdminAbout() {
         {/* Current Work - Simple Cards */}
         {currentWorks.length > 0 && (
           <motion.section variants={fadeInUp}>
-            <h2
-              className={`text-2xl font-bold mb-8 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
+            <h2 className="text-3xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
               Currently Working On
             </h2>
             <motion.div className="grid gap-4" variants={stagger}>
@@ -452,14 +440,14 @@ export default function AdminAbout() {
                   variants={fadeInUp}
                 >
                   <h3
-                    className={`font-semibold mb-2 ${
+                    className={`font-semibold mb-2 text-xl ${
                       theme === "dark" ? "text-green-400" : "text-green-700"
                     }`}
                   >
                     {work.title}
                   </h3>
                   <p
-                    className={`text-sm ${
+                    className={`text-md ${
                       theme === "dark" ? "text-gray-300" : "text-gray-600"
                     }`}
                   >
@@ -472,15 +460,11 @@ export default function AdminAbout() {
         )}
 
         {/* Compact Sections for Certifications and Hobbies */}
-        <div className="grid  md:grid-cols-2 gap-12">
+        <div className="grid md:grid-cols-2 gap-12">
           {/* Certifications */}
           {certifications.length > 0 && (
             <motion.section variants={fadeInUp}>
-              <h2
-                className={`text-xl font-semibold mb-6 ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
-              >
+              <h2 className="text-3xl font-semibold mb-6 text-indigo-800 dark:text-indigo-300">
                 Certifications
               </h2>
               <motion.div className="space-y-3" variants={stagger}>
@@ -490,14 +474,14 @@ export default function AdminAbout() {
                     variants={fadeInUp}
                   >
                     <h4
-                      className={`font-medium ${
+                      className={`font-medium text-xl ${
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
                       {cert.title}
                     </h4>
                     <p
-                      className={`text-sm ${
+                      className={`text-md ${
                         theme === "dark" ? "text-gray-400" : "text-gray-600"
                       }`}
                     >
@@ -512,11 +496,7 @@ export default function AdminAbout() {
           {/* Hobbies */}
           {hobbies.length > 0 && (
             <motion.section variants={fadeInUp}>
-              <h2
-                className={`text-xl font-semibold mb-6 ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
-              >
+              <h2 className="text-2xl font-semibold mb-6 text-indigo-800 dark:text-indigo-300">
                 Interests
               </h2>
               <motion.div className="space-y-3" variants={stagger}>
@@ -526,14 +506,14 @@ export default function AdminAbout() {
                     variants={fadeInUp}
                   >
                     <h4
-                      className={`font-medium ${
+                      className={`font-medium text-xl ${
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
                       {hobby.name}
                     </h4>
                     <p
-                      className={`text-sm ${
+                      className={`text-md ${
                         theme === "dark" ? "text-gray-400" : "text-gray-600"
                       }`}
                     >
@@ -545,8 +525,6 @@ export default function AdminAbout() {
             </motion.section>
           )}
         </div>
-
-        {/* Contact - Minimal */}
       </div>
     </motion.div>
   );
