@@ -41,11 +41,13 @@ export const proseClasses = `
   prose-pre:overflow-x-auto prose-pre:font-mono prose-pre:text-sm sm:prose-pre:text-base
   prose-pre:text-emerald-200 dark:prose-pre:text-emerald-300
 
-  /* Tables */
-  prose-table:w-full prose-table:border prose-table:border-slate-300 dark:prose-table:border-slate-700
-  prose-th:bg-slate-200 dark:prose-th:bg-slate-800 prose-th:p-2 prose-th:font-semibold
-  prose-td:p-2 dark:prose-td:text-slate-200 prose-td:text-slate-900
-  prose-tbody tr:nth-child(even):bg-slate-50 dark:prose-tbody tr:nth-child(even):bg-slate-900/50
+/* Tables */
+prose-table:w-full prose-table:border-collapse prose-table:rounded-md prose-table:shadow-sm
+prose-table:border prose-table:border-slate-300 dark:prose-table:border-slate-700
+prose-th:bg-slate-200 dark:prose-th:bg-slate-800 prose-th:p-2 prose-th:font-semibold
+prose-td:p-2 dark:prose-td:text-slate-200 prose-td:text-slate-900
+prose-tbody tr:nth-child(even):bg-slate-50 dark:prose-tbody tr:nth-child(even):bg-slate-900/50
+
 
   /* Images */
   prose-img:rounded-md prose-img:shadow-sm prose-img:my-6

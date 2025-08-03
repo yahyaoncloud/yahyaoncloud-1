@@ -116,6 +116,42 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   }
 };
 
+export function useEnhanceBlogContent() {
+  useEffect(() => {
+    const article = document.querySelector("article") || document;
+
+    // --- TABLE WRAP ---
+    article.querySelectorAll("table").forEach((table) => {
+      if (table.parentElement?.classList.contains("overflow-x-auto")) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = "overflow-x-auto";
+      table.parentNode?.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    });
+
+    // --- COPY BUTTONS ---
+    article.querySelectorAll("pre").forEach((pre) => {
+      if (pre.querySelector(".copy-btn")) return; // already added
+
+      const button = document.createElement("button");
+      button.innerText = "Copy";
+      button.className =
+        "copy-btn absolute top-2 right-2 bg-slate-700 text-white px-2 py-1 text-xs rounded hover:bg-slate-600 z-10";
+
+      button.addEventListener("click", () => {
+        const code = pre.querySelector("code")?.innerText;
+        if (!code) return;
+        navigator.clipboard.writeText(code);
+        button.innerText = "Copied!";
+        setTimeout(() => (button.innerText = "Copy"), 1500);
+      });
+
+      pre.classList.add("relative");
+      pre.appendChild(button);
+    });
+  }, []);
+}
+
 // --- Component ---
 export default function PostPage() {
   const { theme } = useTheme();
@@ -125,6 +161,7 @@ export default function PostPage() {
   }>();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post?.likes || 0);
+  useEnhanceBlogContent();
 
   // Process content to add copy buttons to code elements
   useEffect(() => {
