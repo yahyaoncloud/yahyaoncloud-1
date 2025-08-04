@@ -19,7 +19,11 @@ import {
   Zap,
 } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
-import { getAllPosts, getCategories, getTags } from "../Services/post.server";
+import {
+  getPosts,
+  getAllCategories,
+  getAllTags,
+} from "../Services/post.server";
 import type { Author, Post, Category, Tag } from "../Types/types";
 import { useState, useEffect, useMemo } from "react";
 import dummyImage from "../assets/yahya_glass.png";
@@ -89,9 +93,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const tag = url.searchParams.get("tag") || "";
     const sortBy = url.searchParams.get("sort") || "newest";
 
-    const posts = await getAllPosts();
-    const categories = await getCategories();
-    const tags = await getTags();
+    const posts = await getPosts();
+    const categories = await getAllCategories();
+    const tags = await getAllTags();
 
     const serializedPosts = posts.map(serializePost);
 
