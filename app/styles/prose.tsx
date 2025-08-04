@@ -1,12 +1,12 @@
 export const proseClasses = `
-  prose mx-auto max-w-3xl
+  prose mx-auto max-w-3xl py-12
   text-base sm:text-lg leading-relaxed
   
 
   /* Headings: clean blog style */
   prose-headings:text-slate-700 dark:prose-headings:text-indigo-400
   prose-headings:font-bold
-  prose-h1:text-3xl sm:prose-h1:text-3xl lg:prose-h1:text-5xl prose-h1:font-extrabold prose-h1:mb-6 dark:prose-h1:text-indigo-400 prose-h1:text-indigo-800
+  prose-h1:text-5xl sm:prose-h1:text-5xl lg:prose-h1:text-5xl prose-h1:font-extrabold prose-h1:mb-6 dark:prose-h1:text-indigo-400 prose-h1:text-indigo-800
   prose-h2:text-2xl sm:prose-h2:text-2xl lg:prose-h2:text-4xl prose-h2:font-bold prose-h2:mb-4
   prose-h3:text-xl sm:prose-h3:text-xl lg:prose-h3:text-3xl prose-h3:font-semibold prose-h3:mb-3
   prose-h4:text-lg sm:prose-h4:text-lg prose-h4:font-medium prose-h4:mb-2
@@ -34,7 +34,7 @@ export const proseClasses = `
 
   /* Inline code */
    prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:bg-transparent prose-code:bg-indigo-500/20
-  prose-code:font-mono prose-code:text-sm prose-code:text-pink-500 dark:prose-code:text-blue-300
+  prose-code:font-mono prose-code:text-sm prose-code:text-pink-400 dark:prose-code:text-blue-300
 
   /* Code blocks */
   prose-pre:bg-slate-900 dark:prose-pre:bg-slate-950 prose-pre:rounded-lg prose-pre:p-4

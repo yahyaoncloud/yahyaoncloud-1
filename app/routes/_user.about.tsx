@@ -28,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 type LoaderData = {
-  portfolio: Portfolio | null;
+  portfolio: Portfolio;
 };
 
 const fadeInUp = {
@@ -468,7 +468,7 @@ export default function AdminAbout() {
                 Certifications
               </h2>
               <motion.div className="space-y-3" variants={stagger}>
-                {certifications.slice(0, 4).map((cert, index) => (
+                {certifications.map((cert, index) => (
                   <motion.div
                     key={`${cert.title}-${index}`}
                     variants={fadeInUp}

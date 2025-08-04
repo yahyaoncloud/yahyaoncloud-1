@@ -631,7 +631,7 @@
 //                         {category.name}
 //                       </h3>
 //                     </div>
-//                     <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100">
+//                     <button className="p-1 text-gray-400 hover:text-grayblog-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100">
 //                       <MoreHorizontal className="w-4 h-4" />
 //                     </button>
 //                   </div>

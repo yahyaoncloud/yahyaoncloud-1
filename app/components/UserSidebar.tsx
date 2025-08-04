@@ -27,6 +27,36 @@ type LoaderData = {
   };
 };
 
+// Animation variants for consistent motion
+const containerVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.25, 0, 1],
+    },
+  },
+};
+
+const buttonVariants = {
+  hover: { scale: 1.05, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)" },
+  tap: { scale: 0.95 },
+};
+
 // Helper function to convert ContactDetails to SocialLinks
 function convertContactDetailsToSocialLinks(
   contactDetails: ContactDetails
@@ -85,7 +115,6 @@ function convertContactDetailsToSocialLinks(
 function useSafeLoaderData() {
   try {
     const loaderData = useRouteLoaderData<LoaderData>("routes/_user");
-    // console.log(loaderData?.data.author.contactDetails);
     return {
       posts: loaderData?.data?.posts || [],
       author: loaderData?.data?.author.contactDetails || null,
@@ -119,10 +148,9 @@ export default function Sidebar({
 
   // Memoize the final data to avoid unnecessary recalculations
   const { recentPosts, socialLinks } = useMemo(() => {
-    // Use loader data if available and valid, otherwise fall back to props
     const finalRecentPosts =
       loaderPosts && loaderPosts.length > 0
-        ? loaderPosts.slice(0, 5) // Limit to 5 recent posts
+        ? loaderPosts.slice(0, 5)
         : propRecentPosts.slice(0, 5);
 
     const finalSocialLinks = loaderAuthor
@@ -135,62 +163,45 @@ export default function Sidebar({
     };
   }, [loaderPosts, loaderAuthor, propRecentPosts, propSocialLinks]);
 
-  // Optional: Log only in development
-  //   if (process.env.NODE_ENV === "development") {
-  //     console.log("Sidebar Data Status:", {
-  //       hasLoaderError: hasError,
-  //       loaderPostsCount: loaderPosts?.length || 0,
-  //       hasAuthor: !!loaderAuthor,
-  //       finalPostsCount: recentPosts.length,
-  //       finalSocialLinksCount: socialLinks.length,
-  //     });
-  //   }
-
   return (
     <motion.div
-      className={`p-6 flex max-w-full dark:bg-slate-950/30 border-slate-800 bg-slate-200 rounded-xl items-center justify-center flex-col gap-4 ${className}`}
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5 }}
+      className={`flex flex-col gap-6 p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 ${className}`}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
     >
       {/* Newsletter */}
       <motion.div
-        className={`rounded-2xl w-full p-6 border ${
-          theme === "dark"
-            ? "bg-gray-800/50 border-gray-700 backdrop-blur-sm"
-            : "bg-white/80 border-gray-200 backdrop-blur-sm shadow-sm"
-        }`}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
+        variants={cardVariants}
       >
         <h3
-          className={`text-lg font-semibold mb-4 ${
+          className={`text-xl font-bold mb-4 ${
             theme === "dark" ? "text-white" : "text-gray-900"
           }`}
         >
           Newsletter
         </h3>
         <p
-          className={`text-sm mb-4 ${
-            theme === "dark" ? "text-gray-300" : "text-gray-700"
+          className={`text-sm mb-4 leading-relaxed ${
+            theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}
         >
-          Get new blog posts delivered to your inbox.
+          Stay updated with the latest blog posts delivered to your inbox.
         </p>
-        <div className="flex gap-2 mx-auto w-auto flex-col">
+        <div className="flex flex-col gap-3">
           <input
             type="email"
             placeholder="Your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`flex rounded-xl px-3 py-2 border ${
+            className={`rounded-xl px-4 py-3 border text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ${
               theme === "dark"
                 ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400"
                 : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            }`}
           />
-          <button
+          <motion.button
             onClick={() => {
               if (email.trim()) {
                 onSubscribe(email.trim());
@@ -198,30 +209,25 @@ export default function Sidebar({
               }
             }}
             disabled={!email.trim()}
-            className={`px-4 py-2 w-full justify-center rounded-xl flex items-center gap-2 font-medium text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              theme === "dark"
-                ? "bg-blue-600 hover:bg-blue-500 text-white disabled:hover:bg-blue-600"
-                : "bg-blue-500 hover:bg-blue-600 text-white disabled:hover:bg-blue-500"
-            }`}
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
           >
             <Mail size={16} />
             Subscribe
-          </button>
+          </motion.button>
         </div>
       </motion.div>
 
-      {/* More Posts - Only show if we have posts */}
+      {/* More Posts */}
       {recentPosts.length > 0 && (
         <motion.div
-          className={`rounded-2xl w-full p-6 borde dark:bg-gray-800/50 dark:border-gray-700 backdrop-blur-sm"
-              bg-white border-gray-200 backdrop-blur-sm shadow-sm"
-          }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
+          variants={cardVariants}
         >
           <h3
-            className={`text-lg font-semibold mb-4 ${
+            className={`text-xl font-bold mb-4 ${
               theme === "dark" ? "text-white" : "text-gray-900"
             }`}
           >
@@ -229,78 +235,78 @@ export default function Sidebar({
           </h3>
           <div className="flex flex-col gap-3">
             {recentPosts.map((post, index) => (
-              <Link
+              <motion.div
                 key={post._id || post.slug || index}
-                to={`/blog/post/${post.slug}`}
-                className={`flex items-center justify-between p-3 rounded-xl group transition-all duration-300 dark:bg-gray-700/30 dark:hover:bg-gray-700/50 dark:border-slate-600 border border-slate-300 dark:text-gray-300 dark:hover:text-white
-                    bg-gray-100/30 hover:bg-gray-100 text-gray-700 hover:text-gray-900`}
+                variants={cardVariants}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <span className="text-sm font-medium line-clamp-2">
-                  {post.title}
-                </span>
-                <ChevronRight
-                  size={14}
-                  className={`transition-transform group-hover:translate-x-1 flex-shrink-0 ml-2 ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                <Link
+                  to={`/blog/post/${post.slug}`}
+                  className={`flex items-center justify-between p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-100/50 to-white/50 dark:from-gray-700/30 dark:to-gray-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 text-sm font-medium ${
+                    theme === "dark"
+                      ? "text-gray-300 hover:text-white"
+                      : "text-gray-700 hover:text-indigo-800"
                   }`}
-                />
-              </Link>
+                >
+                  <span className="line-clamp-2">{post.title}</span>
+                  <ChevronRight
+                    size={14}
+                    className={`transition-transform group-hover:translate-x-1 flex-shrink-0 ml-2 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  />
+                </Link>
+              </motion.div>
             ))}
           </div>
         </motion.div>
       )}
 
-      {/* Follow - Only show if we have social links */}
+      {/* Follow */}
       {socialLinks.length > 0 && (
         <motion.div
-          className={`rounded-2xl w-full p-6 border ${
-            theme === "dark"
-              ? "bg-blue-800/10  border-blue-600"
-              : "bg-white/80 border-gray-200 backdrop-blur-sm shadow-sm"
-          }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
+          variants={cardVariants}
         >
           <h3
-            className={`text-lg font-semibold mb-4 ${
+            className={`text-xl font-bold mb-4 ${
               theme === "dark" ? "text-white" : "text-gray-900"
             }`}
           >
             Follow Me
           </h3>
-          <div className="grid grid-cols-3 items-center justify-center">
+          <div className="grid grid-cols-3 gap-3">
             {socialLinks.map((social, index) => {
               const Icon = social.icon;
               return (
-                <a
+                <motion.a
                   key={social.id || social.href || index}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center justify-center gap-3 p-3 rounded-xl transition-all duration-300 dark:hover:bg-gray-700/50 dark:text-gray-300 dark:hover:text-white border-800"
-                      hover:bg-gray-100 text-gray-700 hover:text-slate-900 border-200"
+                  className={`flex items-center justify-center p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-100/50 to-white/50 dark:from-gray-700/30 dark:to-gray-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 ${
+                    theme === "dark"
+                      ? "text-gray-300 hover:text-white"
+                      : "text-gray-700 hover:text-indigo-800"
                   }`}
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
                 >
-                  <Icon size={28} />
-                </a>
+                  <Icon size={24} />
+                </motion.a>
               );
             })}
           </div>
         </motion.div>
       )}
 
-      {/* Fallback message when no data is available */}
+      {/* Fallback Message */}
       {recentPosts.length === 0 && socialLinks.length === 0 && hasError && (
         <motion.div
-          className={`rounded-2xl w-full p-6 border ${
-            theme === "dark"
-              ? "bg-gray-800/50 border-gray-700 backdrop-blur-sm"
-              : "bg-white/80 border-gray-200 backdrop-blur-sm shadow-sm"
-          }`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
+          variants={cardVariants}
         >
           <p
             className={`text-sm text-center ${
