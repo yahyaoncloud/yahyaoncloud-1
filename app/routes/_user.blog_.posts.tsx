@@ -1,5 +1,5 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, Link, useSearchParams, ScrollRestoration } from "@remix-run/react";
+import { useLoaderData, Link, useSearchParams } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
@@ -25,8 +25,7 @@ import {
   getAllTags,
 } from "../Services/post.server";
 import type { Author, Post, Category, Tag } from "../Types/types";
-import { useState, useEffect, useMemo, useRef } from "react";
-import debounce from "lodash/debounce"; // Add lodash for debouncing
+import { useState, useEffect, useMemo } from "react";
 import dummyImage from "../assets/yahya_glass.png";
 
 // --- Meta ---
@@ -189,6 +188,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
           {/* Image */}
           <div className="relative h-48 overflow-hidden">
             <motion.img
+              // src={post.coverImage || dummyImage}
               src={dummyImage}
               alt={post.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -348,6 +348,7 @@ const FeaturedPost = ({ post }: { post: Post }) => {
     >
       <div className="absolute inset-0">
         <img
+          // src={post.coverImage || dummyImage}
           src={dummyImage}
           alt={post.title}
           className="w-full h-full object-cover opacity-20"
@@ -380,7 +381,7 @@ const FeaturedPost = ({ post }: { post: Post }) => {
           </h2>
 
           {post.summary && (
-            <p className="text-white/90 text-lg mb-6 leading-relaxed max-w-3xl">
+            <p className="text-white/90 text-lg mb-6 leading-relaxed max-w-5xl">
               {post.summary}
             </p>
           )}
@@ -438,42 +439,11 @@ export default function ArticlesListPage() {
   const [selectedTag, setSelectedTag] = useState(filters.tag);
   const [sortBy, setSortBy] = useState(filters.sortBy);
 
-  // Reference to store scroll position
-  const scrollPositionRef = useRef<number>(0);
-
-  // Debounced function to update search params
-  const debouncedSetSearchParams = useMemo(
-    () =>
-      debounce((params: URLSearchParams) => {
-        setSearchParams(params, { replace: true });
-        window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
-      }, 300),
-    [setSearchParams]
-  );
-
-  // Save scroll position before filter changes
-  useEffect(() => {
-    scrollPositionRef.current = window.scrollY;
-  }, [searchTerm, selectedCategory, selectedTag, sortBy]);
-
-  // Update URL params with debounce
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchTerm) params.set("search", searchTerm);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedTag) params.set("tag", selectedTag);
-    if (sortBy !== "newest") params.set("sort", sortBy);
-
-    debouncedSetSearchParams(params);
-
-    return () => {
-      debouncedSetSearchParams.cancel(); // Cleanup debounce on unmount
-    };
-  }, [searchTerm, selectedCategory, selectedTag, sortBy, debouncedSetSearchParams]);
-
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
     let filtered = [...posts];
+
+    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (post) =>
@@ -481,16 +451,22 @@ export default function ArticlesListPage() {
           post.summary?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
+
+    // Category filter
     if (selectedCategory) {
       filtered = filtered.filter((post) =>
         post.categories?.some((cat) => cat.slug === selectedCategory)
       );
     }
+
+    // Tag filter
     if (selectedTag) {
       filtered = filtered.filter((post) =>
         post.tags?.some((tag) => tag.name === selectedTag)
       );
     }
+
+    // Sort
     switch (sortBy) {
       case "oldest":
         filtered.sort(
@@ -504,22 +480,32 @@ export default function ArticlesListPage() {
       case "liked":
         filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
         break;
-      default:
+      default: // newest
         filtered.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
     }
+
     return filtered;
   }, [posts, searchTerm, selectedCategory, selectedTag, sortBy]);
 
   const featuredPost = posts.find((post) => post.featured);
   const trendingPosts = posts.filter((post) => post.trending).slice(0, 3);
 
+  // Update URL params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set("search", searchTerm);
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (selectedTag) params.set("tag", selectedTag);
+    if (sortBy !== "newest") params.set("sort", sortBy);
+
+    setSearchParams(params, { replace: true });
+  }, [searchTerm, selectedCategory, selectedTag, sortBy, setSearchParams]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <ScrollRestoration />
-
       {/* Header */}
       <motion.div
         className="relative py-16 md:py-24 overflow-hidden"
@@ -528,7 +514,7 @@ export default function ArticlesListPage() {
         transition={{ duration: 0.8 }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-pink-600/10"></div>
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
           <motion.h1
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-indigo-800 dark:text-indigo-300 mb-6 leading-tight"
             initial={{ opacity: 0, y: 30 }}
@@ -539,7 +525,7 @@ export default function ArticlesListPage() {
           </motion.h1>
 
           <motion.p
-            className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
+            className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-5xl mx-auto leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
@@ -574,7 +560,7 @@ export default function ArticlesListPage() {
       {/* Featured Post */}
       {featuredPost && (
         <motion.div
-          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-16"
+          className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 mb-16"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.8 }}
@@ -585,7 +571,7 @@ export default function ArticlesListPage() {
 
       {/* Filters and Search */}
       <motion.div
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12"
+        className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 mb-12"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -618,20 +604,6 @@ export default function ArticlesListPage() {
                 {categories.map((category) => (
                   <option key={category._id} value={category.slug}>
                     {category.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Tag Filter */}
-              <select
-                value={selectedTag}
-                onChange={(e) => setSelectedTag(e.target.value)}
-                className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-200"
-              >
-                <option value="">All Tags</option>
-                {tags.map((tag) => (
-                  <option key={tag.tagID} value={tag.name}>
-                    {tag.name}
                   </option>
                 ))}
               </select>
@@ -732,7 +704,7 @@ export default function ArticlesListPage() {
       {/* Trending Posts */}
       {trendingPosts.length > 0 && (
         <motion.div
-          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-16"
+          className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -765,7 +737,7 @@ export default function ArticlesListPage() {
 
       {/* Results Counter */}
       <motion.div
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-8"
+        className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 mb-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 0.5 }}
@@ -791,7 +763,7 @@ export default function ArticlesListPage() {
 
       {/* Posts Grid/List */}
       <motion.div
-        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16"
+        className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-16"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -800,7 +772,7 @@ export default function ArticlesListPage() {
           {filteredPosts.length === 0 ? (
             <motion.div
               key="no-results"
-              className="text-center py-16"
+              className="text-center py-16 max-w-6xl"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
@@ -836,14 +808,17 @@ export default function ArticlesListPage() {
                   ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8"
                   : "space-y-6"
               }
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
               {filteredPosts.map((post, index) => (
                 <motion.div
                   key={post._id}
-                  variants={itemVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
                   transition={{ delay: index * 0.05, duration: 0.5 }}
                 >
                   {viewMode === "grid" ? (
@@ -853,6 +828,7 @@ export default function ArticlesListPage() {
                       <div className="md:flex">
                         <div className="md:w-64 h-48 md:h-auto">
                           <img
+                            // src={post.coverImage || dummyImage}
                             src={dummyImage}
                             alt={post.title}
                             className="w-full h-full object-cover"
