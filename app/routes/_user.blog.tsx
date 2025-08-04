@@ -788,52 +788,54 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
               custom={index + 1}
               whileHover="hover"
             >
-              <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
-                {/* Thumbnail */}
-                <div
-                  className="w-16 sm:w-20 lg:w-24 h-16 sm:h-20 lg:h-24 
+              <Link to={`/blog/post/${post.slug}`}>
+                <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
+                  {/* Thumbnail */}
+                  <div
+                    className="w-16 sm:w-20 lg:w-24 h-16 sm:h-20 lg:h-24 
                                flex-shrink-0 rounded-lg overflow-hidden"
-                >
-                  <img
-                    // src={post.coverImage || dummyImage2}
-                    src={dummyImage}
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0 flex flex-col justify-between">
-                  <div>
-                    <h4
-                      className="font-semibold text-gray-900 dark:text-white 
-                                 mb-1 sm:mb-2 line-clamp-2 text-sm sm:text-base lg:text-lg
-                                 leading-tight"
-                    >
-                      {post.title}
-                    </h4>
-                    <p
-                      className="text-gray-600 dark:text-gray-400 
-                                 text-xs sm:text-sm line-clamp-2 mb-1 sm:mb-2
-                                 leading-relaxed"
-                    >
-                      {post.summary}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="text-xs text-gray-500 dark:text-gray-500">
-                      {new Date(post.createdAt).toLocaleDateString()}
-                    </span>
-                    <ArrowRight
-                      size={12}
-                      className="text-blue-600 dark:text-blue-400 sm:w-4 sm:h-4
-                               flex-shrink-0"
+                  >
+                    <img
+                      // src={post.coverImage || dummyImage2}
+                      src={dummyImage}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div>
+                      <h4
+                        className="font-semibold text-gray-900 dark:text-white 
+                      mb-1 sm:mb-2 line-clamp-2 text-sm sm:text-base lg:text-lg
+                      leading-tight"
+                      >
+                        {post.title}
+                      </h4>
+                      <p
+                        className="text-gray-600 dark:text-gray-400 
+                                 text-xs sm:text-sm line-clamp-2 mb-1 sm:mb-2
+                                 leading-relaxed"
+                      >
+                        {post.summary}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-auto">
+                      <span className="text-xs text-gray-500 dark:text-gray-500">
+                        {new Date(post.createdAt).toLocaleDateString()}
+                      </span>
+                      <ArrowRight
+                        size={12}
+                        className="text-blue-600 dark:text-blue-400 sm:w-4 sm:h-4
+                               flex-shrink-0"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </div>
