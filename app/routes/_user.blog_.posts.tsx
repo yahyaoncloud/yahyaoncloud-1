@@ -1,5 +1,5 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, Link, useSearchParams } from "@remix-run/react";
+import { useLoaderData, Link, useSearchParams, ScrollRestoration } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
@@ -25,7 +25,8 @@ import {
   getAllTags,
 } from "../Services/post.server";
 import type { Author, Post, Category, Tag } from "../Types/types";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import debounce from "lodash/debounce"; // Add lodash for debouncing
 import dummyImage from "../assets/yahya_glass.png";
 
 // --- Meta ---
@@ -183,12 +184,12 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 
   return (
     <motion.div variants={cardVariants} whileHover="hover" className="group">
-      <Link to={`/blog/${post.slug}`} className="block">
+      <Link to={`/blog/post/${post.slug}`} className="block">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all duration-300 h-full">
           {/* Image */}
           <div className="relative h-48 overflow-hidden">
             <motion.img
-              src={post.coverImage || dummyImage}
+              src={dummyImage}
               alt={post.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               initial={{ scale: 1.1 }}
@@ -347,7 +348,7 @@ const FeaturedPost = ({ post }: { post: Post }) => {
     >
       <div className="absolute inset-0">
         <img
-          src={post.coverImage || dummyImage}
+          src={dummyImage}
           alt={post.title}
           className="w-full h-full object-cover opacity-20"
         />
@@ -373,7 +374,7 @@ const FeaturedPost = ({ post }: { post: Post }) => {
           </button>
         </div>
 
-        <Link to={`/blog/${post.slug}`} className="block group">
+        <Link to={`/blog/post/${post.slug}`} className="block group">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight group-hover:text-yellow-200 transition-colors duration-200">
             {post.title}
           </h2>
@@ -437,11 +438,42 @@ export default function ArticlesListPage() {
   const [selectedTag, setSelectedTag] = useState(filters.tag);
   const [sortBy, setSortBy] = useState(filters.sortBy);
 
+  // Reference to store scroll position
+  const scrollPositionRef = useRef<number>(0);
+
+  // Debounced function to update search params
+  const debouncedSetSearchParams = useMemo(
+    () =>
+      debounce((params: URLSearchParams) => {
+        setSearchParams(params, { replace: true });
+        window.scrollTo({ top: scrollPositionRef.current, behavior: "auto" });
+      }, 300),
+    [setSearchParams]
+  );
+
+  // Save scroll position before filter changes
+  useEffect(() => {
+    scrollPositionRef.current = window.scrollY;
+  }, [searchTerm, selectedCategory, selectedTag, sortBy]);
+
+  // Update URL params with debounce
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set("search", searchTerm);
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (selectedTag) params.set("tag", selectedTag);
+    if (sortBy !== "newest") params.set("sort", sortBy);
+
+    debouncedSetSearchParams(params);
+
+    return () => {
+      debouncedSetSearchParams.cancel(); // Cleanup debounce on unmount
+    };
+  }, [searchTerm, selectedCategory, selectedTag, sortBy, debouncedSetSearchParams]);
+
   // Filter and sort posts
   const filteredPosts = useMemo(() => {
     let filtered = [...posts];
-
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (post) =>
@@ -449,22 +481,16 @@ export default function ArticlesListPage() {
           post.summary?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
-    // Category filter
     if (selectedCategory) {
       filtered = filtered.filter((post) =>
         post.categories?.some((cat) => cat.slug === selectedCategory)
       );
     }
-
-    // Tag filter
     if (selectedTag) {
       filtered = filtered.filter((post) =>
         post.tags?.some((tag) => tag.name === selectedTag)
       );
     }
-
-    // Sort
     switch (sortBy) {
       case "oldest":
         filtered.sort(
@@ -478,32 +504,22 @@ export default function ArticlesListPage() {
       case "liked":
         filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
         break;
-      default: // newest
+      default:
         filtered.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
     }
-
     return filtered;
   }, [posts, searchTerm, selectedCategory, selectedTag, sortBy]);
 
   const featuredPost = posts.find((post) => post.featured);
   const trendingPosts = posts.filter((post) => post.trending).slice(0, 3);
 
-  // Update URL params
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchTerm) params.set("search", searchTerm);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedTag) params.set("tag", selectedTag);
-    if (sortBy !== "newest") params.set("sort", sortBy);
-
-    setSearchParams(params, { replace: true });
-  }, [searchTerm, selectedCategory, selectedTag, sortBy, setSearchParams]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <ScrollRestoration />
+
       {/* Header */}
       <motion.div
         className="relative py-16 md:py-24 overflow-hidden"
@@ -602,6 +618,20 @@ export default function ArticlesListPage() {
                 {categories.map((category) => (
                   <option key={category._id} value={category.slug}>
                     {category.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Tag Filter */}
+              <select
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
+                className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-200"
+              >
+                <option value="">All Tags</option>
+                {tags.map((tag) => (
+                  <option key={tag.tagID} value={tag.name}>
+                    {tag.name}
                   </option>
                 ))}
               </select>
@@ -806,17 +836,14 @@ export default function ArticlesListPage() {
                   ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8"
                   : "space-y-6"
               }
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
             >
               {filteredPosts.map((post, index) => (
                 <motion.div
                   key={post._id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
                   transition={{ delay: index * 0.05, duration: 0.5 }}
                 >
                   {viewMode === "grid" ? (
@@ -826,7 +853,7 @@ export default function ArticlesListPage() {
                       <div className="md:flex">
                         <div className="md:w-64 h-48 md:h-auto">
                           <img
-                            src={post.coverImage || dummyImage}
+                            src={dummyImage}
                             alt={post.title}
                             className="w-full h-full object-cover"
                           />
@@ -850,7 +877,10 @@ export default function ArticlesListPage() {
                                   </div>
                                 )}
 
-                              <Link to={`/blog/${post.slug}`} className="group">
+                              <Link
+                                to={`/blog/post/${post.slug}`}
+                                className="group"
+                              >
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
                                   {post.title}
                                 </h3>
