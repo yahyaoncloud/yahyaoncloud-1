@@ -22,6 +22,8 @@ import {
   Copy,
   BookOpen,
   User,
+  EyeIcon,
+  EyeOff,
 } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
 import { getAuthorByAuthorId, getPostBySlug } from "../Services/post.server";
@@ -282,6 +284,11 @@ export default function PostPage() {
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0.7]);
   const contentInView = useInView(contentRef, { once: true, margin: "-100px" });
   const metaInView = useInView(metaRef, { once: true, margin: "-50px" });
+  const [isNavVisible, setIsNavVisible] = useState(true); // State for nav visibility
+
+  const toggleNavVisibility = () => {
+    setIsNavVisible(!isNavVisible);
+  };
 
   useEnhanceBlogContent();
 
@@ -330,6 +337,15 @@ export default function PostPage() {
     });
   };
 
+  const hoverButtonVariants = {
+    hover: {
+      scale: 1.1,
+      boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
+      transition: { duration: 0.2 },
+    },
+    tap: { scale: 0.9 },
+  };
+
   const handleLike = async () => {
     setIsLiked(!isLiked);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
@@ -363,75 +379,110 @@ export default function PostPage() {
   };
 
   return (
-    <div className="max-w-lg md:max-w-6xl min-h-screen bg-gradient-to-br mx-auto from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className=" max-w-[350px] sm:max-w-sm md:max-w-md lg:max-w-xl xl:max-w-5xl min-h-screen bg-gradient-to-br mx-auto from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Floating Navigation */}
-      <motion.div
-        className={`fixed top-16 sm:top-18 left-2 right-2 sm:left-4 sm:right-4 z-50 transition-all duration-500 ${
-          isScrolled ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"
-        }`}
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: isScrolled ? 1 : 0, y: isScrolled ? 0 : -20 }}
-      >
-        <div className="mx-auto max-w-5xl">
-          <motion.div
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-2xl"
-            whileHover={{ y: -2 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="relative flex flex-col md:flex-row sm:items-center justify-between px-3 sm:px-6 py-3 sm:py-4 gap-3 sm:gap-4">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link
-                  to="/blog"
-                  className="flex items-center gap-2 sm:gap-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 font-medium text-sm sm:text-base"
+      {isNavVisible && (
+        <motion.div
+          className={`fixed top-16 sm:top-18 left-2 right-2 sm:left-4 sm:right-4 z-50 transition-all duration-500 ${
+            isScrolled
+              ? "translate-y-0 opacity-100"
+              : "-translate-y-20 opacity-0"
+          }`}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: isScrolled ? 1 : 0, y: isScrolled ? 0 : -20 }}
+        >
+          <div className="mx-auto max-w-5xl">
+            <motion.div
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-2xl"
+              whileHover={{ y: -2 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="relative flex flex-col md:flex-row sm:items-center justify-between px-3 sm:px-6 py-3 sm:py-4 gap-3 sm:gap-4">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span>Back to Blog</span>
-                </Link>
-              </motion.div>
-              <div className="flex-1 sm:px-4">
-                <h1 className="text-xs sm:text-sm items-center text-pink-500 md:justify-center italic gap-4 flex font-serif text-center  dark:text-indigo-300 truncate">
-                  <span>Now Reading:</span> <p>{post.title}</p>
-                </h1>
-              </div>
+                  <Link
+                    to="/blog"
+                    className="flex items-center gap-2 sm:gap-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 font-medium text-sm sm:text-base"
+                  >
+                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span>Back to Blog</span>
+                  </Link>
+                </motion.div>
+                <div className="flex-1 sm:px-4">
+                  <h1 className="text-wrap text-xs sm:text-sm items-center text-pink-500 md:justify-center italic gap-4 flex font-serif text-center dark:text-indigo-300 truncate">
+                    <p>{post.title}</p>
+                  </h1>
+                </div>
 
-              <div className=" flex items-center gap-2 sm:gap-3">
-                <motion.button
-                  onClick={handleLike}
-                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm ${
-                    isLiked
-                      ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 shadow-md"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-sm hover:shadow-md"
-                  }`}
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <Heart
-                    className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                      isLiked ? "fill-current" : ""
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <motion.button
+                    onClick={handleLike}
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm ${
+                      isLiked
+                        ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 shadow-md"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-sm hover:shadow-md"
                     }`}
-                  />
-                  <span className="hidden sm:inline">{likeCount}</span>
-                </motion.button>
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <Heart
+                      className={`w-3 h-3 sm:w-4 sm:h-4 ${
+                        isLiked ? "fill-current" : ""
+                      }`}
+                    />
+                    <span className="hidden sm:inline">{likeCount}</span>
+                  </motion.button>
 
-                <motion.button
-                  onClick={handleShare}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 font-medium shadow-sm hover:shadow-md text-xs sm:text-sm"
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Share</span>
-                </motion.button>
+                  <motion.button
+                    onClick={handleShare}
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 font-medium shadow-sm hover:shadow-md text-xs sm:text-sm"
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Share</span>
+                  </motion.button>
+
+                  <motion.button
+                    onClick={toggleNavVisibility}
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 font-medium shadow-sm hover:shadow-md text-xs sm:text-sm"
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    title={isNavVisible ? "Hide Navigation" : "Show Navigation"}
+                  >
+                    {isNavVisible ? (
+                      <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
+                    ) : (
+                      <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    )}
+                    <span className="hidden sm:inline">
+                      {isNavVisible ? "Hide" : "Show"}
+                    </span>
+                  </motion.button>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+      {/* Hover Toggle Button */}
+      {!isNavVisible && (
+        <motion.button
+          onClick={toggleNavVisibility}
+          className="fixed top-24 right-4 z-50 p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-md hover:shadow-lg"
+          variants={hoverButtonVariants}
+          whileHover="hover"
+          whileTap="tap"
+          title="Show Navigation"
+        >
+          <EyeIcon className="w-5 h-5" />
+        </motion.button>
+      )}
 
       {/* Hero Section */}
       <motion.div
@@ -481,7 +532,7 @@ export default function PostPage() {
                   </div>
 
                   <motion.h1
-                    className="text-5xl md:text-4xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight"
+                    className="text-4xl md:text-4xl w-md lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight"
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
@@ -554,11 +605,11 @@ export default function PostPage() {
         initial="hidden"
         animate="visible"
       >
-        <div className="mx-auto max-w-5xl px-3 sm:px-4 md:px-6 lg:px-8 -mt-2 sm:-mt-4">
+        <div className="mx-auto max-w-[345px] sm:max-w-sm md:max-w-2xl lg:max-w-5xl xl:max-w-5xl px-3 sm:px-4 md:px-6 lg:px-8 -mt-2 sm:-mt-4">
           {/* Article Header Card (for posts without cover image) */}
           {!post.coverImage && (
             <motion.div
-              className="mb-6 sm:mb-8 bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className="mb-6 max-w-md sm:mb-8 bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
               variants={cardVariants}
             >
               <div className="p-4 sm:p-6 md:p-8 lg:p-10">
@@ -874,7 +925,7 @@ export default function PostPage() {
             initial="hidden"
             animate={contentInView ? "visible" : "hidden"}
           >
-            <div className="p-4 sm:p-6 md:p-8 lg:p-12">
+            <div className="p-6 sm:p-6 md:p-8 lg:p-12">
               <motion.div
                 className={proseClasses}
                 initial={{ opacity: 0, y: 30 }}

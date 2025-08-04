@@ -4,6 +4,14 @@ export default {
   content: ["./app/**/{**,.client,.server}/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      screens: {
+        xs: "345px", 
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1536px",
+      },
       colors: {
         background: "hsl(var(--background) / 1)",
         foreground: "hsl(var(--foreground) / 1)",
@@ -73,6 +81,78 @@ export default {
           },
         },
       }),
+      width: {
+        xs: "18rem", // 288px, 
+        sm: "24rem", // 384px
+        md: "28rem", // 448px
+        lg: "32rem", // 512px
+        xl: "36rem", // 576px
+        "2xl": "42rem", // 672px
+        "screen-xs": "100vw", // Full width for mobile
+        "screen-sm": "100vw",
+        "screen-md": "100vw",
+        "screen-lg": "100vw",
+        "screen-xl": "100vw",
+        "screen-2xl": "100vw",
+      },
+      minWidth: {
+        xs: "18rem",
+        sm: "24rem",
+        md: "28rem",
+        lg: "32rem",
+        xl: "36rem",
+        "2xl": "42rem",
+      },
+      maxWidth: {
+        xs: "18rem",
+        sm: "24rem",
+        md: "28rem",
+        lg: "32rem",
+        xl: "36rem",
+        "2xl": "42rem",
+        "screen-xs": "375px", // Matches mobile xs breakpoint
+        "screen-sm": "640px",
+        "screen-md": "768px",
+        "screen-lg": "1024px",
+        "screen-xl": "1280px",
+        "screen-2xl": "1536px",
+      },
+      height: {
+        xs: "18rem",
+        sm: "24rem",
+        md: "28rem",
+        lg: "32rem",
+        xl: "36rem",
+        "2xl": "42rem",
+        "screen-xs": "100vh", // Full height for mobile
+        "screen-sm": "100vh",
+        "screen-md": "100vh",
+        "screen-lg": "100vh",
+        "screen-xl": "100vh",
+        "screen-2xl": "100vh",
+      },
+      minHeight: {
+        xs: "18rem",
+        sm: "24rem",
+        md: "28rem",
+        lg: "32rem",
+        xl: "36rem",
+        "2xl": "42rem",
+      },
+      maxHeight: {
+        xs: "18rem",
+        sm: "24rem",
+        md: "28rem",
+        lg: "32rem",
+        xl: "36rem",
+        "2xl": "42rem",
+        "screen-xs": "100vh",
+        "screen-sm": "100vh",
+        "screen-md": "100vh",
+        "screen-lg": "100vh",
+        "screen-xl": "100vh",
+        "screen-2xl": "100vh",
+      },
     },
   },
   plugins: [],
