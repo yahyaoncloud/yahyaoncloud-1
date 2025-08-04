@@ -206,7 +206,7 @@ const FeaturedPostSection = ({ post }: { post?: Post }) => {
           Featured Article
         </h2>
         <p
-          className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-400 
+          className="text-sm sm:text-base md:text-lg text-gray-600 italic dark:text-gray-400 
                       max-w-2xl mx-auto px-4"
         >
           Whats on demand? find out more.
