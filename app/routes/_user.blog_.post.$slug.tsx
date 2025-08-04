@@ -363,7 +363,7 @@ export default function PostPage() {
   };
 
   return (
-    <div className="max-w-xl md:max-w-6xl min-h-screen bg-gradient-to-br mx-auto from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="max-w-lg md:max-w-6xl min-h-screen bg-gradient-to-br mx-auto from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Floating Navigation */}
       <motion.div
         className={`fixed top-16 sm:top-18 left-2 right-2 sm:left-4 sm:right-4 z-50 transition-all duration-500 ${
@@ -549,7 +549,7 @@ export default function PostPage() {
 
       {/* Main Content */}
       <motion.div
-        className="relative mx-auto z-10 max-w-xl md:max-w-5xl"
+        className="relative mx-auto z-10 max-w-lg md:max-w-5xl"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
