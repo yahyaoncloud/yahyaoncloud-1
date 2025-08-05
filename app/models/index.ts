@@ -169,6 +169,7 @@ interface IContactDetails extends Document {
   website: string;
   createdAt: string;
   updatedAt: string;
+  buyCoffee: string;
 }
 
 interface IAuthor extends Document {
@@ -209,10 +210,16 @@ const UserSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ["admin", "user", "guest"], default: "user" },
-    ContactDetails: {
-      type: Schema.Types.ObjectId,
-      ref: "ContactDetails",
-      required: true,
+    contactDetails: {
+      email: { type: String, required: true },
+      phone: { type: String, required: true },
+      linkedin: { type: String, required: true },
+      github: { type: String, required: true },
+      twitter: { type: String, required: true },
+      website: { type: String, required: true },
+      createdAt: { type: String, required: true },
+      updatedAt: { type: String, required: true },
+      buyCoffee: { type: String, required: true },
     },
   },
   defaultOptions
@@ -428,6 +435,7 @@ const AuthorSchema = new Schema<IAuthor>(
       website: { type: String, required: true },
       createdAt: { type: String, required: true },
       updatedAt: { type: String, required: true },
+      buyCoffee: { type: String, required: true },
     },
   },
   defaultOptions

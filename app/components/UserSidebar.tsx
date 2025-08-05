@@ -4,7 +4,7 @@ import { Link, useRouteLoaderData } from "@remix-run/react";
 import { Mail, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Author, ContactDetails, Post } from "../Types/types";
-import { FaLinkedin, FaGithub, FaTwitter, FaGlobe } from "react-icons/fa";
+import { FaLinkedin, FaGithub, FaTwitter, FaGlobe, FaCoffee } from "react-icons/fa";
 
 interface SocialLink {
   id?: string;
@@ -105,6 +105,14 @@ function convertContactDetailsToSocialLinks(
       label: "Website",
       href: contactDetails.website,
       icon: FaGlobe,
+    });
+  }
+  if (contactDetails?.buyCoffee) {
+    socialLinks.push({
+      id: "buyCoffee",
+      label: "Buy Me Coffee",
+      href: contactDetails.buyCoffee,
+      icon: FaCoffee,
     });
   }
 

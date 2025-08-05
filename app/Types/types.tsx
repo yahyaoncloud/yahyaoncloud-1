@@ -83,7 +83,7 @@ export type MediaAsset = {
 export type GUser = {
   name: string;
   email: string;
-  date: number; 
+  date: number;
   message: string;
 };
 
@@ -96,6 +96,7 @@ export type ContactDetails = {
   website: string;
   createdAt: string;
   updatedAt?: string;
+  buyCoffee: string;
 };
 
 export type Author = {

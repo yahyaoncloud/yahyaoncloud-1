@@ -1,4 +1,4 @@
-// firebase.client.ts
+// app/utils/firebase.client.ts
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import {
@@ -9,6 +9,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { getDatabase } from "firebase/database";
+import { firebaseConfig } from "../environments/firebase.config";
 
 let app;
 let auth;
@@ -17,27 +18,21 @@ let googleProvider;
 let githubProvider;
 let twitterProvider;
 
-// Safe Firebase init (works on both server/client)
 if (typeof window !== "undefined") {
-  const firebaseConfig = window.ENV?.FIREBASE_CONFIG;
-
-  if (firebaseConfig) {
-    if (!getApps().length) {
-      app = initializeApp(firebaseConfig);
-    } else {
-      app = getApp();
-    }
-
-    auth = getAuth(app);
-    db = getDatabase(app);
-
-    googleProvider = new GoogleAuthProvider();
-    githubProvider = new GithubAuthProvider();
-    twitterProvider = new TwitterAuthProvider();
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApp();
   }
+
+  auth = getAuth(app);
+  db = getDatabase(app);
+
+  googleProvider = new GoogleAuthProvider();
+  githubProvider = new GithubAuthProvider();
+  twitterProvider = new TwitterAuthProvider();
 }
 
-// 🔓 Logout function
 export async function firebaseLogout() {
   if (auth) {
     try {
@@ -48,7 +43,6 @@ export async function firebaseLogout() {
   }
 }
 
-// 🖼️ Get user avatar URL (null-safe)
 export function getUserAvatar(user) {
   return user?.photoURL || "/default-avatar.png";
 }
