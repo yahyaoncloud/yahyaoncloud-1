@@ -112,7 +112,7 @@ export default function Header() {
     // { name: "Create", href: "/create" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
-    // { name: "Guestbook", href: "/guestbook" },
+    { name: "Guestbook", href: "/guestbook" },
   ];
 
   const isActive = (href: string) => {

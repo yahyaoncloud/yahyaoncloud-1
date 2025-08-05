@@ -63,7 +63,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function App() {
-  const { theme } = useLoaderData<typeof loader>();
+  const { theme, ENV } = useLoaderData<typeof loader>();
 
   // Initialize AOS (Animate on Scroll)
   useEffect(() => {
@@ -95,7 +95,7 @@ export default function App() {
           <ScrollRestoration />
           <script
             dangerouslySetInnerHTML={{
-              __html: `window.ENV = ${JSON.stringify(data.ENV)};`,
+              __html: `window.ENV = ${JSON.stringify(ENV)};`,
             }}
           />
 
