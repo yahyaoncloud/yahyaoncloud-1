@@ -28,27 +28,6 @@ export const getEnv = () => {
   if (!environment.MONGODB_URI) {
     throw new Error("MONGODB_URI is not defined in .env file");
   }
-  if (!environment.FIREBASE_API_KEY) {
-    throw new Error("FIREBASE_API_KEY is not defined in .env file");
-  }
-  if (!environment.FIREBASE_AUTH_DOMAIN) {
-    throw new Error("FIREBASE_AUTH_DOMAIN is not defined in .env file");
-  }
-  if (!environment.FIREBASE_DATABASE_URL) {
-    throw new Error("FIREBASE_DATABASE_URL is not defined in .env file");
-  }
-  if (!environment.FIREBASE_PROJECT_ID) {
-    throw new Error("FIREBASE_PROJECT_ID is not defined in .env file");
-  }
-  if (!environment.FIREBASE_STORAGE_BUCKET) {
-    throw new Error("FIREBASE_STORAGE_BUCKET is not defined in .env file");
-  }
-  if (!environment.FIREBASE_MESSAGING_SENDER_ID) {
-    throw new Error("FIREBASE_MESSAGING_SENDER_ID is not defined in .env file");
-  }
-  if (!environment.FIREBASE_APP_ID) {
-    throw new Error("FIREBASE_APP_ID is not defined in .env file");
-  }
 
   return environment;
 };
