@@ -1,7 +1,7 @@
 // app/utils/session.server.ts
 import { createCookieSessionStorage } from "@remix-run/node";
 
-const sessionSecret = process.env.SESSION_SECRET!;
+const sessionSecret = process.env.SESSION_SECRET || "yahyaoncloud";
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: "__firebase_session",
