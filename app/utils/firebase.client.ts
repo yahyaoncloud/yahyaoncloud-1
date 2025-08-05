@@ -9,7 +9,6 @@ import {
   signOut,
 } from "firebase/auth";
 import { getDatabase } from "firebase/database";
-import { firebaseConfig } from "../environments/firebase.config";
 
 let app;
 let auth;
@@ -18,7 +17,9 @@ let googleProvider;
 let githubProvider;
 let twitterProvider;
 
-if (typeof window !== "undefined") {
+if (typeof window !== "undefined" && window.ENV?.FIREBASE_CONFIG?.apiKey) {
+  const firebaseConfig = window.ENV.FIREBASE_CONFIG;
+
   if (!getApps().length) {
     app = initializeApp(firebaseConfig);
   } else {
@@ -32,7 +33,6 @@ if (typeof window !== "undefined") {
   githubProvider = new GithubAuthProvider();
   twitterProvider = new TwitterAuthProvider();
 }
-
 export async function firebaseLogout() {
   if (auth) {
     try {
