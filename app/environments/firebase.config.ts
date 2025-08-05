@@ -1,11 +1,25 @@
 // app/utils/firebase.config.ts
 export const firebaseConfig = {
-  apiKey: import.meta.env.VITE_PUBLIC_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: import.meta.env.VITE_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_PUBLIC_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  apiKey:
+    typeof window !== "undefined" ? window.ENV?.FIREBASE_CONFIG?.apiKey : "",
+  authDomain:
+    typeof window !== "undefined"
+      ? window.ENV?.FIREBASE_CONFIG?.authDomain
+      : "",
+  databaseURL:
+    typeof window !== "undefined"
+      ? window.ENV?.FIREBASE_CONFIG?.databaseURL
+      : "",
+  projectId:
+    typeof window !== "undefined" ? window.ENV?.FIREBASE_CONFIG?.projectId : "",
+  storageBucket:
+    typeof window !== "undefined"
+      ? window.ENV?.FIREBASE_CONFIG?.storageBucket
+      : "",
+  messagingSenderId:
+    typeof window !== "undefined"
+      ? window.ENV?.FIREBASE_CONFIG?.messagingSenderId
+      : "",
+  appId:
+    typeof window !== "undefined" ? window.ENV?.FIREBASE_CONFIG?.appId : "",
 };

@@ -10,29 +10,30 @@ import {
 } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
-let app;
-let auth;
-let db;
-let googleProvider;
-let githubProvider;
-let twitterProvider;
+let app, auth, db, googleProvider, githubProvider, twitterProvider;
 
-if (typeof window !== "undefined" && window.ENV?.FIREBASE_CONFIG?.apiKey) {
-  const firebaseConfig = window.ENV.FIREBASE_CONFIG;
+if (typeof window !== "undefined") {
+  const firebaseConfig = window.ENV?.FIREBASE_CONFIG;
 
-  if (!getApps().length) {
+  if (firebaseConfig && !getApps().length) {
     app = initializeApp(firebaseConfig);
-  } else {
+    auth = getAuth(app);
+    db = getDatabase(app);
+
+    googleProvider = new GoogleAuthProvider();
+    githubProvider = new GithubAuthProvider();
+    twitterProvider = new TwitterAuthProvider();
+  } else if (getApps().length) {
     app = getApp();
+    auth = getAuth(app);
+    db = getDatabase(app);
+
+    googleProvider = new GoogleAuthProvider();
+    githubProvider = new GithubAuthProvider();
+    twitterProvider = new TwitterAuthProvider();
   }
-
-  auth = getAuth(app);
-  db = getDatabase(app);
-
-  googleProvider = new GoogleAuthProvider();
-  githubProvider = new GithubAuthProvider();
-  twitterProvider = new TwitterAuthProvider();
 }
+
 export async function firebaseLogout() {
   if (auth) {
     try {
@@ -44,7 +45,7 @@ export async function firebaseLogout() {
 }
 
 export function getUserAvatar(user) {
-  return user?.photoURL || "/default-avatar.png";
+  return user?.photoURL;
 }
 
 export { app, auth, db, googleProvider, githubProvider, twitterProvider };
