@@ -67,19 +67,19 @@ export default function ContactPage() {
   const contactLinks = [
     {
       name: "Email",
-      href: "mailto:yahya@example.com",
+      href: "mailto:ykinwork1@gmail.com",
       icon: Mail,
-      display: "yahya@example.com",
+      display: "ykinwork1@gmail.com",
     },
     {
       name: "LinkedIn",
-      href: "https://www.linkedin.com/in/yahya",
+      href: "https://www.linkedin.com/in/ykinwork1",
       icon: Linkedin,
       display: "Connect professionally",
     },
     {
       name: "GitHub",
-      href: "https://github.com/yahya",
+      href: "https://github.com/tunkstun",
       icon: Github,
       display: "View my code",
     },
@@ -89,7 +89,7 @@ export default function ContactPage() {
     <div className="min-h-screen ">
       {/* Header */}
       <div className="max-w-5xl mx-auto px-6 pt-20 pb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-indigo-800 dark:text-indigo-400 mb-4">
           Let's Connect
         </h1>
         <p className="text-lg text-slate-600 dark:text-slate-300">

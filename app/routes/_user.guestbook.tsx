@@ -1,321 +1,467 @@
-import { useState } from "react";
-import { Send, Heart, Star, Clock } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Send, Clock, User, LogOut } from "lucide-react";
 import { FaGithub, FaGoogle, FaTwitter } from "react-icons/fa";
+import {
+  json,
+  type LoaderFunction,
+  type ActionFunction,
+} from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import {
+  auth,
+  googleProvider,
+  githubProvider,
+  twitterProvider,
+  db,
+} from "../utils/firebase.client";
+import { getUserSession } from "../utils/session.server";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { onValue, push, ref } from "firebase/database";
+
+interface Message {
+  id: string;
+  message: string;
+  timestamp: string;
+  user: {
+    name: string;
+    photo: string;
+    uid: string;
+  };
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const session = await getUserSession(request);
+  const user = session.get("user") || null;
+  return json({ user });
+};
+
+export const action: ActionFunction = async ({ request }) => {
+  const session = await getUserSession(request);
+  const formData = await request.formData();
+  const message = formData.get("message") as string;
+
+  if (!session.has("user")) {
+    return json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const user = session.get("user");
+  const timestamp = new Date().toISOString();
+
+  const entry = {
+    message,
+    timestamp,
+    user: {
+      name: user.displayName,
+      photo: user.photoURL,
+      uid: user.uid,
+    },
+  };
+
+  try {
+    await push(ref(db, "guestbook"), entry);
+    return json({ entry });
+  } catch (error) {
+    return json({ error: "Failed to send message" }, { status: 500 });
+  }
+};
 
 export default function MinimalistGuestbook() {
-  const [formData, setFormData] = useState({
-    name: "",
-    message: "",
-  });
-  const [status, setStatus] = useState({ type: "", message: "" });
+  const { user } = useLoaderData<typeof loader>();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [visibleMessages, setVisibleMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // Dummy comments
-  const dummyComments = [
-    {
-      id: "1",
-      author: { name: "Sarah Chen", avatar: "SC" },
-      content:
-        "Your tutorials completely changed my approach to React! Thank you for sharing your knowledge.",
-      createdAt: "2025-06-28T14:30:00Z",
-      reactions: { hearts: 12, stars: 8 },
-    },
-    {
-      id: "2",
-      author: { name: "Alex Rodriguez", avatar: "AR" },
-      content:
-        "Just landed my dream job thanks to your JavaScript guide series. Your content is pure gold!",
-      createdAt: "2025-06-27T09:15:00Z",
-      reactions: { hearts: 24, stars: 15 },
-    },
-    {
-      id: "3",
-      author: { name: "Maya Patel", avatar: "MP" },
-      content:
-        "Been following your blog for 2 years now. Every post is a masterpiece! Your coding style is so clean.",
-      createdAt: "2025-06-26T16:45:00Z",
-      reactions: { hearts: 18, stars: 11 },
-    },
-    {
-      id: "4",
-      author: { name: "David Kim", avatar: "DK" },
-      content:
-        "The Three.js tutorial series blew my mind! Never thought I could create 3D experiences on the web.",
-      createdAt: "2025-06-25T11:20:00Z",
-      reactions: { hearts: 31, stars: 22 },
-    },
-    {
-      id: "5",
-      author: { name: "Emma Watson", avatar: "EW" },
-      content:
-        "Clean code, great explanations, and amazing projects. Keep up the fantastic work!",
-      createdAt: "2025-06-24T08:30:00Z",
-      reactions: { hearts: 16, stars: 9 },
-    },
-    {
-      id: "6",
-      author: { name: "James Liu", avatar: "JL" },
-      content:
-        "Your portfolio inspired me to redesign mine. Love the minimalist approach!",
-      createdAt: "2025-06-23T15:45:00Z",
-      reactions: { hearts: 21, stars: 13 },
-    },
-  ];
+  const messagesPerPage = 20;
 
-  const [comments, setComments] = useState(dummyComments);
+  // Listen to Firebase messages and sort by timestamp (newest first)
+  useEffect(() => {
+    const messagesRef = ref(db, "guestbook");
+    const unsubscribe = onValue(messagesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const entries = Object.entries(data).map(
+          ([id, value]: [string, any]) => {
+            // Handle both new (user object) and old (name-based) formats
+            const isOldFormat = value.name && !value.user;
+            return {
+              id,
+              message: value.message || "",
+              timestamp: isOldFormat
+                ? new Date(value.timestamp).toISOString()
+                : value.timestamp || new Date().toISOString(),
+              user: isOldFormat
+                ? {
+                    name: value.name || "Anonymous",
+                    photo: "",
+                    uid: "",
+                  }
+                : {
+                    name:
+                      value.user?.name ||
+                      value.user?.displayName ||
+                      "Anonymous",
+                    photo: value.user?.photo || value.user?.photoURL || "",
+                    uid: value.user?.uid || "",
+                  },
+            };
+          }
+        );
+        // Sort messages by timestamp in descending order (newest first)
+        entries.sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+        setMessages(entries);
+        // Initialize with first 20 messages (newest)
+        setVisibleMessages(entries.slice(0, messagesPerPage));
+        setHasMore(entries.length > messagesPerPage);
+      } else {
+        setMessages([]);
+        setVisibleMessages([]);
+        setHasMore(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // Intersection Observer to load more messages
+  useEffect(() => {
+    if (!observerRef.current || !hasMore) return;
 
-    if (formData.name.trim().length < 2) {
-      setStatus({
-        type: "error",
-        message: "Name must have at least 2 characters.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-    if (formData.message.trim().length < 5) {
-      setStatus({
-        type: "error",
-        message: "Message must have at least 5 characters.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Add new comment to the list
-    const newComment = {
-      id: Date.now().toString(),
-      author: {
-        name: formData.name.trim(),
-        avatar: formData.name
-          .trim()
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-          .slice(0, 2),
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore) {
+          setIsLoadingMore(true);
+          // Simulate loading delay (can be removed if not needed)
+          setTimeout(() => {
+            const nextMessages = messages.slice(
+              0,
+              visibleMessages.length + messagesPerPage
+            );
+            setVisibleMessages(nextMessages);
+            setHasMore(nextMessages.length < messages.length);
+            setIsLoadingMore(false);
+          }, 500); // Adjust delay as needed
+        }
       },
-      content: formData.message.trim(),
-      createdAt: new Date().toISOString(),
-      reactions: { hearts: 0, stars: 0 },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [messages, visibleMessages, hasMore, isLoadingMore]);
+
+  const handleSignIn = async (provider: any) => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+      const session = await fetch("/api/auth", {
+        method: "POST",
+        body: JSON.stringify({
+          token: idToken,
+          uid: result.user.uid,
+          displayName: result.user.displayName,
+          photoURL: result.user.photoURL,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (session.ok) window.location.reload();
+    } catch (err) {
+      console.error("Login failed", err);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      await fetch("/api/logout", { method: "POST" });
+      window.location.reload();
+    } catch (err) {
+      console.error("Sign out failed", err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !user) return;
+
+    setIsSubmitting(true);
+    const entry = {
+      message: newMessage.trim(),
+      timestamp: new Date().toISOString(),
+      user,
     };
 
-    setComments((prev) => [newComment, ...prev]);
-
-    setStatus({
-      type: "success",
-      message: "Message added successfully!",
-    });
-
-    setTimeout(() => {
-      setFormData({ name: "", message: "" });
-      setStatus({ type: "", message: "" });
+    try {
+      await push(ref(db, "guestbook"), entry);
+      setNewMessage("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    } finally {
       setIsSubmitting(false);
-    }, 2000);
+    }
   };
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-    if (status.message) setStatus({ type: "", message: "" });
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent newline
+      handleSubmit(e); // Trigger form submission
+    }
   };
 
-  const formatTime = (dateStr) => {
-    const d = new Date(dateStr);
+  const formatTime = (timestamp: string) => {
     const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
+    const messageTime = new Date(timestamp);
+    const diffMs = now.getTime() - messageTime.getTime();
+
     if (diffMs < 60000) return "now";
     if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
     if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
     return `${Math.floor(diffMs / 86400000)}d ago`;
   };
 
-  const handleReaction = (commentId, type) => {
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              reactions: {
-                ...comment.reactions,
-                [type]: comment.reactions[type] + 1,
-              },
-            }
-          : comment
-      )
-    );
+  const getInitials = (name: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
-    <div className="min-h-screen ">
-      {/* Header */}
-      <div className="max-w-5xl mx-auto px-6 pt-20 pb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-          Guestbook
-        </h1>
-        <p className="text-slate-600 dark:text-slate-300">
-          Leave a message and see what others are saying
-        </p>
-      </div>
+    <div className="min-h-screen max-w-7xl ">
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+      <div className="max-w-7xl flex flex-col lg:w-[600px] xl:w-[1000px] md:w-[400px] w-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="mb-16 opacity-0 animate-[fadeInUp_0.6s_ease-out_forwards]">
+          <h1 className="text-5xl font-bold text-indigo-800 dark:text-indigo-400 mb-4">
+            Guestbook
+          </h1>
+          <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl">
+            Leave your mark and connect with others. Share your thoughts, ideas,
+            or just say hello.
+          </p>
+        </div>
 
-      {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Message Form */}
-          <div className="order-2 lg:order-1">
-            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-8 border border-slate-200 dark:border-slate-700">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">
-                Leave a message
-              </h2>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <input
-                    name="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Your name"
-                    className="w-full px-4 py-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  />
-                </div>
-
-                <div>
-                  <textarea
-                    name="message"
-                    rows={5}
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Write your message here..."
-                    className="w-full px-4 py-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
-                  />
-                </div>
-
-                {status.message && (
-                  <div
-                    className={`text-sm p-3 rounded-lg ${
-                      status.type === "error"
-                        ? "bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300"
-                        : "bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300"
-                    }`}
-                  >
-                    {status.message}
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-3 gap-12">
+          {/* Form Section */}
+          <div className="lg:col-span-1 max-w-lg opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards]">
+            {!user ? (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <User className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                   </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={!formData.name || !formData.message || isSubmitting}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                    !formData.name || !formData.message || isSubmitting
-                      ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send size={16} />
-                      Submit Message
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Social Sign In */}
-              <div className="mt-8">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-slate-50 dark:bg-slate-800/50 px-3 text-slate-500 dark:text-slate-400">
-                      Or sign in with
-                    </span>
-                  </div>
+                  <h2 className="text-xl font-medium text-slate-900 dark:text-white mb-2">
+                    Sign in to leave a message
+                  </h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Choose your preferred authentication method
+                  </p>
                 </div>
-
-                <div className="grid grid-cols-3 gap-3 mt-4">
-                  <button className="flex items-center justify-center p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors group">
-                    <FaGoogle className="w-5 h-5 text-slate-600 dark:text-slate-400 group-hover:text-red-500" />
-                  </button>
-                  <button className="flex items-center justify-center p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors group">
-                    <FaGithub className="w-5 h-5 text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white" />
-                  </button>
-                  <button className="flex items-center justify-center p-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors group">
-                    <FaTwitter className="w-5 h-5 text-slate-600 dark:text-slate-400 group-hover:text-blue-500" />
-                  </button>
+                <div className="space-y-3">
+                  {[
+                    {
+                      name: "Google",
+                      provider: googleProvider,
+                      icon: FaGoogle,
+                      color: "hover:text-red-500",
+                    },
+                    {
+                      name: "GitHub",
+                      provider: githubProvider,
+                      icon: FaGithub,
+                      color: "hover:text-slate-900 dark:hover:text-white",
+                    },
+                    {
+                      name: "Twitter",
+                      provider: twitterProvider,
+                      icon: FaTwitter,
+                      color: "hover:text-sky-500",
+                    },
+                  ].map(({ name, provider, icon: Icon, color }) => (
+                    <button
+                      key={name}
+                      onClick={() => handleSignIn(provider)}
+                      className="w-full py-3 px-4 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2"
+                    >
+                      <Icon
+                        className={`w-4 h-4 text-slate-600 dark:text-slate-400 ${color}`}
+                      />
+                      Sign in with {name}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Messages List */}
-          <div className="order-1 lg:order-3">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                Recent Messages
-              </h2>
-              <span className="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
-                {comments.length} messages
-              </span>
-            </div>
-
-            <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-              {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-200 dark:border-slate-700"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
-                      {comment.author.avatar}
+            ) : (
+              <div className="space-y-6 flex flex-col w-full">
+                {/* User Info */}
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-200 dark:border-slate-700">
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName}
+                      className="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-600"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                      {getInitials(user.displayName || "User")}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-slate-900 dark:text-white">
-                          {comment.author.name}
-                        </span>
-                        <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                          <Clock size={12} />
-                          {formatTime(comment.createdAt)}
-                        </div>
-                      </div>
-                      <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-                        {comment.content}
-                      </p>
-                      <div className="flex items-center gap-4">
-                        <button
-                          onClick={() => handleReaction(comment.id, "hearts")}
-                          className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                        >
-                          <Heart size={14} />
-                          <span>{comment.reactions.hearts}</span>
-                        </button>
-                        <button
-                          onClick={() => handleReaction(comment.id, "stars")}
-                          className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors"
-                        >
-                          <Star size={14} />
-                          <span>{comment.reactions.stars}</span>
-                        </button>
-                      </div>
-                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white">
+                      {user.displayName}
+                    </p>
+                    <button
+                      onClick={handleSignOut}
+                      className="text-xs text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-1 transition-colors"
+                    >
+                      <LogOut className="w-3 h-3" />
+                      Sign out
+                    </button>
                   </div>
                 </div>
-              ))}
+
+                {/* Message Input */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <textarea
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Share your thoughts, ideas, or just say hello..."
+                    rows={6}
+                    className="max-w-xl w-full px-0 py-2 border-0 border-b-2 border-slate-200 dark:border-slate-600 bg-transparent focus:border-blue-500 dark:focus:border-blue-400 outline-none resize-none placeholder-slate-400 dark:placeholder-slate-400 text-slate-900 dark:text-white transition-colors text-sm"
+                    maxLength={500}
+                  />
+                  <div className="flex md:flex-col flex-row items-center justify-between gap-4 w-full">
+                    <span className="text-xs text-slate-400 dark:text-slate-500 self-start sm:self-center">
+                      {newMessage.length}/500
+                    </span>
+
+                    <button
+                      type="submit"
+                      disabled={!newMessage.trim() || isSubmitting}
+                      className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all ${
+                        !newMessage.trim() || isSubmitting
+                          ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                          : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md"
+                      }`}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          Send Message
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+
+          {/* Messages Section */}
+          <div className="lg:col-span-2 max-w-4xl opacity-0 animate-[fadeInUp_0.6s_ease-out_0.4s_forwards]">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
+                <h2 className="text-xl font-medium text-slate-900 dark:text-white">
+                  Messages
+                </h2>
+                <span className="text-sm text-slate-600 dark:text-slate-400">
+                  {messages.length}{" "}
+                  {messages.length === 1 ? "message" : "messages"}
+                </span>
+              </div>
+              <div className="flex flex-col h-64 md:h-[600px] overflow-y-auto rounded border dark:border-slate-600 border-slate-200 p-6">
+                {visibleMessages.length === 0 ? (
+                  <div className="text-center py-16">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">
+                      No messages yet. Be the first to share your thoughts!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {visibleMessages.map((message, index) => {
+                      const userName =
+                        message.user?.name ||
+                        message.user?.displayName ||
+                        "Anonymous";
+                      const userPhoto =
+                        message.user?.photo || message.user?.photoURL;
+                      return (
+                        <div
+                          key={message.id}
+                          className="pb-6 border-b border-slate-100 dark:border-slate-800 last:border-0 opacity-0 animate-[fadeInUp_0.5s_ease-out_forwards]"
+                          style={{ animationDelay: `${index * 0.1}s` }}
+                        >
+                          <div className="flex gap-4">
+                            {userPhoto ? (
+                              <img
+                                src={userPhoto}
+                                alt={userName}
+                                className="w-8 h-8 rounded-full flex-shrink-0"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                                {getInitials(userName)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="font-medium text-slate-900 dark:text-white text-sm">
+                                  {userName}
+                                </span>
+                                <span className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  {formatTime(message.timestamp)}
+                                </span>
+                              </div>
+                              <p className="text-slate-700 dark:text-slate-300 leading-relaxed break-words text-sm">
+                                {message.message || "No message content"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {hasMore && (
+                      <div ref={observerRef} className="text-center py-4">
+                        {isLoadingMore ? (
+                          <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+                            <div className="w-4 h-4 border-2 border-slate-300 dark:border-slate-600 border-t-slate-500 dark:border-t-slate-400 rounded-full animate-spin"></div>
+                            Loading more messages...
+                          </div>
+                        ) : (
+                          <div className="h-1"></div> // Invisible trigger for observer
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

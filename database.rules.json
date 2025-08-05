@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "guestbook": {
+      ".read": true,
+      ".write": true,
+      "$msg": {
+        ".validate": "newData.child('timestamp').val() > now - 86400000"
+      }
+    }
+  }
+}

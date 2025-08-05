@@ -80,6 +80,13 @@ export type MediaAsset = {
   updatedAt?: string;
 };
 
+export type GUser = {
+  name: string;
+  email: string;
+  date: number; 
+  message: string;
+};
+
 export type ContactDetails = {
   email: string;
   phone: string;

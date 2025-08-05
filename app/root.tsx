@@ -48,6 +48,13 @@ export const meta: MetaFunction = () => {
 export async function loader({ request }: LoaderFunctionArgs) {
   return json({
     theme: "dark",
+    FIREBASE_CONFIG: {
+      apiKey: process.env.FIREBASE_API_KEY,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      databaseURL: process.env.FIREBASE_DATABASE_URL,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      appId: process.env.FIREBASE_APP_ID,
+    },
   });
 }
 
@@ -82,7 +89,16 @@ export default function App() {
           <Outlet />
           <Toaster position="top-right" richColors />
           <ScrollRestoration />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify({
+                FIREBASE_CONFIG: useLoaderData().FIREBASE_CONFIG,
+              })}`,
+            }}
+          />
+
           <Scripts />
+
           {/* <LiveReload /> */}
         </ThemeProvider>
       </body>
