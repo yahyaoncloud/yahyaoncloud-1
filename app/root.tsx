@@ -24,9 +24,7 @@ import { Toaster } from "sonner";
 import { useEffect } from "react";
 import AOS from "aos";
 
-// Import styles
 import "./styles/tailwind.css";
-// Ensure ThemeProvider and useTheme are correctly imported
 import { ThemeProvider, useTheme } from "./Contexts/ThemeContext";
 
 export const meta: MetaFunction = () => {
@@ -47,11 +45,8 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  // In a real application, you would determine the theme dynamically,
-  // e.g., from a cookie, user preference, or system setting.
-  // For now, it's hardcoded to "dark" as per your original loader.
   return json({
-    theme: "dark", // This theme value is passed to the client via ENV
+    theme: "dark",
     ENV: {
       FIREBASE_CONFIG: {
         apiKey: process.env.VITE_PUBLIC_FIREBASE_API_KEY,
@@ -66,13 +61,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 }
 
-// This component will now consume the theme context
 function RootLayout() {
   const { ENV } = useLoaderData<typeof loader>();
-  // useTheme can now be called safely because RootLayout is a child of ThemeProvider
   const { theme } = useTheme();
 
-  // Initialize AOS (Animate on Scroll)
   useEffect(() => {
     AOS.init({
       once: true,
@@ -82,7 +74,6 @@ function RootLayout() {
   }, []);
 
   return (
-    // Apply the theme class to the html tag based on the context value
     <html lang="en" className={theme === "dark" ? "dark" : ""}>
       <head>
         <meta charSet="utf-8" />
@@ -102,13 +93,11 @@ function RootLayout() {
           }}
         />
         <Scripts />
-        {/* <LiveReload /> is commented out as per your original code */}
       </body>
     </html>
   );
 }
 
-// The main App component now wraps RootLayout with ThemeProvider
 export default function App() {
   return (
     <ThemeProvider>
@@ -135,8 +124,6 @@ export function ErrorBoundary() {
   }
 
   return (
-    // ErrorBoundary also needs to be wrapped by ThemeProvider if it uses useTheme
-    // or if its children might use it.
     <ThemeProvider>
       <html lang="en" className="dark">
         <head>
