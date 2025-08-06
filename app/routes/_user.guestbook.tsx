@@ -326,7 +326,7 @@ export default function MinimalistGuestbook() {
                       {getInitials(user.displayName || "User")}
                     </div>
                   )}
-                  <div>
+                  <div className="flex w-full items-center justify-between">
                     <p className="font-semibold text-slate-900 dark:text-white">
                       {user.displayName}
                     </p>

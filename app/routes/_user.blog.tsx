@@ -150,7 +150,7 @@ const HeroSection = () => {
         variants={heroVariants}
       >
         <motion.h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight text-indigo-300"
+          className="text-6xl lg:text-6xl xl:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight text-indigo-300"
           variants={heroVariants}
         >
           Welcome to Yahya's Engineering Hub
