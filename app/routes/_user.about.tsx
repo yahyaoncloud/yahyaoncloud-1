@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { json, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useTheme } from "../Contexts/ThemeContext";
+import ProfilePic from "../assets/profile.jpg"; // Default portrait image
 import {
   FaInstagram,
   FaGithub,
@@ -56,9 +57,8 @@ export default function AdminAbout() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div
-          className={`text-center ${
-            theme === "dark" ? "text-white" : "text-gray-900"
-          }`}
+          className={`text-center ${theme === "dark" ? "text-white" : "text-gray-900"
+            }`}
         >
           <h1 className="text-2xl font-medium mb-2 text-indigo-800 dark:text-indigo-300">
             Portfolio not found
@@ -72,7 +72,7 @@ export default function AdminAbout() {
   // Safe getters with fallbacks
   const getName = () => portfolio.name || "Unknown User";
   const getBio = () => portfolio.bio || "No bio available";
-  const getPortraitUrl = () => portfolio.portraitUrl || portraitImage;
+  const getPortraitUrl = () => portfolio.portraitUrl|| ProfilePic;
   const getExperiences = () => portfolio.experiences || [];
   const getCertifications = () => portfolio.certifications || [];
   const getHobbies = () => portfolio.hobbies || [];
@@ -129,9 +129,8 @@ export default function AdminAbout() {
               </motion.h1>
 
               <motion.p
-                className={`text-md text-justify mb-6 max-w-2xl ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-md text-justify mb-6 max-w-2xl ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  }`}
                 variants={fadeInUp}
               >
                 {getBio()}
@@ -143,17 +142,15 @@ export default function AdminAbout() {
                 variants={fadeInUp}
               >
                 <div
-                  className={`flex items-center gap-2 text-sm ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`flex items-center gap-2 text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   <MapPin size={16} />
                   <span>Hyderabad, India</span>
                 </div>
                 <div
-                  className={`flex items-center gap-2 text-sm ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`flex items-center gap-2 text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>Available for work</span>
@@ -168,11 +165,10 @@ export default function AdminAbout() {
                 {socialLinks.email && (
                   <motion.a
                     href={`mailto:${socialLinks.email}`}
-                    className={`p-2 rounded-lg transition-colors ${
-                      theme === "dark"
-                        ? "hover:bg-gray-800 text-gray-400 hover:text-blue-400"
-                        : "hover:bg-gray-100 text-gray-600 hover:text-blue-600"
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${theme === "dark"
+                      ? "hover:bg-gray-800 text-gray-400 hover:text-blue-400"
+                      : "hover:bg-gray-100 text-gray-600 hover:text-blue-600"
+                      }`}
                     variants={fadeInUp}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -185,11 +181,10 @@ export default function AdminAbout() {
                     href={socialLinks.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2 rounded-lg transition-colors ${
-                      theme === "dark"
-                        ? "hover:bg-gray-800 text-gray-400 hover:text-white"
-                        : "hover:bg-gray-100 text-gray-600 hover:text-black"
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${theme === "dark"
+                      ? "hover:bg-gray-800 text-gray-400 hover:text-white"
+                      : "hover:bg-gray-100 text-gray-600 hover:text-black"
+                      }`}
                     variants={fadeInUp}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -202,11 +197,10 @@ export default function AdminAbout() {
                     href={socialLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2 rounded-lg transition-colors ${
-                      theme === "dark"
-                        ? "hover:bg-gray-800 text-gray-400 hover:text-blue-400"
-                        : "hover:bg-gray-100 text-gray-600 hover:text-blue-600"
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${theme === "dark"
+                      ? "hover:bg-gray-800 text-gray-400 hover:text-blue-400"
+                      : "hover:bg-gray-100 text-gray-600 hover:text-blue-600"
+                      }`}
                     variants={fadeInUp}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -219,11 +213,10 @@ export default function AdminAbout() {
                     href={socialLinks.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2 rounded-lg transition-colors ${
-                      theme === "dark"
-                        ? "hover:bg-gray-800 text-gray-400 hover:text-blue-400"
-                        : "hover:bg-gray-100 text-gray-600 hover:text-blue-500"
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${theme === "dark"
+                      ? "hover:bg-gray-800 text-gray-400 hover:text-blue-400"
+                      : "hover:bg-gray-100 text-gray-600 hover:text-blue-500"
+                      }`}
                     variants={fadeInUp}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -252,11 +245,10 @@ export default function AdminAbout() {
               {skills.map((skill, index) => (
                 <motion.div
                   key={`${skill}-${index}`}
-                  className={`px-4 py-2 text-center text-sm rounded-lg border ${
-                    theme === "dark"
-                      ? "bg-gray-800/50 border-gray-700 text-gray-300"
-                      : "bg-gray-50 border-gray-200 text-gray-700"
-                  }`}
+                  className={`px-4 py-2 text-center text-sm rounded-lg border ${theme === "dark"
+                    ? "bg-gray-800/50 border-gray-700 text-gray-300"
+                    : "bg-gray-50 border-gray-200 text-gray-700"
+                    }`}
                   variants={fadeInUp}
                   whileHover={{ scale: 1.02 }}
                 >
@@ -280,11 +272,10 @@ export default function AdminAbout() {
               {projects.slice(0, 4).map((project, index) => (
                 <motion.div
                   key={`${project.title}-${index}`}
-                  className={`p-6 rounded-xl border ${
-                    theme === "dark"
-                      ? "bg-gray-800/30 border-gray-700 hover:bg-gray-800/50"
-                      : "bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md"
-                  } transition-all`}
+                  className={`p-6 rounded-xl border ${theme === "dark"
+                    ? "bg-gray-800/30 border-gray-700 hover:bg-gray-800/50"
+                    : "bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                    } transition-all`}
                   variants={fadeInUp}
                   whileHover={{ y: -2 }}
                 >
@@ -300,16 +291,14 @@ export default function AdminAbout() {
                     )}
                     <div className="flex-1">
                       <h3
-                        className={`text-lg font-semibold mb-2 ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`text-lg font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         {project.title}
                       </h3>
                       <p
-                        className={`text-sm mb-3 ${
-                          theme === "dark" ? "text-gray-300" : "text-gray-600"
-                        }`}
+                        className={`text-sm mb-3 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                          }`}
                       >
                         {project.description}
                       </p>
@@ -322,11 +311,10 @@ export default function AdminAbout() {
                               .map((tech, techIndex) => (
                                 <span
                                   key={techIndex}
-                                  className={`px-2 py-1 text-xs rounded ${
-                                    theme === "dark"
-                                      ? "bg-gray-700 text-gray-300"
-                                      : "bg-gray-100 text-gray-600"
-                                  }`}
+                                  className={`px-2 py-1 text-xs rounded ${theme === "dark"
+                                    ? "bg-gray-700 text-gray-300"
+                                    : "bg-gray-100 text-gray-600"
+                                    }`}
                                 >
                                   {tech}
                                 </span>
@@ -340,11 +328,10 @@ export default function AdminAbout() {
                             href={project.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-1 text-sm ${
-                              theme === "dark"
-                                ? "text-blue-400 hover:text-blue-300"
-                                : "text-blue-600 hover:text-blue-700"
-                            }`}
+                            className={`inline-flex items-center gap-1 text-sm ${theme === "dark"
+                              ? "text-blue-400 hover:text-blue-300"
+                              : "text-blue-600 hover:text-blue-700"
+                              }`}
                           >
                             <ExternalLink size={20} />
                             Live Demo
@@ -355,11 +342,10 @@ export default function AdminAbout() {
                             href={project.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-1 text-sm ${
-                              theme === "dark"
-                                ? "text-gray-400 hover:text-gray-300"
-                                : "text-gray-600 hover:text-gray-700"
-                            }`}
+                            className={`inline-flex items-center gap-1 text-sm ${theme === "dark"
+                              ? "text-gray-400 hover:text-gray-300"
+                              : "text-gray-600 hover:text-gray-700"
+                              }`}
                           >
                             <Link size={20} />
                             link
@@ -384,32 +370,28 @@ export default function AdminAbout() {
               {experiences.map((exp, index) => (
                 <motion.div
                   key={`${exp.title}-${index}`}
-                  className={`border-l-2 pl-6 ${
-                    theme === "dark" ? "border-gray-700" : "border-gray-200"
-                  }`}
+                  className={`border-l-2 pl-6 ${theme === "dark" ? "border-gray-700" : "border-gray-200"
+                    }`}
                   variants={fadeInUp}
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
                     <h3
-                      className={`text-xl font-semibold ${
-                        theme === "dark" ? "text-indigo-300" : "text-gray-900"
-                      }`}
+                      className={`text-xl font-semibold ${theme === "dark" ? "text-indigo-300" : "text-gray-900"
+                        }`}
                     >
                       {exp.title}
                     </h3>
                     <span
-                      className={`text-base leading-relaxed ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-base leading-relaxed ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       {exp.period}
                     </span>
                   </div>
                   {exp.description && exp.description.length > 0 && (
                     <ul
-                      className={`space-y-1 text-md ${
-                        theme === "dark" ? "text-gray-300" : "text-gray-600"
-                      } list-disc pl-5`}
+                      className={`space-y-1 text-md ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                        } list-disc pl-5`}
                     >
                       {exp.description.slice(0, 2).map((desc, i) => (
                         <li key={i}>{desc}</li>
@@ -432,24 +414,21 @@ export default function AdminAbout() {
               {currentWorks.map((work, index) => (
                 <motion.div
                   key={`${work.title}-${index}`}
-                  className={`p-4 rounded-lg border ${
-                    theme === "dark"
-                      ? "bg-gray-800/30 border-gray-700"
-                      : "bg-green-50 border-green-200"
-                  }`}
+                  className={`p-4 rounded-lg border ${theme === "dark"
+                    ? "bg-gray-800/30 border-gray-700"
+                    : "bg-green-50 border-green-200"
+                    }`}
                   variants={fadeInUp}
                 >
                   <h3
-                    className={`font-semibold mb-2 text-xl ${
-                      theme === "dark" ? "text-green-400" : "text-green-700"
-                    }`}
+                    className={`font-semibold mb-2 text-xl ${theme === "dark" ? "text-green-400" : "text-green-700"
+                      }`}
                   >
                     {work.title}
                   </h3>
                   <p
-                    className={`text-md ${
-                      theme === "dark" ? "text-gray-300" : "text-gray-600"
-                    }`}
+                    className={`text-md ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                      }`}
                   >
                     {work.description}
                   </p>
@@ -474,16 +453,14 @@ export default function AdminAbout() {
                     variants={fadeInUp}
                   >
                     <h4
-                      className={`font-medium text-xl ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`font-medium text-xl ${theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {cert.title}
                     </h4>
                     <p
-                      className={`text-md ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-md ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       {cert.issuer} • {cert.year}
                     </p>
@@ -506,16 +483,14 @@ export default function AdminAbout() {
                     variants={fadeInUp}
                   >
                     <h4
-                      className={`font-medium text-xl ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`font-medium text-xl ${theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {hobby.name}
                     </h4>
                     <p
-                      className={`text-md ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-md ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       {hobby.description}
                     </p>
