@@ -15,10 +15,10 @@ import {
   Zap,
 } from "lucide-react";
 import dummyImage from "../assets/yahya_glass.png";
-import { json, Link, useLoaderData } from "@remix-run/react";
+import { json, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { LoaderFunction } from "@remix-run/node";
-import { getPosts, getAllCategories } from "../Services/post.server";
-import { Category, Post } from "../Types/types";
+import { getPosts, getAllCategories } from "../../Services/post.server";
+import { Category, Post } from "../../Types/types";
 
 const dummyImage2 =
   "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=800&h=600&fit=crop";
@@ -144,6 +144,7 @@ const HeroSection = () => {
       initial="hidden"
       animate="visible"
     >
+      <Outlet/>
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/70 via-cyan-900/60 to-indigo-900/80 dark:from-black/20 dark:via-gray-900/70 dark:to-black/80" />
       <motion.div
         className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8"
@@ -357,11 +358,10 @@ const CategoryFilterSection = ({
             whileHover="hover"
             onClick={() => setSelectedCategory(null)}
             className={`px-4 py-2 text-sm font-semibold rounded-full border-2 
-                       transition-all duration-200 ${
-                         selectedCategory === null
-                           ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                           : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                       }`}
+                       transition-all duration-200 ${selectedCategory === null
+                ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+              }`}
           >
             All Posts
           </motion.button>
@@ -378,11 +378,10 @@ const CategoryFilterSection = ({
                 )
               }
               className={`px-4 py-2 text-sm font-semibold rounded-full border-2 
-                         transition-all duration-200 ${
-                           selectedCategory === cat.name
-                             ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                             : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                         }`}
+                         transition-all duration-200 ${selectedCategory === cat.name
+                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                }`}
             >
               {cat.name}
             </motion.button>
@@ -418,11 +417,10 @@ const CategoryFilterSection = ({
               whileHover="hover"
               onClick={() => setSelectedCategory(null)}
               className={`flex-shrink-0 snap-start px-6 py-3 text-sm font-semibold 
-                         rounded-full border-2 transition-all duration-200 min-w-[120px] ${
-                           selectedCategory === null
-                             ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                             : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                         }`}
+                         rounded-full border-2 transition-all duration-200 min-w-[120px] ${selectedCategory === null
+                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                }`}
             >
               All Posts
             </motion.button>
@@ -438,11 +436,10 @@ const CategoryFilterSection = ({
                   )
                 }
                 className={`flex-shrink-0 snap-start px-6 py-3 text-sm font-semibold 
-                           rounded-full border-2 transition-all duration-200 min-w-[120px] ${
-                             selectedCategory === cat.name
-                               ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                               : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                           }`}
+                           rounded-full border-2 transition-all duration-200 min-w-[120px] ${selectedCategory === cat.name
+                    ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                  }`}
               >
                 {cat.name}
               </motion.button>
@@ -462,11 +459,10 @@ const CategoryFilterSection = ({
             whileHover="hover"
             onClick={() => setSelectedCategory(null)}
             className={`px-6 py-3 text-base font-semibold rounded-full border-2 
-                       transition-all duration-200 ${
-                         selectedCategory === null
-                           ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                           : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                       }`}
+                       transition-all duration-200 ${selectedCategory === null
+                ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+              }`}
           >
             All Posts
           </motion.button>
@@ -482,11 +478,10 @@ const CategoryFilterSection = ({
                 )
               }
               className={`px-6 py-3 text-base font-semibold rounded-full border-2 
-                         transition-all duration-200 ${
-                           selectedCategory === cat.name
-                             ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                             : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                         }`}
+                         transition-all duration-200 ${selectedCategory === cat.name
+                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                }`}
             >
               {cat.name}
             </motion.button>
@@ -997,7 +992,7 @@ const PalestineSupportSection = ({ theme }) => {
 };
 
 // Main Homepage Component
-export default function Homepage() {
+export default function Blog() {
   // Use loader data
   const { posts, categories } = useLoaderData<LoaderData>();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -1006,8 +1001,8 @@ export default function Homepage() {
   // Filter posts based on selected category
   const filteredPosts = selectedCategory
     ? posts.filter((p) =>
-        p.categories?.some((c) => c.name === selectedCategory)
-      )
+      p.categories?.some((c) => c.name === selectedCategory)
+    )
     : posts;
 
   // Get featured post (first post or most recent)

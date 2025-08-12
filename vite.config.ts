@@ -19,6 +19,11 @@ export default defineConfig({
         v3_singleFetch: true,
         v3_lazyRouteDiscovery: true,
       },
+      // routes(defineRoutes) {
+      //   return defineRoutes((route) => {
+      //     route("/blog/*", "/routes/blog/_index.tsx"); // Example custom route
+      //   });
+      // },
     }),
     tsconfigPaths(),
   ],

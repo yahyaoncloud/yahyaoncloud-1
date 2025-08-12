@@ -147,7 +147,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   ];
 
   return (
-    <header className="w-auto sticky top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-b-gray-200 dark:border-b-gray-700 text-gray-900 dark:text-white z-10 shadow-sm transition-all duration-300">
+    <header className="w-auto z-40 sticky top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-b-gray-200 dark:border-b-gray-700 text-gray-900 dark:text-white shadow-sm transition-all duration-300">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2 min-h-[4rem] w-full">
           {/* Left side - Hamburger Menu (Mobile only) */}

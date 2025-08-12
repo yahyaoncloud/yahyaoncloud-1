@@ -18,13 +18,13 @@ import {
   Star,
   Zap,
 } from "lucide-react";
-import { useTheme } from "../Contexts/ThemeContext";
+import { useTheme } from "../../Contexts/ThemeContext";
 import {
   getPosts,
   getAllCategories,
   getAllTags,
-} from "../Services/post.server";
-import type { Author, Post, Category, Tag } from "../Types/types";
+} from "../../Services/post.server";
+import type { Author, Post, Category, Tag } from "../../Types/types";
 import { useState, useEffect, useMemo } from "react";
 import dummyImage from "../assets/yahya_glass.png";
 
@@ -217,11 +217,10 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
             {/* Like Button */}
             <button
               onClick={handleLike}
-              className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-200 ${
-                isLiked
+              className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-200 ${isLiked
                   ? "bg-red-500/80 text-white"
                   : "bg-white/80 text-gray-700 hover:bg-white/90"
-              }`}
+                }`}
             >
               <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
             </button>
@@ -293,9 +292,8 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
               <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-1">
                   <Heart
-                    className={`w-4 h-4 ${
-                      isLiked ? "fill-current text-red-500" : ""
-                    }`}
+                    className={`w-4 h-4 ${isLiked ? "fill-current text-red-500" : ""
+                      }`}
                   />
                   <span>{likeCount}</span>
                 </div>
@@ -364,11 +362,10 @@ const FeaturedPost = ({ post }: { post: Post }) => {
           </span>
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 px-3 py-1.5 backdrop-blur-md rounded-full transition-all duration-200 ${
-              isLiked
+            className={`flex items-center gap-2 px-3 py-1.5 backdrop-blur-md rounded-full transition-all duration-200 ${isLiked
                 ? "bg-red-500/80 text-white"
                 : "bg-white/20 text-white hover:bg-white/30"
-            }`}
+              }`}
           >
             <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
             <span className="text-sm font-medium">{likeCount}</span>
@@ -624,21 +621,19 @@ export default function ArticlesListPage() {
               <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-md transition-all duration-200 ${
-                    viewMode === "grid"
+                  className={`p-2 rounded-md transition-all duration-200 ${viewMode === "grid"
                       ? "bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm"
                       : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                  }`}
+                    }`}
                 >
                   <Grid className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-md transition-all duration-200 ${
-                    viewMode === "list"
+                  className={`p-2 rounded-md transition-all duration-200 ${viewMode === "list"
                       ? "bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm"
                       : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                  }`}
+                    }`}
                 >
                   <List className="w-5 h-5" />
                 </button>

@@ -13,8 +13,8 @@ import {
   githubProvider,
   twitterProvider,
   db,
-} from "../utils/firebase.client";
-import { getUserSession } from "../utils/session.server";
+} from "../../utils/firebase.client";
+import { getUserSession } from "../../utils/session.server";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { onValue, push, ref } from "firebase/database";
 
@@ -95,18 +95,18 @@ export default function MinimalistGuestbook() {
                 : value.timestamp || new Date().toISOString(),
               user: isOldFormat
                 ? {
-                    name: value.name || "Anonymous",
-                    photo: "",
-                    uid: "",
-                  }
+                  name: value.name || "Anonymous",
+                  photo: "",
+                  uid: "",
+                }
                 : {
-                    name:
-                      value.user?.name ||
-                      value.user?.displayName ||
-                      "Anonymous",
-                    photo: value.user?.photo || value.user?.photoURL || "",
-                    uid: value.user?.uid || "",
-                  },
+                  name:
+                    value.user?.name ||
+                    value.user?.displayName ||
+                    "Anonymous",
+                  photo: value.user?.photo || value.user?.photoURL || "",
+                  uid: value.user?.uid || "",
+                },
             };
           }
         );
@@ -359,11 +359,10 @@ export default function MinimalistGuestbook() {
                     <button
                       type="submit"
                       disabled={!newMessage.trim() || isSubmitting}
-                      className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all ${
-                        !newMessage.trim() || isSubmitting
+                      className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all ${!newMessage.trim() || isSubmitting
                           ? "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
                           : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md"
-                      }`}
+                        }`}
                     >
                       {isSubmitting ? (
                         <>

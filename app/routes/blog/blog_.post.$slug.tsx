@@ -5,7 +5,7 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "../components/ui/hover-card";
+} from "../../components/ui/hover-card";
 import "../styles/md-button.css";
 import {
   Calendar,
@@ -25,11 +25,11 @@ import {
   EyeIcon,
   EyeOff,
 } from "lucide-react";
-import { useTheme } from "../Contexts/ThemeContext";
-import { getAuthorByAuthorId, getPostBySlug } from "../Services/post.server";
+import { useTheme } from "../../Contexts/ThemeContext";
+import { getAuthorByAuthorId, getPostBySlug } from "../../Services/post.server";
 import { marked } from "marked";
-import type { Author, Post } from "../Types/types";
-import { proseClasses } from "../styles/prose";
+import type { Author, Post } from "../../Types/types";
+import { proseClasses } from "../../styles/prose";
 import { useState, useEffect, useRef } from "react";
 import { FaGithub, FaGlobeAsia, FaLinkedin } from "react-icons/fa";
 import dummyImage from "../assets/yahya_glass.png";
@@ -383,11 +383,10 @@ export default function PostPage() {
       {/* Floating Navigation */}
       {isNavVisible && (
         <motion.div
-          className={`fixed top-16 sm:top-18 left-2 right-2 sm:left-4 sm:right-4 z-50 transition-all duration-500 ${
-            isScrolled
+          className={`fixed top-16 sm:top-18 left-2 right-2 sm:left-4 sm:right-4 z-50 transition-all duration-500 ${isScrolled
               ? "translate-y-0 opacity-100"
               : "-translate-y-20 opacity-0"
-          }`}
+            }`}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: isScrolled ? 1 : 0, y: isScrolled ? 0 : -20 }}
         >
@@ -419,19 +418,17 @@ export default function PostPage() {
                 <div className="flex items-center gap-2 sm:gap-3">
                   <motion.button
                     onClick={handleLike}
-                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm ${
-                      isLiked
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm ${isLiked
                         ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 shadow-md"
                         : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-sm hover:shadow-md"
-                    }`}
+                      }`}
                     variants={buttonVariants}
                     whileHover="hover"
                     whileTap="tap"
                   >
                     <Heart
-                      className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                        isLiked ? "fill-current" : ""
-                      }`}
+                      className={`w-3 h-3 sm:w-4 sm:h-4 ${isLiked ? "fill-current" : ""
+                        }`}
                     />
                     <span className="hidden sm:inline">{likeCount}</span>
                   </motion.button>
@@ -563,19 +560,17 @@ export default function PostPage() {
                   >
                     <motion.button
                       onClick={handleLike}
-                      className={`flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl backdrop-blur-xl transition-all duration-300 border font-medium shadow-lg text-sm sm:text-base ${
-                        isLiked
+                      className={`flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl backdrop-blur-xl transition-all duration-300 border font-medium shadow-lg text-sm sm:text-base ${isLiked
                           ? "bg-red-500/20 border-red-400/50 text-white"
                           : "bg-white/10 border-white/20 text-white hover:bg-white/20"
-                      }`}
+                        }`}
                       variants={buttonVariants}
                       whileHover="hover"
                       whileTap="tap"
                     >
                       <Heart
-                        className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                          isLiked ? "fill-current" : ""
-                        }`}
+                        className={`w-4 h-4 sm:w-5 sm:h-5 ${isLiked ? "fill-current" : ""
+                          }`}
                       />
                       <span>{likeCount}</span>
                     </motion.button>
@@ -630,19 +625,17 @@ export default function PostPage() {
                   <div className="flex items-center gap-2 sm:gap-3">
                     <motion.button
                       onClick={handleLike}
-                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-300 font-medium shadow-sm hover:shadow-md text-xs sm:text-sm ${
-                        isLiked
+                      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-300 font-medium shadow-sm hover:shadow-md text-xs sm:text-sm ${isLiked
                           ? "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
                           : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
-                      }`}
+                        }`}
                       variants={buttonVariants}
                       whileHover="hover"
                       whileTap="tap"
                     >
                       <Heart
-                        className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                          isLiked ? "fill-current" : ""
-                        }`}
+                        className={`w-3 h-3 sm:w-4 sm:h-4 ${isLiked ? "fill-current" : ""
+                          }`}
                       />
                       <span>{likeCount}</span>
                     </motion.button>

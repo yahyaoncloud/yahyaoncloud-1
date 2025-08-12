@@ -1,59 +1,29 @@
-// import { json, Outlet, useLocation } from "@remix-run/react";
-// import UserLayout from "../components/layouts/UserLayout";
-// import MainLayout from "../components/layouts/MainLayout";
-// import { ThemeProvider } from "../Contexts/ThemeContext";
-// import { LoaderFunction, redirect } from "@remix-run/node";
-// import { getTokenFromSession } from "../utils/session.server";
-// import { environment } from "../environments/environment";
-// import { NotFound } from "../components/404";
+import { Link } from "@remix-run/react";
 
-// export const loader: LoaderFunction = async ({ request }) => {
-//   // throw new Response("Not Found", { status: 404 });
+const posts = [
+  { id: 1, title: "First Blog Post", summary: "This is the first post." },
+  { id: 2, title: "Second Blog Post", summary: "Another interesting post." },
+];
 
-//   const url = new URL(request.url);
-//   if (url.pathname === "/admin") {
-//     return redirect("/admin/blog");
-//   }
-//   const token = await getTokenFromSession(request);
-//   console.log("Token in loader:", token);
-
-//   // if (!token) {
-//   //   redirect("/admin/login");
-//   //   throw new Error("Authentication token is missing");
-//   // }
-
-//   // Validate token with backend
-//   try {
-//     const response = await fetch(
-//       `${environment.GO_BACKEND_URL}/validate-token`,
-//       {
-//         method: "GET",
-//         headers: { Authorization: `Bearer ${token}` },
-//       }
-//     );
-
-//     const userData = await response.text();
-//     return json({ user: userData });
-//   } catch (error) {
-//     console.error("Token validation error:", error);
-//     return redirect("/admin/login");
-//   }
-// };
-
-// export default function AdminLayout() {
-//   const location = useLocation();
-//   const isLoginPage = location.pathname === "/admin/login";
-//   const Layout = isLoginPage ? MainLayout : UserLayout;
-
-//   return (
-//     <ThemeProvider>
-//       <MainLayout>
-//         <Outlet />
-//       </MainLayout>
-//     </ThemeProvider>
-//   );
-// }
-
-// export function CatchBoundary() {
-//   return <NotFound />;
-// }
+export default function Admin() {
+  return (
+    <main style={{ padding: "2rem" }}>
+      <h1>Admin Blog</h1>
+      <Link
+        to="/admin/blog/new"
+        style={{ marginBottom: "1rem", display: "inline-block" }}
+      >
+        Create New Post
+      </Link>
+      <ul>
+        {posts.map((post) => (
+          <li key={post.id} style={{ marginBottom: "1rem" }}>
+            <h2>{post.title}</h2>
+            <p>{post.summary}</p>
+            <Link to={`/admin/blog/${post.id}/edit`}>Edit</Link>
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}

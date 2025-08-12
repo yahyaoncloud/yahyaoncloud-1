@@ -115,7 +115,7 @@ export default function Sidebar({
           exit={{ opacity: 0, scale: 0 }}
           transition={{ type: "spring", stiffness: 400, damping: 20 }}
           onClick={onToggleVisible}
-          className="fixed top-3 left-4 z-50 hidden md:flex items-center justify-center w-10 h-10 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-xl transition-all duration-200"
+          className="fixed top-3 left-4 z-[999] hidden md:flex items-center justify-center w-10 h-10 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-xl transition-all duration-200"
           title="Show Sidebar"
         >
           <ChevronRight size={20} />
@@ -178,10 +178,9 @@ export default function Sidebar({
                 <NavLink
                   to={item.href}
                   className={({ isActive }) =>
-                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
-                      isActive
-                        ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
+                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${isActive
+                      ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
                     }`
                   }
                 >
@@ -271,10 +270,9 @@ export default function Sidebar({
                   to={item.href}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
-                      isActive
-                        ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
+                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${isActive
+                      ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
                     }`
                   }
                 >
