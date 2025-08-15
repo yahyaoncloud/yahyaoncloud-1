@@ -20,6 +20,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const data = await getAllPortfolios();
     const portfolio = Array.isArray(data) && data.length > 0 ? data[0] : null;
+    console.log("PortfolioData:", data)
 
     return json({ portfolio });
   } catch (error) {
@@ -72,7 +73,7 @@ export default function AdminAbout() {
   // Safe getters with fallbacks
   const getName = () => portfolio.name || "Unknown User";
   const getBio = () => portfolio.bio || "No bio available";
-  const getPortraitUrl = () => portfolio.portraitUrl|| ProfilePic;
+  const getPortraitUrl = () => portfolio.portraitUrl || ProfilePic;
   const getExperiences = () => portfolio.experiences || [];
   const getCertifications = () => portfolio.certifications || [];
   const getHobbies = () => portfolio.hobbies || [];
@@ -80,13 +81,7 @@ export default function AdminAbout() {
   const getSocialLinks = () => portfolio.socialLinks || {};
   const getProjects = () => portfolio.projects || [];
 
-  const getSkills = () => {
-    if (!portfolio.skills) return [];
-    const allSkills = Array.isArray(portfolio.skills)
-      ? portfolio.skills
-      : Object.values(portfolio.skills).flat();
-    return allSkills.slice(0, 10); // Limit to 10 skills
-  };
+  const getSkills = () => portfolio.skills || [];
 
   const skills = getSkills();
   const experiences = getExperiences();
@@ -95,17 +90,16 @@ export default function AdminAbout() {
   const currentWorks = getCurrentWorks();
   const socialLinks = getSocialLinks();
   const projects = getProjects();
-  console.log(certifications);
 
   return (
-    <motion.div className="min-h-screen" initial="hidden" animate="visible">
+    <motion.div className="min-h-screen p-4 xl:p-2" initial="hidden" animate="visible">
       {/* Hero Section - Compact */}
       <motion.section
         className="my-8 p-10 mx-2 dark:border-slate-700 dark:bg-slate-900 bg-slate-50 border-slate-300 border rounded-xl"
         variants={fadeInUp}
       >
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center gap-12">
+          <div className="flex flex-col xl:flex-row items-center gap-12">
             {/* Profile Image */}
             <motion.div
               className="flex-shrink-0"
@@ -120,7 +114,7 @@ export default function AdminAbout() {
             </motion.div>
 
             {/* Info */}
-            <div className="flex-1 text-center md:text-left">
+            <div className="flex-1 text-center xl:text-left">
               <motion.h1
                 className="text-3xl md:text-4xl font-bold mb-4 text-indigo-800 dark:text-indigo-300"
                 variants={fadeInUp}
@@ -235,7 +229,7 @@ export default function AdminAbout() {
         {/* Skills - Minimal Grid */}
         {skills.length > 0 && (
           <motion.section variants={fadeInUp}>
-            <h2 className="text-2xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
+            <h2 className="text-3xl font-bold mb-8 text-indigo-800 dark:text-indigo-300">
               Skills
             </h2>
             <motion.div
@@ -266,7 +260,7 @@ export default function AdminAbout() {
               Featured Projects
             </h2>
             <motion.div
-              className="grid md:grid-cols-2 gap-6"
+              className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-6"
               variants={stagger}
             >
               {projects.slice(0, 4).map((project, index) => (
@@ -274,7 +268,7 @@ export default function AdminAbout() {
                   key={`${project.title}-${index}`}
                   className={`p-6 rounded-xl border ${theme === "dark"
                     ? "bg-gray-800/30 border-gray-700 hover:bg-gray-800/50"
-                    : "bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md"
+                    : "bg-slate-200 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md"
                     } transition-all`}
                   variants={fadeInUp}
                   whileHover={{ y: -2 }}
@@ -289,9 +283,9 @@ export default function AdminAbout() {
                         />
                       </div>
                     )}
-                    <div className="flex-1">
+                    <div className="flex-1 relative">
                       <h3
-                        className={`text-lg font-semibold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"
+                        className={`text-xl max-w-72 font-semibold mb-2 ${theme === "dark" ? "text-indigo-300" : "text-indigo-800"
                           }`}
                       >
                         {project.title}
@@ -313,7 +307,7 @@ export default function AdminAbout() {
                                   key={techIndex}
                                   className={`px-2 py-1 text-xs rounded ${theme === "dark"
                                     ? "bg-gray-700 text-gray-300"
-                                    : "bg-gray-100 text-gray-600"
+                                    : "bg-slate-500 text-white"
                                     }`}
                                 >
                                   {tech}
@@ -322,7 +316,7 @@ export default function AdminAbout() {
                           </div>
                         )}
 
-                      <div className="flex gap-3">
+                      <div className="flex gap-3 absolute top-0 right-0">
                         {project.url && (
                           <a
                             href={project.url}
@@ -334,23 +328,10 @@ export default function AdminAbout() {
                               }`}
                           >
                             <ExternalLink size={20} />
-                            Live Demo
+                            Demo
                           </a>
                         )}
-                        {project.url && (
-                          <a
-                            href={project.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-1 text-sm ${theme === "dark"
-                              ? "text-gray-400 hover:text-gray-300"
-                              : "text-gray-600 hover:text-gray-700"
-                              }`}
-                          >
-                            <Link size={20} />
-                            link
-                          </a>
-                        )}
+
                       </div>
                     </div>
                   </div>

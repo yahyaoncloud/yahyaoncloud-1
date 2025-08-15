@@ -106,51 +106,51 @@ export default function App() {
   );
 }
 
-export function ErrorBoundary() {
-  const error = useRouteError();
-  console.error("ErrorBoundary caught:", error);
+// export function ErrorBoundary() {
+//   const error = useRouteError();
+//   console.error("ErrorBoundary caught:", error);
 
-  let status = 500;
-  let message = "Something went wrong";
+//   let status = 500;
+//   let message = "Something went wrong";
 
-  if (
-    error &&
-    typeof error === "object" &&
-    "status" in error &&
-    "statusText" in error
-  ) {
-    status = (error as any).status;
-    message = (error as any).statusText;
-  }
+//   if (
+//     error &&
+//     typeof error === "object" &&
+//     "status" in error &&
+//     "statusText" in error
+//   ) {
+//     status = (error as any).status;
+//     message = (error as any).statusText;
+//   }
 
-  return (
-    <ThemeProvider>
-      <html lang="en" className="dark">
-        <head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width,initial-scale=1" />
-          <title>{`${status} - ${message}`}</title>
-          <Meta />
-          <Links />
-        </head>
-        <body className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900">
-          <div className="text-center">
-            <h1 className="text-6xl font-bold text-gray-800 dark:text-indigo-100">
-              {status}
-            </h1>
-            <p className="text-lg text-gray-500 dark:text-indigo-300 mt-2">
-              {message}
-            </p>
-            <a
-              href="/"
-              className="mt-4 text-blue-500 dark:text-blue-800 hover:text-blue-600 dark:hover:text-blue-900 underline"
-            >
-              Back to Home
-            </a>
-          </div>
-          <Scripts />
-        </body>
-      </html>
-    </ThemeProvider>
-  );
-}
+//   return (
+//     <ThemeProvider>
+//       <html lang="en" className="dark">
+//         <head>
+//           <meta charSet="utf-8" />
+//           <meta name="viewport" content="width=device-width,initial-scale=1" />
+//           <title>{`${status} - ${message}`}</title>
+//           <Meta />
+//           <Links />
+//         </head>
+//         <body className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900">
+//           <div className="text-center">
+//             <h1 className="text-6xl font-bold text-gray-800 dark:text-indigo-100">
+//               {status}
+//             </h1>
+//             <p className="text-lg text-gray-500 dark:text-indigo-300 mt-2">
+//               {message}
+//             </p>
+//             <a
+//               href="/"
+//               className="mt-4 text-blue-500 dark:text-blue-800 hover:text-blue-600 dark:hover:text-blue-900 underline"
+//             >
+//               Back to Home
+//             </a>
+//           </div>
+//           <Scripts />
+//         </body>
+//       </html>
+//     </ThemeProvider>
+//   );
+// }

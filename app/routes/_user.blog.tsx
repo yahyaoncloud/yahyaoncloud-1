@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { apiGetPosts, apiGetAllCategories } from "../apis/posts.api";
+
 import {
   Heart,
   ExternalLink,
@@ -23,37 +25,67 @@ import { Category, Post } from "../Types/types";
 const dummyImage2 =
   "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=800&h=600&fit=crop";
 
-type LoaderData = {
+interface LoaderData {
   posts: Post[];
   categories: Category[];
-};
-// Mock data for demonstration
+  page: number;
+  message: string | null;
+  isEmpty: boolean;
+}
 
-// implement loader functions for post: Post[] and categories: Category[] in jsx
+
+
+// Loader function (unchanged)
+
+
+// posts.api.ts
 export const loader: LoaderFunction = async ({ request }) => {
   try {
     const url = new URL(request.url);
     const pageParam = url.searchParams.get("page");
     const page = pageParam ? parseInt(pageParam, 10) : 1;
 
-    const posts = await getPosts("published", 10, page);
-    const categories = await getAllCategories();
+    const postsRes = await apiGetPosts("published", 10, page);
+    const categoriesRes = await apiGetAllCategories();
 
-    if (!posts?.length) {
+    if (postsRes.status === "error") {
+      return json(
+        {
+          posts: [],
+          categories: categoriesRes.data || [],
+          message: postsRes.message,
+          isEmpty: false,
+        },
+        { status: 500 }
+      );
+    }
+
+    if (postsRes.meta?.isEmpty) {
       console.warn("No posts found");
     }
-    if (!categories?.length) {
-      console.warn("No categories found");
-    }
 
-    return json({ posts, categories, page });
+    return json({
+      posts: postsRes.data || [],
+      categories: categoriesRes.data || [],
+      page,
+      message: postsRes.meta?.isEmpty ? postsRes.message : null, // Only show message for empty state
+      isEmpty: postsRes.meta?.isEmpty || false,
+    }, { status: 200 });
+
   } catch (error) {
     console.error("Loader error:", error);
-    return json({ posts: null, categories: null }, { status: 500 });
+    return json(
+      {
+        posts: [],
+        categories: [],
+        message: "Unexpected error occurred",
+        isEmpty: false,
+      },
+      { status: 500 }
+    );
   }
 };
-
-// Animation variants
+// Animation variants (unchanged)
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -121,7 +153,7 @@ const fadeInUp = {
   },
 };
 
-// Hero Section Component
+// Hero Section Component (unchanged)
 const HeroSection = () => {
   const heroVariants = {
     hidden: { opacity: 0, y: 50 },
@@ -183,7 +215,7 @@ const HeroSection = () => {
   );
 };
 
-// Featured Post Section
+// Featured Post Section (unchanged)
 const FeaturedPostSection = ({ post }: { post?: Post }) => {
   if (!post) return null;
 
@@ -209,7 +241,7 @@ const FeaturedPostSection = ({ post }: { post?: Post }) => {
           className="text-sm sm:text-base md:text-lg text-gray-600 italic dark:text-gray-400 
                       max-w-2xl mx-auto px-4"
         >
-          Whats on demand? find out more.
+          What's on demand? Find out more.
         </p>
       </motion.div>
 
@@ -220,10 +252,8 @@ const FeaturedPostSection = ({ post }: { post?: Post }) => {
         whileHover="hover"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-          {/* Image section */}
           <div className="relative aspect-[16/9] sm:aspect-[4/3] lg:aspect-square overflow-hidden">
             <img
-              // src={post.coverImage || dummyImage2}
               src={dummyImage}
               alt={post.title}
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
@@ -238,8 +268,6 @@ const FeaturedPostSection = ({ post }: { post?: Post }) => {
               </span>
             </div>
           </div>
-
-          {/* Content section */}
           <div className="p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center">
             <div
               className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 
@@ -254,21 +282,18 @@ const FeaturedPostSection = ({ post }: { post?: Post }) => {
                 <span>Featured Read</span>
               </div>
             </div>
-
             <h3
               className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold 
                           mb-2 sm:mb-3 md:mb-4 text-gray-900 dark:text-white leading-tight"
             >
               {post.title}
             </h3>
-
             <p
               className="text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 md:mb-6 
                           text-sm sm:text-base lg:text-lg leading-relaxed line-clamp-3"
             >
               {post.summary}
             </p>
-
             <div className="flex flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6">
               {post.categories?.slice(0, 3).map((cat) => (
                 <span
@@ -280,7 +305,6 @@ const FeaturedPostSection = ({ post }: { post?: Post }) => {
                 </span>
               ))}
             </div>
-
             <motion.button
               className="group bg-blue-600 hover:bg-blue-700 text-white 
                          px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold 
@@ -306,7 +330,7 @@ const FeaturedPostSection = ({ post }: { post?: Post }) => {
   );
 };
 
-// Category Filter Section
+// Category Filter Section (unchanged)
 const CategoryFilterSection = ({
   categories,
   selectedCategory,
@@ -324,7 +348,6 @@ const CategoryFilterSection = ({
     hover: { scale: 1.05, y: -2, transition: { duration: 0.2 } },
   };
 
-  // Show only first 4 categories on mobile, all on desktop
   const visibleCategories = showAllCategories
     ? categories
     : categories.slice(0, 4);
@@ -347,8 +370,6 @@ const CategoryFilterSection = ({
           Browse by Category
         </h2>
       </motion.div>
-
-      {/* Mobile: Stacked layout with show more */}
       <div className="md:hidden space-y-3">
         <div className="flex flex-wrap gap-2 justify-center">
           <motion.button
@@ -357,15 +378,13 @@ const CategoryFilterSection = ({
             whileHover="hover"
             onClick={() => setSelectedCategory(null)}
             className={`px-4 py-2 text-sm font-semibold rounded-full border-2 
-                       transition-all duration-200 ${
-                         selectedCategory === null
-                           ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                           : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                       }`}
+                       transition-all duration-200 ${selectedCategory === null
+                ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+              }`}
           >
             All Posts
           </motion.button>
-
           {visibleCategories.map((cat, index) => (
             <motion.button
               key={cat._id}
@@ -378,17 +397,15 @@ const CategoryFilterSection = ({
                 )
               }
               className={`px-4 py-2 text-sm font-semibold rounded-full border-2 
-                         transition-all duration-200 ${
-                           selectedCategory === cat.name
-                             ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                             : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                         }`}
+                         transition-all duration-200 ${selectedCategory === cat.name
+                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                }`}
             >
               {cat.name}
             </motion.button>
           ))}
         </div>
-
         {categories.length > 4 && (
           <div className="text-center">
             <button
@@ -406,10 +423,7 @@ const CategoryFilterSection = ({
           </div>
         )}
       </div>
-
-      {/* Tablet & Desktop: Horizontal scroll or wrapped grid */}
       <div className="hidden md:block">
-        {/* Tablet: Horizontal scroll */}
         <div className="md:block lg:hidden mb-4">
           <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
             <motion.button
@@ -418,11 +432,10 @@ const CategoryFilterSection = ({
               whileHover="hover"
               onClick={() => setSelectedCategory(null)}
               className={`flex-shrink-0 snap-start px-6 py-3 text-sm font-semibold 
-                         rounded-full border-2 transition-all duration-200 min-w-[120px] ${
-                           selectedCategory === null
-                             ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                             : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                         }`}
+                         rounded-full border-2 transition-all duration-200 min-w-[120px] ${selectedCategory === null
+                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                }`}
             >
               All Posts
             </motion.button>
@@ -438,19 +451,16 @@ const CategoryFilterSection = ({
                   )
                 }
                 className={`flex-shrink-0 snap-start px-6 py-3 text-sm font-semibold 
-                           rounded-full border-2 transition-all duration-200 min-w-[120px] ${
-                             selectedCategory === cat.name
-                               ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                               : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                           }`}
+                           rounded-full border-2 transition-all duration-200 min-w-[120px] ${selectedCategory === cat.name
+                    ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                  }`}
               >
                 {cat.name}
               </motion.button>
             ))}
           </div>
         </div>
-
-        {/* Desktop: Wrapped grid */}
         <motion.div
           className="hidden lg:flex flex-wrap gap-3 justify-center"
           initial="hidden"
@@ -462,11 +472,10 @@ const CategoryFilterSection = ({
             whileHover="hover"
             onClick={() => setSelectedCategory(null)}
             className={`px-6 py-3 text-base font-semibold rounded-full border-2 
-                       transition-all duration-200 ${
-                         selectedCategory === null
-                           ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                           : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                       }`}
+                       transition-all duration-200 ${selectedCategory === null
+                ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+              }`}
           >
             All Posts
           </motion.button>
@@ -482,11 +491,10 @@ const CategoryFilterSection = ({
                 )
               }
               className={`px-6 py-3 text-base font-semibold rounded-full border-2 
-                         transition-all duration-200 ${
-                           selectedCategory === cat.name
-                             ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                             : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
-                         }`}
+                         transition-all duration-200 ${selectedCategory === cat.name
+                  ? "bg-blue-600 text-white border-blue-600 shadow-lg"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700"
+                }`}
             >
               {cat.name}
             </motion.button>
@@ -497,7 +505,7 @@ const CategoryFilterSection = ({
   );
 };
 
-// Articles Grid Section
+// Updated Articles Grid Section with better "no posts" UI
 const ArticlesGridSection = ({ posts }: { posts: Post[] }) => {
   return (
     <motion.section
@@ -525,162 +533,166 @@ const ArticlesGridSection = ({ posts }: { posts: Post[] }) => {
       </motion.div>
 
       <AnimatePresence mode="wait">
-        <motion.div
-          key={posts.map((p) => p._id).join("-")}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3
-                     gap-4 sm:gap-6 lg:gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          {posts.map((article, index) => {
-            const isFirstPost = index === 0 && posts.length > 1;
-            // First post spans 2 columns on larger screens
-            const gridSpan = isFirstPost
-              ? "sm:col-span-2 lg:col-span-2 xl:col-span-2"
-              : "";
-
-            return (
-              <motion.div
-                key={article._id}
-                variants={cardVariants}
-                whileHover="hover"
-                layout
-                className={`group ${gridSpan}`}
-              >
-                <div
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg 
-                               overflow-hidden hover:shadow-2xl transition-all duration-300 h-full
-                               flex flex-col"
-                >
-                  {/* Image */}
-                  <div className="relative aspect-[16/9] sm:aspect-[4/3] overflow-hidden flex-shrink-0">
-                    <img
-                      // src={article.coverImage || dummyImage2}
-                      src={dummyImage}
-                      alt={article.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                    />
-                    {isFirstPost && (
-                      <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
-                        <span
-                          className="bg-yellow-500 text-black px-2 sm:px-3 py-1 
-                                       rounded-full text-xs sm:text-sm font-medium"
-                        >
-                          Latest
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-3 sm:p-4 md:p-6 flex-1 flex flex-col">
-                    {/* Meta info */}
-                    <div
-                      className="flex flex-wrap items-center gap-2 sm:gap-3 
-                                   mb-2 sm:mb-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400"
-                    >
-                      <span>
-                        {new Date(article.createdAt).toLocaleDateString()}
-                      </span>
-                      <div className="flex flex-wrap gap-1 sm:gap-2">
-                        {article.categories?.slice(0, 2).map((cat) => (
-                          <span
-                            key={cat._id}
-                            className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 
-                                     px-2 py-1 rounded-full text-xs"
-                          >
-                            {cat.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <h3
-                      className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold 
-                                  mb-2 sm:mb-3 text-gray-900 dark:text-white line-clamp-2 
-                                  group-hover:text-blue-600 dark:group-hover:text-blue-400 
-                                  transition-colors flex-shrink-0
-                                  leading-tight"
-                    >
-                      {article.title}
-                    </h3>
-
-                    {/* Summary */}
-                    <p
-                      className="text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 
-                                  text-xs sm:text-sm md:text-base line-clamp-3 flex-1
-                                  leading-relaxed"
-                    >
-                      {article.summary}
-                    </p>
-
-                    {/* Read more link */}
-                    <Link to={`/blog/post/${article.slug}`}>
-                      <button
-                        className="text-blue-600 dark:text-blue-400 font-semibold 
-                                     hover:text-blue-700 dark:hover:text-blue-300 
-                                     transition-colors flex items-center gap-1 group 
-                                     text-xs sm:text-sm md:text-base self-start mt-auto"
-                      >
-                        Read More
-                        <ArrowRight
-                          size={14}
-                          className="group-hover:translate-x-1 transition-transform sm:w-4 sm:h-4"
-                        />
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* No posts message */}
-      {posts.length === 0 && (
-        <motion.div
-          className="text-center py-12 sm:py-16 md:py-20"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        >
+        {posts.length > 0 ? (
           <motion.div
-            className="text-gray-400 dark:text-gray-600 mb-3 sm:mb-4"
-            initial={{ y: 20 }}
-            animate={{ y: 0 }}
-            transition={{ delay: 0.2 }}
+            key={posts.map((p) => p._id).join("-")}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3
+                       gap-4 sm:gap-6 lg:gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
           >
-            <Star size={36} className="mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12" />
+            {posts.map((article, index) => {
+              const isFirstPost = index === 0 && posts.length > 1;
+              const gridSpan = isFirstPost
+                ? "sm:col-span-2 lg:col-span-2 xl:col-span-2"
+                : "";
+
+              return (
+                <motion.div
+                  key={article._id}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  layout
+                  className={`group ${gridSpan}`}
+                >
+                  <div
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg 
+                                 overflow-hidden hover:shadow-2xl transition-all duration-300 h-full
+                                 flex flex-col"
+                  >
+                    <div className="relative aspect-[16/9] sm:aspect-[4/3] overflow-hidden flex-shrink-0">
+                      <img
+                        src={dummyImage}
+                        alt={article.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                      {isFirstPost && (
+                        <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
+                          <span
+                            className="bg-yellow-500 text-black px-2 sm:px-3 py-1 
+                                         rounded-full text-xs sm:text-sm font-medium"
+                          >
+                            Latest
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 sm:p-4 md:p-6 flex-1 flex flex-col">
+                      <div
+                        className="flex flex-wrap items-center gap-2 sm:gap-3 
+                                     mb-2 sm:mb-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400"
+                      >
+                        <span>
+                          {new Date(article.createdAt).toLocaleDateString()}
+                        </span>
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
+                          {article.categories?.slice(0, 2).map((cat) => (
+                            <span
+                              key={cat._id}
+                              className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 
+                                       px-2 py-1 rounded-full text-xs"
+                            >
+                              {cat.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <h3
+                        className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold 
+                                    mb-2 sm:mb-3 text-gray-900 dark:text-white line-clamp-2 
+                                    group-hover:text-blue-600 dark:group-hover:text-blue-400 
+                                    transition-colors flex-shrink-0
+                                    leading-tight"
+                      >
+                        {article.title}
+                      </h3>
+                      <p
+                        className="text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 
+                                    text-xs sm:text-sm md:text-base line-clamp-3 flex-1
+                                    leading-relaxed"
+                      >
+                        {article.summary}
+                      </p>
+                      <Link to={`/blog/post/${article.slug}`}>
+                        <button
+                          className="text-blue-600 dark:text-blue-400 font-semibold 
+                                       hover:text-blue-700 dark:hover:text-blue-300 
+                                       transition-colors flex items-center gap-1 group 
+                                       text-xs sm:text-sm md:text-base self-start mt-auto"
+                        >
+                          Read More
+                          <ArrowRight
+                            size={14}
+                            className="group-hover:translate-x-1 transition-transform sm:w-4 sm:h-4"
+                          />
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
-          <motion.h3
-            className="text-lg sm:text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2"
-            initial={{ y: 20 }}
-            animate={{ y: 0 }}
-            transition={{ delay: 0.3 }}
+        ) : (
+          <motion.div
+            className="text-center py-12 sm:py-16 md:py-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            No posts found
-          </motion.h3>
-          <motion.p
-            className="text-sm sm:text-base text-gray-500 dark:text-gray-500"
-            initial={{ y: 20 }}
-            animate={{ y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            Try selecting a different category or check back later for new
-            content.
-          </motion.p>
-        </motion.div>
-      )}
+            <motion.div
+              className="mb-4 sm:mb-6"
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Zap size={48} className="mx-auto mb-3 sm:mb-4 text-blue-600 dark:text-blue-400 sm:w-16 sm:h-16" />
+            </motion.div>
+            <motion.h3
+              className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4"
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              Exciting Content Coming Soon!
+            </motion.h3>
+            <motion.p
+              className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4"
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              We're crafting fresh articles packed with engineering insights and cloud expertise. Stay tuned for updates or explore our categories to get started!
+            </motion.p>
+            <motion.div
+              className="mt-6 sm:mt-8"
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <button
+                className="group bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base"
+              >
+                <span className="flex items-center gap-2">
+                  Check Back Soon
+                  <ArrowRight
+                    size={16}
+                    className="group-hover:translate-x-1 transition-transform sm:w-5 sm:h-5"
+                  />
+                </span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.section>
   );
 };
 
-// Cloud Computing Spotlight Section
+// Cloud Computing Spotlight Section (unchanged)
 const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
   if (!posts || posts.length === 0) return null;
   const featuredPost = posts[0];
@@ -709,13 +721,10 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
           className="text-sm sm:text-base md:text-lg italic text-gray-600 dark:text-gray-400 
                       max-w-2xl mx-auto px-4"
         >
-          Articles related to cloud space. find tutorials, case studies and much
-          more.
+          Articles related to cloud space. Find tutorials, case studies, and much more.
         </p>
       </motion.div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-        {/* Big Central Card */}
         <motion.div
           className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-purple-700 
                      rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl"
@@ -723,10 +732,8 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
           whileHover="hover"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 h-full min-h-[400px] sm:min-h-[450px] lg:min-h-[500px]">
-            {/* Image section */}
             <div className="relative overflow-hidden">
               <img
-                // src={featuredPost.coverImage || dummyImage2}
                 src={dummyImage}
                 alt={featuredPost.title}
                 className="w-full h-full object-cover"
@@ -734,8 +741,6 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
             </div>
-
-            {/* Content section */}
             <div className="p-4 sm:p-6 md:p-8 lg:p-12 text-white flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-2 sm:mb-3 md:mb-4">
                 <span
@@ -775,8 +780,6 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
             </div>
           </div>
         </motion.div>
-
-        {/* Smaller Cards */}
         <div className="space-y-3 sm:space-y-4 lg:space-y-6">
           {otherPosts.map((post, index) => (
             <motion.div
@@ -790,39 +793,34 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
             >
               <Link to={`/blog/post/${post.slug}`}>
                 <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
-                  {/* Thumbnail */}
                   <div
                     className="w-16 sm:w-20 lg:w-24 h-16 sm:h-20 lg:h-24 
                                flex-shrink-0 rounded-lg overflow-hidden"
                   >
                     <img
-                      // src={post.coverImage || dummyImage2}
                       src={dummyImage}
                       alt={post.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
                   </div>
-
-                  {/* Content */}
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
                     <div>
                       <h4
                         className="font-semibold text-gray-900 dark:text-white 
-                      mb-1 sm:mb-2 line-clamp-2 text-sm sm:text-base lg:text-lg
-                      leading-tight"
+                        mb-1 sm:mb-2 line-clamp-2 text-sm sm:text-base lg:text-lg
+                        leading-tight"
                       >
                         {post.title}
                       </h4>
                       <p
                         className="text-gray-600 dark:text-gray-400 
-                                 text-xs sm:text-sm line-clamp-2 mb-1 sm:mb-2
-                                 leading-relaxed"
+                                   text-xs sm:text-sm line-clamp-2 mb-1 sm:mb-2
+                                   leading-relaxed"
                       >
                         {post.summary}
                       </p>
                     </div>
-
                     <div className="flex items-center justify-between mt-auto">
                       <span className="text-xs text-gray-500 dark:text-gray-500">
                         {new Date(post.createdAt).toLocaleDateString()}
@@ -830,7 +828,7 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
                       <ArrowRight
                         size={12}
                         className="text-blue-600 dark:text-blue-400 sm:w-4 sm:h-4
-                               flex-shrink-0"
+                                 flex-shrink-0"
                       />
                     </div>
                   </div>
@@ -844,7 +842,7 @@ const CloudComputingSection = ({ posts }: { posts: Post[] }) => {
   );
 };
 
-// Palestine Support Section
+// Palestine Support Section (unchanged)
 const PalestineSupportSection = ({ theme }) => {
   const supportLinks = [
     {
@@ -874,7 +872,7 @@ const PalestineSupportSection = ({ theme }) => {
       x: 0,
       transition: { delay: i * 0.1, duration: 0.4, ease: "easeOut" },
     }),
-    hover: { scale: 1.05, transition: { duration: 0.2 } },
+    hover: { scale: 1.00, transition: { duration: 0.2 } },
   };
 
   return (
@@ -885,7 +883,7 @@ const PalestineSupportSection = ({ theme }) => {
       viewport={{ once: true }}
     >
       <motion.div
-        className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl 
+        className="bg-gradient-to-r from-white via-red-500/10 to-green-500/10 dark:bg-red-900/30 dark:from-red-900/30 dark:to-green-900/30 border border-slate-500 dark:border-slate-700 dark:bg-gray-800 rounded-xl sm:rounded-2xl 
                    shadow-xl p-4 sm:p-6 md:p-8 lg:p-12"
         variants={cardVariants}
       >
@@ -893,7 +891,6 @@ const PalestineSupportSection = ({ theme }) => {
           className="flex flex-col lg:flex-row lg:items-center justify-between 
                        gap-4 sm:gap-6 lg:gap-8"
         >
-          {/* Text content */}
           <motion.div
             className="lg:w-1/3"
             initial={{ opacity: 0, x: -20 }}
@@ -921,10 +918,7 @@ const PalestineSupportSection = ({ theme }) => {
               ongoing humanitarian crisis.
             </p>
           </motion.div>
-
-          {/* Links */}
           <div className="lg:w-2/3">
-            {/* Mobile: Stacked layout */}
             <div className="flex flex-col sm:hidden gap-3">
               {supportLinks.map((link, index) => {
                 const Icon = link.icon;
@@ -942,9 +936,9 @@ const PalestineSupportSection = ({ theme }) => {
                     initial="hidden"
                     animate="visible"
                     whileHover="hover"
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl 
-                             bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 
-                             dark:hover:bg-gray-600 text-gray-900 dark:text-white 
+                    className="flex items-center border-red-500 border gap-3 px-4 py-3 rounded-xl 
+                             bg-gray-100 dark:bg-gray-700  
+                              text-gray-900 dark:text-white 
                              transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
                   >
                     <Icon size={16} className={iconColor} />
@@ -954,8 +948,6 @@ const PalestineSupportSection = ({ theme }) => {
                 );
               })}
             </div>
-
-            {/* Tablet & Desktop: Flexible layout */}
             <div className="hidden sm:flex flex-wrap gap-3 lg:gap-4 justify-start lg:justify-end">
               {supportLinks.map((link, index) => {
                 const Icon = link.icon;
@@ -996,24 +988,20 @@ const PalestineSupportSection = ({ theme }) => {
   );
 };
 
-// Main Homepage Component
+// Updated Main Homepage Component with top-level "no posts" fallback
 export default function Homepage() {
-  // Use loader data
-  const { posts, categories } = useLoaderData<LoaderData>();
+  const { posts, categories, message } = useLoaderData<LoaderData>();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [theme] = useState("light"); // Mock theme
+  const [theme] = useState("light");
 
-  // Filter posts based on selected category
   const filteredPosts = selectedCategory
     ? posts.filter((p) =>
-        p.categories?.some((c) => c.name === selectedCategory)
-      )
+      p.categories?.some((c) => c.name === selectedCategory)
+    )
     : posts;
 
-  // Get featured post (first post or most recent)
   const featuredPost = posts.length > 0 ? posts[0] : null;
 
-  // Cloud posts (filtering for cloud-related posts)
   const cloudPosts = posts.filter((post) =>
     post.categories?.some(
       (cat) =>
@@ -1022,28 +1010,35 @@ export default function Homepage() {
     )
   );
 
+  // If no posts are available at all, show a full-page fallback
+  if (message) {
+    return (
+      <div className="min-h-screen max-w-5xl mx-auto rounded-xl bg-gray-50 dark:bg-gray-900 transition-colors ">
+        <HeroSection />
+        <div className="text-center py-20">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            {message}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
+            Working on bringing you fresh content soon.
+          </p>
+        </div>
+        <PalestineSupportSection theme={theme} />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen max-w-5xl rouded-xl bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      {/* 1. Hero Section */}
+    <div className="min-h-screen max-w-5xl rounded-xl bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <HeroSection />
-
-      {/* 2. Featured Post Section */}
       <FeaturedPostSection post={featuredPost} />
-
-      {/* 3. Category Filter Section */}
       <CategoryFilterSection
         categories={categories}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
-
-      {/* 4. Articles Grid Section */}
       <ArticlesGridSection posts={filteredPosts} />
-
-      {/* 5. Cloud Computing Spotlight Section */}
       <CloudComputingSection posts={cloudPosts} />
-
-      {/* 6. Palestine Support Section */}
       <PalestineSupportSection theme={theme} />
     </div>
   );
