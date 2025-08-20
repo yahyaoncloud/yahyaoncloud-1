@@ -195,9 +195,9 @@ function Experience({ experiences }: ExperienceProps) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <div className="space-y-4 ">
+    <div className="gap-2">
       <h2 className="text-lg font-semibold">Experience</h2>
-      <div className="space-y-2">
+      <div className="gap-2">
         {experiences.map((exp, i) => {
           const isOpen = open === i;
 
