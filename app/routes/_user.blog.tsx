@@ -95,7 +95,7 @@ const SocialIcon = ({ social }: { social: SocialLink }) => {
       href={social.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-zinc-500 dark:text-zinc-300 hover:text-indigo-600"
+      className="text-zinc-500 dark:text-indigo-400 hover:text-indigo-600"
       aria-label={social.id}
     >
       <Icon size={20} />
@@ -328,9 +328,9 @@ const LifeBlogSection = ({ posts }: { posts: Post[] }) => {
 
 const HeroSection = ({ socials }: { socials: SocialLink[] }) => (
   <MotionSection className="max-w-3xl mx-auto mt-4  py-12">
-    <div className="flex items-center justify-between mb-2">
-      <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white">
-        Hi, I'm Yahya
+    <div className="flex items-center justify-between mb-2 mt-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-indigo-400 ">
+        Yahya
       </h1>
       <div className="flex gap-3">
         {socials.map((social) => (
