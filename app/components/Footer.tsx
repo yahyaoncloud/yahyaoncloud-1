@@ -95,7 +95,7 @@ export default function Footer() {
                   scrolled ? "w-16 h-16" : "w-24 h-24"
                 }`}
               />
-              <span className="font-thin text-2xl text-zinc-900 dark:text-white">
+              <span className="font-thin text-2xl text-zinc-900 dark:text-white mrs-saint-delafield-regular">
                 Yahya On Cloud
               </span>
             </Link>
@@ -110,7 +110,7 @@ export default function Footer() {
                 href="https://coff.ee/yahyaoncloud"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400 dark:bg-yellow-600 text-zinc-900 dark:text-zinc-50 font-medium rounded-md transition-all duration-200 shadow-md hover:shadow-lg"
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400  text-zinc-800  font-medium rounded-md transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 <Coffee size={18} />
                 <span>Buy me a coffee</span>

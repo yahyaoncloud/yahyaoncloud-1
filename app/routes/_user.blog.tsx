@@ -327,7 +327,7 @@ const LifeBlogSection = ({ posts }: { posts: Post[] }) => {
 };
 
 const HeroSection = ({ socials }: { socials: SocialLink[] }) => (
-  <MotionSection className="max-w-3xl mx-auto  py-12">
+  <MotionSection className="max-w-3xl mx-auto mt-4  py-12">
     <div className="flex items-center justify-between mb-2">
       <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white">
         Hi, I'm Yahya

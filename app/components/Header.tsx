@@ -241,7 +241,9 @@ export default function Header() {
               alt="yahyaoncloud logo"
               className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${"w-16 h-16"}`}
             />
-            <span className="text-lg font-semibold ">Yahya On Cloud</span>
+            <span className="text-xl  mrs-saint-delafield-regular">
+              Yahya On Cloud
+            </span>
           </Link>
         </motion.div>
 
