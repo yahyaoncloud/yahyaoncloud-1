@@ -14,15 +14,15 @@ function LayoutContent({ children, sidebar }: MainLayoutProps) {
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-col max-w-3xl mx-auto items-center justify-center p-10 bg-zinc-50 dark:bg-zinc-950 min-h-screen overflow-x-clip">
+    <div className="flex flex-col max-w-3xl mx-auto items-center justify-center bg-zinc-50 dark:bg-zinc-950 min-h-screen overflow-x-clip">
       <Header />
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.25 }}
-        className="flex-grow"
+        className="flex-grow py-12 p-6"
       >
-        <div className="flex py-4  mx-auto">
+        <div className="flex">
           {/* {sidebar && (
             <aside className="hidden lg:block max-w-xs w-full  z-40">
               <div className="sticky flex bg-blue-400" />

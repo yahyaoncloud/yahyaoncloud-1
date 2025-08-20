@@ -91,29 +91,32 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 // --- Enhance Blog Content ---
-function useEnhanceBlogContent() {
+export function useEnhanceBlogContent() {
   useEffect(() => {
     const article = document.querySelector("article") || document;
-    // Wrap tables
+
+    // --- TABLE WRAP ---
     article.querySelectorAll("table").forEach((table) => {
       if (table.parentElement?.classList.contains("overflow-x-auto")) return;
       const wrapper = document.createElement("div");
       wrapper.className =
-        "overflow-x-auto rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900";
+        "overflow-x-auto  shadow-sm bg-white dark:bg-transparent mb-4";
       table.parentNode?.insertBefore(wrapper, table);
       wrapper.appendChild(table);
       table.className +=
-        " min-w-full divide-y divide-zinc-200 dark:divide-zinc-700";
+        " min-w-full divide-y divide-gray-200 dark:divide-gray-700";
     });
 
-    // Add copy buttons to code blocks
+    // --- CODE BLOCKS ---
     article.querySelectorAll("pre").forEach((pre) => {
-      if (pre.querySelector(".copy-button")) return;
+      if (pre.parentElement?.classList.contains("code-block-wrapper")) return;
+
       const wrapper = document.createElement("div");
-      wrapper.className = "code-block-wrapper relative";
+      wrapper.className = "code-block-wrapper relative overflow-hidden";
       pre.parentNode?.insertBefore(wrapper, pre);
       wrapper.appendChild(pre);
 
+      // --- LANGUAGE LABEL ---
       const codeElement = pre.querySelector("code");
       let language = "code";
       if (codeElement) {
@@ -121,34 +124,54 @@ function useEnhanceBlogContent() {
         const langClass = classList.find((cls) => cls.startsWith("language-"));
         if (langClass) language = langClass.replace("language-", "");
       }
+      const langLabel = document.createElement("div");
+      langLabel.textContent = language;
+      langLabel.className =
+        "absolute bottom-2 right-2 text-xs font-mono px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200";
+      wrapper.appendChild(langLabel);
 
-      const langIndicator = document.createElement("div");
-      langIndicator.className = "language-indicator text-xs text-zinc-500";
-      langIndicator.textContent = language;
-
+      // --- COPY BUTTON ---
       const button = document.createElement("button");
-      button.className = "copy-button text-xs text-zinc-500";
-      button.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
       button.setAttribute("aria-label", "Copy code");
+      button.className =
+        "copy-button absolute top-8 right-2 p-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 opacity-0 transition-opacity hover:opacity-100";
+      button.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      `;
 
       button.addEventListener("click", async () => {
         if (!codeElement) return;
-        const codeText = codeElement.textContent;
         try {
-          await navigator.clipboard.writeText(codeText);
-          button.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"></polyline></svg>`;
-          button.classList.add("copied");
+          await navigator.clipboard.writeText(codeElement.textContent || "");
+          button.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20,6 9,17 4,12"></polyline>
+            </svg>
+          `;
           setTimeout(() => {
-            button.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
-            button.classList.remove("copied");
+            button.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            `;
           }, 2000);
-        } catch (error) {
-          console.error("Failed to copy code:", error);
+        } catch (err) {
+          console.error(err);
         }
       });
 
+      wrapper.addEventListener("mouseenter", () => {
+        button.style.opacity = "1";
+      });
+      wrapper.addEventListener("mouseleave", () => {
+        button.style.opacity = "0";
+      });
+
       wrapper.appendChild(button);
-      wrapper.appendChild(langIndicator);
     });
   }, []);
 }
@@ -222,7 +245,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="min-h-screen max-w-3xl mx-auto px-6 py-12 space-y-8"
+      className=" max-w-sm sm:max-w-sm md:max-w-md lg:max-w-3xl xl:max-w-3xl mx-auto px-6 py-12 space-y-8"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}

@@ -1,5 +1,5 @@
 export const proseClasses = `
-  prose mx-auto max-w-3xl py-12
+  prose mx-auto  py-12
   text-base sm:text-lg leading-relaxed
   
 
@@ -33,7 +33,7 @@ export const proseClasses = `
   hover:prose-a:text-indigo-700 dark:hover:prose-a:text-indigo-300 transition-colors duration-200 xl:prose-a:text-sm
 
   /* Inline code */
-   prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:bg-transparent prose-code:bg-indigo-500/20 xl:prose-code:text-sm
+   prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:bg-indigo-500/20 xl:prose-code:text-sm
   prose-code:font-mono prose-code:text-sm prose-code:text-indigo-400 dark:prose-code:text-indigo-300 xl:prose-code:text-sm
 
   /* Code blocks */
