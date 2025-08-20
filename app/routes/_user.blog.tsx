@@ -10,9 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import {
-  FaCoffee,
   FaGithub,
-  FaGlobe,
   FaInstagram,
   FaLinkedin,
   FaTwitter,
@@ -22,7 +20,7 @@ import {
   getPosts,
   getAllCategories,
   getAllPortfolios,
-} from "../services/post.server";
+} from "../Services/post.server";
 
 // Types
 interface Post {
