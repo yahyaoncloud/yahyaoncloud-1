@@ -64,7 +64,7 @@ export default function AdminPostDetail() {
   }
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-zinc-500">
         Loading...
       </div>
     );
@@ -82,14 +82,14 @@ export default function AdminPostDetail() {
   return (
     <div
       className={`min-h-screen p-6 ${
-        theme === "dark" ? "bg-gray-900" : "bg-gray-100"
+        theme === "dark" ? "bg-zinc-900" : "bg-zinc-100"
       }`}
     >
       <div className="max-w-3xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1
             className={`text-3xl font-bold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+              theme === "dark" ? "text-white" : "text-zinc-900"
             }`}
           >
             {post.title || "Untitled Post"}
@@ -99,8 +99,8 @@ export default function AdminPostDetail() {
               to={`/admin/update/${post.id}`}
               className={`p-2 rounded-md ${
                 theme === "dark"
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : "bg-blue-500 hover:bg-blue-600"
+                  ? "bg-indigo-600 hover:bg-indigo-700"
+                  : "bg-indigo-500 hover:bg-indigo-600"
               } text-white`}
             >
               <Edit size={16} />
@@ -128,10 +128,10 @@ export default function AdminPostDetail() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`rounded-lg p-6 shadow overflow-clip ${
+          className={`rounded-md p-6 shadow overflow-clip ${
             theme === "dark"
-              ? "bg-gray-800 text-gray-100"
-              : "bg-white text-gray-900"
+              ? "bg-zinc-800 text-zinc-100"
+              : "bg-zinc-50 text-zinc-900"
           }`}
         >
           {post.coverImage?.url && (
@@ -142,7 +142,7 @@ export default function AdminPostDetail() {
             />
           )}
 
-          <div className="text-sm text-gray-500 mb-2">
+          <div className="text-sm text-zinc-500 mb-2">
             {post.createdAt && formatDate(post.createdAt)} •{" "}
             {post.categoryId || "Uncategorized"}
           </div>
@@ -153,7 +153,7 @@ export default function AdminPostDetail() {
 
           <div
             className={`prose-sm max-w-none flex-wrap break-words ${
-              theme === "dark" ? "text-gray-100" : "text-gray-900 prose-light"
+              theme === "dark" ? "text-zinc-100" : "text-zinc-900 prose-light"
             }`}
             style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
             dangerouslySetInnerHTML={{ __html: markdownContent }}
@@ -166,8 +166,8 @@ export default function AdminPostDetail() {
                   key={tag.id || tag.name || Math.random()}
                   className={`px-2 py-1 rounded text-xs font-medium ${
                     theme === "dark"
-                      ? "bg-gray-700 text-gray-200"
-                      : "bg-gray-200 text-gray-700"
+                      ? "bg-zinc-700 text-zinc-200"
+                      : "bg-zinc-200 text-zinc-700"
                   }`}
                 >
                   #{tag.name || "Unknown"}
@@ -181,7 +181,7 @@ export default function AdminPostDetail() {
           <div className="mt-8">
             <h3
               className={`text-lg font-semibold mb-4 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
+                theme === "dark" ? "text-white" : "text-zinc-900"
               }`}
             >
               Gallery
@@ -192,7 +192,7 @@ export default function AdminPostDetail() {
                   key={img.id || Math.random()}
                   src={img.url || dummyImage}
                   alt={img.altText || "Gallery image"}
-                  className="w-full object-cover rounded-lg shadow"
+                  className="w-full object-cover rounded-md shadow"
                 />
               ))}
             </div>

@@ -88,10 +88,10 @@ const ProfileCard: React.FC<{
   className?: string;
 }> = ({ title, children, icon, className = "" }) => (
   <div
-    className={`bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 ${className}`}
+    className={`bg-zinc-50/10 backdrop-blur-sm rounded-md p-6 border border-white/20 ${className}`}
   >
     <div className="flex items-center gap-3 mb-4">
-      <div className="p-2 bg-white/20 rounded-lg">{icon}</div>
+      <div className="p-2 bg-zinc-50/20 rounded-md">{icon}</div>
       <h3 className="text-xl font-semibold text-white">{title}</h3>
     </div>
     {children}
@@ -105,15 +105,15 @@ const StatCard: React.FC<{
   gradient: string;
 }> = ({ label, value, icon, gradient }) => (
   <div
-    className="p-4 rounded-xl text-white relative overflow-hidden"
+    className="p-4 rounded-md text-white relative overflow-hidden"
     style={{ background: `linear-gradient(135deg, ${gradient})` }}
   >
     <div className="absolute top-0 right-0 w-16 h-16 opacity-20">
-      <div className="absolute inset-0 bg-white rounded-full transform translate-x-8 -translate-y-8"></div>
+      <div className="absolute inset-0 bg-zinc-50 rounded-full transform translate-x-8 -translate-y-8"></div>
     </div>
     <div className="relative z-10">
       <div className="flex items-center justify-between mb-2">
-        <div className="p-2 bg-white/20 rounded-lg">{icon}</div>
+        <div className="p-2 bg-zinc-50/20 rounded-md">{icon}</div>
       </div>
       <div className="text-2xl font-bold mb-1">{value}</div>
       <div className="text-white/80 text-sm">{label}</div>
@@ -127,7 +127,7 @@ const ToggleSwitch: React.FC<{
   label: string;
   description: string;
 }> = ({ checked, onChange, label, description }) => (
-  <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+  <div className="flex items-center justify-between p-4 bg-zinc-50/5 rounded-md">
     <div>
       <div className="text-white font-medium">{label}</div>
       <div className="text-white/70 text-sm">{description}</div>
@@ -135,11 +135,11 @@ const ToggleSwitch: React.FC<{
     <button
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-        checked ? "bg-purple-600" : "bg-gray-600"
+        checked ? "bg-purple-600" : "bg-zinc-600"
       }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+        className={`inline-block h-4 w-4 transform rounded-full bg-zinc-50 transition-transform ${
           checked ? "translate-x-6" : "translate-x-1"
         }`}
       />
@@ -176,7 +176,7 @@ export default function AdminProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-purple-900 to-indigo-900 p-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -193,7 +193,7 @@ export default function AdminProfile() {
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white transition-colors"
               >
                 <Edit3 className="w-4 h-4" />
                 Edit Profile
@@ -202,14 +202,14 @@ export default function AdminProfile() {
               <div className="flex gap-2">
                 <button
                   onClick={handleSave}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   Save
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-white transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-zinc-600 hover:bg-zinc-700 rounded-md text-white transition-colors"
                 >
                   <X className="w-4 h-4" />
                   Cancel
@@ -231,13 +231,13 @@ export default function AdminProfile() {
             <div className="flex items-start gap-6">
               {/* Avatar */}
               <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold">
                   {profile.name
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
                 </div>
-                <button className="absolute -bottom-2 -right-2 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors">
+                <button className="absolute -bottom-2 -right-2 p-2 bg-zinc-50/20 rounded-full hover:bg-zinc-50/30 transition-colors">
                   <Camera className="w-4 h-4 text-white" />
                 </button>
               </div>
@@ -259,7 +259,7 @@ export default function AdminProfile() {
                             name: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       />
                     ) : (
                       <div className="text-white font-medium">
@@ -296,7 +296,7 @@ export default function AdminProfile() {
                             email: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       />
                     ) : (
                       <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export default function AdminProfile() {
                             phone: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       />
                     ) : (
                       <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export default function AdminProfile() {
                           location: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   ) : (
                     <div className="flex items-center gap-2">
@@ -369,7 +369,7 @@ export default function AdminProfile() {
                         })
                       }
                       rows={3}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                      className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                     />
                   ) : (
                     <div className="text-white/90">{profile.bio}</div>
@@ -392,7 +392,7 @@ export default function AdminProfile() {
                 <input
                   type="text"
                   value={profile.socialLinks.twitter}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="@username"
                 />
               </div>
@@ -403,7 +403,7 @@ export default function AdminProfile() {
                 <input
                   type="text"
                   value={profile.socialLinks.linkedin}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="username"
                 />
               </div>
@@ -414,7 +414,7 @@ export default function AdminProfile() {
                 <input
                   type="text"
                   value={profile.socialLinks.github}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="username"
                 />
               </div>
@@ -425,7 +425,7 @@ export default function AdminProfile() {
                 <input
                   type="text"
                   value={profile.socialLinks.website}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="yoursite.com"
                 />
               </div>
@@ -542,16 +542,16 @@ export default function AdminProfile() {
             icon={<Lock className="w-5 h-5 text-white" />}
           >
             <div className="space-y-3">
-              <button className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-left transition-colors">
+              <button className="w-full px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white text-left transition-colors">
                 Change Password
               </button>
-              <button className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-left transition-colors">
+              <button className="w-full px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white text-left transition-colors">
                 Two-Factor Authentication
               </button>
-              <button className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-left transition-colors">
+              <button className="w-full px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white text-left transition-colors">
                 Active Sessions
               </button>
-              <button className="w-full px-4 py-2 bg-red-600/20 hover:bg-red-600/30 rounded-lg text-red-300 text-left transition-colors">
+              <button className="w-full px-4 py-2 bg-red-600/20 hover:bg-red-600/30 rounded-md text-red-300 text-left transition-colors">
                 Delete Account
               </button>
             </div>

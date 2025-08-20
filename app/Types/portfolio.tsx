@@ -1,6 +1,6 @@
 export interface Portfolio {
   name: string;
-  bio: string;
+  bio: string[];
   portraitUrl: string;
   location?: string;
   experiences: Experience[];
@@ -14,8 +14,13 @@ export interface Portfolio {
 
 export interface Experience {
   title: string;
+  role: string;
+  year: string;
+  isWorking: number;
+  company: string;
   description: string[];
   period: string;
+  location: string;
   summary: string;
 }
 

@@ -23,8 +23,8 @@ export default function Form({
 
   return (
     <motion.div
-      className={`rounded-lg p-6 shadow-lg ${
-        theme === "dark" ? "bg-gray-800" : "bg-white"
+      className={`rounded-md p-6 shadow-lg ${
+        theme === "dark" ? "bg-zinc-800" : "bg-zinc-50"
       } ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -35,7 +35,7 @@ export default function Form({
           <label
             htmlFor="name"
             className={`block text-sm font-medium ${
-              theme === "dark" ? "text-gray-300" : "text-gray-700"
+              theme === "dark" ? "text-zinc-300" : "text-zinc-700"
             }`}
           >
             Name
@@ -47,10 +47,10 @@ export default function Form({
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+            className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
               theme === "dark"
-                ? "bg-gray-700 border-gray-600 text-white"
-                : "bg-white border-gray-300 text-gray-900"
+                ? "bg-zinc-700 border-zinc-600 text-white"
+                : "bg-zinc-50 border-zinc-300 text-zinc-900"
             }`}
             placeholder="Your name"
           />
@@ -59,7 +59,7 @@ export default function Form({
           <label
             htmlFor="email"
             className={`block text-sm font-medium ${
-              theme === "dark" ? "text-gray-300" : "text-gray-700"
+              theme === "dark" ? "text-zinc-300" : "text-zinc-700"
             }`}
           >
             Email
@@ -71,10 +71,10 @@ export default function Form({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+            className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
               theme === "dark"
-                ? "bg-gray-700 border-gray-600 text-white"
-                : "bg-white border-gray-300 text-gray-900"
+                ? "bg-zinc-700 border-zinc-600 text-white"
+                : "bg-zinc-50 border-zinc-300 text-zinc-900"
             }`}
             placeholder="Your email"
           />
@@ -83,7 +83,7 @@ export default function Form({
           <label
             htmlFor="message"
             className={`block text-sm font-medium ${
-              theme === "dark" ? "text-gray-300" : "text-gray-700"
+              theme === "dark" ? "text-zinc-300" : "text-zinc-700"
             }`}
           >
             Message
@@ -95,10 +95,10 @@ export default function Form({
             onChange={(e) => setMessage(e.target.value)}
             required
             rows={5}
-            className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y transition-all ${
+            className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y transition-all ${
               theme === "dark"
-                ? "bg-gray-700 border-gray-600 text-white"
-                : "bg-white border-gray-300 text-gray-900"
+                ? "bg-zinc-700 border-zinc-600 text-white"
+                : "bg-zinc-50 border-zinc-300 text-zinc-900"
             }`}
             placeholder="Your message"
           />
@@ -129,8 +129,8 @@ export default function Form({
           type="submit"
           className={`w-full px-4 py-2 rounded-md font-medium flex items-center justify-center ${
             theme === "dark"
-              ? "bg-blue-600 hover:bg-blue-700 text-white"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
+              ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+              : "bg-indigo-500 hover:bg-indigo-600 text-white"
           }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

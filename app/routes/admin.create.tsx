@@ -255,13 +255,13 @@ export default function BlogPostCreatePage() {
   return (
     <div
       className={`min-h-screen p-6 transition-colors duration-300 ${
-        theme === "dark" ? "bg-gray-900" : "bg-gray-100"
+        theme === "dark" ? "bg-zinc-900" : "bg-zinc-100"
       }`}
     >
       <header className="flex justify-between items-center mb-8 max-w-5xl mx-auto">
         <h1
           className={`text-3xl font-bold ${
-            theme === "dark" ? "text-white" : "text-gray-900"
+            theme === "dark" ? "text-white" : "text-zinc-900"
           }`}
         >
           Create New Blog Post
@@ -275,10 +275,10 @@ export default function BlogPostCreatePage() {
         transition={{ duration: 0.5 }}
       >
         <div
-          className={`rounded-lg shadow-xl p-8 transition-all duration-300 ${
+          className={`rounded-md shadow-xl p-8 transition-all duration-300 ${
             theme === "dark"
-              ? "bg-gray-800 text-white"
-              : "bg-white text-gray-900"
+              ? "bg-zinc-800 text-white"
+              : "bg-zinc-50 text-zinc-900"
           }`}
         >
           <Form method="post" className="space-y-6">
@@ -292,7 +292,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="title"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 Title
@@ -304,10 +304,10 @@ export default function BlogPostCreatePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
                 placeholder="Enter your blog post title"
               />
@@ -323,7 +323,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="type"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 Post Type
@@ -336,10 +336,10 @@ export default function BlogPostCreatePage() {
                   setType(e.target.value as "article" | "news" | "tutorial")
                 }
                 required
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
               >
                 <option value="article">Article</option>
@@ -358,7 +358,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="categoryId"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 Category
@@ -370,10 +370,10 @@ export default function BlogPostCreatePage() {
                 onChange={(e) => setCategoryId(e.target.value)}
                 disabled={addNewCategory}
                 required={!addNewCategory}
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 } ${addNewCategory ? "opacity-50" : ""}`}
               >
                 <option value="">Select a category</option>
@@ -391,11 +391,11 @@ export default function BlogPostCreatePage() {
                     setAddNewCategory(e.target.checked);
                     if (!e.target.checked) setNewCategoryName("");
                   }}
-                  className="rounded text-blue-500 focus:ring-blue-500"
+                  className="rounded text-indigo-500 focus:ring-indigo-500"
                 />
                 <span
                   className={`text-sm ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-700"
+                    theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                   }`}
                 >
                   Add New Category
@@ -409,10 +409,10 @@ export default function BlogPostCreatePage() {
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   required={addNewCategory}
-                  className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                  className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                     theme === "dark"
-                      ? "bg-gray-700 border-gray-600 text-white"
-                      : "bg-white border-gray-300 text-gray-900"
+                      ? "bg-zinc-700 border-zinc-600 text-white"
+                      : "bg-zinc-50 border-zinc-300 text-zinc-900"
                   }`}
                   placeholder="Enter new category name"
                 />
@@ -429,7 +429,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="tagIds"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 Tag IDs (comma-separated)
@@ -441,16 +441,16 @@ export default function BlogPostCreatePage() {
                 value={tagIds}
                 onChange={(e) => setTagIds(e.target.value)}
                 required
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
                 placeholder="e.g., tag1,tag2"
               />
               <p
                 className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  theme === "dark" ? "text-zinc-400" : "text-zinc-600"
                 }`}
               >
                 Available tags:{" "}
@@ -470,7 +470,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="coverImageUrl"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 Cover Image URL
@@ -481,10 +481,10 @@ export default function BlogPostCreatePage() {
                 id="coverImageUrl"
                 value={coverImageUrl}
                 onChange={(e) => setCoverImageUrl(e.target.value)}
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
                 placeholder="Enter image URL (optional)"
               />
@@ -501,7 +501,7 @@ export default function BlogPostCreatePage() {
                 <label
                   htmlFor="content"
                   className={`block text-sm font-medium ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-700"
+                    theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                   }`}
                 >
                   Content
@@ -511,11 +511,11 @@ export default function BlogPostCreatePage() {
                     type="checkbox"
                     checked={showContent}
                     onChange={() => setShowContent((v) => !v)}
-                    className="rounded text-blue-500 focus:ring-blue-500"
+                    className="rounded text-indigo-500 focus:ring-indigo-500"
                   />
                   <span
                     className={`text-sm ${
-                      theme === "dark" ? "text-gray-300" : "text-gray-700"
+                      theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                     }`}
                   >
                     Expand Editor
@@ -529,10 +529,10 @@ export default function BlogPostCreatePage() {
                 onChange={(e) => setContent(e.target.value)}
                 required
                 rows={showContent ? 15 : 8}
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
                 placeholder="Write your blog post content..."
               />
@@ -548,7 +548,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="seoTitle"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 SEO Title
@@ -560,10 +560,10 @@ export default function BlogPostCreatePage() {
                 value={seoTitle}
                 onChange={(e) => setSeoTitle(e.target.value)}
                 required
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
                 placeholder="Enter SEO title"
               />
@@ -578,7 +578,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="seoDescription"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 SEO Description
@@ -590,10 +590,10 @@ export default function BlogPostCreatePage() {
                 onChange={(e) => setSeoDescription(e.target.value)}
                 required
                 rows={3}
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
                 placeholder="Enter SEO description"
               />
@@ -608,7 +608,7 @@ export default function BlogPostCreatePage() {
               <label
                 htmlFor="seoKeywords"
                 className={`block text-sm font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 SEO Keywords (comma-separated)
@@ -620,10 +620,10 @@ export default function BlogPostCreatePage() {
                 value={seoKeywords}
                 onChange={(e) => setSeoKeywords(e.target.value)}
                 required
-                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                className={`w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
                   theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-zinc-700 border-zinc-600 text-white"
+                    : "bg-zinc-50 border-zinc-300 text-zinc-900"
                 }`}
                 placeholder="e.g., cloud, aws, devops"
               />
@@ -669,8 +669,8 @@ export default function BlogPostCreatePage() {
                 }}
                 className={`px-4 py-2 rounded-md transition-colors ${
                   theme === "dark"
-                    ? "bg-gray-600 hover:bg-gray-500 text-white"
-                    : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                    ? "bg-zinc-600 hover:bg-zinc-500 text-white"
+                    : "bg-zinc-200 hover:bg-zinc-300 text-zinc-900"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -681,8 +681,8 @@ export default function BlogPostCreatePage() {
                 type="submit"
                 className={`px-4 py-2 rounded-md transition-colors ${
                   theme === "dark"
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                    ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                    : "bg-indigo-500 hover:bg-indigo-600 text-white"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

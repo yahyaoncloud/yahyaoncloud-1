@@ -119,7 +119,7 @@
 //   ];
 
 //   const categories = [
-//     { name: "DevOps", count: 12, color: "bg-blue-500" },
+//     { name: "DevOps", count: 12, color: "bg-indigo-500" },
 //     { name: "Frontend", count: 8, color: "bg-green-500" },
 //     { name: "Cloud", count: 15, color: "bg-purple-500" },
 //     { name: "Architecture", count: 9, color: "bg-orange-500" },
@@ -137,13 +137,13 @@
 //   ];
 
 //   const StatCard = ({ title, value, change, icon: Icon, trend }) => (
-//     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200">
+//     <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 hover:shadow-md transition-all duration-200">
 //       <div className="flex items-center justify-between mb-4">
 //         <div className="flex items-center gap-3">
-//           <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-//             <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+//           <div className="p-2 bg-indigo-100 dark:bg-indigo-900/20 rounded-md">
+//             <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
 //           </div>
-//           <h3 className="font-medium text-gray-700 dark:text-gray-300">
+//           <h3 className="font-medium text-zinc-700 dark:text-zinc-300">
 //             {title}
 //           </h3>
 //         </div>
@@ -162,7 +162,7 @@
 //           {change}%
 //         </div>
 //       </div>
-//       <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+//       <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
 //         {typeof value === "number" && value > 999
 //           ? `${(value / 1000).toFixed(1)}k`
 //           : value}
@@ -171,11 +171,11 @@
 //   );
 
 //   const PostRow = ({ post }) => (
-//     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group">
+//     <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-4 shadow-sm border border-zinc-200 dark:border-zinc-700 hover:shadow-md transition-all duration-200 group">
 //       <div className="flex items-center justify-between">
 //         <div className="flex-1 min-w-0">
 //           <div className="flex items-center gap-3 mb-2">
-//             <h3 className="font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer truncate">
+//             <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer truncate">
 //               {post.title}
 //             </h3>
 //             <span
@@ -190,7 +190,7 @@
 //               {post.status}
 //             </span>
 //           </div>
-//           <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 flex-wrap">
+//           <div className="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400 flex-wrap">
 //             <span className="flex items-center gap-1">
 //               <Tag className="w-4 h-4" />
 //               {post.category}
@@ -214,13 +214,13 @@
 //           </div>
 //         </div>
 //         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-//           <button className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20">
+//           <button className="p-2 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
 //             <Edit3 className="w-4 h-4" />
 //           </button>
-//           <button className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+//           <button className="p-2 text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20">
 //             <Trash2 className="w-4 h-4" />
 //           </button>
-//           <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+//           <button className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-700">
 //             <MoreHorizontal className="w-4 h-4" />
 //           </button>
 //         </div>
@@ -231,10 +231,10 @@
 //   const TabButton = ({ id, label, active, onClick }) => (
 //     <button
 //       onClick={() => onClick(id)}
-//       className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+//       className={`px-4 py-2 rounded-md font-medium transition-all duration-200 ${
 //         active
-//           ? "bg-blue-600 text-white shadow-sm"
-//           : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+//           ? "bg-indigo-600 text-white shadow-sm"
+//           : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-700"
 //       }`}
 //     >
 //       {label}
@@ -251,10 +251,10 @@
 //   });
 
 //   return (
-//     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+//     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
 //       <div className="max-w-7xl mx-auto px-4 py-8">
 //         {/* Navigation Tabs */}
-//         <div className="flex gap-2 mb-8 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg w-fit">
+//         <div className="flex gap-2 mb-8 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-md w-fit">
 //           <TabButton
 //             id="overview"
 //             label="Overview"
@@ -320,13 +320,13 @@
 //             <div className="grid lg:grid-cols-3 gap-8">
 //               {/* Recent Posts */}
 //               <div className="lg:col-span-2">
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+//                 <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
 //                   <div className="flex items-center justify-between mb-6">
-//                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-//                       <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+//                     <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+//                       <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
 //                       Recent Posts
 //                     </h2>
-//                     <button className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+//                     <button className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium">
 //                       View all
 //                     </button>
 //                   </div>
@@ -341,8 +341,8 @@
 //               {/* Sidebar */}
 //               <div className="space-y-6">
 //                 {/* Top Categories */}
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-//                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+//                 <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+//                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 flex items-center gap-2">
 //                     <PieChart className="w-5 h-5 text-purple-600 dark:text-purple-400" />
 //                     Top Categories
 //                   </h3>
@@ -356,11 +356,11 @@
 //                           <div
 //                             className={`w-3 h-3 rounded-full ${category.color}`}
 //                           />
-//                           <span className="text-gray-700 dark:text-gray-300 font-medium">
+//                           <span className="text-zinc-700 dark:text-zinc-300 font-medium">
 //                             {category.name}
 //                           </span>
 //                         </div>
-//                         <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+//                         <span className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">
 //                           {category.count}
 //                         </span>
 //                       </div>
@@ -369,27 +369,27 @@
 //                 </div>
 
 //                 {/* Quick Actions */}
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-//                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+//                 <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+//                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 flex items-center gap-2">
 //                     <Star className="w-5 h-5 text-yellow-500" />
 //                     Quick Actions
 //                   </h3>
 //                   <div className="space-y-3">
-//                     <button className="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-//                       <Plus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-//                       <span className="text-gray-700 dark:text-gray-300">
+//                     <button className="w-full flex items-center gap-3 p-3 text-left rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
+//                       <Plus className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+//                       <span className="text-zinc-700 dark:text-zinc-300">
 //                         Create New Post
 //                       </span>
 //                     </button>
-//                     <button className="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+//                     <button className="w-full flex items-center gap-3 p-3 text-left rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
 //                       <Tag className="w-4 h-4 text-green-600 dark:text-green-400" />
-//                       <span className="text-gray-700 dark:text-gray-300">
+//                       <span className="text-zinc-700 dark:text-zinc-300">
 //                         Manage Categories
 //                       </span>
 //                     </button>
-//                     <button className="w-full flex items-center gap-3 p-3 text-left rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+//                     <button className="w-full flex items-center gap-3 p-3 text-left rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors">
 //                       <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-//                       <span className="text-gray-700 dark:text-gray-300">
+//                       <span className="text-zinc-700 dark:text-zinc-300">
 //                         View Analytics
 //                       </span>
 //                     </button>
@@ -397,23 +397,23 @@
 //                 </div>
 
 //                 {/* Palestine Support Section */}
-//                 <div className="bg-gradient-to-br from-red-50 to-green-50 dark:from-red-900/10 dark:to-green-900/10 rounded-xl p-6 border border-red-200/50 dark:border-red-800/20">
+//                 <div className="bg-gradient-to-br from-red-50 to-green-50 dark:from-red-900/10 dark:to-green-900/10 rounded-md p-6 border border-red-200/50 dark:border-red-800/20">
 //                   <div className="flex items-center gap-2 mb-3">
 //                     <HandHeart className="w-5 h-5 text-red-500" />
-//                     <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+//                     <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
 //                       Support Palestine
 //                     </h3>
 //                   </div>
-//                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+//                   <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
 //                     Your platform continues to raise awareness and support for
 //                     Palestine through technology and education.
 //                   </p>
 //                   <div className="flex gap-2">
-//                     <button className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+//                     <button className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-2 rounded-md transition-colors flex items-center justify-center gap-1">
 //                       <Heart className="w-3 h-3" />
 //                       Donate
 //                     </button>
-//                     <button className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+//                     <button className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-2 rounded-md transition-colors flex items-center justify-center gap-1">
 //                       <Globe className="w-3 h-3" />
 //                       Learn
 //                     </button>
@@ -430,30 +430,30 @@
 //             {/* Post Management Header */}
 //             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
 //               <div>
-//                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-//                   <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+//                 <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+//                   <FileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
 //                   All Posts
 //                 </h2>
-//                 <p className="text-gray-600 dark:text-gray-400 mt-1">
+//                 <p className="text-zinc-600 dark:text-zinc-400 mt-1">
 //                   Manage and organize your blog content ({recentPosts.length}{" "}
 //                   total)
 //                 </p>
 //               </div>
 //               <div className="flex gap-3 w-full sm:w-auto">
 //                 <div className="relative flex-1 sm:w-64">
-//                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+//                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
 //                   <input
 //                     type="text"
 //                     placeholder="Search posts..."
 //                     value={searchQuery}
 //                     onChange={(e) => setSearchQuery(e.target.value)}
-//                     className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+//                     className="w-full pl-10 pr-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
 //                   />
 //                 </div>
 //                 <select
 //                   value={selectedFilter}
 //                   onChange={(e) => setSelectedFilter(e.target.value)}
-//                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+//                   className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 //                 >
 //                   <option value="all">All Status</option>
 //                   <option value="published">Published</option>
@@ -470,12 +470,12 @@
 //                   <PostRow key={post.id} post={post} />
 //                 ))
 //               ) : (
-//                 <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-//                   <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-//                   <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+//                 <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-800 rounded-md border border-zinc-200 dark:border-zinc-700">
+//                   <Search className="w-12 h-12 text-zinc-400 mx-auto mb-4" />
+//                   <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">
 //                     No posts found
 //                   </h3>
-//                   <p className="text-gray-600 dark:text-gray-400">
+//                   <p className="text-zinc-600 dark:text-zinc-400">
 //                     Try adjusting your search or filter criteria
 //                   </p>
 //                 </div>
@@ -488,14 +488,14 @@
 //         {activeTab === "analytics" && (
 //           <div className="space-y-8">
 //             <div className="flex items-center justify-between">
-//               <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+//               <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
 //                 <BarChart3 className="w-6 h-6 text-purple-600 dark:text-purple-400" />
 //                 Analytics Dashboard
 //               </h2>
 //               <select
 //                 value={selectedTimeframe}
 //                 onChange={(e) => setSelectedTimeframe(e.target.value)}
-//                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+//                 className="px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500"
 //               >
 //                 <option value="7d">Last 7 days</option>
 //                 <option value="30d">Last 30 days</option>
@@ -505,40 +505,40 @@
 
 //             {/* Analytics Overview */}
 //             <div className="grid lg:grid-cols-2 gap-8">
-//               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-//                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-//                   <TrendingUp className="w-5 h-5 text-blue-600" />
+//               <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+//                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 flex items-center gap-2">
+//                   <TrendingUp className="w-5 h-5 text-indigo-600" />
 //                   Views Over Time
 //                 </h3>
-//                 <div className="h-64 flex items-end justify-between bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 gap-2">
+//                 <div className="h-64 flex items-end justify-between bg-zinc-50 dark:bg-zinc-900/50 rounded-md p-4 gap-2">
 //                   {analytics.map((day, index) => (
 //                     <div
 //                       key={day.day}
 //                       className="flex flex-col items-center flex-1"
 //                     >
 //                       <div
-//                         className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm transition-all duration-300 hover:from-blue-700 hover:to-blue-500"
+//                         className="w-full bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t-sm transition-all duration-300 hover:from-indigo-700 hover:to-indigo-500"
 //                         style={{ height: `${(day.views / 240) * 200}px` }}
 //                       />
-//                       <span className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">
+//                       <span className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 font-medium">
 //                         {day.day}
 //                       </span>
 //                     </div>
 //                   ))}
 //                 </div>
-//                 <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+//                 <div className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
 //                   Peak: 240 views on Thursday
 //                 </div>
 //               </div>
 
-//               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-//                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+//               <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+//                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 flex items-center gap-2">
 //                   <Activity className="w-5 h-5 text-green-600" />
 //                   Engagement Rate
 //                 </h3>
 //                 <div className="h-64 flex items-center justify-center">
 //                   <div className="relative w-48 h-48">
-//                     <div className="w-full h-full rounded-full border-8 border-gray-200 dark:border-gray-700"></div>
+//                     <div className="w-full h-full rounded-full border-8 border-zinc-200 dark:border-zinc-700"></div>
 //                     <div
 //                       className="absolute top-0 left-0 w-full h-full rounded-full border-8 border-green-500 transform -rotate-90"
 //                       style={{
@@ -548,10 +548,10 @@
 //                     ></div>
 //                     <div className="absolute inset-0 flex items-center justify-center">
 //                       <div className="text-center">
-//                         <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+//                         <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
 //                           {stats.engagement}%
 //                         </div>
-//                         <div className="text-sm text-gray-600 dark:text-gray-400">
+//                         <div className="text-sm text-zinc-600 dark:text-zinc-400">
 //                           Avg. Engagement
 //                         </div>
 //                       </div>
@@ -562,8 +562,8 @@
 //             </div>
 
 //             {/* Top Performing Posts */}
-//             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-//               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+//             <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+//               <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4 flex items-center gap-2">
 //                 <Star className="w-5 h-5 text-yellow-500" />
 //                 Top Performing Posts
 //               </h3>
@@ -574,24 +574,24 @@
 //                   .map((post, index) => (
 //                     <div
 //                       key={post.id}
-//                       className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+//                       className="flex items-center gap-4 p-3 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
 //                     >
-//                       <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
+//                       <div className="flex-shrink-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/20 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
 //                         {index + 1}
 //                       </div>
 //                       <div className="flex-1 min-w-0">
-//                         <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate">
+//                         <h4 className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
 //                           {post.title}
 //                         </h4>
-//                         <p className="text-sm text-gray-600 dark:text-gray-400">
+//                         <p className="text-sm text-zinc-600 dark:text-zinc-400">
 //                           {post.category} • {post.views.toLocaleString()} views
 //                         </p>
 //                       </div>
 //                       <div className="text-right">
-//                         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+//                         <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
 //                           {post.likes} likes
 //                         </div>
-//                         <div className="text-xs text-gray-600 dark:text-gray-400">
+//                         <div className="text-xs text-zinc-600 dark:text-zinc-400">
 //                           {post.comments} comments
 //                         </div>
 //                       </div>
@@ -606,11 +606,11 @@
 //         {activeTab === "categories" && (
 //           <div className="space-y-6">
 //             <div className="flex items-center justify-between">
-//               <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+//               <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
 //                 <Tag className="w-6 h-6 text-orange-600 dark:text-orange-400" />
 //                 Categories
 //               </h2>
-//               <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-sm">
+//               <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-md font-medium transition-all duration-200 flex items-center gap-2 shadow-sm">
 //                 <Plus className="w-4 h-4" />
 //                 Add Category
 //               </button>
@@ -620,29 +620,29 @@
 //               {categories.map((category) => (
 //                 <div
 //                   key={category.name}
-//                   className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 group"
+//                   className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 hover:shadow-md transition-all duration-200 group"
 //                 >
 //                   <div className="flex items-center justify-between mb-4">
 //                     <div className="flex items-center gap-3">
 //                       <div
 //                         className={`w-4 h-4 rounded-full ${category.color} shadow-sm`}
 //                       />
-//                       <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+//                       <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
 //                         {category.name}
 //                       </h3>
 //                     </div>
-//                     <button className="p-1 text-gray-400 hover:text-grayblog-600 dark:hover:text-gray-300 transition-colors opacity-0 group-hover:opacity-100">
+//                     <button className="p-1 text-zinc-400 hover:text-zincblog-600 dark:hover:text-zinc-300 transition-colors opacity-0 group-hover:opacity-100">
 //                       <MoreHorizontal className="w-4 h-4" />
 //                     </button>
 //                   </div>
-//                   <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+//                   <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
 //                     {category.count}
 //                   </div>
-//                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+//                   <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
 //                     {category.count === 1 ? "post" : "posts"} published
 //                   </p>
 //                   <div className="flex gap-2">
-//                     <button className="flex-1 text-sm px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+//                     <button className="flex-1 text-sm px-3 py-1 rounded-md bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors">
 //                       Edit
 //                     </button>
 //                     <button className="px-3 py-1 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">

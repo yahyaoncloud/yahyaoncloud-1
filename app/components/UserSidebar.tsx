@@ -4,7 +4,13 @@ import { Link, useRouteLoaderData } from "@remix-run/react";
 import { Mail, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Author, ContactDetails, Post } from "../Types/types";
-import { FaLinkedin, FaGithub, FaTwitter, FaGlobe, FaCoffee } from "react-icons/fa";
+import {
+  FaLinkedin,
+  FaGithub,
+  FaTwitter,
+  FaGlobe,
+  FaCoffee,
+} from "react-icons/fa";
 
 interface SocialLink {
   id?: string;
@@ -34,27 +40,27 @@ const containerVariants = {
     opacity: 1,
     x: 0,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.3,
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
     },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
+      duration: 0.4,
       ease: [0.25, 0.25, 0, 1],
     },
   },
 };
 
 const buttonVariants = {
-  hover: { scale: 1.05, boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)" },
-  tap: { scale: 0.95 },
+  hover: { scale: 1.03, boxShadow: "0 6px 20px rgba(0, 0, 0, 0.12)" },
+  tap: { scale: 0.97 },
 };
 
 // Helper function to convert ContactDetails to SocialLinks
@@ -158,8 +164,8 @@ export default function Sidebar({
   const { recentPosts, socialLinks } = useMemo(() => {
     const finalRecentPosts =
       loaderPosts && loaderPosts.length > 0
-        ? loaderPosts.slice(0, 5)
-        : propRecentPosts.slice(0, 5);
+        ? loaderPosts.slice(0, 4) // Reduced from 5 to 4
+        : propRecentPosts.slice(0, 4);
 
     const finalSocialLinks = loaderAuthor
       ? convertContactDetailsToSocialLinks(loaderAuthor)
@@ -173,40 +179,37 @@ export default function Sidebar({
 
   return (
     <motion.div
-      className={`flex flex-col gap-6 p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 ${className}`}
+      className={`flex flex-col gap-4 p-6 m-4 bg-zinc-50 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-700 ${className}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       {/* Newsletter */}
-      <motion.div
-        className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
-        variants={cardVariants}
-      >
+      <motion.div className="relative" variants={cardVariants}>
         <h3
-          className={`text-xl font-bold mb-4 ${
-            theme === "dark" ? "text-white" : "text-gray-900"
+          className={`text-base font-bold mb-2 ${
+            theme === "dark" ? "text-white" : "text-zinc-900"
           }`}
         >
           Newsletter
         </h3>
         <p
-          className={`text-sm mb-4 leading-relaxed ${
-            theme === "dark" ? "text-gray-300" : "text-gray-600"
+          className={`text-xs mb-3 leading-relaxed ${
+            theme === "dark" ? "text-zinc-300" : "text-zinc-600"
           }`}
         >
-          Stay updated with the latest blog posts delivered to your inbox.
+          Stay updated with the latest posts.
         </p>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           <input
             type="email"
             placeholder="Your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`rounded-xl px-4 py-3 border text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ${
+            className={`rounded-md px-2 py-1.5 border text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ${
               theme === "dark"
-                ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400"
-                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                ? "bg-zinc-700 border-zinc-600 text-zinc-100 placeholder-zinc-400"
+                : "bg-zinc-50 border-zinc-300 text-zinc-900 placeholder-zinc-500"
             }`}
           />
           <motion.button
@@ -217,12 +220,12 @@ export default function Sidebar({
               }
             }}
             disabled={!email.trim()}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md font-medium text-white bg-gradient-to-r from-indigo-600 to-indigo-600 hover:from-indigo-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-xs`}
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
           >
-            <Mail size={16} />
+            <Mail size={14} />
             Subscribe
           </motion.button>
         </div>
@@ -230,38 +233,37 @@ export default function Sidebar({
 
       {/* More Posts */}
       {recentPosts.length > 0 && (
-        <motion.div
-          className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
-          variants={cardVariants}
-        >
+        <motion.div className="" variants={cardVariants}>
           <h3
-            className={`text-xl font-bold mb-4 ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+            className={`text-base font-bold mb-3 ${
+              theme === "dark" ? "text-white" : "text-zinc-900"
             }`}
           >
             More Posts
           </h3>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             {recentPosts.map((post, index) => (
               <motion.div
                 key={post._id || post.slug || index}
                 variants={cardVariants}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.01, y: -1 }}
+                whileTap={{ scale: 0.99 }}
               >
                 <Link
                   to={`/blog/post/${post.slug}`}
-                  className={`flex items-center justify-between p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-100/50 to-white/50 dark:from-gray-700/30 dark:to-gray-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 text-sm font-medium ${
+                  className={`flex items-center justify-between px-2.5 py-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 text-xs font-medium ${
                     theme === "dark"
-                      ? "text-gray-300 hover:text-white"
-                      : "text-gray-700 hover:text-indigo-800"
+                      ? "text-zinc-300 hover:text-white"
+                      : "text-zinc-700 hover:text-indigo-800"
                   }`}
                 >
-                  <span className="line-clamp-2">{post.title}</span>
+                  <span className="line-clamp-2 text-xs leading-tight">
+                    {post.title}
+                  </span>
                   <ChevronRight
-                    size={14}
-                    className={`transition-transform group-hover:translate-x-1 flex-shrink-0 ml-2 ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    size={12}
+                    className={`transition-transform group-hover:translate-x-1 flex-shrink-0 ml-1.5 ${
+                      theme === "dark" ? "text-zinc-400" : "text-zinc-500"
                     }`}
                   />
                 </Link>
@@ -273,18 +275,15 @@ export default function Sidebar({
 
       {/* Follow */}
       {socialLinks.length > 0 && (
-        <motion.div
-          className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
-          variants={cardVariants}
-        >
+        <motion.div className="" variants={cardVariants}>
           <h3
-            className={`text-xl font-bold mb-4 ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+            className={`text-base font-bold mb-3 ${
+              theme === "dark" ? "text-white" : "text-zinc-900"
             }`}
           >
             Follow Me
           </h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             {socialLinks.map((social, index) => {
               const Icon = social.icon;
               return (
@@ -293,16 +292,16 @@ export default function Sidebar({
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center justify-center p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-100/50 to-white/50 dark:from-gray-700/30 dark:to-gray-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 ${
+                  className={`flex items-center justify-center p-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 ${
                     theme === "dark"
-                      ? "text-gray-300 hover:text-white"
-                      : "text-gray-700 hover:text-indigo-800"
+                      ? "text-zinc-300 hover:text-white"
+                      : "text-zinc-700 hover:text-indigo-800"
                   }`}
                   variants={buttonVariants}
                   whileHover="hover"
                   whileTap="tap"
                 >
-                  <Icon size={24} />
+                  <Icon size={16} />
                 </motion.a>
               );
             })}
@@ -313,12 +312,12 @@ export default function Sidebar({
       {/* Fallback Message */}
       {recentPosts.length === 0 && socialLinks.length === 0 && hasError && (
         <motion.div
-          className="rounded-2xl p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
+          className="rounded-md p-4 bg-zinc-50/90 dark:bg-zinc-800/90 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-700/50 shadow-md"
           variants={cardVariants}
         >
           <p
-            className={`text-sm text-center ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            className={`text-xs text-center ${
+              theme === "dark" ? "text-zinc-400" : "text-zinc-600"
             }`}
           >
             Content loading...

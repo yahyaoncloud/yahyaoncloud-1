@@ -48,7 +48,7 @@ export function UnderConstruction({
   };
 
   return (
-    <div className="min-h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 dark:from-gray-900 dark:via-orange-900/20 dark:to-yellow-900/20 p-4">
+    <div className="min-h-screen overflow-hidden flex items-center justify-center bg-gradient-to-br from-orange-50 via-yellow-50 to-amber-50 dark:from-zinc-900 dark:via-orange-900/20 dark:to-yellow-900/20 p-4">
       <motion.div
         className="w-full max-w-2xl text-center"
         variants={container}
@@ -100,12 +100,12 @@ export function UnderConstruction({
           {/* Progress Bar */}
           <motion.div className="w-full max-w-md mx-auto mb-6" variants={item}>
             <div className="flex justify-between mb-2 text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Progress</span>
+              <span className="text-zinc-600 dark:text-zinc-400">Progress</span>
               <span className="font-medium text-orange-600 dark:text-orange-400">
                 {progress}%
               </span>
             </div>
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
               <motion.div
                 className="h-3 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full"
                 style={{ width: `${progress}%` }}
@@ -117,13 +117,13 @@ export function UnderConstruction({
 
         {/* Headline and Message */}
         <motion.h1
-          className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+          className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-4"
           variants={item}
         >
           {title}
         </motion.h1>
         <motion.p
-          className="text-lg text-gray-600 dark:text-gray-300 max-w-lg mx-auto leading-relaxed mb-6"
+          className="text-lg text-zinc-600 dark:text-zinc-300 max-w-lg mx-auto leading-relaxed mb-6"
           variants={item}
         >
           {message}
@@ -134,28 +134,28 @@ export function UnderConstruction({
           className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto mb-6"
           variants={item}
         >
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 border border-orange-200 dark:border-orange-800 rounded-xl shadow-lg">
+          <div className="bg-zinc-50/80 dark:bg-zinc-800/80 backdrop-blur-sm p-4 border border-orange-200 dark:border-orange-800 rounded-md shadow-lg">
             <div className="flex items-center space-x-3">
               <Clock size={20} className="text-orange-500" />
               <div className="text-left">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-zinc-900 dark:text-white">
                   Timeline
                 </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
                   {estimatedCompletion}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 border border-orange-200 dark:border-orange-800 rounded-xl shadow-lg">
+          <div className="bg-zinc-50/80 dark:bg-zinc-800/80 backdrop-blur-sm p-4 border border-orange-200 dark:border-orange-800 rounded-md shadow-lg">
             <div className="flex items-center space-x-3">
               <Mail size={20} className="text-orange-500" />
               <div className="text-left">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-zinc-900 dark:text-white">
                   Updates
                 </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
                   We’ll notify you
                 </p>
               </div>
@@ -171,7 +171,7 @@ export function UnderConstruction({
           >
             <Link
               to="/admin/blog"
-              className="group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 font-medium"
+              className="group flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white rounded-md shadow-lg transform hover:scale-105 transition-all duration-300 font-medium"
             >
               <ArrowLeft size={18} />
               <span>Back to Dashboard</span>

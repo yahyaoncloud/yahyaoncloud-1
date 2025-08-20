@@ -23,13 +23,13 @@ const LoginNavbar: React.FC = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={handleReaderNavigation}
-            className="px-4 py-2 rounded-xl font-semibold transition-colors bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-blue-500 dark:hover:bg-blue-600"
+            className="px-4 py-2 rounded-md font-semibold transition-colors bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white hover:bg-indigo-500 dark:hover:bg-indigo-600"
           >
             A Reader?
           </button>
           <motion.button
             onClick={toggleTheme}
-            className="p-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300"
+            className="p-3 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all duration-300"
             aria-label="Toggle theme"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -39,7 +39,7 @@ const LoginNavbar: React.FC = () => {
               transition={{ duration: 0.5 }}
             >
               {theme === "light" ? (
-                <Moon size={18} className="text-gray-600 dark:text-gray-300" />
+                <Moon size={18} className="text-zinc-600 dark:text-zinc-300" />
               ) : (
                 <Sun size={18} className="text-yellow-500" />
               )}

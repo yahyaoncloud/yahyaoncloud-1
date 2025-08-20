@@ -82,7 +82,7 @@ function RootLayout() {
         <Links />
       </head>
       <body
-        className={`dark:bg-slate-900 dark:text-dark-100 bg-white text-dark-800 min-h-screen transition-colors duration-300`}
+        className={`dark:bg-zinc-900 dark:text-dark-100 bg-zinc-50 text-dark-800 min-h-screen transition-colors duration-300`}
       >
         <Outlet />
         <Toaster position="top-right" richColors />
@@ -133,17 +133,17 @@ export function ErrorBoundary() {
           <Meta />
           <Links />
         </head>
-        <body className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900">
+        <body className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-900">
           <div className="text-center">
-            <h1 className="text-6xl font-bold text-gray-800 dark:text-indigo-100">
+            <h1 className="text-6xl font-bold text-zinc-800 dark:text-indigo-100">
               {status}
             </h1>
-            <p className="text-lg text-gray-500 dark:text-indigo-300 mt-2">
+            <p className="text-lg text-zinc-500 dark:text-indigo-300 mt-2">
               {message}
             </p>
             <a
               href="/"
-              className="mt-4 text-blue-500 dark:text-blue-800 hover:text-blue-600 dark:hover:text-blue-900 underline"
+              className="mt-4 text-indigo-500 dark:text-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-900 underline"
             >
               Back to Home
             </a>

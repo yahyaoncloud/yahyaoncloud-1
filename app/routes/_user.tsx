@@ -41,7 +41,7 @@ function ThemedContainer() {
   const { theme } = useTheme(); // get theme state
 
   return (
-    <div className="bg-background dark:bg-slate-900">
+    <div className="bg-background dark:bg-zinc-950">
       <main>
         <UserLayout>
           <Outlet />

@@ -11,11 +11,10 @@ interface MainLayoutProps {
 }
 
 function LayoutContent({ children, sidebar }: MainLayoutProps) {
-  const location = useLocation();
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-col bg-background dark:bg-slate-950 min-h-screen overflow-x-clip">
+    <div className="flex flex-col max-w-3xl mx-auto items-center justify-center p-10 bg-zinc-50 dark:bg-zinc-950 min-h-screen overflow-x-clip">
       <Header />
       <motion.main
         initial={{ opacity: 0 }}
@@ -23,21 +22,21 @@ function LayoutContent({ children, sidebar }: MainLayoutProps) {
         transition={{ duration: 0.25 }}
         className="flex-grow"
       >
-        <div className=" flex py-4 md:px-8 ">
-          {sidebar && (
-            <aside className="hidden lg:block max-w-2xl  z-40">
-              <div className="sticky top-24 w-72" />
+        <div className="flex py-4  mx-auto">
+          {/* {sidebar && (
+            <aside className="hidden lg:block max-w-xs w-full  z-40">
+              <div className="sticky flex bg-blue-400" />
             </aside>
-          )}
+          )} */}
           {/* Main content */}
-          <div className="flex mx-auto">{children}</div>
+          <div className="flex">{children}</div>
 
           {/* Sidebar (only on large screens) */}
-          {sidebar && (
-            <aside className="hidden lg:block w-72 z-40">
+          {/* {sidebar && (
+            <aside className="hidden lg:block max-w-xs z-40">
               <div className="sticky top-24">{sidebar}</div>
             </aside>
-          )}
+          )} */}
         </div>
       </motion.main>
       <Footer />
@@ -45,16 +44,27 @@ function LayoutContent({ children, sidebar }: MainLayoutProps) {
   );
 }
 
-export default function MainLayout({ children, sidebar }: MainLayoutProps) {
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const location = useLocation();
+
+  // Render sidebar only if path matches /blog/posts/*
+  const showSidebar = location.pathname.startsWith("/blog/posts");
+
   return (
     <ThemeProvider>
       <LayoutContent
         sidebar={
-          <Sidebar
-            onSubscribe={function (email: string): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
+          showSidebar ? (
+            <Sidebar
+              onSubscribe={(email: string) => {
+                console.log("Subscribed:", email);
+              }}
+            />
+          ) : undefined
         }
       >
         {children}

@@ -46,7 +46,7 @@
 //             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 //                 <div>
 //                     <h2 className="text-xl font-semibold mb-4 text-secondary">Categories</h2>
-//                     <ul className="bg-base-200 rounded-lg shadow divide-y divide-base-300">
+//                     <ul className="bg-base-200 rounded-md shadow divide-y divide-base-300">
 //                         {categories.map((cat: any) => (
 //                             <li key={cat.id} className="flex items-center justify-between px-4 py-3">
 //                                 <span>{cat.name}</span>
@@ -62,7 +62,7 @@
 //                 </div>
 //                 <div>
 //                     {categoryToEdit ? (
-//                         <Form method="post" className="bg-base-200 p-6 rounded-lg shadow space-y-4">
+//                         <Form method="post" className="bg-base-200 p-6 rounded-md shadow space-y-4">
 //                             <input type="hidden" name="id" value={categoryToEdit.id} />
 //                             <div>
 //                                 <label className="block text-sm font-medium text-secondary mb-1">Category Name</label>

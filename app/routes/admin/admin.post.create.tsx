@@ -300,17 +300,17 @@ export default function CreatePost() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <FileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
             Create New Post
           </h2>
           <a
             href="/posts"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2"
+            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-2"
           >
             <X className="w-5 h-5" />
             Cancel
@@ -319,7 +319,7 @@ export default function CreatePost() {
 
         {/* Error Messages */}
         {(loaderError || actionData?.message) && (
-          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-md">
             {loaderError || actionData?.message}
           </div>
         )}
@@ -328,14 +328,14 @@ export default function CreatePost() {
         <Form
           method="post"
           encType="multipart/form-data"
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+          className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700"
         >
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Form Fields */}
             <div className="lg:col-span-2 space-y-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Post Title
                 </label>
                 <input
@@ -344,14 +344,14 @@ export default function CreatePost() {
                   value={formData.title}
                   onChange={handleInputChange}
                   placeholder="Enter post title"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
 
               {/* Summary */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
                   <FileText className="w-4 h-4" />
                   Summary
                 </label>
@@ -361,14 +361,14 @@ export default function CreatePost() {
                   onChange={handleInputChange}
                   placeholder="Enter a brief summary of the post"
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
 
               {/* Content */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
                   <FileText className="w-4 h-4" />
                   Content (Markdown)
                 </label>
@@ -379,7 +379,7 @@ export default function CreatePost() {
                     onChange={handleInputChange}
                     placeholder="Write your post content in Markdown..."
                     rows={12}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
+                    className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all font-mono"
                     required
                   />
                   <div className="flex gap-4">
@@ -388,9 +388,9 @@ export default function CreatePost() {
                       onDrop={handleDrop}
                       className="flex-1"
                     >
-                      <label className="flex flex-col items-center w-full p-4 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">
-                        <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <label className="flex flex-col items-center w-full p-4 border-2 border-zinc-300 dark:border-zinc-600 border-dashed rounded-md cursor-pointer bg-zinc-50 dark:bg-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-all">
+                        <Upload className="w-8 h-8 text-zinc-400 mb-2" />
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
                           Drag and drop .md or image file here
                         </p>
                         <input
@@ -405,7 +405,7 @@ export default function CreatePost() {
                     <button
                       type="button"
                       onClick={openGooglePicker}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2"
+                      className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-2"
                       disabled={!googlePickerToken}
                     >
                       <File className="w-4 h-4" />
@@ -417,7 +417,7 @@ export default function CreatePost() {
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Tags
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
@@ -428,13 +428,13 @@ export default function CreatePost() {
                     return (
                       <div
                         key={index}
-                        className="flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded-full text-sm"
+                        className="flex items-center gap-1 px-3 py-1 bg-indigo-100 dark:bg-indigo-900/20 text-indigo-800 dark:text-indigo-400 rounded-full text-sm"
                       >
                         {tag.name}
                         <button
                           type="button"
                           onClick={() => removeTag(tagId)}
-                          className="ml-1 text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100"
+                          className="ml-1 text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-100"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -450,7 +450,7 @@ export default function CreatePost() {
                   onChange={handleInputChange}
                   onKeyDown={handleTagInput}
                   placeholder="Add tags (press Enter to add)"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
@@ -458,8 +458,8 @@ export default function CreatePost() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Categories */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
                   <List className="w-4 h-4" />
                   Categories
                 </label>
@@ -468,7 +468,7 @@ export default function CreatePost() {
                   name="catids"
                   value={formData.catids}
                   onChange={(e) => handleMultiSelect(e, "catids")}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent h-32"
+                  className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32"
                 >
                   {categories.map((cat) => (
                     <option
@@ -482,8 +482,8 @@ export default function CreatePost() {
               </div>
 
               {/* Types */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
                   <List className="w-4 h-4" />
                   Types
                 </label>
@@ -492,7 +492,7 @@ export default function CreatePost() {
                   name="typeids"
                   value={formData.typeids}
                   onChange={(e) => handleMultiSelect(e, "typeids")}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                  className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-24"
                 >
                   {types.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -503,23 +503,23 @@ export default function CreatePost() {
               </div>
 
               {/* Cover Image */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
                   <Image className="w-4 h-4" />
                   Cover Image
                 </label>
                 <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">
+                  <label className="flex flex-col items-center w-full h-32 border-2 border-zinc-300 dark:border-zinc-600 border-dashed rounded-md cursor-pointer bg-zinc-50 dark:bg-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-all">
                     {previewCoverImage ? (
                       <img
                         src={previewCoverImage}
                         alt="Cover Preview"
-                        className="h-full w-full object-cover rounded-lg"
+                        className="h-full w-full object-cover rounded-md"
                       />
                     ) : (
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Image className="w-8 h-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <Image className="w-8 h-8 text-zinc-400 mb-2" />
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
                           Upload cover image
                         </p>
                       </div>
@@ -536,16 +536,16 @@ export default function CreatePost() {
               </div>
 
               {/* Gallery */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
                   <Image className="w-4 h-4" />
                   Gallery Images
                 </label>
                 <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-all">
+                  <label className="flex flex-col items-center w-full h-32 border-2 border-zinc-300 dark:border-zinc-600 border-dashed rounded-md cursor-pointer bg-zinc-50 dark:bg-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-all">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Image className="w-8 h-8 text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <Image className="w-8 h-8 text-zinc-400 mb-2" />
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
                         Upload gallery images
                       </p>
                     </div>
@@ -565,7 +565,7 @@ export default function CreatePost() {
                       <img
                         src={image}
                         alt={`Gallery ${index}`}
-                        className="h-20 w-full object-cover rounded-lg"
+                        className="h-20 w-full object-cover rounded-md"
                       />
                       <button
                         type="button"
@@ -584,7 +584,7 @@ export default function CreatePost() {
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-600 transition-all"
                 >
                   <RotateCcw className="w-4 h-4" />
                   Clear
@@ -592,7 +592,7 @@ export default function CreatePost() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all duration-200 shadow-sm ${
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-md font-medium transition-all duration-200 shadow-sm ${
                     isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
@@ -603,10 +603,10 @@ export default function CreatePost() {
             </div>
 
             {/* Preview Panel */}
-            <div className="lg:col-span-1 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 overflow-y-auto">
-              <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <div className="lg:col-span-1 bg-zinc-50 dark:bg-zinc-800 rounded-md p-6 shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-y-auto">
+              <div className="flex items-center gap-2 mb-4 pb-2 border-b border-zinc-200 dark:border-zinc-700">
+                <Eye className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                   Live Preview
                 </h2>
               </div>
@@ -616,9 +616,9 @@ export default function CreatePost() {
                   formData.catids.length ||
                   formData.tagids.length ||
                   formData.typeids.length) && (
-                  <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-700">
                     {formData.title && (
-                      <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+                      <h1 className="text-3xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">
                         {formData.title}
                       </h1>
                     )}
@@ -626,15 +626,15 @@ export default function CreatePost() {
                       <img
                         src={previewCoverImage}
                         alt="Cover Preview"
-                        className="w-full h-auto rounded-lg mb-4"
+                        className="w-full h-auto rounded-md mb-4"
                       />
                     )}
                     {formData.summary && (
-                      <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      <p className="text-zinc-600 dark:text-zinc-400 mb-4">
                         {formData.summary}
                       </p>
                     )}
-                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
                       {formData.typeids.length > 0 && (
                         <span>
                           {types.find((t) => t.value === formData.typeids[0])
@@ -661,7 +661,7 @@ export default function CreatePost() {
                           return tag ? (
                             <span
                               key={tagId}
-                              className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs rounded-full"
+                              className="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/20 text-indigo-800 dark:text-indigo-400 text-xs rounded-full"
                             >
                               {tag.name}
                             </span>
@@ -678,7 +678,7 @@ export default function CreatePost() {
                         key={index}
                         src={image}
                         alt={`Gallery ${index}`}
-                        className="w-full h-auto rounded-lg"
+                        className="w-full h-auto rounded-md"
                       />
                     ))}
                   </div>
@@ -686,32 +686,32 @@ export default function CreatePost() {
                 <ReactMarkdown
                   components={{
                     h1: ({ children }) => (
-                      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 mt-6 first:mt-0 pb-2 border-b border-gray-200 dark:border-gray-700">
+                      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4 mt-6 first:mt-0 pb-2 border-b border-zinc-200 dark:border-zinc-700">
                         {children}
                       </h1>
                     ),
                     h2: ({ children }) => (
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 mt-5 first:mt-0">
+                      <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-5 first:mt-0">
                         {children}
                       </h2>
                     ),
                     h3: ({ children }) => (
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2 mt-4 first:mt-0">
+                      <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2 mt-4 first:mt-0">
                         {children}
                       </h3>
                     ),
                     p: ({ children }) => (
-                      <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                      <p className="text-zinc-600 dark:text-zinc-400 mb-4 leading-relaxed">
                         {children}
                       </p>
                     ),
                     ul: ({ children }) => (
-                      <ul className="list-disc list-inside space-y-2 mb-4 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc list-inside space-y-2 mb-4 text-zinc-600 dark:text-zinc-400">
                         {children}
                       </ul>
                     ),
                     ol: ({ children }) => (
-                      <ol className="list-decimal list-inside space-y-2 mb-4 text-gray-600 dark:text-gray-400">
+                      <ol className="list-decimal list-inside space-y-2 mb-4 text-zinc-600 dark:text-zinc-400">
                         {children}
                       </ol>
                     ),
@@ -721,7 +721,7 @@ export default function CreatePost() {
                     a: ({ href, children }) => (
                       <a
                         href={href}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline underline-offset-2"
+                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline underline-offset-2"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -729,12 +729,12 @@ export default function CreatePost() {
                       </a>
                     ),
                     strong: ({ children }) => (
-                      <strong className="font-semibold text-gray-900 dark:text-gray-100">
+                      <strong className="font-semibold text-zinc-900 dark:text-zinc-100">
                         {children}
                       </strong>
                     ),
                     em: ({ children }) => (
-                      <em className="italic text-gray-900 dark:text-gray-100">
+                      <em className="italic text-zinc-900 dark:text-zinc-100">
                         {children}
                       </em>
                     ),
@@ -744,9 +744,9 @@ export default function CreatePost() {
                         <code
                           className={`${
                             isBlock
-                              ? "block my-6 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50"
-                              : "inline px-1.5 py-0.5 rounded text-sm font-mono border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50"
-                          } text-blue-600 dark:text-blue-400`}
+                              ? "block my-6 p-4 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50"
+                              : "inline px-1.5 py-0.5 rounded text-sm font-mono border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50"
+                          } text-indigo-600 dark:text-indigo-400`}
                           {...props}
                         >
                           {children}
@@ -754,35 +754,35 @@ export default function CreatePost() {
                       );
                     },
                     blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-blue-600 dark:border-blue-400 pl-4 my-4 italic text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 py-2 rounded-r">
+                      <blockquote className="border-l-4 border-indigo-600 dark:border-indigo-400 pl-4 my-4 italic text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/50 py-2 rounded-r">
                         {children}
                       </blockquote>
                     ),
                     table: ({ children }) => (
                       <div className="overflow-x-auto my-6">
-                        <table className="w-full border-collapse border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse border border-zinc-200 dark:border-zinc-700 rounded-md overflow-hidden">
                           {children}
                         </table>
                       </div>
                     ),
                     th: ({ children }) => (
-                      <th className="border border-gray-200 dark:border-gray-700 px-4 py-2 bg-gray-50 dark:bg-gray-900/50 text-left font-medium text-gray-900 dark:text-gray-100">
+                      <th className="border border-zinc-200 dark:border-zinc-700 px-4 py-2 bg-zinc-50 dark:bg-zinc-900/50 text-left font-medium text-zinc-900 dark:text-zinc-100">
                         {children}
                       </th>
                     ),
                     td: ({ children }) => (
-                      <td className="border border-gray-200 dark:border-gray-700 px-4 py-2 text-gray-600 dark:text-gray-400">
+                      <td className="border border-zinc-200 dark:border-zinc-700 px-4 py-2 text-zinc-600 dark:text-zinc-400">
                         {children}
                       </td>
                     ),
                     hr: () => (
-                      <hr className="my-8 border-t border-gray-200 dark:border-gray-700" />
+                      <hr className="my-8 border-t border-zinc-200 dark:border-zinc-700" />
                     ),
                     img: ({ src, alt }) => (
                       <img
                         src={src}
                         alt={alt}
-                        className="w-full h-auto rounded-lg my-4"
+                        className="w-full h-auto rounded-md my-4"
                       />
                     ),
                   }}

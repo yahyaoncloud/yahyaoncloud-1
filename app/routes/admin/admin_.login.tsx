@@ -304,8 +304,8 @@
 //     <motion.div
 //       className={`min-h-screen flex flex-col ${
 //         theme === "dark"
-//           ? "bg-gradient-to-br from-gray-900 to-gray-950 text-gray-100"
-//           : "bg-gradient-to-br from-amber-50 to-indigo-50 text-gray-900"
+//           ? "bg-gradient-to-br from-zinc-900 to-zinc-950 text-zinc-100"
+//           : "bg-gradient-to-br from-amber-50 to-indigo-50 text-zinc-900"
 //       }`}
 //       initial={{ opacity: 0 }}
 //       animate={{ opacity: 1 }}
@@ -348,8 +348,8 @@
 //               <motion.h1
 //                 className={`text-3xl font-bold ${
 //                   theme === "dark"
-//                     ? "bg-gradient-to-r from-white via-blue-300 to-white text-transparent bg-clip-text"
-//                     : "text-gray-900"
+//                     ? "bg-gradient-to-r from-white via-indigo-300 to-white text-transparent bg-clip-text"
+//                     : "text-zinc-900"
 //                 } mb-2`}
 //                 variants={slideVariants}
 //               >
@@ -361,7 +361,7 @@
 //               </motion.h1>
 //               <motion.p
 //                 className={`text-sm ${
-//                   theme === "dark" ? "text-gray-300" : "text-gray-600"
+//                   theme === "dark" ? "text-zinc-300" : "text-zinc-600"
 //                 }`}
 //                 variants={slideVariants}
 //               >
@@ -380,7 +380,7 @@
 //                   animate={{ opacity: 1, y: 0, scale: 1 }}
 //                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
 //                   transition={{ duration: 0.3 }}
-//                   className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm border ${
+//                   className={`flex items-center gap-2 px-4 py-3 rounded-md text-sm border ${
 //                     notification.type === "success"
 //                       ? "bg-green-500/10 border-green-500 text-green-300"
 //                       : "bg-red-500/10 border-red-500 text-red-300"
@@ -425,7 +425,7 @@
 //                   </motion.div>
 //                   <motion.p
 //                     className={`text-lg font-semibold ${
-//                       theme === "dark" ? "text-gray-100" : "text-gray-900"
+//                       theme === "dark" ? "text-zinc-100" : "text-zinc-900"
 //                     }`}
 //                     initial={{ opacity: 0 }}
 //                     animate={{ opacity: 1 }}
@@ -437,8 +437,8 @@
 //                     onClick={() => setFormMode("login")}
 //                     className={`text-sm ${
 //                       theme === "dark"
-//                         ? "text-blue-400 hover:text-blue-300"
-//                         : "text-blue-600 hover:text-blue-500"
+//                         ? "text-indigo-400 hover:text-indigo-300"
+//                         : "text-indigo-600 hover:text-indigo-500"
 //                     } hover:underline`}
 //                     initial={{ opacity: 0 }}
 //                     animate={{ opacity: 1 }}
@@ -460,7 +460,7 @@
 //                   <motion.div className="relative" variants={itemVariants}>
 //                     <Mail
 //                       className={`absolute left-3 top-3.5 ${
-//                         theme === "dark" ? "text-gray-400" : "text-gray-500"
+//                         theme === "dark" ? "text-zinc-400" : "text-zinc-500"
 //                       }`}
 //                     />
 //                     <motion.input
@@ -470,10 +470,10 @@
 //                       value={formData.email}
 //                       onChange={handleInputChange}
 //                       placeholder="Email"
-//                       className={`w-full pl-10 pr-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none ${
+//                       className={`w-full pl-10 pr-4 py-3 rounded-md border focus:ring-2 focus:ring-indigo-500 outline-none ${
 //                         theme === "dark"
-//                           ? "bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-//                           : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+//                           ? "bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-400"
+//                           : "bg-zinc-50 border-zinc-300 text-zinc-900 placeholder:text-zinc-400"
 //                       }`}
 //                       whileFocus={{ scale: 1.02 }}
 //                       transition={{ type: "spring", stiffness: 300 }}
@@ -492,7 +492,7 @@
 //                       >
 //                         <Lock
 //                           className={`absolute left-3 top-3.5 ${
-//                             theme === "dark" ? "text-gray-400" : "text-gray-500"
+//                             theme === "dark" ? "text-zinc-400" : "text-zinc-500"
 //                           }`}
 //                         />
 //                         <motion.input
@@ -502,10 +502,10 @@
 //                           value={formData.password}
 //                           onChange={handleInputChange}
 //                           placeholder="Password"
-//                           className={`w-full pl-10 pr-10 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 outline-none ${
+//                           className={`w-full pl-10 pr-10 py-3 rounded-md border focus:ring-2 focus:ring-indigo-500 outline-none ${
 //                             theme === "dark"
-//                               ? "bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-//                               : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+//                               ? "bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-400"
+//                               : "bg-zinc-50 border-zinc-300 text-zinc-900 placeholder:text-zinc-400"
 //                           }`}
 //                           whileFocus={{ scale: 1.02 }}
 //                           transition={{ type: "spring", stiffness: 300 }}
@@ -513,7 +513,7 @@
 //                         <motion.button
 //                           type="button"
 //                           className={`absolute right-3 top-3.5 ${
-//                             theme === "dark" ? "text-gray-400" : "text-gray-500"
+//                             theme === "dark" ? "text-zinc-400" : "text-zinc-500"
 //                           }`}
 //                           onClick={() => setShowPassword((prev) => !prev)}
 //                           whileHover={{ scale: 1.1 }}
@@ -531,7 +531,7 @@
 
 //                   <motion.div
 //                     className={`flex justify-between text-sm ${
-//                       theme === "dark" ? "text-gray-300" : "text-gray-600"
+//                       theme === "dark" ? "text-zinc-300" : "text-zinc-600"
 //                     }`}
 //                     variants={itemVariants}
 //                   >
@@ -551,8 +551,8 @@
 //                               onChange={handleInputChange}
 //                               className={`${
 //                                 theme === "dark"
-//                                   ? "text-blue-500 bg-gray-700"
-//                                   : "text-blue-500 bg-gray-200"
+//                                   ? "text-indigo-500 bg-zinc-700"
+//                                   : "text-indigo-500 bg-zinc-200"
 //                               } rounded`}
 //                             />
 //                             Remember me
@@ -561,8 +561,8 @@
 //                             type="button"
 //                             className={`${
 //                               theme === "dark"
-//                                 ? "hover:text-blue-300"
-//                                 : "hover:text-blue-500"
+//                                 ? "hover:text-indigo-300"
+//                                 : "hover:text-indigo-500"
 //                             }`}
 //                             onClick={() => setFormMode("forgot")}
 //                             initial={{ opacity: 0, x: 10 }}
@@ -580,7 +580,7 @@
 //                   <motion.button
 //                     type="submit"
 //                     disabled={isLoading || fetcher.state !== "idle"}
-//                     className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 rounded-xl font-semibold transition-all disabled:opacity-50`}
+//                     className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white py-3 rounded-md font-semibold transition-all disabled:opacity-50`}
 //                     variants={itemVariants}
 //                     whileHover={{ scale: 1.02 }}
 //                     whileTap={{ scale: 0.98 }}
@@ -615,7 +615,7 @@
 //                       >
 //                         <motion.div
 //                           className={`text-center text-sm ${
-//                             theme === "dark" ? "text-gray-400" : "text-gray-500"
+//                             theme === "dark" ? "text-zinc-400" : "text-zinc-500"
 //                           }`}
 //                           variants={fadeInVariants}
 //                         >
@@ -631,10 +631,10 @@
 //                             onClick={() => handleSSOLogin("Google")}
 //                             type="button"
 //                             disabled={isLoading || fetcher.state !== "idle"}
-//                             className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-xl transition-all ${
+//                             className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-md transition-all ${
 //                               theme === "dark"
-//                                 ? "bg-gray-800 border-gray-700 hover:bg-gray-700 text-white"
-//                                 : "bg-white border-gray-300 hover:bg-gray-100 text-gray-900"
+//                                 ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white"
+//                                 : "bg-zinc-50 border-zinc-300 hover:bg-zinc-100 text-zinc-900"
 //                             }`}
 //                             variants={itemVariants}
 //                             whileHover={{ scale: 1.02 }}
@@ -647,10 +647,10 @@
 //                             onClick={() => handleSSOLogin("GitHub")}
 //                             type="button"
 //                             disabled={isLoading || fetcher.state !== "idle"}
-//                             className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-xl transition-all ${
+//                             className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-md transition-all ${
 //                               theme === "dark"
-//                                 ? "bg-gray-800 border-gray-700 hover:bg-gray-700 text-white"
-//                                 : "bg-white border-gray-300 hover:bg-gray-100 text-gray-900"
+//                                 ? "bg-zinc-800 border-zinc-700 hover:bg-zinc-700 text-white"
+//                                 : "bg-zinc-50 border-zinc-300 hover:bg-zinc-100 text-zinc-900"
 //                             }`}
 //                             variants={itemVariants}
 //                             whileHover={{ scale: 1.02 }}
@@ -678,8 +678,8 @@
 //                           onClick={() => setFormMode("login")}
 //                           className={`text-sm ${
 //                             theme === "dark"
-//                               ? "text-blue-400 hover:text-blue-300"
-//                               : "text-blue-600 hover:text-blue-500"
+//                               ? "text-indigo-400 hover:text-indigo-300"
+//                               : "text-indigo-600 hover:text-indigo-500"
 //                           } hover:underline`}
 //                           whileHover={{ scale: 1.05 }}
 //                         >
@@ -697,7 +697,7 @@
 
 //         {/* Right Panel - Gallery */}
 //         <motion.div
-//           className="hidden md:block w-1/2 relative overflow-hidden m-10 rounded-xl shadow-lg"
+//           className="hidden md:block w-1/2 relative overflow-hidden m-10 rounded-md shadow-lg"
 //           initial={{ opacity: 0, x: 100 }}
 //           animate={{ opacity: 1, x: 0 }}
 //           transition={{ duration: 0.8, delay: 0.2 }}
@@ -745,7 +745,7 @@
 //               <AnimatePresence mode="wait">
 //                 <motion.p
 //                   key={currentImage.description}
-//                   className="text-sm text-gray-300 mb-4"
+//                   className="text-sm text-zinc-300 mb-4"
 //                   initial={{ opacity: 0, y: 20 }}
 //                   animate={{ opacity: 1, y: 0 }}
 //                   exit={{ opacity: 0, y: -20 }}
@@ -766,8 +766,8 @@
 //                     onClick={() => setCurrentImageIndex(index)}
 //                     className={`w-9 h-2 rounded-full transition-all duration-300 ${
 //                       index === currentImageIndex
-//                         ? "bg-blue-100 shadow-md shadow-white/20 scale-110"
-//                         : "bg-white/40 hover:bg-blue-100/70 hover:shadow-sm"
+//                         ? "bg-indigo-100 shadow-md shadow-white/20 scale-110"
+//                         : "bg-zinc-50/40 hover:bg-indigo-100/70 hover:shadow-sm"
 //                     }`}
 //                     whileHover={{ scale: 1.05 }}
 //                     whileTap={{ scale: 0.9 }}

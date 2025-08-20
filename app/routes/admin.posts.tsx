@@ -60,13 +60,13 @@ export default function AdminPosts() {
       <Outlet />
       <div
         className={`min-h-screen p-6 transition-colors duration-300 ${
-          theme === "dark" ? "bg-gray-900" : "bg-gray-100"
+          theme === "dark" ? "bg-zinc-900" : "bg-zinc-100"
         }`}
       >
         <header className="flex justify-between items-center mb-8 max-w-5xl mx-auto">
           <h1
             className={`text-3xl font-bold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+              theme === "dark" ? "text-white" : "text-zinc-900"
             }`}
           >
             Admin Posts
@@ -94,10 +94,10 @@ export default function AdminPosts() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {posts.length === 0 ? (
               <motion.div
-                className={`rounded-lg p-6 text-center ${
+                className={`rounded-md p-6 text-center ${
                   theme === "dark"
-                    ? "bg-gray-800 text-gray-300"
-                    : "bg-white text-gray-600"
+                    ? "bg-zinc-800 text-zinc-300"
+                    : "bg-zinc-50 text-zinc-600"
                 }`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -108,8 +108,8 @@ export default function AdminPosts() {
                   to="/admin/create"
                   className={`inline-block mt-4 px-4 py-2 rounded-md font-medium ${
                     theme === "dark"
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "bg-blue-500 hover:bg-blue-600 text-white"
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                      : "bg-indigo-500 hover:bg-indigo-600 text-white"
                   }`}
                 >
                   Create Post
@@ -145,8 +145,8 @@ export default function AdminPosts() {
                       to={`/admin/edit/${post.id}`}
                       className={`p-2 rounded-md transition-colors ${
                         theme === "dark"
-                          ? "bg-blue-600 hover:bg-blue-700 text-white"
-                          : "bg-blue-500 hover:bg-blue-600 text-white"
+                          ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                          : "bg-indigo-500 hover:bg-indigo-600 text-white"
                       }`}
                     >
                       <Edit size={16} />

@@ -24,12 +24,10 @@ interface NavbarProps {
 export default function Navbar({ onToggleSidebar }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [activeIndicator, setActiveIndicator] = useState({ width: 0, left: 0 });
   const location = useLocation();
   const navRef = useRef<HTMLDivElement>(null);
 
-  // Navigation items
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: Home },
     { name: "Posts", href: "/admin/posts", icon: FileText },
@@ -38,35 +36,8 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   ];
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const shouldBeScrolled = currentScrollY > 20;
-
-      setScrolled((prev) => {
-        if (prev !== shouldBeScrolled) {
-          // Only auto-scroll to top if scrolling up and crossing threshold
-          if (prev && !shouldBeScrolled && currentScrollY < lastScrollY) {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-          return shouldBeScrolled;
-        }
-        return prev;
-      });
-
-      lastScrollY = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Update active indicator position
-  useEffect(() => {
     const updateIndicator = () => {
       if (!navRef.current) return;
-
       const activeLink = navRef.current.querySelector(
         `[data-path="${location.pathname}"]`
       ) as HTMLElement;
@@ -79,64 +50,15 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
           width: linkRect.width,
           left: linkRect.left - navRect.left,
         });
-      } else {
-        // Find the closest matching path
-        const currentPath = location.pathname;
-        const matchingItem = navItems.find(
-          (item) =>
-            currentPath.startsWith(item.href) ||
-            (item.href === "/admin" && currentPath === "/admin")
-        );
-
-        if (matchingItem) {
-          const matchingLink = navRef.current.querySelector(
-            `[data-path="${matchingItem.href}"]`
-          ) as HTMLElement;
-          if (matchingLink) {
-            const navRect = navRef.current.getBoundingClientRect();
-            const linkRect = matchingLink.getBoundingClientRect();
-
-            setActiveIndicator({
-              width: linkRect.width,
-              left: linkRect.left - navRect.left,
-            });
-          }
-        }
       }
     };
-
-    // Update on mount and route change
     updateIndicator();
-
-    // Update on window resize
     window.addEventListener("resize", updateIndicator);
     return () => window.removeEventListener("resize", updateIndicator);
-  }, [location.pathname, navItems]);
-
-  // Close profile menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isProfileMenuOpen &&
-        !(event.target as Element).closest(".profile-menu-container")
-      ) {
-        setIsProfileMenuOpen(false);
-      }
-    };
-
-    if (isProfileMenuOpen) {
-      document.addEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [isProfileMenuOpen]);
+  }, [location.pathname]);
 
   const isActiveLink = (href: string) => {
-    if (href === "/admin") {
-      return location.pathname === "/admin";
-    }
+    if (href === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(href);
   };
 
@@ -147,41 +69,34 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   ];
 
   return (
-    <header className="w-auto sticky top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-b-gray-200 dark:border-b-gray-700 text-gray-900 dark:text-white z-10 shadow-sm transition-all duration-300">
+    <header className="w-auto sticky  top-0 left-0 right-0 border-b border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white z-10 ">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2 min-h-[4rem] w-full">
-          {/* Left side - Hamburger Menu (Mobile only) */}
+          {/* Hamburger (mobile) */}
           <div className="flex items-center md:hidden">
-            <motion.button
+            <button
               onClick={onToggleSidebar}
-              className="p-3 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
+              className="p-2 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors"
               aria-label="Toggle sidebar"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <Menu size={18} className="text-gray-600 dark:text-gray-300" />
-            </motion.button>
+              <Menu size={18} className="text-zinc-600 dark:text-zinc-300" />
+            </button>
           </div>
 
-          {/* Center Navigation - Hidden on mobile, visible on larger screens */}
+          {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center justify-center flex-1 mx-8">
             <div
               ref={navRef}
-              className="relative flex items-center space-x-1 bg-gray-100/50 dark:bg-gray-800/50 rounded-2xl p-1 backdrop-blur-sm"
+              className="relative flex items-center space-x-1 rounded-md p-1"
             >
-              {/* Sliding background indicator */}
+              {/* Active indicator */}
               <motion.div
-                className="absolute top-1 bottom-1 bg-white dark:bg-gray-700 rounded-xl shadow-md"
+                className="absolute top-1 bottom-1 bg-zinc-200 dark:bg-zinc-700 rounded-md"
                 animate={{
                   width: activeIndicator.width,
                   x: activeIndicator.left,
                 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 30,
-                }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
               />
 
               {navItems.map((item) => {
@@ -193,32 +108,22 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
                     key={item.name}
                     to={item.href}
                     data-path={item.href}
-                    className="relative z-10 flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300"
+                    className="relative z-10 flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm font-medium transition-colors"
                   >
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 17,
-                      }}
-                    >
-                      <IconComponent
-                        size={16}
-                        className={`transition-colors duration-300 ${
-                          isActive
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200"
-                        }`}
-                      />
-                    </motion.div>
-                    <span
-                      className={`transition-colors duration-300 ${
+                    <IconComponent
+                      size={16}
+                      className={`${
                         isActive
-                          ? "text-gray-900 dark:text-white"
-                          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                          ? "text-indigo-600 dark:text-indigo-400"
+                          : "text-zinc-600 dark:text-zinc-400"
                       }`}
+                    />
+                    <span
+                      className={
+                        isActive
+                          ? "text-zinc-900 dark:text-white"
+                          : "text-zinc-600 dark:text-zinc-400"
+                      }
                     >
                       {item.name}
                     </span>
@@ -228,135 +133,74 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             </div>
           </nav>
 
-          {/* Right side controls */}
+          {/* Right controls */}
           <div className="flex items-center space-x-3 ml-auto">
-            {/* New Post Button */}
+            {/* New Post */}
             <Link
               to="/admin/post/create"
-              className="hidden sm:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r dark:from-blue-400 dark:to-blue-500 from-blue-500 to-blue-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:from-orange-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-400"
+              className="hidden sm:flex items-center space-x-2 px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors"
             >
-              <span className="text-sm">New Post</span>
+              <span>New Post</span>
             </Link>
 
-            {/* Theme Toggle Button */}
-            <motion.button
+            {/* Theme Toggle */}
+            <button
               onClick={toggleTheme}
-              className="p-3 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
+              className="p-2 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors"
               aria-label="Toggle theme"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <motion.div
-                initial={false}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-              >
-                {theme === "light" ? (
-                  <Moon
-                    size={18}
-                    className="text-gray-600 dark:text-gray-300"
-                  />
-                ) : (
-                  <Sun size={18} className="text-yellow-500" />
-                )}
-              </motion.div>
-            </motion.button>
+              {theme === "light" ? (
+                <Moon size={18} className="text-zinc-600 dark:text-zinc-300" />
+              ) : (
+                <Sun size={18} className="text-yellow-500" />
+              )}
+            </button>
 
-            {/* Profile Menu */}
+            {/* Profile */}
             <div className="relative profile-menu-container">
-              <motion.button
+              <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center space-x-3 p-2 rounded-xl bg-gray-100/80 hover:bg-gray-200/80 dark:bg-gray-800/80 dark:hover:bg-gray-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="flex items-center space-x-2 p-2 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors"
               >
-                {/* Profile Image */}
-                <motion.div
-                  className="w-8 h-8 rounded-full bg-gradient-to-r from-navy-500 to-blue-600 dark:from-blue-500 dark:to-blue-400 flex items-center justify-center shadow-lg shadow-blue-500/25"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
+                <div className="w-8 h-8 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center">
                   <User size={16} className="text-white" />
-                </motion.div>
-
-                {/* Profile Info (hidden on mobile) */}
-                <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    John Doe
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Admin
-                  </span>
                 </div>
+                <ChevronDown
+                  size={16}
+                  className={`text-zinc-500 dark:text-zinc-400 transition-transform ${
+                    isProfileMenuOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
 
-                {/* Dropdown Arrow */}
-                <motion.div
-                  animate={{ rotate: isProfileMenuOpen ? 180 : 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                >
-                  <ChevronDown
-                    size={16}
-                    className="text-gray-500 dark:text-gray-400"
-                  />
-                </motion.div>
-              </motion.button>
-
-              {/* Profile Dropdown Menu */}
+              {/* Dropdown */}
               <AnimatePresence>
                 {isProfileMenuOpen && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    transition={{ duration: 0.2, ease: "easeInOut" }}
-                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-gray-800/50 border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 mt-2 w-48 bg-zinc-50 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-700 overflow-hidden z-50"
                   >
-                    <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-navy-500 to-blue-600 dark:from-blue-500 dark:to-blue-400 flex items-center justify-center shadow-lg shadow-blue-500/25">
-                          <User size={18} className="text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            John Doe
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            john@example.com
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="py-2">
-                      {profileMenuItems.map((item) => {
-                        const IconComponent = item.icon;
-                        return (
-                          <motion.div
-                            key={item.name}
-                            whileHover={{ x: 4 }}
-                            transition={{
-                              type: "spring",
-                              stiffness: 400,
-                              damping: 17,
-                            }}
-                          >
-                            <Link
-                              to={item.href}
-                              className={`flex items-center space-x-3 px-4 py-3 text-sm transition-all duration-300 ${
-                                item.name === "Sign Out"
-                                  ? "text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
-                                  : "text-gray-700 hover:text-navy-600 dark:text-gray-300 dark:hover:text-blue-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50"
-                              }`}
-                              onClick={() => setIsProfileMenuOpen(false)}
-                            >
-                              <IconComponent size={16} />
-                              <span>{item.name}</span>
-                            </Link>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
+                    {profileMenuItems.map((item) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          onClick={() => setIsProfileMenuOpen(false)}
+                          className={`flex items-center space-x-3 px-4 py-3 text-sm transition-colors ${
+                            item.name === "Sign Out"
+                              ? "text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                              : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                          }`}
+                        >
+                          <IconComponent size={16} />
+                          <span>{item.name}</span>
+                        </Link>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -365,8 +209,8 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
         </div>
       </div>
 
-      {/* Mobile Navigation - Sliding tabs for mobile */}
-      <div className="lg:hidden border-t border-gray-200 dark:border-gray-700">
+      {/* Mobile Nav */}
+      <div className="lg:hidden border-t border-zinc-200 dark:border-zinc-700">
         <nav className="flex overflow-x-auto scrollbar-hide">
           <div className="flex space-x-1 p-2 min-w-full">
             {navItems.map((item) => {
@@ -377,10 +221,10 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                     isActive
-                      ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   }`}
                 >
                   <IconComponent size={16} />

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { NavLink } from "@remix-run/react";
 import { useTheme } from "../Contexts/ThemeContext";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import Logo from "../assets/yoc-logo.png";
 
@@ -108,19 +108,29 @@ export default function Sidebar({
   return (
     <>
       {/* Toggle Button - Shows when sidebar is hidden */}
-      {!visible && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          onClick={onToggleVisible}
-          className="fixed top-3 left-4 z-50 hidden md:flex items-center justify-center w-10 h-10 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-xl transition-all duration-200"
-          title="Show Sidebar"
-        >
-          <ChevronRight size={20} />
-        </motion.button>
-      )}
+      <AnimatePresence>
+        {!visible && (
+          <motion.button
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{
+              type: "spring",
+              stiffness: 400,
+              damping: 20,
+              duration: 0.3,
+            }}
+            onClick={onToggleVisible}
+            className="fixed top-6 left-4 z-[60] flex items-center justify-center w-12 h-12 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-md shadow-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:shadow-xl transition-all duration-200 backdrop-blur-sm"
+            style={{
+              display: "flex !important",
+            }}
+            title="Show Sidebar"
+          >
+            <ChevronRight size={20} />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Desktop Sidebar */}
       <motion.aside
@@ -130,13 +140,13 @@ export default function Sidebar({
           width: 256,
         }}
         transition={{ type: "spring", stiffness: 400, damping: 40 }}
-        className="hidden md:flex flex-col h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 fixed top-0 left-0 z-40"
+        className="hidden md:flex flex-col h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white border-r border-zinc-200 dark:border-zinc-700 fixed top-0 left-0 z-40"
       >
         <div className="p-3 h-full flex flex-col overflow-hidden">
           {/* Hide Button */}
           <button
             onClick={onToggleVisible}
-            className="absolute top-4 right-4 z-10 text-gray-500 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+            className="absolute top-4 right-4 z-10 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors"
             title="Hide Sidebar"
           >
             <ChevronLeft size={20} />
@@ -152,22 +162,22 @@ export default function Sidebar({
             <motion.img
               src={Logo}
               alt="YOC Logo"
-              className="w-10 h-10 rounded-xl object-cover   flex-shrink-0"
+              className="w-10 h-10 rounded-md object-cover   flex-shrink-0"
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             />
             <div className="overflow-hidden">
-              <h2 className="mrs-saint-delafield-regular text-2xl bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white bg-clip-text text-transparent">
+              <h2 className="mrs-saint-delafield-regular text-2xl bg-gradient-to-r from-zinc-900 via-indigo-800 to-zinc-900 dark:from-white dark:via-indigo-300 dark:to-white bg-clip-text text-transparent">
                 YahyaOnCloud
               </h2>
-              <p className="text-xs pt-2 text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
+              <p className="text-xs pt-2 text-zinc-500 dark:text-zinc-400 font-medium uppercase tracking-wide">
                 Content Management
               </p>
             </div>
           </motion.div>
 
           {/* Nav Links */}
-          <nav className="space-y-1 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+          <nav className="space-y-1 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-600 scrollbar-track-transparent">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.name}
@@ -178,10 +188,10 @@ export default function Sidebar({
                 <NavLink
                   to={item.href}
                   className={({ isActive }) =>
-                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
+                    `group flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-all relative overflow-hidden ${
                       isActive
-                        ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
+                        ? "bg-gradient-to-r from-navy-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25 dark:from-indigo-500 dark:to-indigo-400"
+                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-navy-600 dark:hover:text-indigo-400"
                     }`
                   }
                 >
@@ -195,7 +205,7 @@ export default function Sidebar({
 
                   <div className="flex-1 overflow-hidden">
                     <span className="block">{item.name}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-navy-500 dark:group-hover:text-blue-400 transition-colors duration-300">
+                    <span className="text-xs text-zinc-400 dark:text-zinc-500 group-hover:text-navy-500 dark:group-hover:text-indigo-400 transition-colors duration-300">
                       {item.description}
                     </span>
                   </div>
@@ -205,12 +215,12 @@ export default function Sidebar({
           </nav>
 
           {/* Footer */}
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
+          <div className="pt-4 border-t border-zinc-200 dark:border-zinc-700 overflow-hidden">
+            <div className="flex items-center space-x-2 text-xs text-zinc-500 dark:text-zinc-400">
               <Eye size={12} />
               <span>Blog CMS v2.0</span>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
               Manage your content with ease
             </p>
           </div>
@@ -222,7 +232,7 @@ export default function Sidebar({
         initial={{ x: -300 }}
         animate={{ x: isOpen ? 0 : -300 }}
         transition={{ type: "spring", stiffness: 400, damping: 40 }}
-        className="fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 md:hidden"
+        className="fixed top-0 left-0 z-50 h-screen w-64 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white border-r border-zinc-200 dark:border-zinc-700 md:hidden"
       >
         <div className="p-3 h-full flex flex-col overflow-hidden">
           {/* Mobile Header */}
@@ -236,15 +246,15 @@ export default function Sidebar({
               <motion.img
                 src={Logo}
                 alt="YOC Logo"
-                className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-blue-500/25"
+                className="w-10 h-10 rounded-md object-cover shadow-lg shadow-indigo-500/25"
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               />
               <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-zinc-900 via-indigo-800 to-zinc-900 dark:from-white dark:via-indigo-300 dark:to-white bg-clip-text text-transparent">
                   YOC
                 </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium uppercase tracking-wide">
                   Content Management
                 </p>
               </div>
@@ -252,14 +262,14 @@ export default function Sidebar({
 
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+              className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors"
             >
               <ChevronLeft size={20} />
             </button>
           </div>
 
           {/* Nav Links */}
-          <nav className="space-y-1 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+          <nav className="space-y-1 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-600 scrollbar-track-transparent">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.name}
@@ -271,10 +281,10 @@ export default function Sidebar({
                   to={item.href}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
+                    `group flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-all relative overflow-hidden ${
                       isActive
-                        ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
+                        ? "bg-gradient-to-r from-navy-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25 dark:from-indigo-500 dark:to-indigo-400"
+                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-navy-600 dark:hover:text-indigo-400"
                     }`
                   }
                 >
@@ -288,7 +298,7 @@ export default function Sidebar({
 
                   <div className="flex-1 relative z-10">
                     <span className="block">{item.name}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-navy-500 dark:group-hover:text-blue-400 transition-colors duration-300">
+                    <span className="text-xs text-zinc-400 dark:text-zinc-500 group-hover:text-navy-500 dark:group-hover:text-indigo-400 transition-colors duration-300">
                       {item.description}
                     </span>
                   </div>
@@ -299,16 +309,16 @@ export default function Sidebar({
 
           {/* Footer */}
           <motion.div
-            className="pt-4 border-t border-gray-200 dark:border-gray-700"
+            className="pt-4 border-t border-zinc-200 dark:border-zinc-700"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
           >
-            <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center space-x-2 text-xs text-zinc-500 dark:text-zinc-400">
               <Eye size={12} />
               <span>Blog CMS v2.0</span>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
               Manage your content with ease
             </p>
           </motion.div>

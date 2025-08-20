@@ -6,16 +6,16 @@
 
 :root {
   /* Primary Background Colors */
-  --background: 0 0% 98%; /* Equivalent to bg-gray-50 */
-  --foreground: 0 0% 10%; /* Equivalent to text-gray-900 */
+  --background: 0 0% 98%; /* Equivalent to bg-zinc-50 */
+  --foreground: 0 0% 10%; /* Equivalent to text-zinc-900 */
 
   /* Card and Component Backgrounds */
-  --card: 0 0% 100%; /* Equivalent to bg-white */
-  --card-foreground: 0 0% 10%; /* Equivalent to text-gray-900 */
+  --card: 0 0% 100%; /* Equivalent to bg-zinc-50 */
+  --card-foreground: 0 0% 10%; /* Equivalent to text-zinc-900 */
 
   /* Secondary Backgrounds (e.g., code blocks, hover states) */
-  --secondary: 0 0% 95%; /* Equivalent to bg-gray-100 */
-  --secondary-foreground: 0 0% 20%; /* Equivalent to text-gray-800 */
+  --secondary: 0 0% 95%; /* Equivalent to bg-zinc-100 */
+  --secondary-foreground: 0 0% 20%; /* Equivalent to text-zinc-800 */
 
   /* Accent Colors */
   --primary: 221 83% 53%; /* Equivalent to blue-600 */
@@ -24,12 +24,12 @@
   --accent-foreground: 0 0% 100%; /* White text for contrast */
 
   /* Border Colors */
-  --border: 0 0% 80%; /* Equivalent to border-gray-200 */
-  --input: 0 0% 80%; /* Equivalent to border-gray-200 */
+  --border: 0 0% 80%; /* Equivalent to border-zinc-200 */
+  --input: 0 0% 80%; /* Equivalent to border-zinc-200 */
 
   /* Muted and Subtle Colors */
-  --muted: 0 0% 90%; /* Equivalent to bg-gray-100 */
-  --muted-foreground: 0 0% 40%; /* Equivalent to text-gray-600 */
+  --muted: 0 0% 90%; /* Equivalent to bg-zinc-100 */
+  --muted-foreground: 0 0% 40%; /* Equivalent to text-zinc-600 */
 
   /* Destructive (e.g., liked button states) */
   --destructive: 0 84% 60%; /* Equivalent to red-500 */
@@ -49,16 +49,16 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* Primary Background Colors */
-    --background: 0 0% 6%; /* Equivalent to bg-gray-900 */
+    --background: 0 0% 6%; /* Equivalent to bg-zinc-900 */
     --foreground: 0 0% 100%; /* Equivalent to text-white */
 
     /* Card and Component Backgrounds */
-    --card: 0 0% 12%; /* Equivalent to bg-gray-800 */
+    --card: 0 0% 12%; /* Equivalent to bg-zinc-800 */
     --card-foreground: 0 0% 100%; /* Equivalent to text-white */
 
     /* Secondary Backgrounds */
-    --secondary: 0 0% 15%; /* Equivalent to bg-gray-700 */
-    --secondary-foreground: 0 0% 90%; /* Equivalent to text-gray-100 */
+    --secondary: 0 0% 15%; /* Equivalent to bg-zinc-700 */
+    --secondary-foreground: 0 0% 90%; /* Equivalent to text-zinc-100 */
 
     /* Accent Colors */
     --primary: 221 83% 65%; /* Equivalent to blue-400 */
@@ -67,12 +67,12 @@
     --accent-foreground: 0 0% 0%; /* Black text for contrast */
 
     /* Border Colors */
-    --border: 0 0% 20%; /* Equivalent to border-gray-700 */
-    --input: 0 0% 20%; /* Equivalent to border-gray-700 */
+    --border: 0 0% 20%; /* Equivalent to border-zinc-700 */
+    --input: 0 0% 20%; /* Equivalent to border-zinc-700 */
 
     /* Muted and Subtle Colors */
-    --muted: 0 0% 15%; /* Equivalent to bg-gray-700 */
-    --muted-foreground: 0 0% 70%; /* Equivalent to text-gray-300 */
+    --muted: 0 0% 15%; /* Equivalent to bg-zinc-700 */
+    --muted-foreground: 0 0% 70%; /* Equivalent to text-zinc-300 */
 
     /* Destructive */
     --destructive: 0 84% 70%; /* Equivalent to red-400 */
@@ -117,4 +117,36 @@
   .font-cursive {
     font-family: "Dancing Script", cursive;
   }
+}
+
+/* Hide scrollbar by default */
+.auto-hide-scrollbar {
+  /* For Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent; /* thumb and track */
+}
+
+/* Show scrollbar on hover or when scrolling */
+.auto-hide-scrollbar:hover,
+.auto-hide-scrollbar:active {
+  scrollbar-width: thin;
+  scrollbar-color: auto; /* Use default colors or customize */
+}
+
+/* For WebKit browsers (Chrome, Safari) */
+.auto-hide-scrollbar::-webkit-scrollbar {
+  width: 6px; /* Thin scrollbar */
+}
+
+.auto-hide-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent; /* Hide thumb by default */
+}
+
+.auto-hide-scrollbar:hover::-webkit-scrollbar-thumb,
+.auto-hide-scrollbar:active::-webkit-scrollbar-thumb {
+  background: #888; /* Customize thumb color */
+}
+
+.auto-hide-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Hide track */
 }

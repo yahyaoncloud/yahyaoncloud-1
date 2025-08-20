@@ -99,8 +99,8 @@ export default function AdminPosts() {
       <div
         className={`min-h-screen transition-all duration-300 ${
           theme === "dark"
-            ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-            : "bg-gradient-to-br from-gray-50 via-white to-gray-100"
+            ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"
+            : "bg-gradient-to-br from-zinc-50 via-white to-zinc-100"
         }`}
       >
         {/* Header Section */}
@@ -119,7 +119,7 @@ export default function AdminPosts() {
                 <Search
                   size={20}
                   className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    theme === "dark" ? "text-zinc-400" : "text-zinc-500"
                   }`}
                 />
                 <input
@@ -127,10 +127,10 @@ export default function AdminPosts() {
                   placeholder="Search posts..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-opacity-50 ${
+                  className={`w-full pl-10 pr-4 py-3 rounded-md border transition-all duration-200 focus:ring-2 focus:ring-opacity-50 ${
                     theme === "dark"
-                      ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
+                      ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-400 focus:ring-indigo-500 focus:border-indigo-500"
+                      : "bg-zinc-50 border-zinc-300 text-zinc-900 placeholder-zinc-500 focus:ring-indigo-500 focus:border-indigo-500"
                   }`}
                 />
               </div>
@@ -140,16 +140,16 @@ export default function AdminPosts() {
                 <Filter
                   size={20}
                   className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    theme === "dark" ? "text-zinc-400" : "text-zinc-500"
                   }`}
                 />
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className={`pl-10 pr-8 py-3 rounded-xl border transition-all duration-200 focus:ring-2 focus:ring-opacity-50 appearance-none min-w-48 ${
+                  className={`pl-10 pr-8 py-3 rounded-md border transition-all duration-200 focus:ring-2 focus:ring-opacity-50 appearance-none min-w-48 ${
                     theme === "dark"
-                      ? "bg-gray-800 border-gray-700 text-white focus:ring-blue-500 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
+                      ? "bg-zinc-800 border-zinc-700 text-white focus:ring-indigo-500 focus:border-indigo-500"
+                      : "bg-zinc-50 border-zinc-300 text-zinc-900 focus:ring-indigo-500 focus:border-indigo-500"
                   }`}
                 >
                   <option value="all">All Categories</option>
@@ -165,7 +165,7 @@ export default function AdminPosts() {
             {/* Results Count */}
             <div
               className={`mt-4 text-sm ${
-                theme === "dark" ? "text-gray-400" : "text-gray-600"
+                theme === "dark" ? "text-zinc-400" : "text-zinc-600"
               }`}
             >
               {searchTerm || selectedCategory !== "all" ? (
@@ -187,31 +187,31 @@ export default function AdminPosts() {
             {filteredPosts.length === 0 ? (
               <motion.div
                 variants={itemVariants}
-                className={`rounded-2xl p-12 text-center shadow-lg ${
+                className={`rounded-md p-12 text-center shadow-lg ${
                   theme === "dark"
-                    ? "bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700"
-                    : "bg-gradient-to-br from-white to-gray-50 border border-gray-200"
+                    ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                    : "bg-gradient-to-br from-white to-zinc-50 border border-zinc-200"
                 }`}
               >
                 <div
                   className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
                     theme === "dark"
-                      ? "bg-gray-700 text-gray-400"
-                      : "bg-gray-100 text-gray-500"
+                      ? "bg-zinc-700 text-zinc-400"
+                      : "bg-zinc-100 text-zinc-500"
                   }`}
                 >
                   <Search size={32} />
                 </div>
                 <h3
                   className={`text-xl font-semibold mb-2 ${
-                    theme === "dark" ? "text-gray-200" : "text-gray-800"
+                    theme === "dark" ? "text-zinc-200" : "text-zinc-800"
                   }`}
                 >
                   {posts.length === 0 ? "No posts yet" : "No posts found"}
                 </h3>
                 <p
                   className={`mb-6 ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-600"
+                    theme === "dark" ? "text-zinc-400" : "text-zinc-600"
                   }`}
                 >
                   {posts.length === 0
@@ -221,10 +221,10 @@ export default function AdminPosts() {
                 {posts.length === 0 && (
                   <Link
                     to="/admin/create"
-                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 ${
                       theme === "dark"
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-                        : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white"
+                        : "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white"
                     }`}
                   >
                     <Plus size={20} />
@@ -241,10 +241,10 @@ export default function AdminPosts() {
                     className="group"
                   >
                     <div
-                      className={`relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 ${
+                      className={`relative rounded-md overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 ${
                         theme === "dark"
-                          ? "bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700"
-                          : "bg-white border border-gray-200"
+                          ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                          : "bg-zinc-50 border border-zinc-200"
                       }`}
                     >
                       <ArticleCard
@@ -270,10 +270,10 @@ export default function AdminPosts() {
                       <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <Link
                           to={`/admin/edit/${post.id}`}
-                          className={`p-3 rounded-xl backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+                          className={`p-3 rounded-md backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
                             theme === "dark"
-                              ? "bg-blue-600/80 hover:bg-blue-500 text-white shadow-lg"
-                              : "bg-blue-500/80 hover:bg-blue-600 text-white shadow-lg"
+                              ? "bg-indigo-600/80 hover:bg-indigo-500 text-white shadow-lg"
+                              : "bg-indigo-500/80 hover:bg-indigo-600 text-white shadow-lg"
                           }`}
                           title="Edit Post"
                         >
@@ -284,7 +284,7 @@ export default function AdminPosts() {
                           <input type="hidden" name="postId" value={post.id} />
                           <motion.button
                             type="submit"
-                            className={`p-3 rounded-xl backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+                            className={`p-3 rounded-md backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
                               theme === "dark"
                                 ? "bg-red-600/80 hover:bg-red-500 text-white shadow-lg"
                                 : "bg-red-500/80 hover:bg-red-600 text-white shadow-lg"

@@ -96,11 +96,17 @@ interface ISEO extends Document {
 }
 
 interface IPortfolio extends Document {
+  _id: Types.ObjectId;
   name: string;
-  bio: string;
+  bio: string[];
   portraitUrl: string;
   experiences: {
     title: string;
+    year: string;
+    isWorking: number;
+    company: string;
+    location: string;
+    role: string;
     description: string[];
     period: string;
   }[];
@@ -129,9 +135,16 @@ interface IPortfolio extends Document {
 }
 
 interface IExperience extends Document {
+  _id: Types.ObjectId;
   title: string;
   company: string;
   skills: string[];
+  isWorking: number;
+  year: string;
+  description: string[];
+  location: string;
+  role: string;
+  period: string;
 }
 
 interface ICertification extends Document {
@@ -332,13 +345,18 @@ const SEOSchema = new Schema<ISEO>(
 const PortfolioSchema = new Schema<IPortfolio>(
   {
     name: { type: String, required: true },
-    bio: { type: String, required: true },
+    bio: [{ type: String, required: true }],
     portraitUrl: { type: String, required: true },
     experiences: [
       {
         title: { type: String, required: true },
+        role: { type: String, required: true },
+        company: { type: String, required: true },
+        isWorking: { type: Number, required: true },
+        location: { type: String, required: true },
         description: [{ type: String, required: true }],
         period: { type: String, required: true },
+        year: { type: String, required: true },
       },
     ],
     certifications: [
@@ -376,8 +394,13 @@ const PortfolioSchema = new Schema<IPortfolio>(
 const ExperienceSchema = new Schema<IExperience>(
   {
     title: { type: String, required: true },
+    role: { type: String, required: true },
     company: { type: String, required: true },
-    skills: [String],
+    isWorking: { type: Number, required: true },
+    location: { type: String, required: true },
+    description: [{ type: String, required: true }],
+    period: { type: String, required: true },
+    year: { type: String, required: true },
   },
   defaultOptions
 );

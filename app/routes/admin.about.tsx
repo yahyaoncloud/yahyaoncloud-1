@@ -93,12 +93,12 @@ export default function AdminAbout() {
   const { theme } = useTheme();
 
   return (
-    <div className="min-h-screen mx-auto p-10 dark:bg-gray-950">
+    <div className="min-h-screen mx-auto p-10 dark:bg-zinc-950">
       <div className="max-w-7xl mx-auto ">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Profile */}
           <motion.div
-            className="flex flex-col rounded-2xl py-8 border border-gray-500 bg-slate-100 dark:bg-slate-900 items-center text-center lg:col-span-1"
+            className="flex flex-col rounded-md py-8 border border-zinc-500 bg-zinc-100 dark:bg-zinc-900 items-center text-center lg:col-span-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -106,20 +106,20 @@ export default function AdminAbout() {
             <img
               src={portraitUrl}
               alt={name}
-              className="w-80 h-80 lg:w-80 lg:h-80 rounded-3xl object-cover shadow-lg border-4 border-white/20 dark:border-gray-700/50"
+              className="w-80 h-80 lg:w-80 lg:h-80 rounded-3xl object-cover shadow-lg border-4 border-white/20 dark:border-zinc-700/50"
             />
             <h1
               className={`text-3xl lg:text-4xl font-bold p-6 bg-gradient-to-r ${
                 theme === "dark"
-                  ? "from-white via-blue-300 to-white"
-                  : "from-gray-900 via-blue-800 to-gray-900"
+                  ? "from-white via-indigo-300 to-white"
+                  : "from-zinc-900 via-indigo-800 to-zinc-900"
               } bg-clip-text text-transparent`}
             >
               {name}
             </h1>
             <p
               className={`text-sm/8 text-justify  leading-relaxed   lg:px-12 px-6 ${
-                theme === "dark" ? "text-gray-300" : "text-gray-600"
+                theme === "dark" ? "text-zinc-300" : "text-zinc-600"
               }`}
             >
               {bio}
@@ -127,7 +127,7 @@ export default function AdminAbout() {
             {/* <div className="mt-6 flex items-center space-x-4 text-base">
               <div
                 className={`flex items-center space-x-1 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  theme === "dark" ? "text-zinc-400" : "text-zinc-500"
                 }`}
               >
                 <MapPin size={14} />
@@ -135,7 +135,7 @@ export default function AdminAbout() {
               </div>
               <div
                 className={`flex items-center space-x-1 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  theme === "dark" ? "text-zinc-400" : "text-zinc-500"
                 }`}
               >
                 <Coffee size={14} />
@@ -149,10 +149,10 @@ export default function AdminAbout() {
                     href={socialLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2.5 rounded-xl transition-all duration-300 ${
+                    className={`p-2.5 rounded-md transition-all duration-300 ${
                       theme === "dark"
-                        ? "bg-gray-800/50 hover:bg-blue-600/20 text-gray-400 hover:text-blue-400"
-                        : "bg-gray-100/80 hover:bg-blue-50 text-gray-600 hover:text-blue-600"
+                        ? "bg-zinc-800/50 hover:bg-indigo-600/20 text-zinc-400 hover:text-indigo-400"
+                        : "bg-zinc-100/80 hover:bg-indigo-50 text-zinc-600 hover:text-indigo-600"
                     }`}
                   >
                     <FaLinkedin size={18} />
@@ -163,10 +163,10 @@ export default function AdminAbout() {
                     href={socialLinks.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2.5 rounded-xl transition-all duration-300 ${
+                    className={`p-2.5 rounded-md transition-all duration-300 ${
                       theme === "dark"
-                        ? "bg-gray-800/50 hover:bg-gray-700/40 text-gray-400 hover:text-white"
-                        : "bg-gray-100/80 hover:bg-gray-200 text-gray-600 hover:text-black"
+                        ? "bg-zinc-800/50 hover:bg-zinc-700/40 text-zinc-400 hover:text-white"
+                        : "bg-zinc-100/80 hover:bg-zinc-200 text-zinc-600 hover:text-black"
                     }`}
                   >
                     <FaGithub size={18} />
@@ -177,10 +177,10 @@ export default function AdminAbout() {
                     href={socialLinks.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2.5 rounded-xl transition-all duration-300 ${
+                    className={`p-2.5 rounded-md transition-all duration-300 ${
                       theme === "dark"
-                        ? "bg-gray-800/50 hover:bg-blue-400/20 text-gray-400 hover:text-blue-400"
-                        : "bg-gray-100/80 hover:bg-blue-50 text-gray-600 hover:text-blue-500"
+                        ? "bg-zinc-800/50 hover:bg-indigo-400/20 text-zinc-400 hover:text-indigo-400"
+                        : "bg-zinc-100/80 hover:bg-indigo-50 text-zinc-600 hover:text-indigo-500"
                     }`}
                   >
                     <FaTwitter size={18} />
@@ -191,10 +191,10 @@ export default function AdminAbout() {
                     href={socialLinks.youtube}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2.5 rounded-xl transition-all duration-300 ${
+                    className={`p-2.5 rounded-md transition-all duration-300 ${
                       theme === "dark"
-                        ? "bg-gray-800/50 hover:bg-red-600/20 text-gray-400 hover:text-red-500"
-                        : "bg-gray-100/80 hover:bg-red-50 text-gray-600 hover:text-red-600"
+                        ? "bg-zinc-800/50 hover:bg-red-600/20 text-zinc-400 hover:text-red-500"
+                        : "bg-zinc-100/80 hover:bg-red-50 text-zinc-600 hover:text-red-600"
                     }`}
                   >
                     <FaYoutube size={18} />
@@ -205,10 +205,10 @@ export default function AdminAbout() {
                     href={socialLinks.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2.5 rounded-xl transition-all duration-300 ${
+                    className={`p-2.5 rounded-md transition-all duration-300 ${
                       theme === "dark"
-                        ? "bg-gray-800/50 hover:bg-pink-600/20 text-gray-400 hover:text-pink-400"
-                        : "bg-gray-100/80 hover:bg-pink-50 text-gray-600 hover:text-pink-600"
+                        ? "bg-zinc-800/50 hover:bg-indigo-600/20 text-zinc-400 hover:text-indigo-400"
+                        : "bg-zinc-100/80 hover:bg-indigo-50 text-zinc-600 hover:text-indigo-600"
                     }`}
                   >
                     <FaInstagram size={18} />
@@ -217,10 +217,10 @@ export default function AdminAbout() {
                 {socialLinks.email && (
                   <a
                     href={`mailto:${socialLinks.email}`}
-                    className={`p-2.5 rounded-xl transition-all duration-300 ${
+                    className={`p-2.5 rounded-md transition-all duration-300 ${
                       theme === "dark"
-                        ? "bg-gray-800/50 hover:bg-emerald-600/20 text-gray-400 hover:text-emerald-400"
-                        : "bg-gray-100/80 hover:bg-emerald-50 text-gray-600 hover:text-emerald-600"
+                        ? "bg-zinc-800/50 hover:bg-emerald-600/20 text-zinc-400 hover:text-emerald-400"
+                        : "bg-zinc-100/80 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-600"
                     }`}
                   >
                     <Mail size={18} />
@@ -239,12 +239,12 @@ export default function AdminAbout() {
             <div className="flex items-center space-x-2 mb-6">
               <Calendar
                 className={`w-5 h-5 ${
-                  theme === "dark" ? "text-blue-400" : "text-blue-600"
+                  theme === "dark" ? "text-indigo-400" : "text-indigo-600"
                 }`}
               />
               <h2
                 className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
+                  theme === "dark" ? "text-white" : "text-zinc-900"
                 }`}
               >
                 Experience
@@ -254,35 +254,35 @@ export default function AdminAbout() {
               {experiences?.slice(0, 4).map((exp, index) => (
                 <motion.div
                   key={exp.title + index} // Use unique key
-                  className={`relative p-4 rounded-lg transition-all duration-300 ${
+                  className={`relative p-4 rounded-md transition-all duration-300 ${
                     theme === "dark"
-                      ? "bg-gray-800/50 hover:bg-gray-800/70 border border-gray-500"
-                      : "bg-gray-50/80 hover:bg-gray-100/80 border border-gray-500"
+                      ? "bg-zinc-800/50 hover:bg-zinc-800/70 border border-zinc-500"
+                      : "bg-zinc-50/80 hover:bg-zinc-100/80 border border-zinc-500"
                   }`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                 >
                   <div
-                    className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-blue-600 rounded-l-3xl`}
+                    className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-l-3xl`}
                   ></div>
                   <h3
                     className={`font-semibold text-base mb-1 ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-zinc-900"
                     }`}
                   >
                     {exp.title}
                   </h3>
                   <p
                     className={`text-sm mb-2 ${
-                      theme === "dark" ? "text-blue-400" : "text-blue-600"
+                      theme === "dark" ? "text-indigo-400" : "text-indigo-600"
                     }`}
                   >
                     {exp.period}
                   </p>
                   <p
                     className={`text-sm leading-relaxed ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-600"
+                      theme === "dark" ? "text-zinc-400" : "text-zinc-600"
                     }`}
                   >
                     {Array.isArray(exp.description)
@@ -302,7 +302,7 @@ export default function AdminAbout() {
                   />
                   <h2
                     className={`text-2xl font-bold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                      theme === "dark" ? "text-white" : "text-zinc-900"
                     }`}
                   >
                     Current Focus
@@ -312,7 +312,7 @@ export default function AdminAbout() {
                   {currentWorks.slice(0, 2).map((work, index) => (
                     <motion.div
                       key={work.title + index}
-                      className={`p-4 rounded-2xl transition-all duration-300 ${
+                      className={`p-4 rounded-md transition-all duration-300 ${
                         theme === "dark"
                           ? "bg-gradient-to-br from-emerald-900/30 to-green-900/30 border border-emerald-500"
                           : "bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-500"
@@ -332,7 +332,7 @@ export default function AdminAbout() {
                       </h3>
                       <p
                         className={`text-sm leading-relaxed ${
-                          theme === "dark" ? "text-gray-300" : "text-gray-600"
+                          theme === "dark" ? "text-zinc-300" : "text-zinc-600"
                         }`}
                       >
                         {work.description}
@@ -364,10 +364,10 @@ export default function AdminAbout() {
           >
             {skills && (
               <div
-                className={`rounded-2xl p-6 shadow-lg border ${
+                className={`rounded-md p-6 shadow-lg border ${
                   theme === "dark"
-                    ? "bg-gray-800/50 border-gray-700 text-white"
-                    : "bg-white/80 border-gray-200 text-gray-900"
+                    ? "bg-zinc-800/50 border-zinc-700 text-white"
+                    : "bg-zinc-50/80 border-zinc-200 text-zinc-900"
                 } backdrop-blur-sm`}
               >
                 <h3 className="text-2xl font-semibold mb-6 tracking-tight">
@@ -412,12 +412,12 @@ export default function AdminAbout() {
                           <span
                             className={`${
                               isLongSkill
-                                ? "block px-4 py-3 text-sm font-medium rounded-xl" // Block layout for long skills
+                                ? "block px-4 py-3 text-sm font-medium rounded-md" // Block layout for long skills
                                 : "px-3 py-2 text-xs font-medium rounded-full" // Compact for short skills
                             } text-center cursor-pointer transition-all duration-300 ${
                               theme === "dark"
-                                ? "bg-gradient-to-r from-gray-700 to-gray-600 text-gray-100 hover:from-gray-600 hover:to-gray-500"
-                                : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 hover:from-gray-200 hover:to-gray-300"
+                                ? "bg-gradient-to-r from-zinc-700 to-zinc-600 text-zinc-100 hover:from-zinc-600 hover:to-zinc-500"
+                                : "bg-gradient-to-r from-zinc-100 to-zinc-200 text-zinc-800 hover:from-zinc-200 hover:to-zinc-300"
                             } hover:shadow-md hover:-translate-y-0.5 ${
                               isLongSkill ? "w-full" : ""
                             }`}
