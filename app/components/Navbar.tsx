@@ -24,6 +24,7 @@ interface NavbarProps {
 export default function Navbar({ onToggleSidebar }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [activeIndicator, setActiveIndicator] = useState({ width: 0, left: 0 });
   const location = useLocation();
   const navRef = useRef<HTMLDivElement>(null);
@@ -36,20 +37,25 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   ];
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const shouldBeScrolled = currentScrollY > 20;
+      setScrolled((prev) => (prev !== shouldBeScrolled ? shouldBeScrolled : prev));
+      lastScrollY = currentScrollY;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
     const updateIndicator = () => {
       if (!navRef.current) return;
-      const activeLink = navRef.current.querySelector(
-        `[data-path="${location.pathname}"]`
-      ) as HTMLElement;
-
+      const activeLink = navRef.current.querySelector(`[data-path="${location.pathname}"]`) as HTMLElement;
       if (activeLink) {
         const navRect = navRef.current.getBoundingClientRect();
         const linkRect = activeLink.getBoundingClientRect();
-
-        setActiveIndicator({
-          width: linkRect.width,
-          left: linkRect.left - navRect.left,
-        });
+        setActiveIndicator({ width: linkRect.width, left: linkRect.left - navRect.left });
       }
     };
     updateIndicator();
@@ -57,10 +63,18 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
     return () => window.removeEventListener("resize", updateIndicator);
   }, [location.pathname]);
 
-  const isActiveLink = (href: string) => {
-    if (href === "/admin") return location.pathname === "/admin";
-    return location.pathname.startsWith(href);
-  };
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isProfileMenuOpen && !(event.target as Element).closest(".profile-menu-container")) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    if (isProfileMenuOpen) document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [isProfileMenuOpen]);
+
+  const isActiveLink = (href: string) =>
+    href === "/admin" ? location.pathname === "/admin" : location.pathname.startsWith(href);
 
   const profileMenuItems = [
     { name: "Profile", href: "/admin/profile", icon: User },
@@ -69,62 +83,51 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   ];
 
   return (
-    <header className="w-auto sticky  top-0 left-0 right-0 border-b border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white z-10 ">
+    <header className="w-auto sticky top-0 left-0 right-0 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-50 z-10 shadow-sm transition-all duration-300">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2 min-h-[4rem] w-full">
-          {/* Hamburger (mobile) */}
-          <div className="flex items-center md:hidden">
-            <button
+          {/* Collapsible Sidebar Button */}
+          <div className="flex items-center">
+            <motion.button
               onClick={onToggleSidebar}
-              className="p-2 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors"
+              className="p-3 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
               aria-label="Toggle sidebar"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               <Menu size={18} className="text-zinc-600 dark:text-zinc-300" />
-            </button>
+            </motion.button>
           </div>
 
-          {/* Desktop Nav */}
+          {/* Center Navigation */}
           <nav className="hidden lg:flex items-center justify-center flex-1 mx-8">
             <div
               ref={navRef}
-              className="relative flex items-center space-x-1 rounded-md p-1"
+              className="relative flex items-center space-x-1 bg-zinc-100/50 dark:bg-zinc-800/50 rounded-2xl p-1 backdrop-blur-sm"
             >
-              {/* Active indicator */}
               <motion.div
-                className="absolute top-1 bottom-1 bg-zinc-200 dark:bg-zinc-700 rounded-md"
-                animate={{
-                  width: activeIndicator.width,
-                  x: activeIndicator.left,
-                }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
+                className="absolute top-1 bottom-1 bg-zinc-200 dark:bg-zinc-700 rounded-xl shadow-md"
+                animate={{ width: activeIndicator.width, x: activeIndicator.left }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
-
               {navItems.map((item) => {
                 const IconComponent = item.icon;
                 const isActive = isActiveLink(item.href);
-
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
                     data-path={item.href}
-                    className="relative z-10 flex items-center space-x-2 px-4 py-2.5 rounded-md text-sm font-medium transition-colors"
+                    className="relative z-10 flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300"
                   >
-                    <IconComponent
-                      size={16}
-                      className={`${
-                        isActive
-                          ? "text-indigo-600 dark:text-indigo-400"
-                          : "text-zinc-600 dark:text-zinc-400"
-                      }`}
-                    />
-                    <span
-                      className={
-                        isActive
-                          ? "text-zinc-900 dark:text-white"
-                          : "text-zinc-600 dark:text-zinc-400"
-                      }
-                    >
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
+                      <IconComponent
+                        size={16}
+                        className={`transition-colors duration-300 ${isActive ? "text-zinc-900 dark:text-zinc-50" : "text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-50"}`}
+                      />
+                    </motion.div>
+                    <span className={`transition-colors duration-300 ${isActive ? "text-zinc-900 dark:text-zinc-50" : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50"}`}>
                       {item.name}
                     </span>
                   </Link>
@@ -133,74 +136,74 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             </div>
           </nav>
 
-          {/* Right controls */}
+          {/* Right Controls */}
           <div className="flex items-center space-x-3 ml-auto">
             {/* New Post */}
             <Link
               to="/admin/post/create"
-              className="hidden sm:flex items-center space-x-2 px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors"
+              className="hidden sm:flex items-center space-x-2 px-4 py-2 rounded-xl bg-zinc-800 text-zinc-50 font-medium shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <span>New Post</span>
+              <span className="text-sm">New Post</span>
             </Link>
 
             {/* Theme Toggle */}
-            <button
+            <motion.button
               onClick={toggleTheme}
-              className="p-2 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors"
+              className="p-3 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
               aria-label="Toggle theme"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {theme === "light" ? (
-                <Moon size={18} className="text-zinc-600 dark:text-zinc-300" />
-              ) : (
-                <Sun size={18} className="text-yellow-500" />
-              )}
-            </button>
+              {theme === "light" ? <Moon size={18} className="text-zinc-600 dark:text-zinc-300" /> : <Sun size={18} className="text-zinc-300 dark:text-zinc-50" />}
+            </motion.button>
 
-            {/* Profile */}
+            {/* Profile Menu */}
             <div className="relative profile-menu-container">
-              <button
+              <motion.button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center space-x-2 p-2 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-colors"
+                className="flex items-center space-x-3 p-2 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
               >
-                <div className="w-8 h-8 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center">
-                  <User size={16} className="text-white" />
+                <motion.div className="w-8 h-8 rounded-full bg-zinc-700 dark:bg-zinc-600 flex items-center justify-center shadow" whileHover={{ scale: 1.1 }}>
+                  <User size={16} className="text-zinc-50" />
+                </motion.div>
+                <div className="hidden md:flex flex-col items-start">
+                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">John Doe</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Admin</span>
                 </div>
-                <ChevronDown
-                  size={16}
-                  className={`text-zinc-500 dark:text-zinc-400 transition-transform ${
-                    isProfileMenuOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+                <motion.div animate={{ rotate: isProfileMenuOpen ? 180 : 0 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
+                  <ChevronDown size={16} className="text-zinc-500 dark:text-zinc-400" />
+                </motion.div>
+              </motion.button>
 
-              {/* Dropdown */}
               <AnimatePresence>
                 {isProfileMenuOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.15, ease: "easeOut" }}
-                    className="absolute right-0 mt-2 w-48 bg-zinc-50 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-700 overflow-hidden z-50"
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-48 bg-zinc-50 dark:bg-zinc-900 rounded-xl shadow-md border border-zinc-200 dark:border-zinc-700 overflow-hidden z-50"
                   >
-                    {profileMenuItems.map((item) => {
-                      const IconComponent = item.icon;
-                      return (
-                        <Link
-                          key={item.name}
-                          to={item.href}
-                          onClick={() => setIsProfileMenuOpen(false)}
-                          className={`flex items-center space-x-3 px-4 py-3 text-sm transition-colors ${
-                            item.name === "Sign Out"
-                              ? "text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                              : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                          }`}
-                        >
-                          <IconComponent size={16} />
-                          <span>{item.name}</span>
-                        </Link>
-                      );
-                    })}
+                    <div className="py-2">
+                      {profileMenuItems.map((item) => {
+                        const IconComponent = item.icon;
+                        return (
+                          <motion.div key={item.name} whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
+                            <Link
+                              to={item.href}
+                              className={`flex items-center space-x-3 px-4 py-3 text-sm transition-all duration-300 ${item.name === "Sign Out"
+                                  ? "text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                                  : "text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
+                                }`}
+                              onClick={() => setIsProfileMenuOpen(false)}
+                            >
+                              <IconComponent size={16} />
+                              <span>{item.name}</span>
+                            </Link>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -209,23 +212,19 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
         </div>
       </div>
 
-      {/* Mobile Nav */}
+      {/* Mobile Navigation */}
       <div className="lg:hidden border-t border-zinc-200 dark:border-zinc-700">
         <nav className="flex overflow-x-auto scrollbar-hide">
           <div className="flex space-x-1 p-2 min-w-full">
             {navItems.map((item) => {
               const IconComponent = item.icon;
               const isActive = isActiveLink(item.href);
-
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
-                    isActive
-                      ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
-                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 ${isActive ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-50" : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    }`}
                 >
                   <IconComponent size={16} />
                   <span>{item.name}</span>

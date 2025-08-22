@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { cloudinary } from "../config/cloudinary"; // Assume cloudinary config is in a separate file
+import { cloudinary } from "../utils/cloudinary.server"; // Assume cloudinary config is in a separate file
 import { MediaAsset } from "../models";
 import { environment } from "../environments/environment";
 

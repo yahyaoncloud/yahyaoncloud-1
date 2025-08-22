@@ -129,9 +129,9 @@ const SearchBox = ({
   query: string;
   setQuery: (q: string) => void;
 }) => (
-  <div className="max-w-3xl mx-auto mb-8">
+  <div className="max-w-3xl mx-auto mb-8 z-0">
     <div className="relative">
-      <Search className="absolute left-3 top-2.5 text-zinc-400" size={18} />
+      <Search className="absolute left-3  top-2.5 text-zinc-400" size={18} />
       <input
         type="text"
         value={query}
@@ -353,13 +353,13 @@ export default function Homepage() {
     () =>
       query
         ? posts.filter(
-            (post) =>
-              post.title.toLowerCase().includes(query.toLowerCase()) ||
-              post.summary?.toLowerCase().includes(query.toLowerCase()) ||
-              post.categories?.some((category) =>
-                category.name.toLowerCase().includes(query.toLowerCase())
-              )
-          )
+          (post) =>
+            post.title.toLowerCase().includes(query.toLowerCase()) ||
+            post.summary?.toLowerCase().includes(query.toLowerCase()) ||
+            post.categories?.some((category) =>
+              category.name.toLowerCase().includes(query.toLowerCase())
+            )
+        )
         : posts,
     [query, posts]
   );

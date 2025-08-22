@@ -379,34 +379,36 @@ def generate_stamp_svg(
     stamp_g.add(qr_group)
 
     # Enhanced centerpiece text with prominent company and client names
-    center_group = dwg.g(id="center_text", fill="white", text_anchor="middle")
+    center_group = dwg.g(id="center_text", fill="#3F3F46", stroke="none", text_anchor="middle")
     
     # Company name (most prominent)
     center_group.add(dwg.text(
-        "YAHYAONCLOUD",  
+        "Y A H Y A O N C L O U D",  
         insert=(cx, cy - 75),  
         font_size=18,  
         font_family="Arial, sans-serif",  
         font_weight="bold",
-        letter_spacing="1px"
+        letter_spacing="2px"
     ))
     
     # Verified badge
     center_group.add(dwg.text(
-        "VERIFIED",  
+        "V E R I F I E D",  
         insert=(cx, cy - 58),  
         font_size=12,  
         font_family="Arial, sans-serif",  
-        font_weight="normal"
+        font_weight="normal",
+        letter_spacing="2px"
     ))
     
     # Client name (prominent)
     center_group.add(dwg.text(
-        client_name.upper(),  
+        " ".join(client_name.upper()),  
         insert=(cx, cy - 45),  
         font_size=14,  
         font_family="Arial, sans-serif",
-        font_weight="bold"
+        font_weight="bold",
+        letter_spacing="2px"
     ))
     
     # Year (prominent)
@@ -415,15 +417,17 @@ def generate_stamp_svg(
         insert=(cx, cy + 45),  
         font_size=16,  
         font_family="Arial, sans-serif",
-        font_weight="bold"
+        font_weight="bold",
+        letter_spacing="2px"
     ))
     
     # Serial number
     center_group.add(dwg.text(
-        f"SN: {serial}",  
+        f"S N :  {serial}",  
         insert=(cx, cy + 60),  
         font_size=8,  
-        font_family="monospace"
+        font_family="monospace",
+        letter_spacing="1px"
     ))
     stamp_g.add(center_group)
 
@@ -437,8 +441,8 @@ def generate_stamp_svg(
     dwg.defs.add(dwg.path(d=circ_path, id=path_id))
     
     # Enhanced outer text with more prominent company and client names
-    outer_text = f"YAHYAONCLOUD ★ {client_name.upper()} ★ {current_year} ★ VERIFIED ★ SN:{serial}"
-    text_el = dwg.text("", font_size=13, font_family="Arial, sans-serif", fill="white", font_weight="bold")
+    outer_text = f"Y A H Y A O N C L O U D  ★  { ' '.join(client_name.upper()) }  ★  {current_year}  ★  V E R I F I E D  ★  S N : {serial}"
+    text_el = dwg.text("", font_size=13, font_family="Arial, sans-serif", fill="#3F3F46", stroke="none", font_weight="bold")
     text_el.add(dwg.textPath(f"#{path_id}", outer_text, startOffset="50%"))
     stamp_g.add(text_el)
 
@@ -448,24 +452,24 @@ def generate_stamp_svg(
     inner_circ = f"M {cx + inner_r},{cy} a {inner_r},{inner_r} 0 1,0 {-2*inner_r},0 a {inner_r},{inner_r} 0 1,0 {2*inner_r},0"
     dwg.defs.add(dwg.path(d=inner_circ, id=micro_path_id))
     
-    micro_txt = f"YAHYAONCLOUD • {client_name} • SECURE • {current_year} • AUTHENTICATED • "
-    micro_text_el = dwg.text("", font_size=7, font_family="Arial, sans-serif", fill="white")
+    micro_txt = f"Y A H Y A O N C L O U D  •  {' '.join(client_name)}  •  S E C U R E  •  {current_year}  •  A U T H E N T I C A T E D  •  "
+    micro_text_el = dwg.text("", font_size=7, font_family="Arial, sans-serif", fill="#3F3F46", stroke="none")
     micro_text_el.add(dwg.textPath(f"#{micro_path_id}", micro_txt * 3, startOffset="0"))
     stamp_g.add(micro_text_el)
 
     # Add signature id text with enhanced styling
-    sig_group = dwg.g(id="sig_text", font_size=7, fill="white", font_family="monospace")
-    sig_group.add(dwg.text(f"SIG: {signature}", insert=(cx + qr_visual_size/2 + 10, cy + qr_visual_size/2 - 2)))
+    sig_group = dwg.g(id="sig_text", font_size=7, fill="#3F3F46", stroke="none", font_family="monospace")
+    sig_group.add(dwg.text(f"S I G :  {signature}", insert=(cx + qr_visual_size/2 + 12, cy + qr_visual_size/2)))
     stamp_g.add(sig_group)
 
     # Additional decorative elements with company branding
     # Add small YahyaOnCloud logos/text in corners of the outer ring
-    corner_group = dwg.g(id="corner_branding", font_size=8, fill="white", font_family="Arial, sans-serif")
+    corner_group = dwg.g(id="corner_branding", font_size=8, fill="#3F3F46", stroke="none", font_family="Arial, sans-serif")
     
     # Top corner
-    corner_group.add(dwg.text("YOC", insert=(cx - 5, cy - ring_outer + 25), text_anchor="middle", font_weight="bold"))
+    corner_group.add(dwg.text("Y O C", insert=(cx - 5, cy - ring_outer + 25), text_anchor="middle", font_weight="bold"))
     # Bottom corner  
-    corner_group.add(dwg.text(str(current_year), insert=(cx - 5, cy + ring_outer - 15), text_anchor="middle", font_weight="bold"))
+    corner_group.add(dwg.text(" ".join(str(current_year)), insert=(cx - 5, cy + ring_outer - 15), text_anchor="middle", font_weight="bold"))
     
     stamp_g.add(corner_group)
 

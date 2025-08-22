@@ -6,13 +6,13 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { useToast } from "../hooks/use-toast";
 import { useState, useEffect } from "react";
+import { getClientByCredentials } from "../utils/firebase.server";
 
-// Types
 interface ClientDetails {
     name: string;
-    store: string;
-    project: string;
-    status: string;
+    company?: string;
+    project?: string;
+    status?: string;
 }
 
 interface LoaderData {
@@ -21,77 +21,68 @@ interface LoaderData {
     isValid: boolean;
     error?: string;
     verificationLink: string;
-    clientDetails: ClientDetails;
+    clientDetails?: ClientDetails;
 }
 
-// Configuration
-const VERIFICATION_CONFIG = {
-    expectedCredentials: {
-        serial: "4E1E80209DA3",
-        signature: "C6D391C4-C6FE-4FC7-AEAD-1602C80D5B82",
-        seed: 2719534572
-    },
-    loadingDelay: 1000
-} as const;
+// Helper: sanitize query parameters
+const sanitize = (param: string | null) =>
+    param ? param.trim().replace(/[^a-zA-Z0-9\-]/g, "") : "";
 
-// Utility functions
-const verifyCredentials = (serial: string, signature: string, seed: number) => {
-    const { expectedCredentials } = VERIFICATION_CONFIG;
-    return (
-        serial === expectedCredentials.serial &&
-        signature === expectedCredentials.signature &&
-        seed === expectedCredentials.seed
-    );
-};
-
+// Helper: obfuscate serial/signature for display
 const obfuscate = (str: string | null) =>
     str ? (str.length > 6 ? `${str.slice(0, 6)}${"*".repeat(str.length - 6)}` : str) : "";
 
-const sanitize = (param: string | null) =>
-    param ? param.trim().replace(/[^a-zA-Z0-9\-]/g, "") : null;
-
-// Loader function
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-    try {
-        const url = new URL(request.url);
-        const serial = sanitize(url.searchParams.get("sn"));
-        const signature = sanitize(url.searchParams.get("sig"));
-        const verificationLink = `${url.origin}/admin/verify?sn=${serial || ""}&sig=${signature || ""}`;
+    const url = new URL(request.url);
+    const serial = sanitize(url.searchParams.get("sn"));
+    const signature = sanitize(url.searchParams.get("sig"));
+    const verificationLink = `${url.origin}/admin/verify?sn=${serial}&sig=${signature}`;
 
-        const clientDetails: ClientDetails = {
-            name: "Rahil Irfan",
-            store: "The House Of Pickles",
-            project: "Confidential",
-            status: "valid"
-        };
-
-        if (!serial || !signature) {
-            return json<LoaderData>({ serial, signature, isValid: false, error: "Missing serial number or signature", verificationLink, clientDetails });
-        }
-
-        const isValid = verifyCredentials(serial, signature, VERIFICATION_CONFIG.expectedCredentials.seed);
-
-        return json<LoaderData>({ serial, signature, isValid, error: isValid ? undefined : "Invalid credentials", verificationLink, clientDetails });
-
-    } catch (error) {
-        console.error("Verification error:", error);
+    if (!serial || !signature) {
         return json<LoaderData>({
-            serial: null,
-            signature: null,
+            serial,
+            signature,
             isValid: false,
-            error: "System error occurred",
-            verificationLink: "",
-            clientDetails: { name: "Unknown", store: "Unknown", project: "Unknown", status: "Unknown" }
-        }, { status: 500 });
+            error: "Missing serial number or signature",
+            verificationLink,
+        });
     }
+
+    const client = await getClientByCredentials(serial, signature);
+
+    if (!client) {
+        return json<LoaderData>({
+            serial,
+            signature,
+            isValid: false,
+            error: "Invalid credentials",
+            verificationLink,
+        });
+    }
+
+    const clientDetails: ClientDetails = {
+        name: client.name,
+        company: client.company,
+        project: client.project,
+        status: "valid",
+    };
+
+    return json<LoaderData>({
+        serial,
+        signature,
+        isValid: true,
+        verificationLink,
+        clientDetails,
+    });
 };
 
-// Page Component
+// React component
 export default function VerifyPage() {
     const data = useLoaderData<LoaderData>();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
 
+    // Tailwind classes
     const bgColor = "bg-zinc-100 dark:bg-zinc-950";
     const inputBg = "bg-zinc-100 dark:bg-zinc-700";
     const inputBorder = "border-zinc-200 dark:border-zinc-600";
@@ -100,7 +91,7 @@ export default function VerifyPage() {
     const buttonStyle = "w-full bg-zinc-200 dark:bg-zinc-600 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-300 dark:hover:bg-zinc-500";
 
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), VERIFICATION_CONFIG.loadingDelay);
+        const timer = setTimeout(() => setIsLoading(false), 800);
         return () => clearTimeout(timer);
     }, []);
 
@@ -113,7 +104,7 @@ export default function VerifyPage() {
         }
     };
 
-    const handleVerifyAnother = () => window.location.reload();
+    const handleVerifyAnother = () => window.location.href = "/admin/verify";
 
     if (isLoading) {
         return (
@@ -136,7 +127,6 @@ export default function VerifyPage() {
                     <CardTitle className={`text-xl ${textColor}`}>Verification</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {/* Credential Inputs */}
                     <div>
                         <Label htmlFor="serial" className={textColor}>Serial Number</Label>
                         <Input id="serial" value={obfuscate(data.serial)} readOnly disabled className={`mt-1 ${inputBg} ${textColor} ${inputBorder}`} />
@@ -146,35 +136,31 @@ export default function VerifyPage() {
                         <Input id="signature" value={obfuscate(data.signature)} readOnly disabled className={`mt-1 ${inputBg} ${textColor} ${inputBorder}`} />
                     </div>
 
-                    {/* Verification Status */}
-                    {data.isValid && (
-                        <div className="flex items-center space-x-2">
-                            <svg className={`h-5 w-5 ${textSubtle}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            <p className={`${textSubtle} text-sm`}>Verification successful</p>
-                        </div>
-                    )}
-
-                    {/* Client Details */}
-                    {data.isValid && (
+                    {data.isValid ? (
                         <div className="space-y-2">
-                            <p className={`${textColor} text-sm font-medium`}>Client Details:</p>
-                            <div className={`rounded-lg p-3 ${inputBg} space-y-1`}>
-                                {Object.entries(data.clientDetails).map(([key, value]) => (
-                                    <p key={key} className={`${textSubtle} text-sm`}>
-                                        {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
-                                    </p>
-                                ))}
+                            <div className="flex items-center space-x-2">
+                                <svg className={`h-5 w-5 text-green-500`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <p className="text-green-600 text-sm">Verification successful</p>
+                            </div>
+
+                            <div className="space-y-1 mt-2">
+                                <p className={`${textColor} text-sm font-medium`}>Client Details:</p>
+                                <div className={`rounded-lg p-3 ${inputBg} space-y-1`}>
+                                    {data.clientDetails && Object.entries(data.clientDetails).map(([key, value]) => (
+                                        <p key={key} className={`${textSubtle} text-sm`}>
+                                            {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
+                                        </p>
+                                    ))}
+                                </div>
                             </div>
                         </div>
+                    ) : (
+                        data.error && <p className={`text-red-500 text-sm`}>{data.error}</p>
                     )}
 
-                    {/* Error Message */}
-                    {data.error && <p className={`${textSubtle} text-sm`}>{data.error}</p>}
-
-                    {/* Action Buttons */}
-                    <div className="space-y-3">
+                    <div className="space-y-2 mt-4">
                         <Button onClick={handleCopyLink} className={buttonStyle}>Copy Verification Link</Button>
                         <Button onClick={handleVerifyAnother} className={buttonStyle}>Verify Another</Button>
                     </div>
