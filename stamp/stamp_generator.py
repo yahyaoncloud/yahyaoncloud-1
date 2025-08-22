@@ -300,18 +300,21 @@ def generate_stamp_svg(
     Compose 500x500 SVG stamp with visible patterns and prominent company/client names.
     """
     import os
-    # os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
 
     # Fixed 500x500 dimensions
     dwg = svgwrite.Drawing(out_path, size=("500px", "500px"), viewBox="0 0 500 500")
     cx, cy = 250, 250  # Center
     
     # Stamp dimensions scaled for 500x500
-    ring_outer = 240
+    ring_outer = 230
     ring_inner = 180
     
     # Get current year
     current_year = datetime.utcnow().year
+
+    # Define dark zinc color for text
+    text_color = "#4A4A4A"  # Dark gray resembling zinc
 
     # Background circle
     dwg.add(dwg.circle(center=(cx, cy), r=245, fill="none", stroke="none"))
@@ -320,17 +323,17 @@ def generate_stamp_svg(
     stamp_g = dwg.g(id="stamp", fill="none", stroke="white")
 
     # Draw outer rings (decorative) - properly sized
-    stamp_g.add(dwg.circle(center=(cx, cy), r=ring_outer, stroke="white", stroke_width=3, fill="none"))
-    stamp_g.add(dwg.circle(center=(cx, cy), r=ring_outer - 15, stroke="#C1712B", stroke_width=2, fill="none"))
-    stamp_g.add(dwg.circle(center=(cx, cy), r=ring_inner + 20, stroke="white", stroke_width=1, fill="none"))
+    stamp_g.add(dwg.circle(center=(cx, cy), r=ring_outer, stroke="#240086", stroke_width=3, fill="none"))
+    stamp_g.add(dwg.circle(center=(cx, cy), r=ring_outer - 12, stroke="#C1712B", stroke_width=2, fill="none"))
+    stamp_g.add(dwg.circle(center=(cx, cy), r=ring_inner + 15, stroke="#550202", stroke_width=1, fill="none"))
 
     # Improved Guilloché mesh pattern - proper mathematical security patterns
     guilloche_group = dwg.g(id="guilloche_mesh", fill="none")
     mesh_paths = make_improved_guilloche_mesh(
         seed=seed,  
         center=(cx, cy),  
-        inner_radius=ring_inner * 0.3,
-        outer_radius=ring_inner * 0.95
+        inner_radius=ring_inner * 0.1,
+        outer_radius=ring_inner * 1
     )
     for path_d, color, sw, op in mesh_paths:
         guilloche_group.add(dwg.path(
@@ -350,7 +353,7 @@ def generate_stamp_svg(
     qr.make(fit=True)
     matrix = qr.get_matrix()
     
-    qr_visual_size = 80  # Smaller QR for 500x500
+    qr_visual_size = 90  # Smaller QR for 500x500
     cell_size = qr_visual_size / len(matrix)
     
     qr_group = dwg.g(id="qr_group")
@@ -379,55 +382,56 @@ def generate_stamp_svg(
     stamp_g.add(qr_group)
 
     # Enhanced centerpiece text with prominent company and client names
-    center_group = dwg.g(id="center_text", fill="#3F3F46", stroke="none", text_anchor="middle")
+    center_group = dwg.g(id="center_text", fill=text_color, stroke="none", text_anchor="middle")
     
     # Company name (most prominent)
     center_group.add(dwg.text(
-        "Y A H Y A O N C L O U D",  
+        "YAHYAONCLOUD",  
         insert=(cx, cy - 75),  
         font_size=18,  
-        font_family="Arial, sans-serif",  
+        font_family="Impact, sans-serif",  
         font_weight="bold",
-        letter_spacing="2px"
+        letter_spacing="1px",
+        stroke="none"
     ))
     
     # Verified badge
     center_group.add(dwg.text(
-        "V E R I F I E D",  
+        "VERIFIED",  
         insert=(cx, cy - 58),  
         font_size=12,  
-        font_family="Arial, sans-serif",  
+        font_family="Impact, sans-serif",  
         font_weight="normal",
-        letter_spacing="2px"
+        stroke="none"
     ))
     
     # Client name (prominent)
-    center_group.add(dwg.text(
-        " ".join(client_name.upper()),  
-        insert=(cx, cy - 45),  
-        font_size=14,  
-        font_family="Arial, sans-serif",
-        font_weight="bold",
-        letter_spacing="2px"
-    ))
+    # center_group.add(dwg.text(
+    #     client_name.upper(),  
+    #     insert=(cx, cy - 45),  
+    #     font_size=14,  
+    #     font_family="Impact, sans-serif",
+    #     font_weight="bold",
+    #     stroke="none"
+    # ))
     
     # Year (prominent)
     center_group.add(dwg.text(
         str(current_year),  
         insert=(cx, cy + 45),  
         font_size=16,  
-        font_family="Arial, sans-serif",
+        font_family="Impact, sans-serif",
         font_weight="bold",
-        letter_spacing="2px"
+        stroke="none"
     ))
     
     # Serial number
     center_group.add(dwg.text(
-        f"S N :  {serial}",  
+        f"SN: {serial}",  
         insert=(cx, cy + 60),  
         font_size=8,  
-        font_family="monospace",
-        letter_spacing="1px"
+        font_family="Impact, sans-serif",
+        stroke="none"
     ))
     stamp_g.add(center_group)
 
@@ -441,8 +445,8 @@ def generate_stamp_svg(
     dwg.defs.add(dwg.path(d=circ_path, id=path_id))
     
     # Enhanced outer text with more prominent company and client names
-    outer_text = f"Y A H Y A O N C L O U D  ★  { ' '.join(client_name.upper()) }  ★  {current_year}  ★  V E R I F I E D  ★  S N : {serial}"
-    text_el = dwg.text("", font_size=13, font_family="Arial, sans-serif", fill="#3F3F46", stroke="none", font_weight="bold")
+    outer_text = f"YAHYAONCLOUD ★ {client_name.upper()} ★ {current_year} ★ VERIFIED ★ SN:{serial}"
+    text_el = dwg.text("", font_size=13, font_family="Impact, sans-serif", fill=text_color, stroke="none", font_weight="bold")
     text_el.add(dwg.textPath(f"#{path_id}", outer_text, startOffset="50%"))
     stamp_g.add(text_el)
 
@@ -452,24 +456,24 @@ def generate_stamp_svg(
     inner_circ = f"M {cx + inner_r},{cy} a {inner_r},{inner_r} 0 1,0 {-2*inner_r},0 a {inner_r},{inner_r} 0 1,0 {2*inner_r},0"
     dwg.defs.add(dwg.path(d=inner_circ, id=micro_path_id))
     
-    micro_txt = f"Y A H Y A O N C L O U D  •  {' '.join(client_name)}  •  S E C U R E  •  {current_year}  •  A U T H E N T I C A T E D  •  "
-    micro_text_el = dwg.text("", font_size=7, font_family="Arial, sans-serif", fill="#3F3F46", stroke="none")
+    micro_txt = f"YAHYAONCLOUD • {client_name} • SECURE • {current_year} • AUTHENTICATED • "
+    micro_text_el = dwg.text("", font_size=7, font_family="Impact, sans-serif", fill=text_color, stroke="none")
     micro_text_el.add(dwg.textPath(f"#{micro_path_id}", micro_txt * 3, startOffset="0"))
     stamp_g.add(micro_text_el)
 
     # Add signature id text with enhanced styling
-    sig_group = dwg.g(id="sig_text", font_size=7, fill="#3F3F46", stroke="none", font_family="monospace")
-    sig_group.add(dwg.text(f"S I G :  {signature}", insert=(cx + qr_visual_size/2 + 12, cy + qr_visual_size/2)))
+    sig_group = dwg.g(id="sig_text", font_size=7, fill=text_color, stroke="none", font_family="Impact, sans-serif")
+    sig_group.add(dwg.text(f"SIG: {signature}", insert=(cx + qr_visual_size/2 + 10, cy + qr_visual_size/2 - 2), stroke="none"))
     stamp_g.add(sig_group)
 
     # Additional decorative elements with company branding
     # Add small YahyaOnCloud logos/text in corners of the outer ring
-    corner_group = dwg.g(id="corner_branding", font_size=8, fill="#3F3F46", stroke="none", font_family="Arial, sans-serif")
+    corner_group = dwg.g(id="corner_branding", font_size=8, fill=text_color, stroke="none", font_family="Impact, sans-serif")
     
     # Top corner
-    corner_group.add(dwg.text("Y O C", insert=(cx - 5, cy - ring_outer + 25), text_anchor="middle", font_weight="bold"))
+    corner_group.add(dwg.text("YOC", insert=(cx - 5, cy - ring_outer + 25), text_anchor="middle", font_weight="bold", stroke="none"))
     # Bottom corner  
-    corner_group.add(dwg.text(" ".join(str(current_year)), insert=(cx - 5, cy + ring_outer - 15), text_anchor="middle", font_weight="bold"))
+    corner_group.add(dwg.text(str(current_year), insert=(cx - 5, cy + ring_outer - 15), text_anchor="middle", font_weight="bold", stroke="none"))
     
     stamp_g.add(corner_group)
 
@@ -477,7 +481,7 @@ def generate_stamp_svg(
     dwg.add(stamp_g)
 
     # Save
-    # dwg.save()
+    dwg.save()
     return out_path
 
 # -----------------------
@@ -504,7 +508,7 @@ def main():
         seed=seed,
         out_path=outfile
     )
-    # print(f"Saved stamp SVG to: {path}")
+    print(f"Saved stamp SVG to: {path}")
     print(f"Verification URL: https://yahyaoncloud.vercel.app/admin/verify?sn={serial}&sig={signature}")
 
 if __name__ == "__main__":

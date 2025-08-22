@@ -12,12 +12,43 @@ import {
   Author,
 } from "../models";
 import { Types } from "mongoose";
+import { uploadImage } from "../utils/cloudinary.server";
 
 // ==================== POST OPERATIONS ====================
 
-export async function createPost(postData: Partial<IPostDoc>) {
-  return Post.create(postData);
+export async function createPost(
+  postData: Partial<IPostDoc>,
+  files?: { coverImage?: File; gallery?: File[] }
+) {
+  const slug = postData.slug || postData.title?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  // Upload cover image
+  let coverImageUrl: string = "/default-cover.jpg";
+  if (files?.coverImage) {
+    const uploaded = await uploadImage(files.coverImage, `${slug}-cover-image.${files.coverImage.name.split(".").pop()}`);
+    coverImageUrl = uploaded.url; // must be a string
+  }
+
+  // Upload gallery images
+  const galleryUrls: string[] = [];
+  if (files?.gallery?.length) {
+    for (let i = 0; i < files.gallery.length; i++) {
+      const img = files.gallery[i];
+      const uploaded = await uploadImage(img, `${slug}-gallery-${i + 1}.${img.name.split(".").pop()}`);
+      galleryUrls.push(uploaded.url);
+    }
+  }
+
+  return Post.create({
+    ...postData,
+    slug,
+    coverImage: coverImageUrl,
+    gallery: galleryUrls,
+    author: new Types.ObjectId(postData.authorId), // this must exist
+    authorId: postData.authorId, // add this line if schema still expects it
+  });
 }
+
 
 export async function getPostById(id: string) {
   return (
@@ -57,12 +88,46 @@ export async function getPosts(
   return query.populate("author").populate("categories").populate("coverImage");
 }
 
-export async function updatePost(id: string, updateData: Partial<IPostDoc>) {
+
+export async function updatePost(
+  id: string,
+  updateData: Partial<IPostDoc>,
+  files?: { coverImage?: File; gallery?: File[] }
+) {
+  const post = await Post.findById(id);
+  if (!post) throw new Error("Post not found");
+
+  const slug = updateData.slug || post.slug;
+
+  // Upload new cover image if provided
+  if (files?.coverImage) {
+    const uploadedCover = await uploadImage(
+      files.coverImage,
+      `${slug}-cover-image.${files.coverImage.name.split(".").pop()}`
+    );
+    updateData.coverImage = uploadedCover;
+  }
+
+  // Upload gallery images if provided
+  if (files?.gallery && files.gallery.length > 0) {
+    const galleryUrls = [];
+    for (let i = 0; i < files.gallery.length; i++) {
+      const img = files.gallery[i];
+      const uploaded = await uploadImage(
+        img,
+        `${slug}-gallery-${i + 1}.${img.name.split(".").pop()}`
+      );
+      galleryUrls.push(uploaded);
+    }
+    updateData.gallery = galleryUrls;
+  }
+
   return Post.findByIdAndUpdate(id, updateData, { new: true })
     .populate("categories")
     .populate("tags")
     .populate("types");
 }
+
 
 export async function deletePost(id: string) {
   return Post.findByIdAndDelete(id);

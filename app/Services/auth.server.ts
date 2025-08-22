@@ -1,7 +1,7 @@
 import { Authenticator } from "remix-auth";
 import { OAuth2Strategy, CodeChallengeMethod } from "remix-auth-oauth2";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
-import { User, IUserDoc } from "~/models";
+import { User, IUserDoc } from "../models";
 
 // Session Storage
 const sessionStorage = createCookieSessionStorage({

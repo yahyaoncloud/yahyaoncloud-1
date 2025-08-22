@@ -13,6 +13,9 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
+
+
+//* USER BLOCK
 export async function getUserSession(request: Request) {
   return sessionStorage.getSession(request.headers.get("Cookie"));
 }

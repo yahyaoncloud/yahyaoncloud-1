@@ -6,6 +6,7 @@ interface IUser extends Document {
   _id: Types.ObjectId;
   username: string;
   email: string;
+  password: string;
   passwordHash: string;
   role: "admin" | "user" | "guest";
   contactDetails: IContactDetails;
@@ -18,23 +19,23 @@ interface ICategory extends Document {
   catID: string;
   name: string;
   slug: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface ITag extends Document {
   _id: Types.ObjectId;
   tagID: string;
   name: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IType extends Document {
   _id: Types.ObjectId;
   type: PostType; // enforce the enum here
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IMediaAsset extends Document {
@@ -45,8 +46,8 @@ interface IMediaAsset extends Document {
   uploadedBy: string;
   postId: string;
   type: "image" | "video" | "file";
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IComment extends Document {
@@ -57,8 +58,8 @@ interface IComment extends Document {
     name: string;
   };
   content: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   approved: boolean;
 }
 
@@ -69,13 +70,12 @@ interface IPost extends Document {
   content: string;
   summary: string;
   date: Date;
-  author: Types.ObjectId; // Changed from IAuthor to Types.ObjectId
-  authorId: string;
+  author: Types.ObjectId;
   categories: ICategory[];
   tags: ITag[];
-  types: IType;
+  types: IType[];
   coverImage: string;
-  gallery: IMediaAsset[];
+  gallery: string[];
   minuteRead: number;
   likes: number;
   views: number;
@@ -83,17 +83,16 @@ interface IPost extends Document {
   updatedAt: Date;
   commentsCount: number;
   status: "draft" | "published";
-  seo: ISEO;
 }
 
-interface ISEO extends Document {
-  title: string;
-  description: string;
-  keywords: string[];
-  canonicalUrl: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// interface ISEO extends Document {
+//   title: string;
+//   description: string;
+//   keywords: string[];
+//   canonicalUrl: string;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 interface IPortfolio extends Document {
   _id: Types.ObjectId;
@@ -173,15 +172,13 @@ interface IGuestbook extends Document {
   content: string;
 }
 
-interface IContactDetails extends Document {
+interface IContactDetails {
   email: string;
   phone: string;
   linkedin: string;
   github: string;
   twitter: string;
   website: string;
-  createdAt: string;
-  updatedAt: string;
   buyCoffee: string;
 }
 
@@ -192,8 +189,8 @@ interface IAuthor extends Document {
   authorProfession: string;
   userId: Types.ObjectId;
   contactDetails: IContactDetails;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Schemas
@@ -212,16 +209,16 @@ export type ICertificationDoc = ICertification & Document;
 export type IHobbyDoc = IHobby & Document;
 export type ISettingsDoc = ISettings & Document;
 export type IGuestbookDoc = IGuestbook & Document;
-export type IContactDetailsDoc = IContactDetails & Document;
+export type IContactDetailsDoc = IContactDetails;
 export type IAuthorDoc = IAuthor & Document;
-export type ISEODoc = ISEO & Document;
+// export type ISEODoc = ISEO & Document;
 
 const UserSchema = new Schema<IUser>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
+    password: { type: String, required: true, unique: true },
+    passwordHash: { type: String },
     role: { type: String, enum: ["admin", "user", "guest"], default: "user" },
     contactDetails: {
       email: { type: String, required: true },
@@ -230,8 +227,6 @@ const UserSchema = new Schema<IUser>(
       github: { type: String, required: true },
       twitter: { type: String, required: true },
       website: { type: String, required: true },
-      createdAt: { type: String, required: true },
-      updatedAt: { type: String, required: true },
       buyCoffee: { type: String, required: true },
     },
   },
@@ -240,37 +235,28 @@ const UserSchema = new Schema<IUser>(
 
 const CategorySchema = new Schema<ICategory>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     catID: { type: String, required: true },
     name: { type: String, required: true },
     slug: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   defaultOptions
 );
 
 const TagSchema = new Schema<ITag>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     tagID: { type: String, required: true },
     name: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   defaultOptions
 );
 
 const TypeSchema = new Schema<IType>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     type: {
       type: String,
       required: true,
       enum: Object.values(PostType), // enforce enum
     },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   defaultOptions
 );
@@ -283,23 +269,18 @@ const MediaAssetSchema = new Schema<IMediaAsset>(
     uploadedBy: { type: String, required: true },
     postId: { type: String, required: true },
     type: { type: String, enum: ["image", "video", "file"], required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   { timestamps: true }
 );
 
 const CommentSchema = new Schema<IComment>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     postId: { type: String, required: true },
     author: {
       id: { type: String, required: true },
       name: { type: String, required: true },
     },
     content: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
     approved: { type: Boolean, default: false },
   },
   defaultOptions
@@ -307,40 +288,34 @@ const CommentSchema = new Schema<IComment>(
 
 const PostSchema = new Schema<IPost>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true, index: true },
     content: { type: String, required: true },
-    authorId: { type: String, required: true },
-    summary: { type: String, required: true },
+    summary: { type: String, required: false },
     date: { type: Date, required: true },
     author: { type: Schema.Types.ObjectId, ref: "Author", required: true },
     categories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
     types: [{ type: Schema.Types.ObjectId, ref: "Type" }],
-    coverImage: { type: String, required: true },
-    gallery: [{ type: Schema.Types.ObjectId, ref: "MediaAsset" }],
+    coverImage: { type: String, required: false, default: "/default-cover.jpg" }, // Made optional with default
+    gallery: [{ type: String }],
     minuteRead: { type: Number, default: 0 },
     likes: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     status: { type: String, enum: ["draft", "published"], default: "draft" },
-    seo: { type: Schema.Types.ObjectId, ref: "SEO", required: true },
+    // seo: {
+    //   title: { type: String, },
+    //   description: { type: String },
+    //   keywords: [{ type: String }],
+    //   canonicalUrl: { type: String },
+    //   createdAt: { type: String },
+    //   updatedAt: { type: String },
+    // },
   },
-  defaultOptions
+  { timestamps: true }
 );
 
-const SEOSchema = new Schema<ISEO>(
-  {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    keywords: [{ type: String, required: true }],
-    canonicalUrl: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
-  },
-  defaultOptions
-);
 
 const PortfolioSchema = new Schema<IPortfolio>(
   {
@@ -424,7 +399,6 @@ const HobbySchema = new Schema<IHobby>(
 
 const SettingsSchema = new Schema<ISettings>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     siteTitle: { type: String, required: true },
     siteDescription: { type: String, required: true },
     logoUrl: { type: String, required: true },
@@ -443,12 +417,10 @@ const GuestbookSchema = new Schema<IGuestbook>(
 
 const AuthorSchema = new Schema<IAuthor>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     authorId: { type: String, unique: true },
     authorName: { type: String, required: true },
     authorProfession: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-
     contactDetails: {
       email: { type: String, required: true },
       phone: { type: String, required: true },
@@ -456,8 +428,6 @@ const AuthorSchema = new Schema<IAuthor>(
       github: { type: String, required: true },
       twitter: { type: String, required: true },
       website: { type: String, required: true },
-      createdAt: { type: String, required: true },
-      updatedAt: { type: String, required: true },
       buyCoffee: { type: String, required: true },
     },
   },
@@ -474,9 +444,9 @@ export const Tag: Model<ITagDoc> =
   mongoose.models.Tag || mongoose.model<ITagDoc>("Tag", TagSchema);
 export const Type: Model<ITypeDoc> =
   mongoose.models.Type || mongoose.model<ITypeDoc>("Type", TypeSchema);
-export const MediaAsset =
+export const MediaAsset: Model<IMediaAssetDoc> =
   mongoose.models.MediaAsset ||
-  mongoose.model<IMediaAsset>("MediaAsset", MediaAssetSchema);
+  mongoose.model<IMediaAssetDoc>("MediaAsset", MediaAssetSchema);
 export const Comment: Model<ICommentDoc> =
   mongoose.models.Comment ||
   mongoose.model<ICommentDoc>("Comment", CommentSchema);
@@ -501,5 +471,5 @@ export const Guestbook: Model<IGuestbookDoc> =
   mongoose.model<IGuestbookDoc>("Guestbook", GuestbookSchema);
 export const Author: Model<IAuthorDoc> =
   mongoose.models.Author || mongoose.model<IAuthorDoc>("Author", AuthorSchema);
-export const SEO: Model<ISEODoc> =
-  mongoose.models.SEO || mongoose.model<ISEODoc>("SEO", SEOSchema);
+// export const SEO: Model<ISEODoc> =
+//   mongoose.models.SEO || mongoose.model<ISEODoc>("SEO", SEOSchema);
