@@ -56,7 +56,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         const url = new URL(request.url);
         const serial = sanitize(url.searchParams.get("sn"));
         const signature = sanitize(url.searchParams.get("sig"));
-        const verificationLink = `${url.origin}/verify?sn=${serial || ""}&sig=${signature || ""}`;
+        const verificationLink = `${url.origin}/admin/verify?sn=${serial || ""}&sig=${signature || ""}`;
 
         const clientDetails: ClientDetails = {
             name: "Rahil Irfan",
