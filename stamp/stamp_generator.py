@@ -300,7 +300,7 @@ def generate_stamp_svg(
     Compose 500x500 SVG stamp with visible patterns and prominent company/client names.
     """
     import os
-    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    # os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
 
     # Fixed 500x500 dimensions
     dwg = svgwrite.Drawing(out_path, size=("500px", "500px"), viewBox="0 0 500 500")
@@ -477,7 +477,7 @@ def generate_stamp_svg(
     dwg.add(stamp_g)
 
     # Save
-    dwg.save()
+    # dwg.save()
     return out_path
 
 # -----------------------
@@ -504,7 +504,7 @@ def main():
         seed=seed,
         out_path=outfile
     )
-    print(f"Saved stamp SVG to: {path}")
+    # print(f"Saved stamp SVG to: {path}")
     print(f"Verification URL: https://yahyaoncloud.vercel.app/admin/verify?sn={serial}&sig={signature}")
 
 if __name__ == "__main__":
