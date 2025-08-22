@@ -501,7 +501,7 @@ def main():
         out_path=outfile
     )
     print(f"Saved stamp SVG to: {path}")
-    print(f"Verification URL: https://yahyaoncloud.vercel.app/verify?sn={serial}&sig={signature}")
+    print(f"Verification URL: https://yahyaoncloud.vercel.app/admin/verify?sn={serial}&sig={signature}")
 
 if __name__ == "__main__":
     main()

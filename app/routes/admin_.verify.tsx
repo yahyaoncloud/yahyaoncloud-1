@@ -27,8 +27,8 @@ interface LoaderData {
 // Configuration
 const VERIFICATION_CONFIG = {
     expectedCredentials: {
-        serial: "7EF9E713D1D7",
-        signature: "8621E823-5569-4A69-8BE6-B81FCF0FDD7C",
+        serial: "AB9C9AF69C8D",
+        signature: "6271C227-B099-4DD3-BDCD-B712682B1A35",
         seed: 1985868552
     },
     loadingDelay: 1000
