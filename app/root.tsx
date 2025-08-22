@@ -80,7 +80,21 @@ function RootLayout() {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function() {
+          try {
+            var theme = localStorage.getItem('theme');
+            if (!theme) theme = 'dark'; // default theme
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+          } catch(e) {}
+        })();
+      `,
+          }}
+        />
       </head>
+
       <body
         className={`dark:bg-zinc-900 dark:text-dark-100 bg-zinc-50 text-dark-800 min-h-screen transition-colors duration-300`}
       >
