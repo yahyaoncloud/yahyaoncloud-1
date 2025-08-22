@@ -28,7 +28,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-async function firebaseLogout() {
+export async function firebaseLogout() {
   if (auth) {
     try {
       await signOut(auth);
@@ -38,7 +38,7 @@ async function firebaseLogout() {
   }
 }
 
-function getUserAvatar(user) {
+export function getUserAvatar(user) {
   return user?.photoURL;
 }
 
@@ -65,14 +65,14 @@ type ClientData = {
 };
 
 // Function to add client to RTDB under `clients` node
-async function addClientToRTDB(client: ClientData) {
+export async function addClientToRTDB(client: ClientData) {
   if (!db) throw new Error("Firebase DB not initialized");
   const clientsRef = ref(db, "clients");
   const newClientRef = await push(clientsRef, client);
   return newClientRef.key;
 }
 
-async function getClientList(): Promise<ClientData[]> {
+export async function getClientList(): Promise<ClientData[]> {
   if (!db) throw new Error("Firebase DB not initialized");
 
   const clientsRef = ref(db, "clients");
