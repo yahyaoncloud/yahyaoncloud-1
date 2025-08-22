@@ -6,7 +6,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { useToast } from "../hooks/use-toast";
 import { useState, useEffect } from "react";
-import { getClientByCredentials } from "../utils/firebase.server";
+import { getClientList, getClientByCredentials } from "../utils/firebase.server";
 
 interface ClientDetails {
     name: string;
@@ -22,21 +22,23 @@ interface LoaderData {
     error?: string;
     verificationLink: string;
     clientDetails?: ClientDetails;
+    nextClient?: { serial: string; signature: string } | null;
 }
 
-// Helper: sanitize query parameters
+// Sanitize input
 const sanitize = (param: string | null) =>
     param ? param.trim().replace(/[^a-zA-Z0-9\-]/g, "") : "";
 
-// Helper: obfuscate serial/signature for display
+// Obfuscate serial/signature
 const obfuscate = (str: string | null) =>
     str ? (str.length > 6 ? `${str.slice(0, 6)}${"*".repeat(str.length - 6)}` : str) : "";
 
+// Loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     const url = new URL(request.url);
     const serial = sanitize(url.searchParams.get("sn"));
     const signature = sanitize(url.searchParams.get("sig"));
-    const verificationLink = `${url.origin}/admin/verify?sn=${serial}&sig=${signature}`;
+    const verificationLink = `${"localhost:5173"}/admin/verify?sn=${serial}&sig=${signature}`;
 
     if (!serial || !signature) {
         return json<LoaderData>({
@@ -45,6 +47,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             isValid: false,
             error: "Missing serial number or signature",
             verificationLink,
+            nextClient: null,
         });
     }
 
@@ -57,6 +60,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             isValid: false,
             error: "Invalid credentials",
             verificationLink,
+            nextClient: null,
         });
     }
 
@@ -67,12 +71,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         status: "valid",
     };
 
+    // Get all clients to find next client
+    const allClients = await getClientList();
+    const currentIndex = allClients.findIndex(c => c.key === client.key);
+    const nextClient = allClients[currentIndex + 1] || null;
+
     return json<LoaderData>({
         serial,
         signature,
         isValid: true,
         verificationLink,
         clientDetails,
+        nextClient: nextClient ? { serial: nextClient.stamp?.serial, signature: nextClient.stamp?.signature } : null,
     });
 };
 
@@ -82,7 +92,6 @@ export default function VerifyPage() {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
 
-    // Tailwind classes
     const bgColor = "bg-zinc-100 dark:bg-zinc-950";
     const inputBg = "bg-zinc-100 dark:bg-zinc-700";
     const inputBorder = "border-zinc-200 dark:border-zinc-600";
@@ -98,13 +107,19 @@ export default function VerifyPage() {
     const handleCopyLink = async () => {
         try {
             await navigator.clipboard.writeText(data.verificationLink);
-            toast({ title: "Copied!", description: "Verification link copied to clipboard.", className: "bg-zinc-800 text-zinc-100 border-zinc-700" });
+            toast({ title: "Copied!", description: "Verification link copied.", className: "bg-zinc-800 text-zinc-100 border-zinc-700" });
         } catch {
             toast({ title: "Copy Failed", description: "Unable to copy link.", variant: "destructive" });
         }
     };
 
-    const handleVerifyAnother = () => window.location.href = "/admin/verify";
+    const handleVerifyAnother = () => {
+        if (data.nextClient) {
+            window.location.href = `/admin/verify?sn=${data.nextClient.serial}&sig=${data.nextClient.signature}`;
+        } else {
+            window.location.href = "/admin/verify";
+        }
+    };
 
     if (isLoading) {
         return (
@@ -129,11 +144,11 @@ export default function VerifyPage() {
                 <CardContent className="space-y-4">
                     <div>
                         <Label htmlFor="serial" className={textColor}>Serial Number</Label>
-                        <Input id="serial" value={obfuscate(data.serial)} readOnly disabled className={`mt-1 ${inputBg} ${textColor} ${inputBorder}`} />
+                        <Input id="serial" value={data.serial ? obfuscate(data.serial) : ""} readOnly disabled className={`mt-1 ${inputBg} ${textColor} ${inputBorder}`} />
                     </div>
                     <div>
                         <Label htmlFor="signature" className={textColor}>Signature</Label>
-                        <Input id="signature" value={obfuscate(data.signature)} readOnly disabled className={`mt-1 ${inputBg} ${textColor} ${inputBorder}`} />
+                        <Input id="signature" value={data.signature ? obfuscate(data.signature) : ""} readOnly disabled className={`mt-1 ${inputBg} ${textColor} ${inputBorder}`} />
                     </div>
 
                     {data.isValid ? (
@@ -162,7 +177,7 @@ export default function VerifyPage() {
 
                     <div className="space-y-2 mt-4">
                         <Button onClick={handleCopyLink} className={buttonStyle}>Copy Verification Link</Button>
-                        <Button onClick={handleVerifyAnother} className={buttonStyle}>Verify Another</Button>
+                        <Button onClick={handleVerifyAnother} className={buttonStyle}>Verify Next Client</Button>
                     </div>
                 </CardContent>
             </Card>
