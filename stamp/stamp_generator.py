@@ -344,7 +344,7 @@ def generate_stamp_svg(
     stamp_g.add(guilloche_group)
 
     # Generate smaller QR code for 500x500
-    verify_url = f"https://yahyaoncloud.vercel.app/verify?sn={serial}&sig={signature}"
+    verify_url = f"https://yahyaoncloud.vercel.app/admin/verify?sn={serial}&sig={signature}"
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=1, border=1)
     qr.add_data(verify_url)
     qr.make(fit=True)
