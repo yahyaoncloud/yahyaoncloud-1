@@ -1,5 +1,5 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -36,29 +36,39 @@ const obfuscate = (str: string | null) =>
 // Loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     const url = new URL(request.url);
-    const serial = sanitize(url.searchParams.get("sn"));
-    const signature = sanitize(url.searchParams.get("sig"));
-    const verificationLink = `${"localhost:5173"}/admin/verify?sn=${serial}&sig=${signature}`;
+    let serial = sanitize(url.searchParams.get("sn"));
+    let signature = sanitize(url.searchParams.get("sig"));
 
-    if (!serial || !signature) {
-        return json<LoaderData>({
-            serial,
-            signature,
-            isValid: false,
-            error: "Missing serial number or signature",
-            verificationLink,
-            nextClient: null,
-        });
+    // Get all clients
+    const allClients = await getClientList();
+
+    let client = null;
+    let currentIndex = -1;
+
+    if (serial && signature) {
+        // Find current client
+        currentIndex = allClients.findIndex(c => c.stamp?.serial === serial && c.stamp?.signature === signature);
+        client = currentIndex >= 0 ? allClients[currentIndex] : null;
     }
 
-    const client = await getClientByCredentials(serial, signature);
+    if (!client && allClients.length > 0) {
+        // Fallback to first client with valid stamp
+        currentIndex = allClients.findIndex(c => c.stamp?.serial && c.stamp?.signature);
+        if (currentIndex >= 0) {
+            client = allClients[currentIndex];
+            serial = client.stamp!.serial;
+            signature = client.stamp!.signature;
+        }
+    }
+
+    const verificationLink = `${url.origin}/admin/verify?sn=${serial}&sig=${signature}`;
 
     if (!client) {
         return json<LoaderData>({
             serial,
             signature,
             isValid: false,
-            error: "Invalid credentials",
+            error: "No valid clients available",
             verificationLink,
             nextClient: null,
         });
@@ -71,10 +81,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         status: "valid",
     };
 
-    // Get all clients to find next client
-    const allClients = await getClientList();
-    const currentIndex = allClients.findIndex(c => c.key === client.key);
-    const nextClient = allClients[currentIndex + 1] || null;
+    // Find next client with valid stamp
+    let nextClient = null;
+    for (let i = currentIndex + 1; i < allClients.length; i++) {
+        const c = allClients[i];
+        if (c.stamp?.serial && c.stamp?.signature) {
+            nextClient = { serial: c.stamp.serial, signature: c.stamp.signature };
+            break;
+        }
+    }
 
     return json<LoaderData>({
         serial,
@@ -82,12 +97,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         isValid: true,
         verificationLink,
         clientDetails,
-        nextClient: nextClient ? { serial: nextClient.stamp?.serial, signature: nextClient.stamp?.signature } : null,
+        nextClient,
     });
 };
-
 // React component
 export default function VerifyPage() {
+    const navigate = useNavigate();
+
     const data = useLoaderData<LoaderData>();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
@@ -98,6 +114,19 @@ export default function VerifyPage() {
     const textColor = "text-zinc-900 dark:text-zinc-100";
     const textSubtle = "text-zinc-700 dark:text-zinc-300";
     const buttonStyle = "w-full bg-zinc-200 dark:bg-zinc-600 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-300 dark:hover:bg-zinc-500";
+
+    useEffect(() => {
+        const handlePopState = (event: PopStateEvent) => {
+            // Redirect back to clients page
+            navigate("/admin/clients/onboard", { replace: true });
+        };
+
+        window.addEventListener("popstate", handlePopState);
+
+        return () => {
+            window.removeEventListener("popstate", handlePopState);
+        };
+    }, [navigate]);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 800);
