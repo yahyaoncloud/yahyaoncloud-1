@@ -117,7 +117,7 @@ export default function ArticleCard({
               }`}
             >
               <Calendar size={14} className="mr-1" />
-              <span>{formatDate(post.createdAt)}</span>
+              <span>{formatDate(post?.createdAt)}</span>
             </div>
 
             <div
