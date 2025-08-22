@@ -117,7 +117,7 @@ export default function VerifyPage() {
 
     if (isLoading) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${bgColor}`}>
+            <div className={`min-h-screen flex items-center justify-center p-6 ${bgColor}`}>
                 <div className="flex flex-col items-center">
                     <svg className="animate-spin h-8 w-8 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -130,7 +130,7 @@ export default function VerifyPage() {
     }
 
     return (
-        <div className={`min-h-screen flex items-center justify-center ${bgColor}`}>
+        <div className={`min-h-screen flex items-center justify-center p-6 ${bgColor}`}>
             <Card className={`w-full max-w-md ${inputBg} border-zinc-200 dark:border-zinc-700`}>
                 <CardHeader>
                     <CardTitle className={`text-xl ${textColor}`}>Verification</CardTitle>
