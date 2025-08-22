@@ -1,12 +1,14 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase, ref, push, get } from "firebase/database";
-import { environment } from "../environments/environment"; // <- import environment.ts
 
-let app: ReturnType<typeof getApp>;
-let db: ReturnType<typeof getDatabase>;
+let app: ReturnType<typeof getApp> | undefined;
+let db: ReturnType<typeof getDatabase> | undefined;
 
-function getFirebaseApp() {
-    if (app) return app;
+/**
+ * Initialize Firebase app and DB
+ */
+function getFirebaseApp(): { app: ReturnType<typeof getApp>; db: ReturnType<typeof getDatabase> } {
+    if (app && db) return { app, db };
 
     const firebaseConfig = {
         apiKey: process.env.FIREBASE_API_KEY!,
@@ -18,25 +20,29 @@ function getFirebaseApp() {
         appId: process.env.FIREBASE_APP_ID!,
     };
 
-
     if (!firebaseConfig.apiKey) throw new Error("Firebase environment config not set");
 
     app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     db = getDatabase(app);
-    return app;
+
+    return { app, db };
 }
 
-// Add client to RTDB
+/**
+ * Add a client to RTDB
+ */
 export async function addClientToRTDB(client: any) {
-    getFirebaseApp();
+    const { db } = getFirebaseApp();
     const clientsRef = ref(db, "clients");
     const newClientRef = await push(clientsRef, client);
     return newClientRef.key;
 }
 
-// Get all clients from RTDB
+/**
+ * Get all clients from RTDB
+ */
 export async function getClientList() {
-    getFirebaseApp();
+    const { db } = getFirebaseApp();
     const clientsRef = ref(db, "clients");
     const snapshot = await get(clientsRef);
     if (!snapshot.exists()) return [];
@@ -46,6 +52,10 @@ export async function getClientList() {
         ...value,
     }));
 }
+
+/**
+ * Get a client by serial + signature
+ */
 export async function getClientByCredentials(serial: string, signature: string) {
     const { db } = getFirebaseApp();
     const clientsRef = ref(db, "clients");
@@ -54,12 +64,11 @@ export async function getClientByCredentials(serial: string, signature: string) 
 
     const data = snap.val();
     const found = Object.entries(data).find(
-        ([key, value]: [string, any]) =>
+        ([, value]: [string, any]) =>
             value.stamp?.serial === serial && value.stamp?.signature === signature
     );
 
     if (!found) return null;
-
     const [key, value] = found;
     return { key, ...(value as object) };
 }
