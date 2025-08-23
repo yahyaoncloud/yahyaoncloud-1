@@ -10,7 +10,7 @@ import {
   PlusCircle,
   PersonStandingIcon,
 } from "lucide-react";
-import { NavLink } from "@remix-run/react";
+import { NavLink, useLocation } from "@remix-run/react";
 import { motion } from "framer-motion";
 import Logo from "../assets/yoc-logo.png";
 
@@ -33,6 +33,11 @@ const navItems = [
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const location = useLocation();
+  const isLogoutPage = location.pathname === "/admin/logout";
+  if (isLogoutPage) {
+    return null;
+  }
   return (
     <>
       {/* Desktop Sidebar */}
@@ -46,7 +51,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Logo */}
           <div className="flex items-center space-x-3 mb-6">
             <img src={Logo} alt="YOC Logo" className="w-10 h-10 rounded-md object-cover" />
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">YahyaOnCloud</h2>
+            <h2 className="text-2xl  text-zinc-900 dark:text-zinc-100  mrs-saint-delafield-regular">YahyaOnCloud</h2>
           </div>
 
           {/* Nav Links */}
@@ -57,10 +62,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 to={item.href}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-zinc-800 dark:bg-zinc-700 text-white"
-                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
+                    ? "bg-zinc-800 dark:bg-zinc-700 text-white"
+                    : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
                   }`
                 }
               >
@@ -94,10 +98,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 to={item.href}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-zinc-800 dark:bg-zinc-700 text-white"
-                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
+                    ? "bg-zinc-800 dark:bg-zinc-700 text-white"
+                    : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
                   }`
                 }
               >

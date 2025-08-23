@@ -3,7 +3,7 @@ import { json, LoaderFunction } from "@remix-run/node";
 import { useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "../components/ui/Card";
 import { Button } from "../components/ui/button";
-import { getClientList } from "../utils/firebase.server";
+import { getClientList } from "../utils/clients.server";
 
 // Type for a client (aligned with ClientOnboardPage)
 type ClientData = {

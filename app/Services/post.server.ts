@@ -53,7 +53,7 @@ export async function createPost(
 export async function getPostById(id: string) {
   return (
     Post.findById(id)
-      // .populate("authorId") // Changed from authorId to author
+      .populate("author")
       .populate("categories")
       .populate("tags")
       .populate("types")
@@ -64,7 +64,7 @@ export async function getPostById(id: string) {
 
 export async function getPostBySlug(slug: string) {
   return Post.findOne({ slug })
-    .populate("authorId")
+    .populate("author")
     .populate("categories")
     .populate("tags")
     .populate("types")

@@ -1,3 +1,4 @@
+// routes/admin_.login.tsx
 import React, { useState, useEffect } from "react";
 import { Github, Chrome, CheckCircle, AlertCircle, Sun } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
@@ -11,26 +12,34 @@ import Logo from "../assets/yoc-logo.png";
 import type { LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { getCurrentUser } from "../utils/auth";
+import { auth, googleProvider, githubProvider } from "../utils/firebase.client";
+import { signInWithPopup } from "firebase/auth";
+import { getUser, sessionStorage } from "../utils/session.server";
 
 const galleryImages = [
-    { url: Glitch, title: "Fragmented Signal", description: "A distorted self — caught mid-glitch in the digital ether." },
+    { url: Glitch, title: "Fragmented Signal", description: "A distorted self — caught mid-glitch." },
     { url: BlacknWhite, title: "Binary Silence", description: "Stripped of color, identity becomes contrast." },
-    { url: Glass, title: "Shattered Perception", description: "Seen through fractured glass — distorted, divided, yet whole." },
+    { url: Glass, title: "Shattered Perception", description: "Seen through fractured glass — distorted, divided, whole." },
     { url: Glass2, title: "Obscured Reality", description: "A face veiled by ribbed glass, emotions blurred." },
     { url: Work, title: "Synthetic Soul", description: "A digital echo of the human face under neon hues." },
 ];
 
 export const loader: LoaderFunction = async ({ request }) => {
-    const user = await getCurrentUser(request);
-    if (user) return redirect("/admin");
+    const user = await getUser(request);
+    if (user?.isAdmin) return redirect("/admin");
+    const session = await sessionStorage.getSession(request.headers.get("Cookie"));
     return json({
         ENV: {
-            GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
-            GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
-            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-            GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
+            FIREBASE_CONFIG: {
+                apiKey: process.env.FIREBASE_API_KEY,
+                authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+                messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+                appId: process.env.FIREBASE_APP_ID,
+            },
         },
+        error: session.get("error"),
     });
 };
 
@@ -47,52 +56,70 @@ export default function LoginPage() {
     const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
     const fetcher = useFetcher();
-    const { ENV } = useLoaderData<typeof loader>();
+    const { ENV, error } = useLoaderData<typeof loader>();
     const currentImage = galleryImages[currentImageIndex];
 
     useEffect(() => {
+        window.ENV = window.ENV || {};
+        window.ENV.FIREBASE_CONFIG = ENV.FIREBASE_CONFIG;
+    }, [ENV]);
+
+    useEffect(() => {
+        if (error) setNotification({ type: "error", message: error });
         if (fetcher.state === "idle" && fetcher.data?.error) {
             setNotification({ type: "error", message: fetcher.data.error });
             setIsLoading(false);
         }
-    }, [fetcher.state, fetcher.data]);
+    }, [fetcher.state, fetcher.data, error]);
 
     useEffect(() => {
-        const interval = setInterval(() => setCurrentImageIndex((i) => (i + 1) % galleryImages.length), 5000);
+        const interval = setInterval(() => setCurrentImageIndex(i => (i + 1) % galleryImages.length), 5000);
         return () => clearInterval(interval);
     }, []);
 
-    const handleSSOLogin = (provider: "github" | "google") => {
+    const handleSSOLogin = async (provider: "github" | "google") => {
         setIsLoading(true);
         setNotification(null);
-        window.location.href = `/auth/${provider}`;
+        try {
+            const selectedProvider = provider === "github" ? githubProvider : googleProvider;
+            const result = await signInWithPopup(auth, selectedProvider);
+            const idToken = await result.user.getIdToken();
+            window.location.href = `/auth/callback?idToken=${encodeURIComponent(idToken)}&redirectTo=/admin/dashboard`;
+        } catch (err: any) {
+            setNotification({
+                type: "error",
+                message: err.code === "auth/account-exists-with-different-credential"
+                    ? "Email registered with a different provider. Use original method."
+                    : err.message || "Authentication failed. Try again.",
+            });
+            setIsLoading(false);
+        }
     };
 
     return (
         <motion.div
-            className="min-h-screen flex flex-col dark:bg-zinc-950 dark:text-zinc-100 bg-zinc-50 text-zinc-900"
+            className="min-h-screen flex flex-col  transiton-all ease-in-out duration-300 relative dark:bg-zinc-950 bg-zinc-50 text-zinc-900 dark:text-zinc-100"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
         >
-            {/* Theme Toggle */}
-            <div className="flex justify-end p-4">
-                <button
-                    onClick={toggleTheme}
-                    className="flex items-center justify-center w-10 h-10 border border-zinc-600 rounded-md text-zinc-900 dark:text-zinc-100"
-                >
-                    <Sun size={18} />
-                </button>
-            </div>
+            {/* Dark/Light Mode Toggle */}
+            <button
+                onClick={toggleTheme}
+                className="absolute top-4 right-4 w-10 h-10 z-50 dark:text-white dark:bg-zinc-950 dark:hover:bg-zinc-900 transiton-all ease-in-out duration-300 bg-white text-zinc-900 flex items-center justify-center border border-zinc-300 dark:border-zinc-700 rounded-md hover:bg-zinc-200"
+            >
+                <Sun size={18} />
+            </button>
 
             <div className="flex flex-1">
-                {/* Login Form */}
-                <motion.div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12" variants={motionVariants.container} initial="hidden" animate="visible">
-                    <div className="w-full max-w-md space-y-8">
-                        <motion.div variants={motionVariants.item} className="text-center">
-                            <img src={Logo} alt="Logo" className="w-28 h-28 mx-auto" />
-                            <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
-                            <p className="text-sm text-zinc-400 mb-4">Sign in with GitHub or Google</p>
+                {/* Left Panel: Login Form */}
+                <motion.div className="w-full md:w-1/2 flex items-center justify-center p-8" variants={motionVariants.container} initial="hidden" animate="visible">
+                    <div className="w-full max-w-md space-y-6">
+                        <motion.div variants={motionVariants.item} className="text-center space-y-2">
+                            <img src={Logo} alt="Logo" className="w-24 h-24 mx-auto" />
+                            <h1 className="text-3xl mb-2 mrs-saint-delafield-regular">YahyaOnCloud</h1>
+                            <h3 className="text-lg">Admin Login</h3>
+                            <p className="text-sm text-zinc-500">Sign in with GitHub or Google</p>
                         </motion.div>
 
                         <AnimatePresence>
@@ -101,7 +128,7 @@ export default function LoginPage() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-md text-sm border border-zinc-400 text-zinc-600"
+                                    className="flex items-center gap-2 px-3 py-2 rounded-md border border-zinc-400 text-sm text-zinc-600 dark:text-zinc-300"
                                 >
                                     {notification.type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
                                     {notification.message}
@@ -109,49 +136,45 @@ export default function LoginPage() {
                             )}
                         </AnimatePresence>
 
-                        <div className="space-y-3">
-                            <p className="text-sm text-zinc-400 text-center">Sign in with</p>
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => handleSSOLogin("google")}
-                                    disabled={isLoading || fetcher.state !== "idle"}
-                                    className="flex-1 flex items-center justify-center gap-2 border border-zinc-700 rounded-md py-2 text-sm bg-zinc-800 text-zinc-100"
-                                >
-                                    <Chrome size={18} /> Google
-                                </button>
-                                <button
-                                    onClick={() => handleSSOLogin("github")}
-                                    disabled={isLoading || fetcher.state !== "idle"}
-                                    className="flex-1 flex items-center justify-center gap-2 border border-zinc-700 rounded-md py-2 text-sm bg-zinc-800 text-zinc-100"
-                                >
-                                    <Github size={18} /> GitHub
-                                </button>
-                            </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => handleSSOLogin("google")}
+                                disabled={isLoading || fetcher.state !== "idle"}
+                                className="flex-1 flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 rounded-md py-2 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+                            >
+                                <Chrome size={18} /> Google
+                            </button>
+                            <button
+                                onClick={() => handleSSOLogin("github")}
+                                disabled={isLoading || fetcher.state !== "idle"}
+                                className="flex-1 flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 rounded-md py-2 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+                            >
+                                <Github size={18} /> GitHub
+                            </button>
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Image Carousel */}
-                <motion.div className="hidden md:block w-1/2 relative m-10 rounded-md overflow-hidden" initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-                    <div className="relative h-full">
-                        <AnimatePresence>
-                            <motion.div key={currentImageIndex} variants={motionVariants.image} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
-                                <img src={currentImage.url} alt={currentImage.title} className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                            </motion.div>
-                        </AnimatePresence>
-                        <div className="absolute bottom-4 left-0 right-0 px-8 text-zinc-100">
-                            <h3 className="text-2xl font-semibold mb-1">{currentImage.title}</h3>
-                            <p className="text-sm text-zinc-400 mb-2">{currentImage.description}</p>
-                            <div className="flex gap-2">
-                                {galleryImages.map((_, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setCurrentImageIndex(idx)}
-                                        className={`w-8 h-2 rounded-full transition-all ${idx === currentImageIndex ? "bg-zinc-100" : "bg-zinc-400/50"}`}
-                                    />
-                                ))}
-                            </div>
+                {/* Right Panel: Image Carousel */}
+                <motion.div className="hidden md:block w-1/2 relative overflow-hidden rounded-l-xl"
+                    initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
+                    <AnimatePresence>
+                        <motion.div key={currentImageIndex} variants={motionVariants.image} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
+                            <img src={currentImage.url} alt={currentImage.title} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/40 via-transparent to-transparent" />
+                        </motion.div>
+                    </AnimatePresence>
+                    <div className="absolute bottom-4 left-0 right-0 px-8 text-zinc-100">
+                        <h3 className="text-xl font-semibold">{currentImage.title}</h3>
+                        <p className="text-sm text-zinc-300">{currentImage.description}</p>
+                        <div className="flex gap-2 mt-2">
+                            {galleryImages.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentImageIndex(idx)}
+                                    className={`w-8 h-1.5 rounded-full ${idx === currentImageIndex ? "bg-zinc-100" : "bg-zinc-400/50"}`}
+                                />
+                            ))}
                         </div>
                     </div>
                 </motion.div>

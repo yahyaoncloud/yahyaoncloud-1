@@ -51,4 +51,25 @@ export async function uploadImage(file: File, path: string) {
   };
 }
 
+export async function getImageOfPosts(file: File, path: string) {
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString("base64");
+  const ext = file.name.split(".").pop();
+  const publicId = path.replace(/\.(png|jpg|jpeg|gif)$/, ""); // remove extension
+
+  const result = await cloudinary.uploader.upload(`data:image/${ext};base64,${base64}`, {
+    folder: "posts",
+    public_id: publicId,
+    overwrite: true,
+  });
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+  };
+}
+
+
 export { cloudinary };
+
+

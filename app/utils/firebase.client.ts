@@ -1,7 +1,7 @@
 // app/utils/firebase.client.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, TwitterAuthProvider, signOut } from "firebase/auth";
-import { getDatabase, ref, push } from "firebase/database";
+import { getDatabase } from "firebase/database";
 
 let app: ReturnType<typeof initializeApp> | undefined;
 let auth: ReturnType<typeof getAuth> | undefined;
@@ -13,30 +13,39 @@ let twitterProvider: TwitterAuthProvider | undefined;
 if (typeof window !== "undefined") {
   const firebaseConfig = window.ENV?.FIREBASE_CONFIG;
 
-  if (firebaseConfig && !getApps().length) {
+  if (!firebaseConfig) {
+    console.error("Firebase config is missing in window.ENV.FIREBASE_CONFIG");
+  } else if (!getApps().length) {
     app = initializeApp(firebaseConfig);
-  } else if (getApps().length) {
+  } else {
     app = getApp();
   }
 
   if (app) {
     auth = getAuth(app);
     db = getDatabase(app);
-
     googleProvider = new GoogleAuthProvider();
     githubProvider = new GithubAuthProvider();
     twitterProvider = new TwitterAuthProvider();
+
+    // Set custom scopes if needed (optional)
+    googleProvider.addScope("email profile");
+    githubProvider.addScope("read:user user:email");
   }
 }
 
-export { auth, db, googleProvider, githubProvider, twitterProvider };
+export { app, auth, db, googleProvider, githubProvider, twitterProvider };
 
 // Logout helper
 export async function firebaseLogout() {
-  if (auth) await signOut(auth);
+  if (auth) {
+    await signOut(auth);
+    return true;
+  }
+  return false;
 }
 
-// Example: get user avatar
+// Get user avatar
 export function getUserAvatar(user: any) {
-  return user?.photoURL;
+  return user?.photoURL || null;
 }

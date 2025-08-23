@@ -63,32 +63,21 @@ function serializePost(post: any) {
 
 // --- Loader ---
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  try {
-    const { slug } = params;
-    if (!slug) throw new Response("Not Found", { status: 404 });
+  const { slug } = params;
+  // if (!slug) throw new Response("Not Found", { status: 404 });
 
-    const post = await getPostBySlug(slug);
-    if (!post) throw new Response("Not Found", { status: 404 });
+  const post = await getPostBySlug(slug);
+  // if (!post) throw new Response("Not Found", { status: 404 });
 
-    const serializedPost = serializePost(post);
-    const author = serializedPost.authorId
-      ? await getAuthorByAuthorId(serializedPost.authorId)
-      : null;
+  const serializedPost = serializePost(post);
+  const author = serializedPost.authorId
+    ? await getAuthorByAuthorId(serializedPost.authorId)
+    : null;
 
-    const htmlContent = marked(serializedPost.content || "");
-
-    return json({
-      post: {
-        ...serializedPost,
-        content: htmlContent,
-      },
-      author: author || null,
-    });
-  } catch (error) {
-    console.error("Loader error:", error);
-    throw new Response("Server Error", { status: 500 });
-  }
+  const htmlContent = marked(serializedPost.content || "");
+  return json({ post: { ...serializedPost, content: htmlContent }, author });
 };
+
 
 // --- Enhance Blog Content ---
 export function useEnhanceBlogContent() {

@@ -1,249 +1,281 @@
-import { useState, useMemo } from "react";
+// routes/admin.dashboard.tsx
+import { useLoaderData } from "@remix-run/react";
+import { json, LoaderFunction } from "@remix-run/node";
+import { requireAdminUser } from "../utils/session.server";
 import {
-  BarChart3,
-  Users,
-  FileText,
-  Eye,
-  TrendingUp,
-  Plus,
-  Edit3,
-  Trash2,
-  Search,
-  Calendar,
-  MessageCircle,
-  Heart,
-  MoreHorizontal,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
   PieChart,
-  ArrowUp,
-  ArrowDown,
-  HandHeart,
-} from "lucide-react";
-import { json, useLoaderData } from "@remix-run/react";
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  Legend,
+} from "recharts";
+import { TrendingUp, Users, FileText, Eye, Clock, Calendar } from "lucide-react";
 
-// -------------------- Loader --------------------
-export const loader = async () => {
+// Mock data - replace with actual data from your API
+const blogStats = {
+  totalPosts: 156,
+  totalViews: 24567,
+  totalUsers: 892,
+  engagementRate: 78,
+};
+
+const monthlyViews = [
+  { month: 'Jan', views: 1890 },
+  { month: 'Feb', views: 2398 },
+  { month: 'Mar', views: 3456 },
+  { month: 'Apr', views: 4123 },
+  { month: 'May', views: 5234 },
+  { month: 'Jun', views: 6123 },
+  { month: 'Jul', views: 7234 },
+];
+
+const postPerformance = [
+  { title: 'React Best Practices', views: 3456, engagement: 89 },
+  { title: 'CSS Grid Tutorial', views: 2890, engagement: 78 },
+  { title: 'TypeScript Tips', views: 4123, engagement: 92 },
+  { title: 'Remix Framework', views: 3123, engagement: 85 },
+  { title: 'Firebase Auth', views: 2345, engagement: 76 },
+];
+
+const categoryDistribution = [
+  { name: 'Tutorials', value: 35 },
+  { name: 'News', value: 25 },
+  { name: 'Reviews', value: 20 },
+  { name: 'Opinions', value: 15 },
+  { name: 'Others', value: 5 },
+];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireAdminUser(request);
+
+  // In a real app, you would fetch actual data here
   return json({
-    stats: {
-      totalPosts: 47,
-      totalViews: 12543,
-      totalUsers: 289,
-      engagement: 8.2,
-      postsChange: 12,
-      viewsChange: 23,
-      usersChange: -5,
-      engagementChange: 15,
-    },
-    recentPosts: [
-      {
-        id: 1,
-        title: "Getting Started with Kubernetes in Production",
-        category: "DevOps",
-        views: 1234,
-        status: "published",
-        publishedAt: "2025-01-15",
-        author: "Yahya",
-        comments: 12,
-        likes: 45,
-      },
-    ],
-    categories: [
-      { name: "DevOps", count: 12, color: "bg-indigo-600" },
-      { name: "Frontend", count: 8, color: "bg-emerald-600" },
-      { name: "Cloud", count: 15, color: "bg-purple-600" },
-      { name: "Architecture", count: 9, color: "bg-orange-600" },
-      { name: "Backend", count: 6, color: "bg-rose-600" },
-    ],
+    blogStats,
+    monthlyViews,
+    postPerformance,
+    categoryDistribution,
   });
 };
 
-// -------------------- Dashboard --------------------
-export default function Dashboard() {
-  const { stats, recentPosts, categories } = useLoaderData();
-  const [activeTab, setActiveTab] = useState<"overview" | "posts" | "analytics" | "categories">("overview");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
+export default function AdminDashboard() {
+  const { blogStats, monthlyViews, postPerformance, categoryDistribution } = useLoaderData<typeof loader>();
 
-  const filteredPosts = useMemo(
-    () =>
-      recentPosts.filter((post) => {
-        const matchesSearch =
-          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.category.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = selectedFilter === "all" || post.status === selectedFilter;
-        return matchesSearch && matchesFilter;
-      }),
-    [recentPosts, searchQuery, selectedFilter]
+  const StatCard = ({ title, value, icon: Icon, trend, description }: {
+    title: string;
+    value: number | string;
+    icon: React.ComponentType<any>;
+    trend?: string;
+    description?: string;
+  }) => (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value.toLocaleString()}</div>
+        {trend && (
+          <p className="text-xs text-muted-foreground flex items-center">
+            <TrendingUp className="w-3 h-3 mr-1 text-green-500" />
+            {trend}
+          </p>
+        )}
+        {description && (
+          <p className="text-xs text-muted-foreground">{description}</p>
+        )}
+      </CardContent>
+    </Card>
   );
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-zinc-100 font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
-        <div className="flex gap-2 mb-8 bg-zinc-800 rounded-lg p-1 w-fit">
-          {["overview", "posts", "analytics", "categories"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-2 rounded-md font-medium text-sm transition-colors duration-200 ${
-                activeTab === tab
-                  ? "bg-indigo-600 text-white"
-                  : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700"
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your blog's performance</p>
+      </div>
 
-        {/* Overview Tab */}
-        {activeTab === "overview" && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard title="Total Posts" value={stats.totalPosts} change={stats.postsChange} icon={FileText} trend="up" />
-              <StatCard title="Total Views" value={stats.totalViews} change={stats.viewsChange} icon={Eye} trend="up" />
-              <StatCard title="Subscribers" value={stats.totalUsers} change={Math.abs(stats.usersChange)} icon={Users} trend="down" />
-              <StatCard title="Engagement" value={`${stats.engagement}%`} change={stats.engagementChange} icon={TrendingUp} trend="up" />
-            </div>
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Posts"
+          value={blogStats.totalPosts}
+          icon={FileText}
+          trend="+12% from last month"
+        />
+        <StatCard
+          title="Total Views"
+          value={blogStats.totalViews}
+          icon={Eye}
+          trend="+23% from last month"
+        />
+        <StatCard
+          title="Total Users"
+          value={blogStats.totalUsers}
+          icon={Users}
+          trend="+8% from last month"
+        />
+        <StatCard
+          title="Engagement Rate"
+          value={`${blogStats.engagementRate}%`}
+          icon={Clock}
+          description="Average time on page"
+        />
+      </div>
 
-            <div className="grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-4">
-                <Card title="Recent Posts">
-                  {recentPosts.map((post) => (
-                    <PostRow key={post.id} post={post} />
-                  ))}
-                </Card>
-              </div>
-              <div className="space-y-6">
-                <Card title="Top Categories">
-                  {categories.map((category) => (
-                    <div key={category.name} className="flex items-center justify-between py-2">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${category.color}`} />
-                        <span className="text-zinc-300">{category.name}</span>
-                      </div>
-                      <span className="text-zinc-400 text-sm">{category.count}</span>
-                    </div>
-                  ))}
-                </Card>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Charts Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        {/* Monthly Views Chart */}
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Monthly Views</CardTitle>
+            <CardDescription>Traffic overview for the past 6 months</CardDescription>
+          </CardHeader>
+          <CardContent className="pl-2 text-zinc-900 ">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={monthlyViews}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="views"
+                  stroke="#0088FE"
+                  strokeWidth={2}
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
-        {/* Posts Tab */}
-        {activeTab === "posts" && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-indigo-400" /> All Posts
-                </h2>
-                <p className="text-zinc-400 text-sm mt-1">
-                  Manage and organize your blog content ({recentPosts.length} total)
-                </p>
-              </div>
-              <div className="flex gap-3 w-full sm:w-auto">
-                <div className="relative flex-1 sm:w-64">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Search posts..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-100 focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <select
-                  value={selectedFilter}
-                  onChange={(e) => setSelectedFilter(e.target.value)}
-                  className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-100 focus:ring-2 focus:ring-indigo-500"
+        {/* Category Distribution */}
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>Content Distribution</CardTitle>
+            <CardDescription>Posts by category</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={categoryDistribution}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label
                 >
-                  <option value="all">All Status</option>
-                  <option value="published">Published</option>
-                  <option value="draft">Draft</option>
-                  <option value="scheduled">Scheduled</option>
-                </select>
-              </div>
-            </div>
+                  {categoryDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
 
-            <Card>
-              {filteredPosts.length > 0 ? (
-                filteredPosts.map((post) => <PostRow key={post.id} post={post} />)
-              ) : (
-                <div className="text-center py-12">
-                  <Search className="w-12 h-12 text-zinc-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-zinc-100 mb-2">No posts found</h3>
-                  <p className="text-zinc-400">Try adjusting your search or filter criteria</p>
+      {/* Top Performing Posts */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Performing Posts</CardTitle>
+          <CardDescription>Most viewed content in the last 30 days</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={postPerformance}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="title" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="views" fill="#0088FE" name="Views" />
+              <Bar dataKey="engagement" fill="#00C49F" name="Engagement (%)" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Recent Activity */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Latest actions on your blog</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { action: 'New post published', time: '2 hours ago', user: 'You' },
+                { action: 'Comment approved', time: '4 hours ago', user: 'Moderator' },
+                { action: 'User registered', time: '6 hours ago', user: 'System' },
+                { action: 'Post updated', time: '1 day ago', user: 'You' },
+              ].map((activity, index) => (
+                <div key={index} className="flex items-center space-x-4">
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none">{activity.action}</p>
+                    <p className="text-sm text-muted-foreground">{activity.user}</p>
+                  </div>
+                  <div className="text-sm text-muted-foreground">{activity.time}</div>
                 </div>
-              )}
-            </Card>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-// -------------------- Components --------------------
-function StatCard({ title, value, change, icon: Icon, trend }: any) {
-  return (
-    <div className="p-4 bg-zinc-800 rounded-md">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-indigo-900/20 rounded-md">
-            <Icon className="w-4 h-4 text-indigo-400" />
-          </div>
-          <h3 className="text-sm font-medium text-zinc-300">{title}</h3>
-        </div>
-        <div className={`flex items-center gap-1 text-xs font-medium ${trend === "up" ? "text-emerald-400" : "text-red-400"}`}>
-          {trend === "up" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-          {change}%
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming Schedule</CardTitle>
+            <CardDescription>Scheduled posts and events</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[
+                { title: 'Weekly Newsletter', date: 'Tomorrow, 9:00 AM', status: 'Scheduled' },
+                { title: 'Product Launch', date: 'Dec 25, 2024', status: 'Draft' },
+                { title: 'Holiday Post', date: 'Dec 20, 2024', status: 'Ready' },
+              ].map((item, index) => (
+                <div key={index} className="flex items-center space-x-4">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none">{item.title}</p>
+                    <p className="text-sm text-muted-foreground">{item.date}</p>
+                  </div>
+                  <div className={`text-xs px-2 py-1 rounded-full ${item.status === 'Scheduled' ? 'bg-blue-100 text-blue-800' :
+                    item.status === 'Draft' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-green-100 text-green-800'
+                    }`}>
+                    {item.status}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-      <div className="text-xl font-bold text-zinc-100">
-        {typeof value === "number" && value > 999 ? `${(value / 1000).toFixed(1)}k` : value}
-      </div>
-    </div>
-  );
-}
-
-function PostRow({ post }: any) {
-  return (
-    <div className="p-4 group bg-zinc-800 rounded-md flex justify-between items-center gap-4 hover:bg-zinc-700 transition">
-      <div className="flex-1 min-w-0">
-        <h4 className="text-zinc-100 font-medium truncate">{post.title}</h4>
-        <p className="text-sm text-zinc-400">{post.category}</p>
-      </div>
-      <div className="flex items-center gap-2 text-zinc-400 text-sm">
-        <Eye className="w-4 h-4" /> {post.views}
-        <MessageCircle className="w-4 h-4" /> {post.comments}
-        <Heart className="w-4 h-4" /> {post.likes}
-      </div>
-      <div className="flex gap-2">
-        <button className="p-1 text-zinc-400 hover:text-indigo-400 rounded-md hover:bg-indigo-900/20">
-          <Edit3 className="w-4 h-4" />
-        </button>
-        <button className="p-1 text-zinc-400 hover:text-red-400 rounded-md hover:bg-red-900/20">
-          <Trash2 className="w-4 h-4" />
-        </button>
-        <button className="p-1 text-zinc-400 hover:text-zinc-100 rounded-md hover:bg-zinc-700">
-          <MoreHorizontal className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Card({ title, icon: Icon, children }: any) {
-  return (
-    <div className="bg-zinc-800 rounded-md p-4 space-y-3">
-      {title && (
-        <div className="flex items-center gap-2 mb-2">
-          {Icon && <Icon className="w-4 h-4 text-indigo-400" />}
-          <h3 className="font-medium text-zinc-100">{title}</h3>
-        </div>
-      )}
-      {children}
     </div>
   );
 }

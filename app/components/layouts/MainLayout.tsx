@@ -18,7 +18,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <ThemeProvider>
-      <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
+      <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-all ease0in-out ">
         <Navbar onToggleSidebar={toggleSidebar} />
 
         <div className="flex flex-1 w-full max-w-7xl mx-auto px-4 md:px-6">

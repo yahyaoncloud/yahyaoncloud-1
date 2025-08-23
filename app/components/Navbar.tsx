@@ -18,16 +18,16 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   ];
 
   return (
-    <header className="sticky top-0 left-0 right-0 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 z-10">
+    <header className="sticky top-0 left-0 right-0 z-10 backdrop-blur-sm">
       <div className="flex items-center justify-between px-4 py-2 min-h-[4rem]">
         {/* Sidebar Toggle */}
         <motion.button
           onClick={onToggleSidebar}
-          className="p-3 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-md"
+          className="p-3 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 shadow-sm hover:shadow-md transition-all duration-300"
           aria-label="Toggle sidebar"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         >
           <Menu size={18} className="text-zinc-600 dark:text-zinc-300" />
         </motion.button>
@@ -37,10 +37,10 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
           {/* Theme Toggle */}
           <motion.button
             onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+            className="p-2 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 shadow-sm hover:shadow-md transition-all duration-300"
             aria-label="Toggle theme"
           >
-            {theme === "light" ? (
+            {theme === 'light' ? (
               <Moon size={18} className="text-zinc-700 dark:text-zinc-200" />
             ) : (
               <Sun size={18} className="text-zinc-700 dark:text-zinc-200" />
@@ -51,7 +51,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
           <div className="relative">
             <motion.button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              className="flex items-center p-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+              className="flex items-center p-2 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 shadow-sm hover:shadow-md transition-all duration-300"
             >
               <User size={20} className="text-zinc-700 dark:text-zinc-200" />
               <motion.div animate={{ rotate: isProfileMenuOpen ? 180 : 0 }} className="ml-1">

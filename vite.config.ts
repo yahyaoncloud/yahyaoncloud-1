@@ -10,6 +10,7 @@ declare module "@remix-run/node" {
 }
 
 export default defineConfig({
+  envPrefix: ['VITE_', 'FIREBASE_'], // Allow both VITE_ and FIREBASE_ prefixes
   plugins: [
     remix({
       future: {

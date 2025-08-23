@@ -7,7 +7,7 @@ import { Label } from "../components/ui/label";
 import { Checkbox } from "../components/ui/checkbox";
 import { generateClientStamp } from "../utils/stampgenerator.server";
 import { uploadStampToCloudinary } from "../utils/cloudinary.server";
-import { getClientList, addClientToRTDB } from "../utils/firebase.server";
+import { getClientList, addClientToRTDB } from "../utils/clients.server";
 
 // Type for a client
 type ClientData = {
