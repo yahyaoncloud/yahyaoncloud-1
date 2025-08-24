@@ -22,7 +22,7 @@ function LayoutContent({ children, sidebar }: MainLayoutProps) {
         transition={{ duration: 0.25 }}
         className="flex-grow py-12 p-6 "
       >
-        <div className="flex">
+        <div className="flex my-8">
           {/* {sidebar && (
             <aside className="hidden lg:block max-w-xs w-full  z-40">
               <div className="sticky flex bg-blue-400" />

@@ -1,563 +1,322 @@
-import React, { useState } from "react";
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Camera,
-  Edit3,
-  Save,
-  X,
-  Shield,
-  Bell,
-  Lock,
-  Globe,
-  Calendar,
-  Award,
-  BookOpen,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { json, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData, Form, useNavigation, useActionData } from "@remix-run/react";
+import { useState, useEffect } from "react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
+import { updatePortfolio, getAllPortfolios, uploadImage } from "../Services/post.server";
+import { useToast } from "../hooks/use-toast";
 
-type UserProfile = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  bio: string;
-  avatar: string;
-  role: string;
-  joinDate: string;
-  lastActive: string;
-  preferences: {
-    emailNotifications: boolean;
-    pushNotifications: boolean;
-    publicProfile: boolean;
-    analyticsSharing: boolean;
-  };
-  stats: {
-    totalPosts: number;
-    totalViews: number;
-    followers: number;
-    following: number;
-  };
-  socialLinks: {
-    twitter: string;
-    linkedin: string;
-    github: string;
-    website: string;
-  };
-};
+export async function loader({ request }: LoaderFunctionArgs) {
+  const portfolios = await getAllPortfolios();
+  return json({ portfolios });
+}
 
-const mockProfile: UserProfile = {
-  id: "admin_001",
-  name: "Alex Johnson",
-  email: "alex.johnson@blogsite.com",
-  phone: "+1 (555) 123-4567",
-  location: "San Francisco, CA",
-  bio: "Passionate blogger and tech enthusiast. I write about web development, design trends, and digital marketing. Always learning something new!",
-  avatar: "/api/placeholder/120/120",
-  role: "Admin",
-  joinDate: "2022-03-15",
-  lastActive: "2 hours ago",
-  preferences: {
-    emailNotifications: true,
-    pushNotifications: false,
-    publicProfile: true,
-    analyticsSharing: false,
-  },
-  stats: {
-    totalPosts: 47,
-    totalViews: 28500,
-    followers: 1240,
-    following: 186,
-  },
-  socialLinks: {
-    twitter: "@alexjohnson",
-    linkedin: "alexjohnson",
-    github: "alexjohnson-dev",
-    website: "alexjohnson.blog",
-  },
-};
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const intent = formData.get("intent");
 
-const ProfileCard: React.FC<{
-  title: string;
-  children: React.ReactNode;
-  icon: React.ReactNode;
-  className?: string;
-}> = ({ title, children, icon, className = "" }) => (
-  <div
-    className={`bg-zinc-50/10 backdrop-blur-sm rounded-md p-6 border border-white/20 ${className}`}
-  >
-    <div className="flex items-center gap-3 mb-4">
-      <div className="p-2 bg-zinc-50/20 rounded-md">{icon}</div>
-      <h3 className="text-xl font-semibold text-white">{title}</h3>
-    </div>
-    {children}
-  </div>
-);
+  try {
+    if (intent === "update") {
+      const id = formData.get("id") as string;
+      const name = formData.get("name") as string;
+      const bio = formData.get("bio")?.toString().split("\n") || [];
+      const location = formData.get("location") as string;
+      const portrait = formData.get("portrait") as File;
+      let portraitUrl = formData.get("existingPortraitUrl") as string;
+      if (portrait && portrait.size > 0) {
+        const uploaded = await uploadImage(portrait, `portfolio-${name}-${Date.now()}`);
+        portraitUrl = uploaded.url;
+      }
+      const experiences = JSON.parse(formData.get("experiences") as string);
+      const certifications = JSON.parse(formData.get("certifications") as string);
+      const hobbies = JSON.parse(formData.get("hobbies") as string);
+      const skills = JSON.parse(formData.get("skills") as string);
+      const currentWorks = JSON.parse(formData.get("currentWorks") as string);
+      const projects = JSON.parse(formData.get("projects") as string);
+      const socialLinks = JSON.parse(formData.get("socialLinks") as string);
 
-const StatCard: React.FC<{
-  label: string;
-  value: string | number;
-  icon: React.ReactNode;
-  gradient: string;
-}> = ({ label, value, icon, gradient }) => (
-  <div
-    className="p-4 rounded-md text-white relative overflow-hidden"
-    style={{ background: `linear-gradient(135deg, ${gradient})` }}
-  >
-    <div className="absolute top-0 right-0 w-16 h-16 opacity-20">
-      <div className="absolute inset-0 bg-zinc-50 rounded-full transform translate-x-8 -translate-y-8"></div>
-    </div>
-    <div className="relative z-10">
-      <div className="flex items-center justify-between mb-2">
-        <div className="p-2 bg-zinc-50/20 rounded-md">{icon}</div>
-      </div>
-      <div className="text-2xl font-bold mb-1">{value}</div>
-      <div className="text-white/80 text-sm">{label}</div>
-    </div>
-  </div>
-);
+      await updatePortfolio(id, {
+        name,
+        bio,
+        portraitUrl,
+        location,
+        experiences,
+        certifications,
+        hobbies,
+        skills,
+        currentWorks,
+        projects,
+        socialLinks,
+      });
+      return json({ success: true, message: "Portfolio updated" });
+    }
+  } catch (error) {
+    return json({ success: false, error: error.message }, { status: 400 });
+  }
+}
 
-const ToggleSwitch: React.FC<{
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  label: string;
-  description: string;
-}> = ({ checked, onChange, label, description }) => (
-  <div className="flex items-center justify-between p-4 bg-zinc-50/5 rounded-md">
-    <div>
-      <div className="text-white font-medium">{label}</div>
-      <div className="text-white/70 text-sm">{description}</div>
-    </div>
-    <button
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-        checked ? "bg-purple-600" : "bg-zinc-600"
-      }`}
-    >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-zinc-50 transition-transform ${
-          checked ? "translate-x-6" : "translate-x-1"
-        }`}
-      />
-    </button>
-  </div>
-);
+export default function Portfolio() {
+  const { portfolios } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const { toast } = useToast();
+  const navigation = useNavigation();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    bio: "",
+    location: "",
+    portrait: null,
+    experiences: "[]",
+    certifications: "[]",
+    hobbies: "[]",
+    skills: "[]",
+    currentWorks: "[]",
+    projects: "[]",
+    socialLinks: "{}",
+  });
 
-export default function AdminProfile() {
-  const [profile, setProfile] = useState<UserProfile>(mockProfile);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState<UserProfile>(mockProfile);
+  useEffect(() => {
+    if (actionData?.success) {
+      toast({ title: "Success", description: actionData.message });
+      setEditingId(null);
+      setFormData({
+        name: "",
+        bio: "",
+        location: "",
+        portrait: null,
+        experiences: "[]",
+        certifications: "[]",
+        hobbies: "[]",
+        skills: "[]",
+        currentWorks: "[]",
+        projects: "[]",
+        socialLinks: "{}",
+      });
+    } else if (actionData?.error) {
+      toast({ title: "Error", description: actionData.error, variant: "destructive" });
+    }
+  }, [actionData, toast]);
 
-  const handleSave = () => {
-    setProfile(editedProfile);
-    setIsEditing(false);
-  };
+  useEffect(() => {
+    if (editingId) {
+      const portfolio = portfolios.find((p) => p._id === editingId);
+      if (portfolio) {
+        setFormData({
+          name: portfolio.name || "",
+          bio: portfolio.bio?.join("\n") || "",
+          location: portfolio.location || "",
+          portrait: null,
+          experiences: JSON.stringify(portfolio.experiences || []),
+          certifications: JSON.stringify(portfolio.certifications || []),
+          hobbies: JSON.stringify(portfolio.hobbies || []),
+          skills: JSON.stringify(portfolio.skills || []),
+          currentWorks: JSON.stringify(portfolio.currentWorks || []),
+          projects: JSON.stringify(portfolio.projects || []),
+          socialLinks: JSON.stringify(portfolio.socialLinks || {}),
+        });
+      }
+    }
+  }, [editingId, portfolios]);
 
-  const handleCancel = () => {
-    setEditedProfile(profile);
-    setIsEditing(false);
-  };
-
-  const updatePreference = (
-    key: keyof UserProfile["preferences"],
-    value: boolean
-  ) => {
-    setProfile((prev) => ({
-      ...prev,
-      preferences: {
-        ...prev.preferences,
-        [key]: value,
-      },
-    }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-purple-900 to-indigo-900 p-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Profile Settings
-            </h1>
-            <p className="text-white/70">
-              Manage your account settings and preferences
-            </p>
-          </div>
-
-          <div className="flex gap-3">
-            {!isEditing ? (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white transition-colors"
+    <div className="container mx-auto p-4">
+      <Card className="bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+        <CardHeader>
+          <CardTitle>Portfolios</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {editingId && (
+            <Form method="post" encType="multipart/form-data" className="space-y-4 mb-6">
+              <input type="hidden" name="intent" value="update" />
+              <input type="hidden" name="id" value={editingId} />
+              <input type="hidden" name="existingPortraitUrl" value={portfolios.find((p) => p._id === editingId)?.portraitUrl} />
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                />
+              </div>
+              <div>
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                />
+              </div>
+              <div>
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                />
+              </div>
+              <div>
+                <Label htmlFor="portrait">Portrait</Label>
+                <Input
+                  id="portrait"
+                  name="portrait"
+                  type="file"
+                  accept="image/*"
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  onChange={(e) => setFormData((prev) => ({ ...prev, portrait: e.target.files?.[0] || null }))}
+                />
+                {portfolios.find((p) => p._id === editingId)?.portraitUrl && (
+                  <img
+                    src={portfolios.find((p) => p._id === editingId)?.portraitUrl}
+                    alt="Portrait"
+                    className="mt-2 w-24 h-24 object-cover"
+                  />
+                )}
+              </div>
+              <div>
+                <Label htmlFor="experiences">Experiences (JSON)</Label>
+                <Textarea
+                  id="experiences"
+                  name="experiences"
+                  value={formData.experiences}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  placeholder='[{"title":"Software Engineer","role":"Developer","year":"2020-2022","isWorking":0,"company":"Tech Corp","description":["Built apps"],"period":"2 years","location":"NY","summary":"Developed solutions"}]'
+                />
+              </div>
+              <div>
+                <Label htmlFor="certifications">Certifications (JSON)</Label>
+                <Textarea
+                  id="certifications"
+                  name="certifications"
+                  value={formData.certifications}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  placeholder='[{"title":"AWS Certified","issuer":"Amazon","year":"2023"}]'
+                />
+              </div>
+              <div>
+                <Label htmlFor="hobbies">Hobbies (JSON)</Label>
+                <Textarea
+                  id="hobbies"
+                  name="hobbies"
+                  value={formData.hobbies}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  placeholder='[{"name":"Photography","description":"Nature shots"}]'
+                />
+              </div>
+              <div>
+                <Label htmlFor="skills">Skills (JSON)</Label>
+                <Textarea
+                  id="skills"
+                  name="skills"
+                  value={formData.skills}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  placeholder='["JavaScript","React"] or {"Frontend":["React","Vue"],"Backend":["Node.js"]}'
+                />
+              </div>
+              <div>
+                <Label htmlFor="currentWorks">Current Works (JSON)</Label>
+                <Textarea
+                  id="currentWorks"
+                  name="currentWorks"
+                  value={formData.currentWorks}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  placeholder='[{"title":"Freelance Developer","description":"Building web apps"}]'
+                />
+              </div>
+              <div>
+                <Label htmlFor="projects">Projects (JSON)</Label>
+                <Textarea
+                  id="projects"
+                  name="projects"
+                  value={formData.projects}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  placeholder='[{"title":"Blog App","description":"Remix.js CMS","url":"https://example.com","imageUrl":"https://example.com/image.jpg","duration":"6 months"}]'
+                />
+              </div>
+              <div>
+                <Label htmlFor="socialLinks">Social Links (JSON)</Label>
+                <Textarea
+                  id="socialLinks"
+                  name="socialLinks"
+                  value={formData.socialLinks}
+                  onChange={handleInputChange}
+                  className="bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-600"
+                  placeholder='{"linkedin":"https://linkedin.com/in/user","github":"https://github.com/user"}'
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={navigation.state === "submitting"}
+                className="bg-zinc-700 dark:bg-zinc-300 text-zinc-100 dark:text-zinc-900 hover:bg-zinc-600 dark:hover:bg-zinc-400"
               >
-                <Edit3 className="w-4 h-4" />
-                Edit Profile
-              </button>
-            ) : (
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSave}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white transition-colors"
-                >
-                  <Save className="w-4 h-4" />
-                  Save
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex items-center gap-2 px-4 py-2 bg-zinc-600 hover:bg-zinc-700 rounded-md text-white transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                  Cancel
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+                Update Portfolio
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditingId(null)}
+                className="border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-zinc-100"
+              >
+                Cancel
+              </Button>
+            </Form>
+          )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Profile Section */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Profile Info */}
-          <ProfileCard
-            title="Profile Information"
-            icon={<User className="w-5 h-5 text-white" />}
-          >
-            <div className="flex items-start gap-6">
-              {/* Avatar */}
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold">
-                  {profile.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </div>
-                <button className="absolute -bottom-2 -right-2 p-2 bg-zinc-50/20 rounded-full hover:bg-zinc-50/30 transition-colors">
-                  <Camera className="w-4 h-4 text-white" />
-                </button>
-              </div>
-
-              {/* Profile Details */}
-              <div className="flex-1 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2">
-                      Full Name
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editedProfile.name}
-                        onChange={(e) =>
-                          setEditedProfile({
-                            ...editedProfile,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    ) : (
-                      <div className="text-white font-medium">
-                        {profile.name}
-                      </div>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-zinc-200 dark:border-zinc-700">
+                <TableHead>Name</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Portrait</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {portfolios.map((portfolio) => (
+                <TableRow key={portfolio._id} className="border-zinc-200 dark:border-zinc-700">
+                  <TableCell>{portfolio.name}</TableCell>
+                  <TableCell>{portfolio.location || "N/A"}</TableCell>
+                  <TableCell>
+                    {portfolio.portraitUrl && (
+                      <img src={portfolio.portraitUrl} alt={portfolio.name} className="w-16 h-16 object-cover" />
                     )}
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2">
-                      Role
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-purple-400" />
-                      <span className="text-white font-medium">
-                        {profile.role}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2">
-                      Email
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="email"
-                        value={editedProfile.email}
-                        onChange={(e) =>
-                          setEditedProfile({
-                            ...editedProfile,
-                            email: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-white/60" />
-                        <span className="text-white">{profile.email}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-white/80 text-sm mb-2">
-                      Phone
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="tel"
-                        value={editedProfile.phone}
-                        onChange={(e) =>
-                          setEditedProfile({
-                            ...editedProfile,
-                            phone: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-white/60" />
-                        <span className="text-white">{profile.phone}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-white/80 text-sm mb-2">
-                    Location
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editedProfile.location}
-                      onChange={(e) =>
-                        setEditedProfile({
-                          ...editedProfile,
-                          location: e.target.value,
-                        })
-                      }
-                      className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-white/60" />
-                      <span className="text-white">{profile.location}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-white/80 text-sm mb-2">
-                    Bio
-                  </label>
-                  {isEditing ? (
-                    <textarea
-                      value={editedProfile.bio}
-                      onChange={(e) =>
-                        setEditedProfile({
-                          ...editedProfile,
-                          bio: e.target.value,
-                        })
-                      }
-                      rows={3}
-                      className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                    />
-                  ) : (
-                    <div className="text-white/90">{profile.bio}</div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </ProfileCard>
-
-          {/* Social Links */}
-          <ProfileCard
-            title="Social Links"
-            icon={<Globe className="w-5 h-5 text-white" />}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-white/80 text-sm mb-2">
-                  Twitter
-                </label>
-                <input
-                  type="text"
-                  value={profile.socialLinks.twitter}
-                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="@username"
-                />
-              </div>
-              <div>
-                <label className="block text-white/80 text-sm mb-2">
-                  LinkedIn
-                </label>
-                <input
-                  type="text"
-                  value={profile.socialLinks.linkedin}
-                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="username"
-                />
-              </div>
-              <div>
-                <label className="block text-white/80 text-sm mb-2">
-                  GitHub
-                </label>
-                <input
-                  type="text"
-                  value={profile.socialLinks.github}
-                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="username"
-                />
-              </div>
-              <div>
-                <label className="block text-white/80 text-sm mb-2">
-                  Website
-                </label>
-                <input
-                  type="text"
-                  value={profile.socialLinks.website}
-                  className="w-full px-3 py-2 bg-zinc-50/10 border border-white/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="yoursite.com"
-                />
-              </div>
-            </div>
-          </ProfileCard>
-
-          {/* Preferences */}
-          <ProfileCard
-            title="Preferences"
-            icon={<Bell className="w-5 h-5 text-white" />}
-          >
-            <div className="space-y-4">
-              <ToggleSwitch
-                checked={profile.preferences.emailNotifications}
-                onChange={(checked) =>
-                  updatePreference("emailNotifications", checked)
-                }
-                label="Email Notifications"
-                description="Receive email updates about your blog activity"
-              />
-              <ToggleSwitch
-                checked={profile.preferences.pushNotifications}
-                onChange={(checked) =>
-                  updatePreference("pushNotifications", checked)
-                }
-                label="Push Notifications"
-                description="Get browser notifications for important updates"
-              />
-              <ToggleSwitch
-                checked={profile.preferences.publicProfile}
-                onChange={(checked) =>
-                  updatePreference("publicProfile", checked)
-                }
-                label="Public Profile"
-                description="Make your profile visible to other users"
-              />
-              <ToggleSwitch
-                checked={profile.preferences.analyticsSharing}
-                onChange={(checked) =>
-                  updatePreference("analyticsSharing", checked)
-                }
-                label="Analytics Sharing"
-                description="Share anonymous usage data to improve the platform"
-              />
-            </div>
-          </ProfileCard>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Stats */}
-          <ProfileCard
-            title="Quick Stats"
-            icon={<TrendingUp className="w-5 h-5 text-white" />}
-          >
-            <div className="grid grid-cols-2 gap-4">
-              <StatCard
-                label="Total Posts"
-                value={profile.stats.totalPosts}
-                icon={<BookOpen className="w-4 h-4" />}
-                gradient="rgba(59, 130, 246, 0.8), rgba(99, 102, 241, 0.8)"
-              />
-              <StatCard
-                label="Total Views"
-                value={`${(profile.stats.totalViews / 1000).toFixed(1)}k`}
-                icon={<TrendingUp className="w-4 h-4" />}
-                gradient="rgba(16, 185, 129, 0.8), rgba(5, 150, 105, 0.8)"
-              />
-              <StatCard
-                label="Followers"
-                value={profile.stats.followers}
-                icon={<Users className="w-4 h-4" />}
-                gradient="rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8)"
-              />
-              <StatCard
-                label="Following"
-                value={profile.stats.following}
-                icon={<User className="w-4 h-4" />}
-                gradient="rgba(139, 92, 246, 0.8), rgba(124, 58, 237, 0.8)"
-              />
-            </div>
-          </ProfileCard>
-
-          {/* Account Info */}
-          <ProfileCard
-            title="Account Info"
-            icon={<Calendar className="w-5 h-5 text-white" />}
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-white/80">Member since</span>
-                <span className="text-white font-medium">
-                  {new Date(profile.joinDate).toLocaleDateString()}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-white/80">Last active</span>
-                <span className="text-white font-medium">
-                  {profile.lastActive}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-white/80">Account ID</span>
-                <span className="text-white font-mono text-sm">
-                  {profile.id}
-                </span>
-              </div>
-            </div>
-          </ProfileCard>
-
-          {/* Security */}
-          <ProfileCard
-            title="Security"
-            icon={<Lock className="w-5 h-5 text-white" />}
-          >
-            <div className="space-y-3">
-              <button className="w-full px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white text-left transition-colors">
-                Change Password
-              </button>
-              <button className="w-full px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white text-left transition-colors">
-                Two-Factor Authentication
-              </button>
-              <button className="w-full px-4 py-2 bg-zinc-50/10 hover:bg-zinc-50/20 rounded-md text-white text-left transition-colors">
-                Active Sessions
-              </button>
-              <button className="w-full px-4 py-2 bg-red-600/20 hover:bg-red-600/30 rounded-md text-red-300 text-left transition-colors">
-                Delete Account
-              </button>
-            </div>
-          </ProfileCard>
-        </div>
-      </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingId(portfolio._id)}
+                      className="border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-zinc-100"
+                    >
+                      Edit
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -469,6 +469,25 @@ export async function getRelatedPosts(postId: string, limit: number = 3) {
 
 // ==================== AUTHOR OPERATIONS ====================
 
+export async function getAllAuthors() {
+  try {
+    const authors = await Author.find().sort({ createdAt: -1 });
+    return authors.map((author) => ({
+      _id: author._id.toString(),
+      authorId: author.authorId,
+      authorName: author.authorName,
+      authorProfession: author.authorProfession,
+      userId: author.userId.toString(),
+      contactDetails: author.contactDetails,
+      createdAt: author.createdAt,
+      updatedAt: author.updatedAt,
+    }));
+  } catch (error) {
+    console.error("Error fetching all authors:", error);
+    return [];
+  }
+}
+
 export async function getAuthorByAuthorId(authorId: string) {
   try {
     const author = await Author.findOne({ authorId });
@@ -481,7 +500,7 @@ export async function getAuthorByAuthorId(authorId: string) {
       authorName: author.authorName,
       authorProfession: author.authorProfession,
       userId: author.userId.toString(),
-      contactDetails: author.contactDetails, // Now embedded, no population needed
+      contactDetails: author.contactDetails,
       createdAt: author.createdAt,
       updatedAt: author.updatedAt,
     };
@@ -491,6 +510,106 @@ export async function getAuthorByAuthorId(authorId: string) {
   }
 }
 
+export async function createAuthor(data: {
+  authorId: string;
+  authorName: string;
+  authorProfession: string;
+  userId: string;
+  contactDetails: {
+    email: string;
+    phone: string;
+    linkedin: string;
+    github: string;
+    twitter: string;
+    website: string;
+  };
+}) {
+  try {
+    const author = await Author.create({
+      ...data,
+      contactDetails: {
+        ...data.contactDetails,
+        createdAt: new Date().toISOString(),
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    return {
+      _id: author._id.toString(),
+      authorId: author.authorId,
+      authorName: author.authorName,
+      authorProfession: author.authorProfession,
+      userId: author.userId.toString(),
+      contactDetails: author.contactDetails,
+      createdAt: author.createdAt,
+      updatedAt: author.updatedAt,
+    };
+  } catch (error) {
+    console.error("Error creating author:", error);
+    throw new Error("Failed to create author");
+  }
+}
+
+export async function updateAuthor(id: string, data: {
+  authorId?: string;
+  authorName?: string;
+  authorProfession?: string;
+  userId?: string;
+  contactDetails?: Partial<{
+    email: string;
+    phone: string;
+    linkedin: string;
+    github: string;
+    twitter: string;
+    website: string;
+  }>;
+}) {
+  try {
+    const author = await Author.findById(id);
+    if (!author) {
+      throw new Error("Author not found");
+    }
+    const updatedData = {
+      ...data,
+      contactDetails: {
+        ...author.contactDetails,
+        ...data.contactDetails,
+        updatedAt: new Date().toISOString(),
+      },
+      updatedAt: new Date().toISOString(),
+    };
+    const updatedAuthor = await Author.findByIdAndUpdate(id, updatedData, { new: true });
+    if (!updatedAuthor) {
+      throw new Error("Failed to update author");
+    }
+    return {
+      _id: updatedAuthor._id.toString(),
+      authorId: updatedAuthor.authorId,
+      authorName: updatedAuthor.authorName,
+      authorProfession: updatedAuthor.authorProfession,
+      userId: updatedAuthor.userId.toString(),
+      contactDetails: updatedAuthor.contactDetails,
+      createdAt: updatedAuthor.createdAt,
+      updatedAt: updatedAuthor.updatedAt,
+    };
+  } catch (error) {
+    console.error("Error updating author:", error);
+    throw new Error("Failed to update author");
+  }
+}
+
+export async function deleteAuthor(id: string) {
+  try {
+    const author = await Author.findByIdAndDelete(id);
+    if (!author) {
+      throw new Error("Author not found");
+    }
+    return { success: true, message: "Author deleted" };
+  } catch (error) {
+    console.error("Error deleting author:", error);
+    throw new Error("Failed to delete author");
+  }
+}
 // ==================== STATISTICS ====================
 
 export async function getPostCountByStatus() {

@@ -270,7 +270,7 @@ export default function MinimalistGuestbook() {
   };
 
   return (
-    <div className="min-h-screen my-6 bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-screen my-6 ">
       <style>{scrollbarStyles}</style>
       <motion.div
         className="w-full py-12"
@@ -380,11 +380,10 @@ export default function MinimalistGuestbook() {
                     <button
                       type="submit"
                       disabled={!newMessage.trim() || isSubmitting}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        !newMessage.trim() || isSubmitting
+                      className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${!newMessage.trim() || isSubmitting
                           ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
                           : "bg-indigo-600 dark:bg-indigo-400 text-white hover:bg-indigo-700 dark:hover:bg-indigo-500"
-                      }`}
+                        }`}
                     >
                       {isSubmitting ? (
                         <>

@@ -64,19 +64,18 @@ function serializePost(post: any) {
 // --- Loader ---
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { slug } = params;
-  // if (!slug) throw new Response("Not Found", { status: 404 });
-
   const post = await getPostBySlug(slug);
-  // if (!post) throw new Response("Not Found", { status: 404 });
+  if (!post) throw new Response("Not Found", { status: 404 });
 
+  const authorId = post.authorId; // capture before serialization
+  const author = authorId ? await getAuthorByAuthorId(authorId) : null;
+  console.log(authorId)
   const serializedPost = serializePost(post);
-  const author = serializedPost.authorId
-    ? await getAuthorByAuthorId(serializedPost.authorId)
-    : null;
-
   const htmlContent = marked(serializedPost.content || "");
+
   return json({ post: { ...serializedPost, content: htmlContent }, author });
 };
+
 
 
 // --- Enhance Blog Content ---
@@ -348,7 +347,7 @@ export default function PostPage() {
       </motion.section>
 
       {/* Article Content */}
-      <motion.section variants={fadeInUp} className="z-0">
+      <motion.section variants={fadeInUp} >
         <article
           className={proseClasses}
           dangerouslySetInnerHTML={{ __html: post.content }}

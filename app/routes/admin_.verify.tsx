@@ -148,7 +148,7 @@ export default function VerifyPage() {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleClose = () => navigate("/admin/clients/onboard");
+    const handleClose = () => navigate("/admin/client/onboard");
 
     const handleVerifyNext = () => {
         if (data.nextClient) {

@@ -18,7 +18,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
   ];
 
   return (
-    <header className="sticky top-0 left-0 right-0 z-10 backdrop-blur-sm">
+    <header className="sticky top-0 left-0 right-0 z-10">
       <div className="flex items-center justify-between px-4 py-2 min-h-[4rem]">
         {/* Sidebar Toggle */}
         <motion.button

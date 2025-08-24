@@ -9,6 +9,9 @@ import {
   BarChart3,
   PlusCircle,
   PersonStandingIcon,
+  Briefcase,
+  Tag,
+  Type,
 } from "lucide-react";
 import { NavLink, useLocation } from "@remix-run/react";
 import { motion } from "framer-motion";
@@ -24,6 +27,10 @@ const navItems = [
   { name: "Posts", icon: FileText, href: "/admin/posts" },
   { name: "Create Post", icon: PlusCircle, href: "/admin/post/create" },
   { name: "Categories", icon: Tags, href: "/admin/categories" },
+  { name: "Tags", icon: Tag, href: "/admin/tags" },
+  { name: "Types", icon: Type, href: "/admin/types" },
+  { name: "Portfolio", icon: Briefcase, href: "/admin/profile" },
+  { name: "Authors", icon: Users, href: "/admin/authors" },
   { name: "Media", icon: Image, href: "/admin/media" },
   { name: "Clients", icon: Users, href: "/admin/clients" },
   { name: "Messages", icon: MessageSquare, href: "/admin/messages" },
