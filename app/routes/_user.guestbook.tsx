@@ -239,27 +239,22 @@ export default function MinimalistGuestbook() {
   };
 
   return (
-    <div className="min-h-screen">
-      <motion.div
-        className="py-8 px-4 md:px-0 w-full max-w-3xl mx-auto"
-        initial="hidden"
-        animate="visible"
-        variants={fadeIn}
-      >
+    <div className="min-h-screen w-full">
+      <div className="py-12 px-4 sm:px-6 md:px-8 w-full max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div className="mb-8" variants={fadeIn}>
-          <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
+        <motion.div className="mb-8 w-full" variants={fadeIn} initial="hidden" animate="visible">
+          <h1 className="text-3xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
             Guestbook
           </h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Leave a message and connect with the community
+          <p className="text-base text-zinc-600 dark:text-zinc-400 w-full">
+            Share reflections or drop a message.
           </p>
         </motion.div>
 
         {/* Authentication & Form */}
-        <motion.div className="mb-8" variants={fadeIn}>
+        <motion.div className="mb-8 w-full" variants={fadeIn} initial="hidden" animate="visible">
           {!user ? (
-            <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 p-6">
+            <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 p-6 w-full">
               <div className="text-center mb-6">
                 <User className="mx-auto w-6 h-6 text-zinc-400 mb-3" />
                 <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">
@@ -293,7 +288,7 @@ export default function MinimalistGuestbook() {
                   <button
                     key={name}
                     onClick={() => handleSignIn(provider)}
-                    className="group flex items-center justify-center gap-3 py-2.5 px-4 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors duration-200"
+                    className="group flex items-center justify-center gap-3 py-2.5 px-4 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors duration-200 w-full"
                   >
                     <Icon className={`w-4 h-4 ${color}`} />
                     <span className="text-sm font-medium">Sign in with {name}</span>
@@ -302,9 +297,9 @@ export default function MinimalistGuestbook() {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 w-full flex flex-col">
               {/* User Info */}
-              <div className="flex items-center gap-3 pb-4 border-b border-zinc-200 dark:border-zinc-700">
+              <div className="flex items-center gap-3 pb-4 border-b w-full border-zinc-200 dark:border-zinc-700">
                 {user.photoURL ? (
                   <img
                     src={user.photoURL}
@@ -316,7 +311,7 @@ export default function MinimalistGuestbook() {
                     {getInitials(user.displayName || "User")}
                   </div>
                 )}
-                <div className="flex-1">
+                <div className="flex-1 gap-2">
                   <p className="text-sm font-medium text-zinc-900 dark:text-white">
                     {user.displayName}
                   </p>
@@ -334,7 +329,7 @@ export default function MinimalistGuestbook() {
               </div>
 
               {/* Message Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 w-full">
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
@@ -352,8 +347,8 @@ export default function MinimalistGuestbook() {
                     type="submit"
                     disabled={!newMessage.trim() || isSubmitting}
                     className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${!newMessage.trim() || isSubmitting
-                        ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-                        : "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
+                      ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
+                      : "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
                       }`}
                   >
                     {isSubmitting ? (
@@ -375,7 +370,7 @@ export default function MinimalistGuestbook() {
         </motion.div>
 
         {/* Messages */}
-        <motion.div variants={fadeIn}>
+        <motion.div variants={fadeIn} className="w-full" initial="hidden" animate="visible">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium text-zinc-900 dark:text-white">
               Messages
@@ -450,7 +445,7 @@ export default function MinimalistGuestbook() {
             )}
           </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 }
