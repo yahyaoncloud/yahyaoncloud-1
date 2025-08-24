@@ -109,7 +109,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your blog's performance</p>
+        <p className="text-muted-foreground"> Blog's performance</p>
       </div>
 
       {/* Stats Grid */}
