@@ -224,41 +224,16 @@ const TopicSections = ({ posts }: { posts: Post[] }) => {
 const TopCards = () => (
   <div className="max-w-3xl mx-auto mb-12">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <MotionSection className="rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
-          Upcoming Event
-        </h3>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
-          Join our DevOps Meetup on Sep 10th — networking, cloud, and Kubernetes
-          deep dives.
-        </p>
-        <Link
-          to="/events"
-          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center"
-        >
-          Learn more <ExternalLink className="ml-1 h-4 w-4" />
-        </Link>
+      <MotionSection className="rounded border text-xl text-center items-center flex justify-center h-44 border-zinc-200 dark:text-zinc-800 text-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-6">
+        No Events
       </MotionSection>
-      <MotionSection className="rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
-          Latest News
-        </h3>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
-          Our open-source project just crossed 5k stars on GitHub. Thanks for
-          the support!
-        </p>
-        <a
-          href="https://github.com/yourrepo"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center"
-        >
-          View project <ExternalLink className="ml-1 h-4 w-4" />
-        </a>
+      <MotionSection className="rounded border text-xl text-center items-center flex justify-center h-44 border-zinc-200 dark:border-zinc-700 dark:text-zinc-800 text-zinc-200 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-6">
+        No News
       </MotionSection>
     </div>
   </div>
 );
+
 
 const SupportCard = () => (
   <div className="max-w-3xl mx-auto mt-16">
