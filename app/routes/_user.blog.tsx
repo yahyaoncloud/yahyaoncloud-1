@@ -226,21 +226,45 @@ const TopicSections = ({ posts }: { posts: Post[] }) => {
   );
 };
 
+const dummyCards = [
+  {
+    title: "New AWS Features",
+    description: "Highlights from AWS re:Invent 2025.",
+    link: "/blog/aws-features"
+  },
+  {
+    title: "Kubernetes Tips",
+    description: "Best practices for managing workloads at scale.",
+    link: "/blog/kubernetes-tips"
+  }
+];
+
 const TopCards = () => (
   <div className="max-w-3xl mx-auto mb-8 md:mb-12 px-4 md:px-0">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-      <MotionSection className="rounded border text-lg md:text-xl text-center items-center flex justify-center h-32 md:h-44 border-zinc-200 dark:text-zinc-800 text-zinc-400 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6">
-        No Events
-      </MotionSection>
-      <MotionSection className="rounded border text-lg md:text-xl text-center items-center flex justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 dark:text-zinc-800 text-zinc-400 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6">
-        No News
-      </MotionSection>
+      {dummyCards.map((card) => (
+        <MotionSection
+          key={card.title}
+          className="rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6"
+        >
+          <h3 className="text-lg md:text-xl text-zinc-800 dark:text-zinc-200 font-semibold">
+            {card.title}
+          </h3>
+          <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400">
+            {card.description}
+          </p>
+          <a
+            href={card.link}
+            className="mt-2 text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
+          >
+            Read More
+          </a>
+        </MotionSection>
+      ))}
     </div>
   </div>
 );
 
-import { motion } from "framer-motion";
-import { Globe } from "lucide-react";
 
 const SupportCard = () => (
   <div className="max-w-3xl mx-auto mt-12 md:mt-16 px-4 md:px-0">
