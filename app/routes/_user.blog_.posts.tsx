@@ -3,7 +3,7 @@ import { useLoaderData, Link, useSearchParams } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { Search, Calendar } from "lucide-react";
-import { getPosts } from "../Services/post.server";
+import { getPosts, getAllCategories } from "../Services/post.server";
 
 // --- Meta ---
 export function meta() {
@@ -28,6 +28,8 @@ function serializePost(post) {
     _id: post._id?.toString(),
     title: String(post.title || "Untitled"),
     slug: String(post.slug || ""),
+    summary: post.summary || "",
+    categories: post.categories || [],
     createdAt:
       post.createdAt instanceof Date
         ? post.createdAt.toISOString()
@@ -40,31 +42,51 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   try {
     const url = new URL(request.url);
     const search = url.searchParams.get("search") || "";
-    const posts = await getPosts();
+    const selectedCategory = url.searchParams.get("category") || "";
+
+    const [posts, categories] = await Promise.all([
+      getPosts(),
+      getAllCategories()
+    ]);
+
     const serializedPosts = posts.map(serializePost);
-    return json({ posts: serializedPosts, filters: { search } });
+    return json({
+      posts: serializedPosts,
+      categories,
+      filters: { search, selectedCategory }
+    });
   } catch (error) {
     console.error("Loader error:", error);
-    return json({ posts: [], filters: { search: "" } });
+    return json({
+      posts: [],
+      categories: [],
+      filters: { search: "", selectedCategory: "" }
+    });
   }
 };
 
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
 // --- Main Component ---
 export default function ArticlesListPage() {
-  const { posts, filters } = useLoaderData();
+  const { posts, categories, filters } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(filters.search);
+  const [selectedCategory, setSelectedCategory] = useState(filters.selectedCategory);
 
   const formatDate = (date) => {
     const d = new Date(date);
@@ -78,88 +100,210 @@ export default function ArticlesListPage() {
   };
 
   const filteredPosts = useMemo(() => {
-    return searchTerm
-      ? posts.filter((post) =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      : posts.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    let filtered = posts;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter((post) =>
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.summary?.toLowerCase().includes(searchTerm.toLowerCase())
       );
-  }, [posts, searchTerm]);
+    }
+
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter((post) =>
+        post.categories?.some(cat => cat.name === selectedCategory)
+      );
+    }
+
+    // Sort by date (newest first)
+    return filtered.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [posts, searchTerm, selectedCategory]);
+
+  // Group posts by category for display
+  const groupedPosts = useMemo(() => {
+    if (searchTerm || selectedCategory) {
+      return { "Search Results": filteredPosts };
+    }
+
+    const groups = {};
+    filteredPosts.forEach((post) => {
+      const category = post.categories?.[0]?.name || "Other";
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(post);
+    });
+
+    return groups;
+  }, [filteredPosts, searchTerm, selectedCategory]);
 
   useEffect(() => {
     const params = new URLSearchParams();
     if (searchTerm) params.set("search", searchTerm);
+    if (selectedCategory) params.set("category", selectedCategory);
     setSearchParams(params, { replace: true });
-  }, [searchTerm, setSearchParams]);
+  }, [searchTerm, selectedCategory, setSearchParams]);
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    setSearchTerm(""); // Clear search when selecting category
+  };
 
   return (
-    <div className="md:h-[80vh]  overflow-hidden">
+    <div className="min-h- p-4">
       <motion.div
-        className="py-8 px-6 md:px-8 w-full max-w-7xl mx-auto flex flex-col h-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        className="py-8 px-4 md:px-0 w-full max-w-3xl mx-auto"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
       >
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-indigo-800 dark:text-indigo-300 mb-6">
-          Technical Articles & Insights
-        </h1>
-        <div className="relative mb-6 w-full max-w-7xl mx-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search articles..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-zinc-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
+        {/* Header */}
         <motion.div
-          className="flex-1 overflow-y-auto auto-hide-scrollbar w-full max-w-3xl mx-auto"
+          className="mb-8"
+          variants={fadeIn}
+        >
+          <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
+            Browse Articles
+          </h1>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Technical insights on cloud computing, DevOps, and engineering
+          </p>
+        </motion.div>
+
+        {/* Category Filter */}
+        <motion.div
+          className="mb-6"
+          variants={fadeIn}
+        >
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => handleCategoryChange("")}
+              className={`px-3 py-1 text-sm rounded-full border transition-colors duration-200 ${!selectedCategory
+                ? "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300"
+                : "border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600"
+                }`}
+            >
+              All
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category.name}
+                onClick={() => handleCategoryChange(category.name)}
+                className={`px-3 py-1 text-sm rounded-full border transition-colors duration-200 ${selectedCategory === category.name
+                  ? "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300"
+                  : "border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600"
+                  }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Search */}
+        <motion.div
+          className="mb-8"
+          variants={fadeIn}
+        >
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 text-zinc-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 text-sm text-zinc-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </motion.div>
+
+        {/* Articles List */}
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {filteredPosts.length === 0 ? (
-            <div className="text-center py-8">
-              <Search className="mx-auto w-10 h-10 text-zinc-400 mb-4" />
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
+            <motion.div
+              className="text-center py-12"
+              variants={itemVariants}
+            >
+              <Search className="mx-auto w-8 h-8 text-zinc-400 mb-3" />
+              <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">
                 No articles found
               </h3>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                Try adjusting your search terms.
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Try adjusting your search terms or category filter
               </p>
-            </div>
+            </motion.div>
           ) : (
-            <div className="space-y-4">
-              {filteredPosts.map((post, index) => (
-                <motion.div key={post._id} variants={itemVariants}>
-                  <Link
-                    to={`/blog/post/${post.slug}`}
-                    className="block   border-b border-zinc-200 dark:border-zinc-700 p-4 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-4 w-full justify-between">
-                      <h3 className="md:text-nowrap text-xs w-auto md:text-sm font-semibold text-zinc-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline">
-                        {post.title}
-                      </h3>
-                      <span className="w-full h-[1px] bg-zinc-500 dark:bg-zinc-400" />
-                      <div className="flex items-center gap-2 text-xs md:text-nowrap text-zinc-500 dark:text-zinc-400">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDate(post.createdAt)}</span>
+            <div className="space-y-8">
+              {Object.entries(groupedPosts).map(([categoryName, categoryPosts]) => (
+                <motion.div key={categoryName} variants={itemVariants}>
+                  {!searchTerm && !selectedCategory && (
+                    <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
+                      {categoryName}
+                    </h2>
+                  )}
+                  <div className="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    {categoryPosts.map((post) => (
+                      <div
+                        key={post._id}
+                        className="py-3 md:py-4"
+                      >
+                        <Link
+                          to={`/blog/post/${post.slug}`}
+                          className="group block"
+                        >
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-2">
+                            <span className="relative font-medium text-indigo-600 dark:text-indigo-400 leading-tight transition-colors duration-200">
+                              {post.title}
+                              <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                            </span>
+
+                            <div className="hidden md:flex items-center flex-1 mx-3">
+                              <span className="h-px w-full bg-zinc-300 dark:bg-zinc-700" />
+                            </div>
+
+                            <div className="flex items-center gap-2 text-xs md:text-sm text-zinc-500 dark:text-zinc-400 mt-1 md:mt-0">
+                              <Calendar className="w-3 h-3 md:w-4 md:h-4" />
+                              <span>{formatDate(post.createdAt)}</span>
+                            </div>
+                          </div>
+                          {post.summary && (
+                            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                              {post.summary}
+                            </p>
+                          )}
+                        </Link>
                       </div>
-                    </div>
-                  </Link>
+                    ))}
+                  </div>
                 </motion.div>
               ))}
             </div>
           )}
         </motion.div>
-        {/* <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-10 w-72 h-72 bg-indigo-400/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-purple-400/5 rounded-full blur-3xl"></div>
-          <div className="absolute top-3/4 left-1/3 w-64 h-64 bg-indigo-400/5 rounded-full blur-3xl"></div>
-        </div> */}
+
+        {/* Results Summary */}
+        {filteredPosts.length > 0 && (
+          <motion.div
+            className="mt-8 text-center"
+            variants={fadeIn}
+          >
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              {searchTerm || selectedCategory
+                ? `Found ${filteredPosts.length} article${filteredPosts.length === 1 ? '' : 's'}${searchTerm ? ` matching "${searchTerm}"` : ''
+                }${selectedCategory ? ` in ${selectedCategory}` : ''}`
+                : `${filteredPosts.length} article${filteredPosts.length === 1 ? '' : 's'} published`
+              }
+            </p>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );

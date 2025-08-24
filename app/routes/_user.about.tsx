@@ -93,14 +93,14 @@ export default function AdminAbout() {
         variants={fadeInUp}
       >
         {/* Portrait + Info */}
-        <div className="flex flex-col w-1/2 text-center items-center md:items-start gap-4">
+        <div className="w-1/2 text-center  md:items-start gap-4 flex flex-col items-center justify-center">
           <img
             src={Yahya}
             alt={getName()}
-            className="w-28 h-28 rounded-full object-cover shadow-sm border border-zinc-200 dark:border-zinc-800"
+            className="w-32 h-32 rounded-full object-cover shadow-sm border border-zinc-200 dark:border-zinc-800"
           />
 
-          <div className="space-y-1 text-center">
+          <div className="space-y-1 text-center flex flex-col items-center justify-center">
             <h1 className="text-2xl font-semibold">{getName()}</h1>
             {portfolio.location && (
               <div className="flex items-center justify-center  gap-2 text-sm text-zinc-500">
@@ -117,7 +117,7 @@ export default function AdminAbout() {
         {/* Bio */}
         {getBio().length > 0 && (
           <div
-            className={` md:text-md text-sm leading-relaxed ${theme === "dark" ? "text-zinc-200" : "text-zinc-600"
+            className={` md:text-base  text-sm leading-relaxed dark:text-zinc-100 text-zinc-600
               }`}
           >
             {getBio().map((line, i) => (
@@ -137,7 +137,7 @@ export default function AdminAbout() {
       {/* Skills */}
       {getSkills().length > 0 && (
         <motion.section variants={fadeInUp}>
-          <h2 className="text-lg font-semibold mb-4">Skills</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">Skills</h2>
           <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
             {getSkills().map((skill, i) => (
               <li key={i} className="opacity-80">
@@ -151,7 +151,7 @@ export default function AdminAbout() {
       {/* Projects */}
       {portfolio.projects?.length > 0 && (
         <motion.section variants={fadeInUp}>
-          <h2 className="text-lg font-semibold mb-4">Projects</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">Projects</h2>
           <div className="space-y-4 sm:space-y-6">
             {portfolio.projects.slice(0, 3).map((project, i) => (
               <div key={i} className="space-y-1">
@@ -194,9 +194,9 @@ function Experience({ experiences }: ExperienceProps) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <div className="gap-2">
-      <h2 className="text-lg font-semibold">Experience</h2>
-      <div className="gap-2">
+    <div className="space-y-2">
+      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400 mb-4 md:mb-6">Experience</h2>
+      <div className="space-y-2">
         {experiences.map((exp, i) => {
           const isOpen = open === i;
 
@@ -205,46 +205,46 @@ function Experience({ experiences }: ExperienceProps) {
               {/* Desktop layout */}
               <div className="hidden md:flex w-full">
                 {/* Left column: Year + Present */}
-                <div className="flex items-start gap-2 w-28 shrink-0 pt-2">
-                  <span className="text-md text-zinc-400">{exp.year}</span>
+                <div className="flex items-start gap-2 w-32 shrink-0 pt-3">
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">{exp.year}</span>
                   {Number(exp.isWorking) === 1 && (
-                    <span className="px-2 py-1 text-xs rounded-full bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-300">
+                    <span className="px-2 py-1 text-xs rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
                       Present
                     </span>
                   )}
                 </div>
 
                 {/* Right column */}
-                <div className="flex-1 p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900">
+                <div className="flex-1 p-3 rounded hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors duration-200">
                   <button
                     onClick={() => setOpen(isOpen ? null : i)}
-                    className="flex w-full gap-4 border-b dark:border-b-zinc-700 border-b-zinc-300 text-left pb-2"
+                    className="flex w-full gap-4 border-b border-zinc-200 dark:border-zinc-700 text-left pb-3"
                   >
                     <div className="max-w-full flex justify-between items-center w-full">
-                      <span className="flex items-center gap-6">
+                      <span className="flex items-center gap-4">
                         {isOpen ? (
-                          <ChevronUp size={16} />
+                          <ChevronUp size={16} className="text-zinc-400" />
                         ) : (
-                          <ChevronDown size={16} />
+                          <ChevronDown size={16} className="text-zinc-400" />
                         )}
-                        <span className="font-medium">{exp.company}</span>
+                        <span className="font-medium text-zinc-900 dark:text-zinc-100">{exp.company}</span>
                       </span>
-                      <span className="text-sm text-zinc-400">{exp.role}</span>
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400">{exp.role}</span>
                     </div>
                   </button>
 
                   {/* Dropdown */}
                   <div
-                    className={`transition-[max-height] duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-40 mt-2" : "max-h-0"
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 mt-3" : "max-h-0"
                       }`}
                   >
                     {exp.summary?.length > 0 && (
-                      <div className="text-sm p-1 leading-relaxed text-zinc-500 dark:text-zinc-400">
-                        <p>{exp.summary}</p>
-                        <p className="text-xs text-center justify-end my-4 gap-2 flex">
-                          <MapPin size={16} />
+                      <div className="text-sm p-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
+                        <p className="mb-3">{exp.summary}</p>
+                        <div className="flex items-center justify-end gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                          <MapPin size={14} />
                           {exp.location}
-                        </p>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -252,30 +252,31 @@ function Experience({ experiences }: ExperienceProps) {
               </div>
 
               {/* Mobile layout */}
-              <div className="flex md:hidden flex-col w-full p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900">
+              <div className="flex md:hidden flex-col w-full p-3 rounded hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors duration-200">
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between border-b dark:border-b-zinc-700 border-b-zinc-300 pb-2"
+                  className="flex w-full items-center justify-between border-b border-zinc-200 dark:border-zinc-700 pb-3"
                 >
-                  <span className="flex items-center gap-2 text-xs">
+                  <span className="flex items-center gap-3 text-sm">
                     {isOpen ? (
-                      <ChevronUp size={14} />
+                      <ChevronUp size={14} className="text-zinc-400" />
                     ) : (
-                      <ChevronDown size={14} />
+                      <ChevronDown size={14} className="text-zinc-400" />
                     )}
-                    <span className="font-medium">{exp.company}</span>,{" "}
-                    <span className="text-zinc-400">{exp.role}</span>
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{exp.company}</span>
+                    <span className="text-zinc-500 dark:text-zinc-400">•</span>
+                    <span className="text-zinc-500 dark:text-zinc-400">{exp.role}</span>
                   </span>
-                  <span className="text-xs text-zinc-400">{exp.year}</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">{exp.year}</span>
                 </button>
 
                 {/* Dropdown */}
                 <div
-                  className={`transition-[max-height] duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-40 mt-2" : "max-h-0"
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 mt-3" : "max-h-0"
                     }`}
                 >
                   {exp.summary?.length > 0 && (
-                    <div className="text-xs py-2 leading-relaxed text-zinc-400">
+                    <div className="text-xs py-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
                       <p>{exp.summary}</p>
                     </div>
                   )}
@@ -297,7 +298,7 @@ type CertificationsProps = {
 function Certifications({ certifications }: CertificationsProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Certifications</h2>
+      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">Certifications</h2>
       <div className="space-y-3">
         {certifications.map((cert, i) => (
           <div
@@ -332,20 +333,20 @@ function Socials({ socials }: SocialLinksProps) {
   const entries = Object.entries(socials).filter(([_, v]) => v);
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Elsewhere</h2>
-      <div className="space-y-3">
+    <div className="space-y-4 md:space-y-6">
+      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">Connect</h2>
+      <div className="space-y-4">
         {entries.map(([key, value], i) => (
           <div
             key={i}
-            className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b dark:border-b-zinc-700 border-b-zinc-300 pb-2"
+            className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pb-1 border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 last:pb-0"
           >
-            <span className="capitalize text-sm text-zinc-500">{key}</span>
+            <span className="capitalize text-sm text-zinc-600 dark:text-zinc-400">{key}</span>
             <a
               href={key === "email" ? `mailto:${value}` : value}
               target="_blank"
               rel="noreferrer"
-              className="text-sm font-medium text-indigo-600 break-all sm:break-normal"
+              className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline break-all sm:break-normal transition-colors duration-200"
             >
               {value}
             </a>

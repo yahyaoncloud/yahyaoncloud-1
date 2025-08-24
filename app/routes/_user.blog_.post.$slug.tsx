@@ -2,14 +2,13 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
-import { getAuthorByAuthorId, getPostBySlug } from "../Services/post.server";
+import { getAuthorByAuthorId, getPostBySlug, getPosts } from "../Services/post.server";
 import { marked } from "marked";
 import type { Author, Post } from "../Types/types";
 import { proseClasses } from "../styles/prose";
-import { useEffect } from "react";
-import { ArrowLeft, Clock, Eye, Calendar, Share2, Heart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Clock, Eye, Calendar, Share2, ChevronLeft, ChevronRight } from "lucide-react";
 import dummyImage from "../assets/yahya_glass.png";
-
 // --- Meta ---
 export function meta({
   data,
@@ -67,16 +66,27 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const post = await getPostBySlug(slug);
   if (!post) throw new Response("Not Found", { status: 404 });
 
-  const authorId = post.authorId; // capture before serialization
-  const author = authorId ? await getAuthorByAuthorId(authorId) : null;
-  console.log(authorId)
+  const authorId = post.authorId;
+  const [author, allPosts] = await Promise.all([
+    authorId ? getAuthorByAuthorId(authorId) : null,
+    getPosts("published", 20, 1) // Get more posts for the "More Articles" section
+  ]);
+
   const serializedPost = serializePost(post);
   const htmlContent = marked(serializedPost.content || "");
 
-  return json({ post: { ...serializedPost, content: htmlContent }, author });
+  // Filter out current post and serialize others
+  const otherPosts = allPosts
+    .filter(p => p.slug !== slug)
+    .map(serializePost)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  return json({
+    post: { ...serializedPost, content: htmlContent },
+    author,
+    relatedPosts: otherPosts
+  });
 };
-
-
 
 // --- Enhance Blog Content ---
 export function useEnhanceBlogContent() {
@@ -88,11 +98,11 @@ export function useEnhanceBlogContent() {
       if (table.parentElement?.classList.contains("overflow-x-auto")) return;
       const wrapper = document.createElement("div");
       wrapper.className =
-        "overflow-x-auto  shadow-sm bg-white dark:bg-transparent mb-4";
+        "overflow-x-auto shadow-sm bg-white dark:bg-zinc-900 rounded border border-zinc-200 dark:border-zinc-700 mb-4";
       table.parentNode?.insertBefore(wrapper, table);
       wrapper.appendChild(table);
       table.className +=
-        " min-w-full divide-y divide-gray-200 dark:divide-gray-700";
+        " min-w-full divide-y divide-zinc-200 dark:divide-zinc-700";
     });
 
     // --- CODE BLOCKS ---
@@ -100,7 +110,7 @@ export function useEnhanceBlogContent() {
       if (pre.parentElement?.classList.contains("code-block-wrapper")) return;
 
       const wrapper = document.createElement("div");
-      wrapper.className = "code-block-wrapper relative overflow-hidden";
+      wrapper.className = "code-block-wrapper relative overflow-hidden rounded border border-zinc-200 dark:border-zinc-700";
       pre.parentNode?.insertBefore(wrapper, pre);
       wrapper.appendChild(pre);
 
@@ -115,18 +125,18 @@ export function useEnhanceBlogContent() {
       const langLabel = document.createElement("div");
       langLabel.textContent = language;
       langLabel.className =
-        "absolute bottom-2 right-2 text-xs font-mono px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200";
+        "absolute bottom-2 right-2 text-xs font-mono px-2 py-1 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300";
       wrapper.appendChild(langLabel);
 
       // --- COPY BUTTON ---
       const button = document.createElement("button");
       button.setAttribute("aria-label", "Copy code");
       button.className =
-        "copy-button absolute top-8 right-2 p-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 opacity-0 transition-opacity hover:opacity-100";
+        "copy-button absolute top-2 right-2 p-1 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 opacity-0 transition-opacity hover:opacity-100 hover:bg-zinc-300 dark:hover:bg-zinc-600";
       button.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          <path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path>
         </svg>
       `;
 
@@ -143,7 +153,7 @@ export function useEnhanceBlogContent() {
             button.innerHTML = `
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                <path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path>
               </svg>
             `;
           }, 2000);
@@ -164,6 +174,115 @@ export function useEnhanceBlogContent() {
   }, []);
 }
 
+// --- More Articles Component ---
+const CarouselArticles = ({ posts }: { posts: Post[] }) => {
+  const [index, setIndex] = useState(0);
+  const visible = 2; // Show 2 cards at a time
+
+  const formatDate = (date: Date | string) => {
+    const d = new Date(date);
+    return isNaN(d.getTime())
+      ? "Invalid date"
+      : d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+  };
+
+  const next = () => setIndex((prev) => (prev + visible) % posts.length);
+  const prev = () =>
+    setIndex((prev) => (prev - visible + posts.length) % posts.length);
+
+  if (posts.length === 0) return null;
+
+  const currentPosts = posts.slice(index, index + visible);
+  if (currentPosts.length < visible) {
+    // Wrap around for last item
+    currentPosts.push(...posts.slice(0, visible - currentPosts.length));
+  }
+
+  return (
+    <motion.section
+      className="mt-16 pt-8 md:h-60 border-t border-zinc-200 dark:border-zinc-700"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
+          More Articles
+        </h2>
+        <Link
+          to="/blog/posts"
+          className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+        >
+          View all →
+        </Link>
+      </div>
+
+      <div className="relative flex items-center gap-4">
+        {/* Left Button */}
+        <button
+          onClick={prev}
+          className="p-2   dark:hover:text-indigo-400 hover:text-indigo-800 text-zinc-900 dark:text-zinc-200 transition-colors"
+        >
+          <ChevronLeft size={20} />
+        </button>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 py-4 md:grid-cols-2 gap-4 flex-1">
+          {currentPosts.map((post, idx) => (
+            <motion.div
+              key={post._id + idx}
+              className="relative flex rounded border border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              {/* Left: Background color with text */}
+              <div className="w-2/3 p-4 bg-white dark:bg-zinc-950 z-10">
+                <Link
+                  to={`/blog/post/${post.slug}`}
+                  className="block text-lg font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  {post.title}
+                </Link>
+                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-3">
+                  {post.summary}
+                </p>
+                <span className="block mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                  {formatDate(post.createdAt)}
+                </span>
+              </div>
+
+              {/* Right: Background image with smooth blend */}
+              <div
+                className="w-1/3 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${post.image || dummyImage})`,
+                }}
+              >
+                {/* Optional: Gradient overlay for smooth blending */}
+                <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-transparent to-white dark:to-zinc-950 pointer-events-none"></div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+
+        {/* Right Button */}
+        <button
+          onClick={next}
+          className="p-2 dark:hover:text-indigo-400 hover:text-indigo-800 text-zinc-900 dark:text-zinc-200 transition-colors"
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+    </motion.section>
+  );
+};
+
 // --- Animation Variants ---
 const fadeInUp = {
   hidden: { opacity: 0, y: 15 },
@@ -173,9 +292,10 @@ const fadeInUp = {
 // --- Component ---
 export default function PostPage() {
   const { theme } = useTheme();
-  const { post, author } = useLoaderData<{
+  const { post, author, relatedPosts } = useLoaderData<{
     post: Post;
     author: Author | null;
+    relatedPosts: Post[];
   }>();
 
   useEnhanceBlogContent();
@@ -183,15 +303,17 @@ export default function PostPage() {
   if (!post) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center">
-        <h1 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-          Post not found
-        </h1>
-        <Link
-          to="/blog"
-          className="mt-4 inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline"
-        >
-          <ArrowLeft size={14} /> Back to Blog
-        </Link>
+        <div>
+          <h1 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
+            Post not found
+          </h1>
+          <Link
+            to="/blog"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+          >
+            <ArrowLeft size={14} /> Back to Blog
+          </Link>
+        </div>
       </div>
     );
   }
@@ -233,7 +355,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className=" max-w-sm sm:max-w-sm md:max-w-md lg:max-w-3xl xl:max-w-3xl mx-auto px-6 py-12 space-y-8"
+      className="max-w-3xl mx-auto px-4 md:px-0 py-8 md:py-12 space-y-8 md:space-y-12"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}
@@ -244,31 +366,30 @@ export default function PostPage() {
           <img
             src={dummyImage}
             alt={post.title}
-            className="w-full h-64 object-cover rounded-md border border-zinc-200 dark:border-zinc-800"
+            className="w-full h-48 md:h-64 object-cover rounded border border-zinc-200 dark:border-zinc-700 mb-6"
           />
         )}
-        <div className="space-y-4 mt-6">
+        <div className="space-y-4">
           <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline"
+            to="/blog/posts"
+            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
           >
-            <ArrowLeft size={14} /> Back to Blog
+            <ArrowLeft size={14} /> Back to Articles
           </Link>
-          <h1 className="md:text-4xl text-2xl font-extrabold text-indigo-800 dark:text-indigo-400">
+          <h1 className="text-2xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
             {post.title}
           </h1>
           {post.summary && (
-            <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
               {post.summary}
             </p>
           )}
         </div>
       </motion.section>
 
-      {/* Meta Section */}
       {/* Meta & Author Section */}
       <motion.section variants={fadeInUp}>
-        <div className="flex flex-col gap-6 border-b border-zinc-200 dark:border-zinc-700 pb-6">
+        <div className="flex flex-col gap-4 md:gap-6 border-b border-zinc-200 dark:border-zinc-700 pb-6">
           {/* Author */}
           {author && (
             <div className="flex items-center gap-3">
@@ -318,7 +439,7 @@ export default function PostPage() {
               {post.categories?.map((category) => (
                 <span
                   key={category._id}
-                  className="px-2 py-1 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400"
+                  className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
                 >
                   {category.name}
                 </span>
@@ -326,7 +447,7 @@ export default function PostPage() {
               {post.tags?.map((tag) => (
                 <span
                   key={tag.tagID || tag.name}
-                  className="px-2 py-1 rounded text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
+                  className="px-3 py-1 rounded-full text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
                 >
                   #{tag.name}
                 </span>
@@ -338,7 +459,7 @@ export default function PostPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleShare}
-              className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+              className="flex items-center gap-1 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
             >
               <Share2 size={14} /> Share
             </button>
@@ -347,12 +468,15 @@ export default function PostPage() {
       </motion.section>
 
       {/* Article Content */}
-      <motion.section variants={fadeInUp} >
+      <motion.section variants={fadeInUp}>
         <article
           className={proseClasses}
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </motion.section>
+
+      {/* More Articles Section */}
+      <CarouselArticles posts={relatedPosts} />
     </motion.div>
   );
 }

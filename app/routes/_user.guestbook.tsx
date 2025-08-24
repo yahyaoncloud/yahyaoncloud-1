@@ -31,7 +31,7 @@ interface Message {
   };
 }
 
-// Loader and Action Functions (unchanged)
+// Loader and Action Functions
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const user = session.get("user") || null;
@@ -68,52 +68,21 @@ export const action: ActionFunction = async ({ request }) => {
   }
 };
 
-// Framer Motion Variants
-const containerVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
-
-// CSS for Auto-Hiding Scrollbar
-const scrollbarStyles = `
-  .auto-hide-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-  }
-  .auto-hide-scrollbar:hover,
-  .auto-hide-scrollbar:active {
-    scrollbar-color: #888 #f4f4f4;
-  }
-  .dark .auto-hide-scrollbar:hover,
-  .dark .auto-hide-scrollbar:active {
-    scrollbar-color: #a1a1aa #27272a;
-  }
-  .auto-hide-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .auto-hide-scrollbar::-webkit-scrollbar-thumb {
-    background: transparent;
-  }
-  .auto-hide-scrollbar:hover::-webkit-scrollbar-thumb,
-  .auto-hide-scrollbar:active::-webkit-scrollbar-thumb {
-    background: #888;
-  }
-  .dark .auto-hide-scrollbar:hover::-webkit-scrollbar-thumb,
-  .dark .auto-hide-scrollbar:active::-webkit-scrollbar-thumb {
-    background: #a1a1aa;
-  }
-  .auto-hide-scrollbar::-webkit-scrollbar-track {
-    background: #f4f4f4;
-  }
-  .dark .auto-hide-scrollbar::-webkit-scrollbar-track {
-    background: #27272a;
-  }
-`;
 
 export default function MinimalistGuestbook() {
   const { user } = useLoaderData<typeof loader>();
@@ -270,213 +239,217 @@ export default function MinimalistGuestbook() {
   };
 
   return (
-    <div className="min-h-screen my-6 ">
-      <style>{scrollbarStyles}</style>
+    <div className="min-h-screen">
       <motion.div
-        className="w-full py-12"
-        variants={containerVariants}
+        className="py-8 px-4 md:px-0 w-full max-w-3xl mx-auto"
         initial="hidden"
         animate="visible"
+        variants={fadeIn}
       >
         {/* Header */}
-        <motion.div variants={itemVariants}>
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-4">
+        <motion.div className="mb-8" variants={fadeIn}>
+          <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
             Guestbook
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl">
-            Leave a message and connect with the community. Share your thoughts
-            or say hello!
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Leave a message and connect with the community
           </p>
         </motion.div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-8 mt-8">
-          {/* Form Section */}
-          <motion.div className="lg:col-span-1" variants={itemVariants}>
-            {!user ? (
-              <div className="space-y-6">
-                <div className="text-center">
-                  <User className="mx-auto w-8 h-8 text-zinc-400 mb-4" />
-                  <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
-                    Sign in to leave a message
-                  </h2>
-                  <p className="text-zinc-600 dark:text-zinc-400">
-                    Use one of the options below
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {[
-                    {
-                      name: "Google",
-                      provider: googleProvider,
-                      icon: FaGoogle,
-                      color: "text-red-500",
-                    },
-                    {
-                      name: "GitHub",
-                      provider: githubProvider,
-                      icon: FaGithub,
-                      color: "text-zinc-900 dark:text-white",
-                    },
-                    {
-                      name: "Twitter",
-                      provider: twitterProvider,
-                      icon: FaTwitter,
-                      color: "text-sky-500",
-                    },
-                  ].map(({ name, provider, icon: Icon, color }) => (
-                    <button
-                      key={name}
-                      onClick={() => handleSignIn(provider)}
-                      className="w-full py-2 px-4 border border-zinc-200 dark:border-zinc-700 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Icon className={`w-5 h-5 ${color}`} />
-                      Sign in with {name}
-                    </button>
-                  ))}
-                </div>
+        {/* Authentication & Form */}
+        <motion.div className="mb-8" variants={fadeIn}>
+          {!user ? (
+            <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 p-6">
+              <div className="text-center mb-6">
+                <User className="mx-auto w-6 h-6 text-zinc-400 mb-3" />
+                <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">
+                  Sign in to leave a message
+                </h2>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Choose your preferred method
+                </p>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 border-b border-zinc-200 dark:border-zinc-700 pb-4">
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt={user.displayName}
-                      className="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                      {getInitials(user.displayName || "User")}
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
-                      {user.displayName}
-                    </p>
-                    <button
-                      onClick={handleSignOut}
-                      className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-1 transition-colors"
-                    >
-                      <LogOut className="w-3 h-3" />
-                      Sign out
-                    </button>
-                  </div>
-                </div>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <textarea
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Share your thoughts..."
-                    rows={4}
-                    className="w-full p-3 border border-zinc-200 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white focus:border-indigo-500 dark:focus:border-indigo-400 outline-none resize-none placeholder-zinc-400 dark:placeholder-zinc-500"
-                    maxLength={500}
+              <div className="grid gap-3">
+                {[
+                  {
+                    name: "Google",
+                    provider: googleProvider,
+                    icon: FaGoogle,
+                    color: "text-red-500",
+                  },
+                  {
+                    name: "GitHub",
+                    provider: githubProvider,
+                    icon: FaGithub,
+                    color: "text-zinc-900 dark:text-white",
+                  },
+                  {
+                    name: "Twitter",
+                    provider: twitterProvider,
+                    icon: FaTwitter,
+                    color: "text-sky-500",
+                  },
+                ].map(({ name, provider, icon: Icon, color }) => (
+                  <button
+                    key={name}
+                    onClick={() => handleSignIn(provider)}
+                    className="group flex items-center justify-center gap-3 py-2.5 px-4 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors duration-200"
+                  >
+                    <Icon className={`w-4 h-4 ${color}`} />
+                    <span className="text-sm font-medium">Sign in with {name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* User Info */}
+              <div className="flex items-center gap-3 pb-4 border-b border-zinc-200 dark:border-zinc-700">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName}
+                    className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700"
                   />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {newMessage.length}/500
-                    </span>
-                    <button
-                      type="submit"
-                      disabled={!newMessage.trim() || isSubmitting}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${!newMessage.trim() || isSubmitting
-                          ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-                          : "bg-indigo-600 dark:bg-indigo-400 text-white hover:bg-indigo-700 dark:hover:bg-indigo-500"
-                        }`}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          Send
-                        </>
-                      )}
-                    </button>
+                ) : (
+                  <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                    {getInitials(user.displayName || "User")}
                   </div>
-                </form>
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-zinc-900 dark:text-white">
+                    {user.displayName}
+                  </p>
+                  <button
+                    onClick={handleSignOut}
+                    className="group text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors duration-200"
+                  >
+                    <LogOut className="w-3 h-3" />
+                    <span className="relative">
+                      Sign out
+                      <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                    </span>
+                  </button>
+                </div>
               </div>
+
+              {/* Message Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Share your thoughts..."
+                  rows={3}
+                  className="w-full p-3 border border-zinc-300 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder-zinc-400 dark:placeholder-zinc-500"
+                  maxLength={500}
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {newMessage.length}/500
+                  </span>
+                  <button
+                    type="submit"
+                    disabled={!newMessage.trim() || isSubmitting}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${!newMessage.trim() || isSubmitting
+                        ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
+                        : "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
+                      }`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Send
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Messages */}
+        <motion.div variants={fadeIn}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-medium text-zinc-900 dark:text-white">
+              Messages
+            </h2>
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+              {messages.length} {messages.length === 1 ? "message" : "messages"}
+            </span>
+          </div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="space-y-6"
+          >
+            {visibleMessages.length === 0 ? (
+              <motion.div
+                variants={itemVariants}
+                className="text-center py-12 text-zinc-500 dark:text-zinc-400"
+              >
+                <p>No messages yet. Be the first to share!</p>
+              </motion.div>
+            ) : (
+              <>
+                {visibleMessages.map((message, index) => (
+                  <motion.div
+                    key={message.id}
+                    variants={itemVariants}
+                    className="pb-6 border-b border-zinc-200 dark:border-zinc-700 last:border-0"
+                  >
+                    <div className="flex gap-3">
+                      {message.user.photo ? (
+                        <img
+                          src={message.user.photo}
+                          alt={message.user.name}
+                          className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700 flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                          {getInitials(message.user.name)}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                            {message.user.name}
+                          </span>
+                          <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                            <Clock className="w-3 h-3" />
+                            {formatTime(message.timestamp)}
+                          </div>
+                        </div>
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300 break-words leading-relaxed">
+                          {message.message}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                {hasMore && (
+                  <div ref={observerRef} className="text-center py-4">
+                    {isLoadingMore && (
+                      <div className="flex items-center justify-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm">
+                        <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-500 dark:border-t-zinc-400 rounded-full animate-spin"></div>
+                        Loading more messages...
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </motion.div>
-
-          {/* Messages Section */}
-          <motion.div
-            className="lg:col-span-2 auto-hide-scrollbar"
-            variants={containerVariants}
-          >
-            <div className="border border-zinc-200 dark:border-zinc-700 rounded-md p-6 overflow-y-auto max-h-[600px]">
-              <div className="flex items-center justify-between mb-4 border-b border-zinc-200 dark:border-zinc-700 pb-4">
-                <h2 className="sticky top-0 left-0 text-lg font-semibold text-zinc-900 dark:text-white">
-                  Messages
-                </h2>
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {messages.length}{" "}
-                  {messages.length === 1 ? "message" : "messages"}
-                </span>
-              </div>
-              {visibleMessages.length === 0 ? (
-                <div className="text-center py-8 text-zinc-600 dark:text-zinc-400">
-                  No messages yet. Be the first to share!
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {visibleMessages.map((message, index) => (
-                    <motion.div
-                      key={message.id}
-                      variants={itemVariants}
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                      className="border-b border-zinc-200 dark:border-zinc-700 pb-6 last:border-0"
-                    >
-                      <div className="flex gap-3">
-                        {message.user.photo ? (
-                          <img
-                            src={message.user.photo}
-                            alt={message.user.name}
-                            className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-                            {getInitials(message.user.name)}
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-semibold text-zinc-900 dark:text-white">
-                              {message.user.name}
-                            </span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {formatTime(message.timestamp)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-zinc-700 dark:text-zinc-300 break-words">
-                            {message.message}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                  {hasMore && (
-                    <div ref={observerRef} className="text-center py-4">
-                      {isLoadingMore ? (
-                        <div className="flex items-center justify-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm">
-                          <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-500 dark:border-t-zinc-400 rounded-full animate-spin"></div>
-                          Loading more...
-                        </div>
-                      ) : (
-                        <div className="h-1"></div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );
