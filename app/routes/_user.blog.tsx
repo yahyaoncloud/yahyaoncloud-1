@@ -13,9 +13,12 @@ import {
   FaGithub,
   FaInstagram,
   FaLinkedin,
-  FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
+
+import {
+  FaSquareXTwitter,
+} from "react-icons/fa6";
 import {
   getPosts,
   getAllCategories,
@@ -47,11 +50,13 @@ interface LoaderData {
   socials: SocialLink[];
 }
 
+
+
 // Constants
 const SOCIAL_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   linkedin: FaLinkedin,
   github: FaGithub,
-  twitter: FaTwitter,
+  twitter: FaSquareXTwitter,
   youtube: FaYoutube,
   instagram: FaInstagram,
   email: Mail,

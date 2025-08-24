@@ -5,7 +5,7 @@ import { Sun, Moon, Menu, X, User } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
 import Logo from "../assets/yoc-logo.png";
 import PalestineSVG from "../assets/palestine-svgrepo-com.svg";
-
+import dummyImage from "../assets/yahya_glass.png"
 interface NavLink {
   name: string;
   href: string;
@@ -55,15 +55,27 @@ const SupportButton = ({ onClick }: { onClick?: () => void }) => (
     href="https://www.unrwa.org/donate"
     target="_blank"
     rel="noopener noreferrer"
-    className="p-2 rounded-md dark:hover:bg-zinc-800 hover:bg-zinc-200 transition-colors duration-200"
+    className="relative px-3 py-2 w-full rounded flex gap-2 hover:opacity-80 transition-opacity duration-200 overflow-hidden"
     onClick={onClick}
     whileHover={MOTION_VARIANTS.hover}
     whileTap={MOTION_VARIANTS.tap}
   >
-    <img src={PalestineSVG} alt="Palestine flag" className="w-6 h-6" />
+    {/* Subtle background image */}
+    <div className="absolute inset-0 pointer-events-none">
+      <img
+        src={dummyImage}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover object-left opacity-10"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/90 dark:to-zinc-900/90" />
+    </div>
+
+    <div className="relative z-10 flex gap-2 items-center text-sm">
+      <img src={PalestineSVG} alt="Palestine flag" className="w-4 h-4" />
+      Support
+    </div>
   </motion.a>
 );
-
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -114,6 +126,17 @@ export default function Header() {
         </motion.div>
 
         <div className="flex items-center space-x-2">
+          <motion.button
+            onClick={() => {
+              setIsMenuOpen(false);
+              toggleTheme();
+            }}
+            className="p-2 rounded-md dark:hover:bg-zinc-800 hover:bg-zinc-200 text-zinc-400 hover:text-indigo-400 transition-colors duration-200"
+            whileHover={MOTION_VARIANTS.hover}
+            whileTap={MOTION_VARIANTS.tap}
+          >
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          </motion.button>
           {/* Profile Dropdown */}
           <div
             className="relative profile-dropdown"
@@ -173,20 +196,15 @@ export default function Header() {
               {NAV_LINKS.map((link) => (
                 <MobileNavLinkItem key={link.name} link={link} isActive={isActive(link.href)} onClick={() => setIsMenuOpen(false)} />
               ))}
-              <div className="flex items-center space-x-2 pt-2">
+              <div
+                className="flex items-center justify-between"
+              >
+
+
                 <SupportButton onClick={() => setIsMenuOpen(false)} />
-                <motion.button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    toggleTheme();
-                  }}
-                  className="p-2 rounded-md dark:hover:bg-zinc-800 hover:bg-zinc-200 text-zinc-400 hover:text-indigo-400 transition-colors duration-200"
-                  whileHover={MOTION_VARIANTS.hover}
-                  whileTap={MOTION_VARIANTS.tap}
-                >
-                  {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-                </motion.button>
               </div>
+
+
             </div>
           </motion.div>
         )}

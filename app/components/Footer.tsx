@@ -1,20 +1,18 @@
 import { Link } from "@remix-run/react";
 import {
-  Twitter,
   Github,
   Linkedin,
   Mail,
   Heart,
   ExternalLink,
-  Rss,
   Youtube,
   Instagram,
   Coffee,
 } from "lucide-react";
-
 import Logo from "../assets/yoc-logo.png";
 import { useEffect, useState } from "react";
 import { useTheme } from "../Contexts/ThemeContext";
+import { FaSquareXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -26,15 +24,15 @@ export default function Footer() {
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
     { name: "Guestbook", href: "/guestbook" },
-    { name: "Privacy", href: "/privacy" },
-    // { name: "RSS", href: "/rss.xml" },
+    { name: "Privacy", href: "/privacy-policy" }, // Updated to match Privacy Policy route
+    { name: "Terms", href: "/terms-and-conditions" }, // Added Terms and Conditions
   ];
 
   const socialLinks = [
     {
-      name: "Twitter",
-      href: "https://twitter.com/yahyaoncloud",
-      icon: Twitter,
+      name: "X",
+      href: "https://x.com/yahyaoncloud", // Updated to X URL
+      icon: FaSquareXTwitter,
     },
     { name: "GitHub", href: "https://github.com/yahyaoncloud", icon: Github },
     {
@@ -91,9 +89,8 @@ export default function Footer() {
               <img
                 src={Logo}
                 alt="yahyaoncloud logo"
-                className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${
-                  scrolled ? "w-16 h-16" : "w-24 h-24"
-                }`}
+                className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${scrolled ? "w-16 h-16" : "w-24 h-24"
+                  }`}
               />
               <span className="font-thin text-2xl text-zinc-900 dark:text-white mrs-saint-delafield-regular">
                 Yahya On Cloud
@@ -110,7 +107,7 @@ export default function Footer() {
                 href="https://coff.ee/yahyaoncloud"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400  text-zinc-800  font-medium rounded-md transition-all duration-200 shadow-md hover:shadow-lg"
+                className="inline-flex items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400 text-zinc-800 font-medium rounded-md transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 <Coffee size={18} />
                 <span>Buy me a coffee</span>
@@ -129,7 +126,10 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400 transition-colors duration-200"
+                    className={`underline transition-colors duration-200 ${link.name === "Privacy" || link.name === "Terms"
+                      ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
+                      : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
+                      }`}
                   >
                     {link.name}
                   </Link>

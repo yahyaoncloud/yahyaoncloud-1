@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Clock, User, LogOut } from "lucide-react";
-import { FaGithub, FaGoogle, FaTwitter } from "react-icons/fa";
+import { FaGithub, FaTwitter } from "react-icons/fa";
+import {
+  FaSquareXTwitter, FaGoogle
+} from "react-icons/fa6";
 import {
   json,
   type LoaderFunction,
@@ -237,9 +240,19 @@ export default function MinimalistGuestbook() {
       .toUpperCase()
       .slice(0, 2);
   };
+  const [pinnedMessage, setPinnedMessage] = useState<Message | null>({
+    id: "pinned-1",
+    message: "Welcome to the guestbook! Be kind and respectful.",
+    timestamp: new Date().toISOString(),
+    user: {
+      name: "Admin",
+      photo: "", // optional admin avatar URL
+      uid: "admin",
+    },
+  });
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen md:w-[500px] ">
       <div className="py-12 px-4 sm:px-6 md:px-8 w-full max-w-7xl mx-auto">
         {/* Header */}
         <motion.div className="mb-8 w-full" variants={fadeIn} initial="hidden" animate="visible">
@@ -281,8 +294,8 @@ export default function MinimalistGuestbook() {
                   {
                     name: "Twitter",
                     provider: twitterProvider,
-                    icon: FaTwitter,
-                    color: "text-sky-500",
+                    icon: FaSquareXTwitter,
+                    color: "text-white",
                   },
                 ].map(({ name, provider, icon: Icon, color }) => (
                   <button
@@ -329,7 +342,7 @@ export default function MinimalistGuestbook() {
               </div>
 
               {/* Message Form */}
-              <form onSubmit={handleSubmit} className="space-y-4 w-full">
+              <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl">
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
@@ -370,7 +383,7 @@ export default function MinimalistGuestbook() {
         </motion.div>
 
         {/* Messages */}
-        <motion.div variants={fadeIn} className="w-full" initial="hidden" animate="visible">
+        <motion.div variants={fadeIn} className="max-w-xl" initial="hidden" animate="visible">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium text-zinc-900 dark:text-white">
               Messages
@@ -384,8 +397,41 @@ export default function MinimalistGuestbook() {
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="space-y-6"
+            className="space-y-6 max-h-96 overflow-y-auto"
           >
+            {pinnedMessage && (
+              <motion.div
+                variants={itemVariants}
+                className="pb-6 border-b border-indigo-300 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 p-4 mb-4 flex gap-3"
+              >
+                {pinnedMessage.user.photo ? (
+                  <img
+                    src={pinnedMessage.user.photo}
+                    alt={pinnedMessage.user.name}
+                    className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700 flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                    {getInitials(pinnedMessage.user.name)}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
+                      {pinnedMessage.user.name} (Pinned)
+                    </span>
+                    <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                      <Clock className="w-3 h-3" />
+                      {formatTime(pinnedMessage.timestamp)}
+                    </div>
+                  </div>
+                  <p className="text-sm text-zinc-700 dark:text-zinc-300 break-words leading-relaxed">
+                    {pinnedMessage.message}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
             {visibleMessages.length === 0 ? (
               <motion.div
                 variants={itemVariants}

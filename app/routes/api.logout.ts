@@ -1,10 +1,6 @@
-import { json } from "@remix-run/node";
+// routes/logout.tsx
 import { logout } from "../utils/session.server";
 
-export const action = async ({ request }) => {
-  return json({}, {
-    headers: {
-      "Set-Cookie": await logout(request),
-    },
-  });
+export const action = ({ request }: { request: Request }) => {
+  return logout(request);
 };
