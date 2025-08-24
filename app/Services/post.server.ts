@@ -55,7 +55,7 @@ export async function createPost(
 export async function getPostById(id: string) {
   return (
     Post.findById(id)
-      .populate("author")
+      // .populate("author")
       .populate("categories")
       .populate("tags")
       .populate("types")
@@ -66,7 +66,7 @@ export async function getPostById(id: string) {
 
 export async function getPostBySlug(slug: string) {
   return Post.findOne({ slug })
-    .populate("author")
+    // .populate("author")
     .populate("categories")
     .populate("tags")
     .populate("types")
@@ -87,7 +87,9 @@ export async function getPosts(
   if (options?.populate) {
     query.populate(options.populate);
   }
-  return query.populate("author").populate("categories").populate("coverImage");
+  // return query.populate("author").populate("categories").populate("coverImage");
+  return query.populate("categories").populate("coverImage");
+
 }
 
 
@@ -427,7 +429,7 @@ export async function getPostsByCategory(categoryId: string) {
     status: "published",
   })
     .sort({ date: -1 })
-    .populate("author") // Changed from authorId to author
+    // .populate("author") 
     .populate("coverImage");
 }
 
@@ -437,7 +439,7 @@ export async function getPostsByTag(tagId: string) {
     status: "published",
   })
     .sort({ date: -1 })
-    .populate("author") // Changed from authorId to author
+    // .populate("author") 
     .populate("coverImage");
 }
 
@@ -447,7 +449,7 @@ export async function getPostsByType(typeId: string) {
     status: "published",
   })
     .sort({ date: -1 })
-    .populate("author") // Changed from authorId to author
+    // .populate("author") 
     .populate("coverImage");
 }
 
@@ -488,9 +490,15 @@ export async function getAllAuthors() {
   }
 }
 
-export async function getAuthorByAuthorId(authorId: string) {
+export async function getAuthorByAuthorId(id: string) {
   try {
-    const author = await Author.findOne({ authorId });
+    if (!id) return null;
+    let query: any = { authorId: id };
+    if (Types.ObjectId.isValid(id)) {
+      // If it's a valid ObjectId, also try by _id
+      query = { $or: [{ authorId: id }, { _id: new Types.ObjectId(id) }] };
+    }
+    const author = await Author.findOne(query).lean();
     if (!author) {
       return null;
     }

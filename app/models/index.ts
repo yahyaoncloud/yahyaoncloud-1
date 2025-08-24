@@ -70,7 +70,7 @@ interface IPost extends Document {
   content: string;
   summary: string;
   date: Date;
-  author: Types.ObjectId;
+  authorId: string;
   categories: ICategory[];
   tags: ITag[];
   types: IType[];
@@ -312,7 +312,7 @@ const PostSchema = new Schema<IPost>(
     content: { type: String, required: true },
     summary: { type: String, required: false },
     date: { type: Date, required: true },
-    author: { type: Schema.Types.ObjectId, ref: "Author", required: true },
+    authorId: { type: String, required: true },
     categories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
     types: [{ type: Schema.Types.ObjectId, ref: "Type" }],

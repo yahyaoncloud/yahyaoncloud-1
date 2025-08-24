@@ -63,19 +63,29 @@ function serializePost(post: any) {
 // --- Loader ---
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { slug } = params;
+  if (!slug) {
+    throw new Response("Slug is required", { status: 400 });
+  }
+
   const post = await getPostBySlug(slug);
-  if (!post) throw new Response("Not Found", { status: 404 });
+  if (!post) {
+    throw new Response("Not Found", { status: 404 });
+  }
 
   const authorId = post.authorId;
+
+
+
   const [author, allPosts] = await Promise.all([
     authorId ? getAuthorByAuthorId(authorId) : null,
-    getPosts("published", 20, 1) // Get more posts for the "More Articles" section
+    getPosts("published", 20, 1)
   ]);
 
   const serializedPost = serializePost(post);
+
+
   const htmlContent = marked(serializedPost.content || "");
 
-  // Filter out current post and serialize others
   const otherPosts = allPosts
     .filter(p => p.slug !== slug)
     .map(serializePost)
@@ -355,7 +365,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="max-w-3xl mx-auto px-4 md:px-0 py-8 md:py-12 space-y-8 md:space-y-12"
+      className="max-w-3xl mx-auto px-6 md:px-8 py-8 md:py-12 space-y-8 md:space-y-12"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}
@@ -389,7 +399,7 @@ export default function PostPage() {
 
       {/* Meta & Author Section */}
       <motion.section variants={fadeInUp}>
-        <div className="flex flex-col gap-4 md:gap-6 border-b border-zinc-200 dark:border-zinc-700 pb-6">
+        <div className="flex flex-col gap-4 md:gap-6  border-b border-zinc-200 dark:border-zinc-700 pb-6">
           {/* Author */}
           {author && (
             <div className="flex items-center gap-3">

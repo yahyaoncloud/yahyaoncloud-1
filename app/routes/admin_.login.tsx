@@ -171,19 +171,19 @@ export default function LoginPage() {
                 {/* Right Panel: Image Carousel */}
                 {/* Staircase Background Panels */}
                 <motion.div
-                    className="absolute top-0 right-0 w-1/2 h-full bg-indigo-500/5 rounded-l-xl z-10"
+                    className="absolute top-0 right-0 w-1/2 hidden md:block h-full bg-indigo-500/5 rounded-l-xl z-10"
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: -30 }}
                     transition={{ duration: 0.8, delay: 0.1 }}
                 />
                 <motion.div
-                    className="absolute top-0 right-5 w-1/2 h-full bg-indigo-500/10 rounded-l-xl z-20"
+                    className="absolute top-0 right-5 w-1/2 h-full hidden md:block bg-indigo-500/10 rounded-l-xl z-20"
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: -40 }}
                     transition={{ duration: 0.8, delay: 0.3 }}
                 />
                 <motion.div
-                    className="absolute top-0 right-10 w-1/2 h-full bg-indigo-500/20 rounded-l-xl z-30"
+                    className="absolute top-0 right-10 w-1/2 h-full hidden md:block bg-indigo-500/20 rounded-l-xl z-30"
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: -50 }}
                     transition={{ duration: 0.8, delay: 0.5 }}
