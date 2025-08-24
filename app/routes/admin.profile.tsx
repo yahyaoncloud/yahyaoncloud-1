@@ -7,7 +7,8 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
-import { updatePortfolio, getAllPortfolios, uploadImage } from "../Services/post.server";
+import { updatePortfolio, getAllPortfolios } from "../Services/post.server";
+import { uploadImage } from "../utils/cloudinary.server"
 import { useToast } from "../hooks/use-toast";
 
 export async function loader({ request }: LoaderFunctionArgs) {
