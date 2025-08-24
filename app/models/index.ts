@@ -193,6 +193,25 @@ interface IAuthor extends Document {
   updatedAt: Date;
 }
 
+// Draft interface
+export interface IDraftDoc extends Document {
+  _id: string;
+  title: string;
+  summary?: string;
+  content?: string;
+  categories?: string[];
+  tags?: string[];
+  types?: string[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string[];
+  authorId?: string;
+  sessionId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  expiresAt?: Date;
+}
+
 // Schemas
 const defaultOptions = { timestamps: true };
 
@@ -434,6 +453,88 @@ const AuthorSchema = new Schema<IAuthor>(
   defaultOptions
 );
 
+// Draft schema
+const DraftSchema = new Schema<IDraftDoc>({
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 200
+  },
+  summary: {
+    type: String,
+    trim: true,
+    maxlength: 500
+  },
+  content: {
+    type: String,
+    trim: true
+  },
+  categories: [{
+    type: String,
+    ref: 'Category'
+  }],
+  tags: [{
+    type: String,
+    ref: 'Tag'
+  }],
+  types: [{
+    type: String,
+    ref: 'Type'
+  }],
+  seoTitle: {
+    type: String,
+    trim: true,
+    maxlength: 200
+  },
+  seoDescription: {
+    type: String,
+    trim: true,
+    maxlength: 500
+  },
+  seoKeywords: [{
+    type: String,
+    trim: true
+  }],
+  authorId: {
+    type: String,
+    ref: 'Author',
+    sparse: true // Allows null for anonymous drafts
+  },
+  sessionId: {
+    type: String,
+    sparse: true // For anonymous users
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  },
+  expiresAt: {
+    type: Date,
+    index: { expireAfterSeconds: 0 } // MongoDB TTL index for auto-deletion
+  }
+}, {
+  timestamps: true, // Automatically manage createdAt and updatedAt
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Indexes for better performance
+DraftSchema.index({ authorId: 1, updatedAt: -1 });
+DraftSchema.index({ sessionId: 1, updatedAt: -1 });
+DraftSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+// Pre-save middleware to update the updatedAt field
+DraftSchema.pre('save', function (this: IDraftDoc, next) {
+  this.updatedAt = new Date();
+  next();
+});
+
+
 // Models
 export const User: Model<IUserDoc> =
   mongoose.models.User || mongoose.model<IUserDoc>("User", UserSchema);
@@ -471,5 +572,12 @@ export const Guestbook: Model<IGuestbookDoc> =
   mongoose.model<IGuestbookDoc>("Guestbook", GuestbookSchema);
 export const Author: Model<IAuthorDoc> =
   mongoose.models.Author || mongoose.model<IAuthorDoc>("Author", AuthorSchema);
+export const Draft: Model<IDraftDoc> = mongoose.models.Draft || mongoose.model<IDraftDoc>('Draft', DraftSchema);
 // export const SEO: Model<ISEODoc> =
 //   mongoose.models.SEO || mongoose.model<ISEODoc>("SEO", SEOSchema);
+
+
+
+
+
+// Export the model

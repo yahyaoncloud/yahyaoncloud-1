@@ -98,7 +98,7 @@ export default function LoginPage() {
 
     return (
         <motion.div
-            className="min-h-screen flex flex-col  transiton-all ease-in-out duration-300 relative dark:bg-zinc-950 bg-zinc-50 text-zinc-900 dark:text-zinc-100"
+            className="min-h-screen overflow-clip flex flex-col  transiton-all ease-in-out duration-300 relative dark:bg-zinc-950 bg-zinc-50 text-zinc-900 dark:text-zinc-100"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -156,10 +156,43 @@ export default function LoginPage() {
                 </motion.div>
 
                 {/* Right Panel: Image Carousel */}
-                <motion.div className="hidden md:block w-1/2 relative overflow-hidden rounded-l-xl"
-                    initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
+                {/* Staircase Background Panels */}
+                <motion.div
+                    className="absolute top-0 right-0 w-1/2 h-full bg-indigo-500/5 rounded-l-xl z-10"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: -30 }}
+                    transition={{ duration: 0.8, delay: 0.1 }}
+                />
+                <motion.div
+                    className="absolute top-0 right-5 w-1/2 h-full bg-indigo-500/10 rounded-l-xl z-20"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: -40 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                />
+                <motion.div
+                    className="absolute top-0 right-10 w-1/2 h-full bg-indigo-500/20 rounded-l-xl z-30"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: -50 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                />
+
+
+                {/* Foreground Carousel Panel */}
+                <motion.div
+                    className="hidden md:block relative w-1/2 overflow-hidden shadow-xl shadow-zinc-950 rounded-l-xl z-40"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                >
                     <AnimatePresence>
-                        <motion.div key={currentImageIndex} variants={motionVariants.image} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
+                        <motion.div
+                            key={currentImageIndex}
+                            variants={motionVariants.image}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            className="absolute inset-0"
+                        >
                             <img src={currentImage.url} alt={currentImage.title} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/40 via-transparent to-transparent" />
                         </motion.div>
@@ -178,6 +211,7 @@ export default function LoginPage() {
                         </div>
                     </div>
                 </motion.div>
+
             </div>
         </motion.div>
     );

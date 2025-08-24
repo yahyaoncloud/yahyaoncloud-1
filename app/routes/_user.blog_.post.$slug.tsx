@@ -202,10 +202,10 @@ export default function PostPage() {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
   };
 
   const handleShare = async () => {
@@ -348,7 +348,7 @@ export default function PostPage() {
       </motion.section>
 
       {/* Article Content */}
-      <motion.section variants={fadeInUp}>
+      <motion.section variants={fadeInUp} className="z-0">
         <article
           className={proseClasses}
           dangerouslySetInnerHTML={{ __html: post.content }}

@@ -20,7 +20,7 @@ function LayoutContent({ children, sidebar }: MainLayoutProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.25 }}
-        className="flex-grow py-12 p-6"
+        className="flex-grow py-12 p-6 "
       >
         <div className="flex">
           {/* {sidebar && (

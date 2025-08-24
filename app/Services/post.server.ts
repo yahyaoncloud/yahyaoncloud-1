@@ -10,6 +10,8 @@ import {
   ITagDoc,
   ITypeDoc,
   Author,
+  Draft,
+  IDraftDoc
 } from "../models";
 import { Types } from "mongoose";
 import { uploadImage } from "../utils/cloudinary.server";
@@ -174,6 +176,141 @@ export async function getTopPosts(limit: number = 3) {
   }
 
   return sortedPosts.slice(0, limit);
+}
+
+
+// ==================== DRAFT OPERATIONS ====================
+
+// Create a new draft
+export async function saveDraft(draftData: Partial<IDraftDoc>) {
+  const slug = draftData.title
+    ? draftData.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+    : "untitled-draft";
+
+  // Set expiration date (30 days from now)
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 30);
+
+  const draft = {
+    ...draftData,
+    slug,
+    updatedAt: new Date(),
+    expiresAt,
+    createdAt: draftData.createdAt || new Date(),
+  };
+
+  // Check if draft already exists for this author/session
+  const existingDraft = await Draft.findOne({
+    $or: [
+      { authorId: draftData.authorId },
+      { sessionId: draftData.sessionId }
+    ]
+  });
+
+  if (existingDraft) {
+    return Draft.findByIdAndUpdate(existingDraft._id, draft, { new: true });
+  } else {
+    return Draft.create(draft);
+  }
+}
+
+// Get draft by author ID
+export async function getDraftByAuthorId(authorId: string) {
+  return Draft.findOne({ authorId }).sort({ updatedAt: -1 });
+}
+
+// Get draft by session ID (for anonymous users)
+export async function getDraftBySessionId(sessionId: string) {
+  return Draft.findOne({ sessionId }).sort({ updatedAt: -1 });
+}
+
+// Delete a draft
+export async function deleteDraft(id: string) {
+  return Draft.findByIdAndDelete(id);
+}
+
+// Delete expired drafts (utility function)
+export async function cleanupExpiredDrafts() {
+  return Draft.deleteMany({
+    expiresAt: { $lt: new Date() }
+  });
+}
+
+// Convert draft to post
+export async function convertDraftToPost(
+  draftId: string,
+  additionalPostData?: Partial<IPostDoc>,
+  files?: { coverImage?: File; gallery?: File[] }
+) {
+  const draft = await Draft.findById(draftId);
+  if (!draft) throw new Error("Draft not found");
+
+  // Create post from draft data
+  const postData: Partial<IPostDoc> = {
+    title: draft.title,
+    summary: draft.summary,
+    content: draft.content,
+    categories: draft.categories?.map(id => ({ _id: id })),
+    tags: draft.tags,
+    types: draft.types,
+    authorId: draft.authorId,
+    seo: {
+      title: draft.seoTitle || draft.title,
+      description: draft.seoDescription || draft.summary || "",
+      keywords: draft.seoKeywords || [],
+      canonicalUrl: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    status: "draft",
+    date: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...additionalPostData
+  };
+
+  const post = await createPost(postData, files);
+
+  // Delete the draft after successful conversion
+  await deleteDraft(draftId);
+
+  return post;
+}
+
+// Auto-save draft function (debounced)
+const draftSaveTimeouts = new Map<string, NodeJS.Timeout>();
+
+export async function autoSaveDraft(
+  authorId: string,
+  draftData: Partial<IDraftDoc>,
+  sessionId?: string,
+  debounceMs: number = 2000
+) {
+  const key = authorId || sessionId || 'anonymous';
+
+  // Clear existing timeout
+  if (draftSaveTimeouts.has(key)) {
+    clearTimeout(draftSaveTimeouts.get(key)!);
+  }
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(async () => {
+      try {
+        const result = await saveDraft({
+          ...draftData,
+          authorId,
+          sessionId,
+        });
+        draftSaveTimeouts.delete(key);
+        resolve(result);
+      } catch (error) {
+        draftSaveTimeouts.delete(key);
+        reject(error);
+      }
+    }, debounceMs);
+
+    draftSaveTimeouts.set(key, timeout);
+  });
 }
 
 // ==================== CATEGORY OPERATIONS ====================

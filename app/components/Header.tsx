@@ -102,7 +102,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className="fixed top-0 z-[9999px] w-full max-w-3xl border-b dark:border-zinc-700 border-zinc-300 px-4 py-3 dark:bg-zinc-950 text-zinc-900 bg-zinc-50 dark:text-zinc-100 transition-shadow"
+      className="fixed top-0 z-[9999] w-full max-w-3xl border-b dark:border-zinc-700 border-zinc-300 px-4 py-3 dark:bg-zinc-950 text-zinc-900 bg-zinc-50 dark:text-zinc-100 transition-shadow"
       animate={{ y: isVisible ? 0 : -100, opacity: isVisible ? 1 : 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
