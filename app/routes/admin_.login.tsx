@@ -15,6 +15,8 @@ import { useFetcher, useLoaderData } from "@remix-run/react";
 import { auth, googleProvider, githubProvider } from "../utils/firebase.client";
 import { signInWithPopup } from "firebase/auth";
 import { getUser, sessionStorage } from "../utils/session.server";
+import { Link } from "@remix-run/react";
+
 
 const galleryImages = [
     { url: Glitch, title: "Fragmented Signal", description: "A distorted self — caught mid-glitch." },
@@ -136,22 +138,33 @@ export default function LoginPage() {
                             )}
                         </AnimatePresence>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => handleSSOLogin("google")}
-                                disabled={isLoading || fetcher.state !== "idle"}
-                                className="flex-1 flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 rounded-md py-2 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+                        <div className="flex flex-col gap-3">
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => handleSSOLogin("google")}
+                                    disabled={isLoading || fetcher.state !== "idle"}
+                                    className="flex-1 flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 rounded-md py-2 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+                                >
+                                    <Chrome size={18} /> Google
+                                </button>
+                                <button
+                                    onClick={() => handleSSOLogin("github")}
+                                    disabled={isLoading || fetcher.state !== "idle"}
+                                    className="flex-1 flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 rounded-md py-2 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+                                >
+                                    <Github size={18} /> GitHub
+                                </button>
+                            </div>
+
+                            {/* Blog Navigation Button */}
+                            <Link
+                                to="/blog"
+                                className="w-full flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 rounded-md py-2 bg-indigo-600 text-white hover:bg-indigo-500 transition-colors"
                             >
-                                <Chrome size={18} /> Google
-                            </button>
-                            <button
-                                onClick={() => handleSSOLogin("github")}
-                                disabled={isLoading || fetcher.state !== "idle"}
-                                className="flex-1 flex items-center justify-center gap-2 border border-zinc-400 dark:border-zinc-700 rounded-md py-2 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
-                            >
-                                <Github size={18} /> GitHub
-                            </button>
+                                Go to Blog
+                            </Link>
                         </div>
+
                     </div>
                 </motion.div>
 

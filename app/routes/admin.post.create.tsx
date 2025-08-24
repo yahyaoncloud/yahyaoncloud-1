@@ -23,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { Category, Tag, Type, SEO } from "../Types/types";
 import { Author } from "../models";
 import { Types } from "mongoose";
-import { proseClasses, proseClassesPrev } from "../styles/prose";
+import { proseClasses } from "../styles/prose";
 
 // Form state interface
 interface FormState {
@@ -459,8 +459,8 @@ export default function AdminPostCreate() {
 
         {fetcher.data?.message && (
           <div className={`mb-6 p-4 border rounded-md text-sm ${fetcher.data.success
-              ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400"
-              : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400"
+            ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-400"
+            : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400"
             }`}>
             {fetcher.data.message}
           </div>
@@ -628,7 +628,7 @@ export default function AdminPostCreate() {
                     <div>
                       <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1 block">Preview</Label>
                       <div className="p-4 border border-zinc-200 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-800 max-h-96 overflow-y-auto">
-                        <div className={proseClassesPrev}>
+                        <div className={proseClasses}>
                           <ReactMarkdown>
                             {formState.content}
                           </ReactMarkdown>

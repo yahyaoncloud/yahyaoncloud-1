@@ -117,14 +117,13 @@ export default function AdminAbout() {
         {/* Bio */}
         {getBio().length > 0 && (
           <div
-            className={` md:text-md text-sm leading-relaxed ${
-              theme === "dark" ? "text-zinc-400" : "text-zinc-600"
-            }`}
+            className={` md:text-md text-sm leading-relaxed ${theme === "dark" ? "text-zinc-200" : "text-zinc-600"
+              }`}
           >
             {getBio().map((line, i) => (
               <p key={i} className="mb-2 last:mb-0">
                 {line}
-              </p>
+            </p>
             ))}
           </div>
         )}
@@ -236,9 +235,8 @@ function Experience({ experiences }: ExperienceProps) {
 
                   {/* Dropdown */}
                   <div
-                    className={`transition-[max-height] duration-300 ease-in-out overflow-hidden ${
-                      isOpen ? "max-h-40 mt-2" : "max-h-0"
-                    }`}
+                    className={`transition-[max-height] duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-40 mt-2" : "max-h-0"
+                      }`}
                   >
                     {exp.summary?.length > 0 && (
                       <div className="text-sm p-1 leading-relaxed text-zinc-500 dark:text-zinc-400">
@@ -273,9 +271,8 @@ function Experience({ experiences }: ExperienceProps) {
 
                 {/* Dropdown */}
                 <div
-                  className={`transition-[max-height] duration-300 ease-in-out overflow-hidden ${
-                    isOpen ? "max-h-40 mt-2" : "max-h-0"
-                  }`}
+                  className={`transition-[max-height] duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-40 mt-2" : "max-h-0"
+                    }`}
                 >
                   {exp.summary?.length > 0 && (
                     <div className="text-xs py-2 leading-relaxed text-zinc-400">

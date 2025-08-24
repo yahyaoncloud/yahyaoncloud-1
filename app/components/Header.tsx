@@ -1,18 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X, User } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
 import Logo from "../assets/yoc-logo.png";
 import PalestineSVG from "../assets/palestine-svgrepo-com.svg";
 
-// Types
 interface NavLink {
   name: string;
   href: string;
 }
 
-// Constants
 const NAV_LINKS: NavLink[] = [
   { name: "Blog", href: "/blog" },
   { name: "About", href: "/about" },
@@ -24,7 +22,6 @@ const MOTION_VARIANTS = {
   tap: { scale: 0.95 },
 };
 
-// NavLink Items
 const MobileNavLinkItem = ({
   link,
   isActive,
@@ -43,8 +40,8 @@ const MobileNavLinkItem = ({
       <Link
         to={link.href}
         className={`block px-4 py-3 mx-2 rounded-md font-medium transition-colors duration-200 ${isActive
-          ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-zinc-800"
-          : "text-zinc-700 dark:text-zinc-300 hover:text-indigo-500 dark:hover:text-indigo-300 hover:bg-zinc-100 dark:hover:bg-zinc-900/50"
+            ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-zinc-800"
+            : "text-zinc-700 dark:text-zinc-300 hover:text-indigo-500 dark:hover:text-indigo-300 hover:bg-zinc-100 dark:hover:bg-zinc-900/50"
           }`}
         onClick={onClick}
       >
@@ -72,6 +69,7 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();
   const lastScrollY = useRef(0);
 
@@ -95,8 +93,9 @@ export default function Header() {
     document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
     const handleClickOutside = (event: MouseEvent) => {
       if (!(event.target as Element).closest(".mobile-menu-container")) setIsMenuOpen(false);
+      if (!(event.target as Element).closest(".profile-dropdown")) setIsProfileOpen(false);
     };
-    if (isMenuOpen) document.addEventListener("click", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [isMenuOpen]);
 
@@ -110,24 +109,58 @@ export default function Header() {
         {/* Logo */}
         <motion.div whileHover={MOTION_VARIANTS.hover} whileTap={MOTION_VARIANTS.tap}>
           <Link to="/blog" className="flex items-center space-x-2">
-            <img src={Logo} alt="yahyaoncloud logo" className="w-16 h-16 rounded-md object-cover transition-all duration-200" />
+            <img src={Logo} alt="yahyaoncloud logo" className="w-16 h-16 rounded-md object-cover" />
             <span className="text-xl mrs-saint-delafield-regular">Yahya On Cloud</span>
           </Link>
         </motion.div>
 
-        {/* Hamburger */}
-        <motion.button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-400 hover:text-indigo-400 transition-colors duration-200"
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          whileHover={MOTION_VARIANTS.hover}
-          whileTap={MOTION_VARIANTS.tap}
-        >
-          {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </motion.button>
+        <div className="flex items-center space-x-2">
+          {/* Profile Dropdown */}
+          <div
+            className="relative profile-dropdown"
+            onMouseEnter={() => setIsProfileOpen(true)}
+            onMouseLeave={() => setIsProfileOpen(false)}
+          >
+            <motion.button
+              className="p-2 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-400 hover:text-indigo-400 transition-colors duration-200"
+              whileHover={MOTION_VARIANTS.hover}
+              whileTap={MOTION_VARIANTS.tap}
+            >
+              <User size={20} />
+            </motion.button>
+            <AnimatePresence>
+              {isProfileOpen && (
+                <motion.div
+                  className="absolute right-0 mt-2 w-40 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-md shadow-lg py-2"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <Link to="/admin" className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    Admin Login
+                  </Link>
+                  <Link to="/dashboard" className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    User Login
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Hamburger */}
+          <motion.button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-400 hover:text-indigo-400 transition-colors duration-200"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            whileHover={MOTION_VARIANTS.hover}
+            whileTap={MOTION_VARIANTS.tap}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </motion.button>
+        </div>
       </div>
 
-      {/* Dropdown menu */}
+      {/* Mobile dropdown menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -141,8 +174,6 @@ export default function Header() {
               {NAV_LINKS.map((link) => (
                 <MobileNavLinkItem key={link.name} link={link} isActive={isActive(link.href)} onClick={() => setIsMenuOpen(false)} />
               ))}
-
-              {/* Bottom buttons */}
               <div className="flex items-center space-x-2 pt-2">
                 <SupportButton onClick={() => setIsMenuOpen(false)} />
                 <motion.button
@@ -155,13 +186,6 @@ export default function Header() {
                   whileTap={MOTION_VARIANTS.tap}
                 >
                   {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
-                </motion.button>
-                <motion.button
-                  className="p-2 rounded-md dark:hover:bg-zinc-800 hover:bg-zinc-200 text-zinc-400 hover:text-indigo-400 transition-colors duration-200"
-                  whileHover={MOTION_VARIANTS.hover}
-                  whileTap={MOTION_VARIANTS.tap}
-                >
-                  <Link to="/admin">Admin?</Link>
                 </motion.button>
               </div>
             </div>
