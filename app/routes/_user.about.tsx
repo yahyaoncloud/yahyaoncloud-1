@@ -123,7 +123,7 @@ export default function AdminAbout() {
             {getBio().map((line, i) => (
               <p key={i} className="mb-2 last:mb-0">
                 {line}
-            </p>
+              </p>
             ))}
           </div>
         )}

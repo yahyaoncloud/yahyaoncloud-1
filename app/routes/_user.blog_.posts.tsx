@@ -71,21 +71,21 @@ export default function ArticlesListPage() {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
   };
 
   const filteredPosts = useMemo(() => {
     return searchTerm
       ? posts.filter((post) =>
-          post.title.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        post.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
       : posts.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
   }, [posts, searchTerm]);
 
   useEffect(() => {

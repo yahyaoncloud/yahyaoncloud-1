@@ -18,7 +18,7 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 const MOTION_VARIANTS = {
-  hover: { scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 17 } },
+  hover: { scale: 1.00, transition: { type: "spring", stiffness: 400, damping: 17 } },
   tap: { scale: 0.95 },
 };
 
@@ -32,16 +32,15 @@ const MobileNavLinkItem = ({
   onClick: () => void;
 }) => (
   <motion.div
-    initial={{ x: 50, opacity: 0 }}
-    animate={{ x: 0, opacity: 1 }}
+
     transition={{ delay: NAV_LINKS.indexOf(link) * 0.05 + 0.1, type: "spring", stiffness: 100, damping: 12 }}
   >
-    <motion.div whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }} transition={MOTION_VARIANTS}>
+    <motion.div transition={MOTION_VARIANTS}>
       <Link
         to={link.href}
         className={`block px-4 py-3 mx-2 rounded-md font-medium transition-colors duration-200 ${isActive
-            ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-zinc-800"
-            : "text-zinc-700 dark:text-zinc-300 hover:text-indigo-500 dark:hover:text-indigo-300 hover:bg-zinc-100 dark:hover:bg-zinc-900/50"
+          ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-zinc-800"
+          : "text-zinc-700 dark:text-zinc-300 hover:text-indigo-500 dark:hover:text-indigo-300 hover:bg-zinc-100 dark:hover:bg-zinc-900/50"
           }`}
         onClick={onClick}
       >

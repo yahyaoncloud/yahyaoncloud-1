@@ -187,16 +187,14 @@ export default function Sidebar({
       {/* Newsletter */}
       <motion.div className="relative" variants={cardVariants}>
         <h3
-          className={`text-base font-bold mb-2 ${
-            theme === "dark" ? "text-white" : "text-zinc-900"
-          }`}
+          className={`text-base font-bold mb-2 ${theme === "dark" ? "text-white" : "text-zinc-900"
+            }`}
         >
           Newsletter
         </h3>
         <p
-          className={`text-xs mb-3 leading-relaxed ${
-            theme === "dark" ? "text-zinc-300" : "text-zinc-600"
-          }`}
+          className={`text-xs mb-3 leading-relaxed ${theme === "dark" ? "text-zinc-300" : "text-zinc-600"
+            }`}
         >
           Stay updated with the latest posts.
         </p>
@@ -206,11 +204,10 @@ export default function Sidebar({
             placeholder="Your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`rounded-md px-2 py-1.5 border text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ${
-              theme === "dark"
-                ? "bg-zinc-700 border-zinc-600 text-zinc-100 placeholder-zinc-400"
-                : "bg-zinc-50 border-zinc-300 text-zinc-900 placeholder-zinc-500"
-            }`}
+            className={`rounded-md px-2 py-1.5 border text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ${theme === "dark"
+              ? "bg-zinc-700 border-zinc-600 text-zinc-100 placeholder-zinc-400"
+              : "bg-zinc-50 border-zinc-300 text-zinc-900 placeholder-zinc-50"
+              }`}
           />
           <motion.button
             onClick={() => {
@@ -235,9 +232,8 @@ export default function Sidebar({
       {recentPosts.length > 0 && (
         <motion.div className="" variants={cardVariants}>
           <h3
-            className={`text-base font-bold mb-3 ${
-              theme === "dark" ? "text-white" : "text-zinc-900"
-            }`}
+            className={`text-base font-bold mb-3 ${theme === "dark" ? "text-white" : "text-zinc-900"
+              }`}
           >
             More Posts
           </h3>
@@ -251,20 +247,18 @@ export default function Sidebar({
               >
                 <Link
                   to={`/blog/post/${post.slug}`}
-                  className={`flex items-center justify-between px-2.5 py-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 text-xs font-medium ${
-                    theme === "dark"
-                      ? "text-zinc-300 hover:text-white"
-                      : "text-zinc-700 hover:text-indigo-800"
-                  }`}
+                  className={`flex items-center justify-between px-2.5 py-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 text-xs font-medium ${theme === "dark"
+                    ? "text-zinc-300 hover:text-white"
+                    : "text-zinc-700 hover:text-indigo-800"
+                    }`}
                 >
                   <span className="line-clamp-2 text-xs leading-tight">
                     {post.title}
                   </span>
                   <ChevronRight
                     size={12}
-                    className={`transition-transform group-hover:translate-x-1 flex-shrink-0 ml-1.5 ${
-                      theme === "dark" ? "text-zinc-400" : "text-zinc-500"
-                    }`}
+                    className={`transition-transform group-hover:translate-x-1 flex-shrink-0 ml-1.5 ${theme === "dark" ? "text-zinc-400" : "text-zinc-50"
+                      }`}
                   />
                 </Link>
               </motion.div>
@@ -277,9 +271,8 @@ export default function Sidebar({
       {socialLinks.length > 0 && (
         <motion.div className="" variants={cardVariants}>
           <h3
-            className={`text-base font-bold mb-3 ${
-              theme === "dark" ? "text-white" : "text-zinc-900"
-            }`}
+            className={`text-base font-bold mb-3 ${theme === "dark" ? "text-white" : "text-zinc-900"
+              }`}
           >
             Follow Me
           </h3>
@@ -292,11 +285,10 @@ export default function Sidebar({
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center justify-center p-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 ${
-                    theme === "dark"
-                      ? "text-zinc-300 hover:text-white"
-                      : "text-zinc-700 hover:text-indigo-800"
-                  }`}
+                  className={`flex items-center justify-center p-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 ${theme === "dark"
+                    ? "text-zinc-300 hover:text-white"
+                    : "text-zinc-700 hover:text-indigo-800"
+                    }`}
                   variants={buttonVariants}
                   whileHover="hover"
                   whileTap="tap"
@@ -312,13 +304,12 @@ export default function Sidebar({
       {/* Fallback Message */}
       {recentPosts.length === 0 && socialLinks.length === 0 && hasError && (
         <motion.div
-          className="rounded-md p-4 bg-zinc-50/90 dark:bg-zinc-800/90 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-700/50 shadow-md"
+          className="rounded-md p-4 bg-zinc-200/90 dark:bg-zinc-800/90 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-700/50 shadow-md"
           variants={cardVariants}
         >
           <p
-            className={`text-xs text-center ${
-              theme === "dark" ? "text-zinc-400" : "text-zinc-600"
-            }`}
+            className={`text-xs text-center ${theme === "dark" ? "text-zinc-400" : "text-zinc-600"
+              }`}
           >
             Content loading...
           </p>
