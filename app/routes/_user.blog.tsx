@@ -72,7 +72,6 @@ export const loader: LoaderFunction = async () => {
     ]);
 
     const socialLinksObj = portfolioData[0]?.socialLinks || {};
-    console.log(socialLinksObj)
     const socials: SocialLink[] = Object.entries(socialLinksObj)
       .map(([id, href]) => ({ id, href: String(href) }))
       .filter((social) => social.href);
