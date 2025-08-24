@@ -96,10 +96,10 @@ const SocialIcon = ({ social }: { social: SocialLink }) => {
       href={social.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-zinc-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200"
+      className=" text-zinc-500  dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200"
       aria-label={social.id}
     >
-      <Icon size={20} />
+      <Icon size={24} />
     </a>
   );
 };
@@ -436,11 +436,11 @@ const LifeBlogSection = ({ posts }: { posts: Post[] }) => {
 
 const HeroSection = ({ socials }: { socials: SocialLink[] }) => (
   <MotionSection className="max-w-3xl mx-auto py-6 px-4 md:px-0">
-    <div className="flex items-start sm:items-center justify-between mb-2 mt-6 md:mt-10">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100">
+    <div className="flex items-center justify-between mb-2 mt-6 md:mt-10">
+      <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100">
         Yahya
       </h1>
-      <div className="flex gap-3 mt-1 sm:mt-0">
+      <div className="gap-3 mt-1 sm:mt-0 md:flex md:flex-row grid grid-cols-3">
         {socials.map((social) => (
           <SocialIcon key={social.id} social={social} />
         ))}
