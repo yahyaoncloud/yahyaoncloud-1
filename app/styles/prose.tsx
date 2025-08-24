@@ -12,7 +12,7 @@ export const proseClasses = `
   prose-h4:text-lg sm:prose-h4:text-lg prose-h4:font-medium prose-h4:mb-2 xl:prose-h4:text-lg
 
   /* Paragraphs */
-  prose-p:text-zinc-800 dark:prose-p:text-zinc-200 prose-p:leading-7 prose-p:mb-6 xl:prose-p:text-base prose-p:leading-relaxed 
+  prose-p:text-zinc-800 dark:prose-p:text-zinc-200 prose-p:leading-7 prose-p:mb-6 xl:prose-p:text-base lg:prose-p:text-base prose-p:leading-relaxed 
 
   /* Emphasis and strong */
   prose-strong:font-semibold prose-strong:text-zinc-900 dark:prose-strong:text-zinc-100 
