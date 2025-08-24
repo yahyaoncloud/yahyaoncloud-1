@@ -7,7 +7,7 @@ import { marked } from "marked";
 import type { Author, Post } from "../Types/types";
 import { proseClasses } from "../styles/prose";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Clock, Eye, Calendar, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Clock, Eye, Calendar, Share2, ChevronLeft, ChevronRight, Copy } from "lucide-react";
 import dummyImage from "../assets/yahya_glass.png";
 // --- Meta ---
 export function meta({
@@ -120,7 +120,7 @@ export function useEnhanceBlogContent() {
       if (pre.parentElement?.classList.contains("code-block-wrapper")) return;
 
       const wrapper = document.createElement("div");
-      wrapper.className = "code-block-wrapper relative overflow-hidden rounded border border-zinc-200 dark:border-zinc-700";
+      wrapper.className = "code-block-wrapper relative overflow-hidden rounded";
       pre.parentNode?.insertBefore(wrapper, pre);
       wrapper.appendChild(pre);
 
@@ -144,11 +144,13 @@ export function useEnhanceBlogContent() {
       button.className =
         "copy-button absolute top-2 right-2 p-1 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 opacity-0 transition-opacity hover:opacity-100 hover:bg-zinc-300 dark:hover:bg-zinc-600";
       button.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="m5 15-2 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path>
-        </svg>
-      `;
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+`;
+
+
 
       button.addEventListener("click", async () => {
         if (!codeElement) return;
@@ -365,7 +367,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="max-w-3xl mx-auto px-6 md:px-8 py-8 md:py-12 space-y-8 md:space-y-12"
+      className="max-w-xs sm:max-w-sm md:max-w-4xl mx-auto px-6 md:px-8 py-8 md:py-12 space-y-8 md:space-y-12"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}

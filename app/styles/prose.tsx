@@ -21,7 +21,7 @@ export const proseClasses = `
   prose-em:italic prose-em:text-zinc-800 dark:prose-em:text-zinc-200
 
   /* Blockquotes */
-  prose-blockquote:border-l-4 prose-blockquote:border-amber-400 dark:prose-blockquote:border-amber-500
+  prose-blockquote:border-l-4 prose-blockquote:border-amber-400/40 dark:prose-blockquote:border-amber-500
   prose-blockquote:bg-amber-50 dark:prose-blockquote:bg-amber-900/20
   prose-blockquote:px-4 prose-blockquote:py-2 prose-blockquote:my-6 prose-blockquote:rounded-r-md
   prose-blockquote:text-zinc-700 dark:prose-blockquote:text-zinc-300 prose-blockquote:italic
@@ -39,7 +39,7 @@ export const proseClasses = `
   prose-code:font-mono prose-code:text-sm dark:prose-code:text-indigo-400 prose-code:text-indigo-800 dark:prose-code:text-indigo-300 xl:prose-code:text-sm
 
   /* Code blocks */
-  prose-pre:bg-zinc-200 dark:prose-pre:bg-zinc-900 prose-pre:rounded-md prose-pre:p-4 xl:prose-pre:text-sm dark:prose-pre:border-zinc-700 prose-pre:border prose-pre:border-zinc-400 
+  prose-pre:bg-zinc-200 dark:prose-pre:bg-zinc-900 prose-pre:rounded-md prose-pre:p-4 xl:prose-pre:text-sm  
   prose-pre:overflow-x-auto prose-pre:font-mono prose-pre:text-sm  
   prose-pre:text-emerald-800 dark:prose-pre:text-emerald-300 xl:prose-pre:text-base
 
