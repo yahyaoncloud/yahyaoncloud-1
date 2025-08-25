@@ -18,7 +18,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         return redirect("/admin/login", {
             headers: { "Set-Cookie": await commitSession(session) },
         });
-}
+    }
 
     try {
         console.log("Attempting to verify ID token...");
@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         console.log("Token verified successfully");
 
         // Check if user is admin
-        const adminEmails = ["johnwick4learning@gmail.com", "ykinwork1@gmail.com"];
+        const adminEmails = ["johnwick4learning@gmail.com", "ykinwork1@gmail.com", "fuzi98@gmail.com"];
         const userEmail = decodedToken.email;
 
         if (!userEmail) {
