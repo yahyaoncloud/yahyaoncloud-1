@@ -1,3 +1,4 @@
+import { Link } from "@remix-run/react"; // ✅ not remix-node
 import { Sun, Moon, User, ChevronDown, Menu } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,7 +28,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
           aria-label="Toggle sidebar"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           <Menu size={18} className="text-zinc-600 dark:text-zinc-300" />
         </motion.button>
@@ -40,7 +41,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
             className="p-2 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 shadow-sm hover:shadow-md transition-all duration-300"
             aria-label="Toggle theme"
           >
-            {theme === 'light' ? (
+            {theme === "light" ? (
               <Moon size={18} className="text-zinc-700 dark:text-zinc-200" />
             ) : (
               <Sun size={18} className="text-zinc-700 dark:text-zinc-200" />
@@ -54,8 +55,14 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
               className="flex items-center p-2 rounded-lg bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 shadow-sm hover:shadow-md transition-all duration-300"
             >
               <User size={20} className="text-zinc-700 dark:text-zinc-200" />
-              <motion.div animate={{ rotate: isProfileMenuOpen ? 180 : 0 }} className="ml-1">
-                <ChevronDown size={16} className="text-zinc-700 dark:text-zinc-200" />
+              <motion.div
+                animate={{ rotate: isProfileMenuOpen ? 180 : 0 }}
+                className="ml-1"
+              >
+                <ChevronDown
+                  size={16}
+                  className="text-zinc-700 dark:text-zinc-200"
+                />
               </motion.div>
             </motion.button>
 
@@ -68,14 +75,15 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
                   className="absolute right-0 mt-2 w-40 bg-zinc-50 dark:bg-zinc-900 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden z-50"
                 >
                   {profileMenuItems.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.href}
+                      prefetch="intent" // ✅ enables fast load
                       className="block px-4 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                       onClick={() => setIsProfileMenuOpen(false)}
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </motion.div>
               )}

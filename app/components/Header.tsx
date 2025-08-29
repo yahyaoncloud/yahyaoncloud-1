@@ -6,6 +6,7 @@ import { useTheme } from "../Contexts/ThemeContext";
 import Logo from "../assets/yoc-logo.png";
 import PalestineSVG from "../assets/palestine-svgrepo-com.svg";
 import dummyImage from "../assets/yahya_glass.png";
+
 interface NavLink {
   name: string;
   href: string;
@@ -45,6 +46,7 @@ const MobileNavLinkItem = ({
     <motion.div transition={MOTION_VARIANTS}>
       <Link
         to={link.href}
+        prefetch="intent" // 👈 Prefetch intent here
         className={`block px-4 py-3 mx-2 rounded-md font-medium transition-colors duration-200 ${
           isActive
             ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-zinc-800"
@@ -68,7 +70,6 @@ const SupportButton = ({ onClick }: { onClick?: () => void }) => (
     whileHover={MOTION_VARIANTS.hover}
     whileTap={MOTION_VARIANTS.tap}
   >
-    {/* Subtle background image */}
     <div className="absolute inset-0 pointer-events-none">
       <img
         src={dummyImage}
@@ -77,13 +78,13 @@ const SupportButton = ({ onClick }: { onClick?: () => void }) => (
       />
       <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/90 dark:to-zinc-900/90" />
     </div>
-
     <div className="relative z-10 flex gap-2 items-center text-sm">
       <img src={PalestineSVG} alt="Palestine flag" className="w-4 h-4" />
       Support
     </div>
   </motion.a>
 );
+
 export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -137,8 +138,8 @@ export default function Header() {
           whileTap={MOTION_VARIANTS.tap}
         >
           <Link
-            prefetch="render"
             to="/blog"
+            prefetch="render" // 👈 Preload immediately (homepage critical path)
             className="flex items-center space-x-2"
           >
             <img
@@ -164,6 +165,7 @@ export default function Header() {
           >
             {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
           </motion.button>
+
           {/* Profile Dropdown */}
           <div
             className="relative profile-dropdown"
@@ -186,15 +188,15 @@ export default function Header() {
                   exit={{ opacity: 0, y: -10 }}
                 >
                   <Link
-                    prefetch="render"
                     to="/admin"
+                    prefetch="intent" // 👈 Prefetch only on hover/focus
                     className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   >
                     Admin Login
                   </Link>
                   <Link
-                    prefetch="render"
                     to="/dashboard"
+                    prefetch="intent"
                     className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   >
                     User Login
