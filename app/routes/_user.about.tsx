@@ -83,17 +83,17 @@ export default function AdminAbout() {
 
   return (
     <motion.div
-      className="min-h-screen max-w-4xl mx-auto px-6 py-12 space-y-16 font-sans"
+      className="min-h-screen max-w-4xl mx-auto px-6 py-12 font-sans gap-4"
       initial="hidden"
       animate="visible"
     >
       {/* Hero Section */}
       <motion.section
-        className="flex flex-col pt-6 md:flex-row items-center md:items-start gap-8 text-center md:text-left"
+        className="flex flex-col pb-4 mb-8 pt-6 md:flex-row items-center md:items-start gap-8 text-center md:text-left"
         variants={fadeInUp}
       >
         {/* Portrait + Info */}
-        <div className="w-[400px] text-center  md:items-start gap-4 flex flex-col items-center justify-center">
+        <div className="md:w-[400px] w-auto text-center  md:items-start gap-4 flex flex-col items-center justify-center">
           <img
             src={Yahya}
             alt={getName()}
@@ -117,7 +117,7 @@ export default function AdminAbout() {
         {/* Bio */}
         {getBio().length > 0 && (
           <div
-            className={` md:text-base  text-sm leading-relaxed dark:text-zinc-100 text-zinc-600
+            className={` md:text-base text-start  text-sm leading-relaxed dark:text-zinc-100 text-zinc-600
               }`}
           >
             {getBio().map((line, i) => (
@@ -137,7 +137,7 @@ export default function AdminAbout() {
       {/* Skills */}
       {getSkills().length > 0 && (
         <motion.section variants={fadeInUp}>
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
+          <h2 className="text-lg mb-8 md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
             Skills
           </h2>
           <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
@@ -152,7 +152,7 @@ export default function AdminAbout() {
 
       {/* Projects */}
       {portfolio.projects?.length > 0 && (
-        <motion.section variants={fadeInUp}>
+        <motion.section className="mb-8 mt-12" variants={fadeInUp}>
           <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
             Projects
           </h2>
@@ -178,12 +178,12 @@ export default function AdminAbout() {
       )}
 
       {portfolio.certifications?.length > 0 && (
-        <motion.section variants={fadeInUp}>
+        <motion.section className="mb-8" variants={fadeInUp}>
           <Certifications certifications={portfolio.certifications} />
         </motion.section>
       )}
       {portfolio.socialLinks && (
-        <motion.section variants={fadeInUp}>
+        <motion.section className="mb-8" variants={fadeInUp}>
           <Socials socials={portfolio.socialLinks} />
         </motion.section>
       )}
@@ -198,7 +198,7 @@ function Experience({ experiences }: ExperienceProps) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 mb-8">
       <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400 mb-4 md:mb-6">
         Experience
       </h2>
@@ -207,29 +207,29 @@ function Experience({ experiences }: ExperienceProps) {
           const isOpen = open === i;
 
           return (
-            <div key={i} className="w-full">
+            <div key={i} className="w-full md:max-w-3xl ">
               {/* Desktop layout */}
-              <div className="hidden md:flex w-full">
-                {/* Left column: Year + Present */}
-                <div className="flex items-start gap-2 w-32 shrink-0 pt-3">
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
+              <div className="hidden md:flex w-full gap-6">
+                {/* Left column: Year + Present (always visible) */}
+                <div className="flex items-start justify-between shrink-0 w-24 pt-2">
+                  <span className="text-sm py-1 text-zinc-500 dark:text-zinc-400">
                     {exp.year}
                   </span>
                   {Number(exp.isWorking) === 1 && (
-                    <span className="px-2 py-1 text-xs rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
+                    <span className="mt-1 px-2 py-0.5 text-xs rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
                       Present
                     </span>
                   )}
                 </div>
 
                 {/* Right column */}
-                <div className="flex-1 p-3 rounded hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors duration-200">
+                <div className="flex-1 p-2 rounded hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors duration-200">
                   <button
                     onClick={() => setOpen(isOpen ? null : i)}
                     className="flex w-full gap-4 border-b border-zinc-200 dark:border-zinc-700 text-left pb-3"
                   >
                     <div className="max-w-full flex justify-between items-center w-full">
-                      <span className="flex items-center gap-4">
+                      <span className="flex items-center gap-3">
                         {isOpen ? (
                           <ChevronUp size={16} className="text-zinc-400" />
                         ) : (
@@ -252,7 +252,7 @@ function Experience({ experiences }: ExperienceProps) {
                     }`}
                   >
                     {exp.summary?.length > 0 && (
-                      <div className="text-sm p-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
+                      <div className="text-sm p-2 ml-5 leading-relaxed text-zinc-600 dark:text-zinc-300">
                         <p className="mb-3">{exp.summary}</p>
                         <div className="flex items-center justify-end gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                           <MapPin size={14} />
@@ -265,23 +265,27 @@ function Experience({ experiences }: ExperienceProps) {
               </div>
 
               {/* Mobile layout */}
-              <div className="flex md:hidden flex-col w-full p-3 rounded hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors duration-200">
+              <div className="flex md:hidden flex-col w-full py-3 rounded hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors duration-200">
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="flex w-full items-center justify-between border-b border-zinc-200 dark:border-zinc-700 pb-3"
                 >
-                  <span className="flex items-center gap-3 text-sm">
+                  <span className="flex text-start items-center gap-3 text-sm">
                     {isOpen ? (
                       <ChevronUp size={14} className="text-zinc-400" />
                     ) : (
                       <ChevronDown size={14} className="text-zinc-400" />
                     )}
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                      {exp.company}
-                    </span>
-                    <span className="text-zinc-500 dark:text-zinc-400">•</span>
-                    <span className="text-zinc-500 dark:text-zinc-400">
-                      {exp.role}
+                    <span className="flex flex-col ">
+                      <span className="font-medium text-zinc-900 pt-2 dark:text-zinc-100">
+                        {exp.company}
+                      </span>
+                      <span className="text-zinc-500 dark:text-zinc-400 hidden">
+                        •
+                      </span>
+                      <span className="text-zinc-500 dark:text-zinc-400">
+                        {exp.role}
+                      </span>
                     </span>
                   </span>
                   <span className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -296,8 +300,12 @@ function Experience({ experiences }: ExperienceProps) {
                   }`}
                 >
                   {exp.summary?.length > 0 && (
-                    <div className="text-xs py-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
+                    <div className="text-sm ml-6 p-1 py-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
                       <p>{exp.summary}</p>
+                      <div className="flex items-center justify-end gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        <MapPin size={14} />
+                        {exp.location}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -317,7 +325,7 @@ type CertificationsProps = {
 
 function Certifications({ certifications }: CertificationsProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-8">
       <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">
         Certifications
       </h2>
@@ -355,7 +363,7 @@ function Socials({ socials }: SocialLinksProps) {
   const entries = Object.entries(socials).filter(([_, v]) => v);
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 mb-8">
       <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">
         Connect
       </h2>

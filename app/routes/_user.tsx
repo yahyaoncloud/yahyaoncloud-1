@@ -38,7 +38,7 @@ export async function loader() {
 
 function ThemedContainer() {
   const { theme, isDark } = useTheme(); // Use isDark and theme from useTheme
-  const isDarkTheme = isDark !== undefined ? isDark : theme === 'dark'; // Fallback to theme === 'dark'
+  const isDarkTheme = isDark !== undefined ? isDark : theme === "dark"; // Fallback to theme === 'dark'
 
   return (
     <div className="relative min-h-screen transition-all ease-in-out duration-200">
@@ -47,15 +47,17 @@ function ThemedContainer() {
         key="dark-bg"
         src={BackgroundDark}
         alt="Dark Background"
-        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${isDarkTheme ? 'opacity-100' : 'opacity-0'
-          }`}
+        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${
+          isDarkTheme ? "opacity-100" : "opacity-0"
+        }`}
       />
       <img
         key="bright-bg"
         src={BackgroundDark} // Fixed incorrect src
         alt="Bright Background"
-        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${isDarkTheme ? 'opacity-0' : 'opacity-100'
-          }`}
+        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${
+          isDarkTheme ? "opacity-0" : "opacity-100"
+        }`}
       />
 
       {/* Overlay for readability with smooth transition */}
@@ -69,7 +71,6 @@ function ThemedContainer() {
         className={`fixed inset-0 -z-10 transition-opacity duration-500 ease-in-out ${isDarkTheme ? 'bg-black/30' : 'bg-white/30'
           }`}
       /> */}
-
 
       {/* Main content */}
       <main className="relative z-10">
