@@ -38,6 +38,7 @@
     "marked": "^15.0.12",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.3",
+    "pretty-cache-header": "^1.0.0",
     "prism-react-renderer": "^2.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

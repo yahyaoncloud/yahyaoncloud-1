@@ -93,17 +93,17 @@ export default function AdminAbout() {
         variants={fadeInUp}
       >
         {/* Portrait + Info */}
-        <div className="w-1/2 text-center  md:items-start gap-4 flex flex-col items-center justify-center">
+        <div className="w-[400px] text-center  md:items-start gap-4 flex flex-col items-center justify-center">
           <img
             src={Yahya}
             alt={getName()}
             className="w-32 h-32 rounded-full object-cover shadow-sm border border-zinc-200 dark:border-zinc-800"
           />
 
-          <div className="space-y-1 text-center flex flex-col items-center justify-center">
+          <div className="space-y-1 text-start flex flex-col items-center justify-center md:justify-start ">
             <h1 className="text-2xl font-semibold">{getName()}</h1>
             {portfolio.location && (
-              <div className="flex items-center justify-center  gap-2 text-sm text-zinc-500">
+              <div className="flex  gap-2 text-sm text-zinc-500">
                 <MapPin size={14} /> {portfolio.location}
               </div>
             )}
@@ -137,7 +137,9 @@ export default function AdminAbout() {
       {/* Skills */}
       {getSkills().length > 0 && (
         <motion.section variants={fadeInUp}>
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">Skills</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
+            Skills
+          </h2>
           <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
             {getSkills().map((skill, i) => (
               <li key={i} className="opacity-80">
@@ -151,7 +153,9 @@ export default function AdminAbout() {
       {/* Projects */}
       {portfolio.projects?.length > 0 && (
         <motion.section variants={fadeInUp}>
-          <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">Projects</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
+            Projects
+          </h2>
           <div className="space-y-4 sm:space-y-6">
             {portfolio.projects.slice(0, 3).map((project, i) => (
               <div key={i} className="space-y-1">
@@ -195,7 +199,9 @@ function Experience({ experiences }: ExperienceProps) {
 
   return (
     <div className="space-y-2">
-      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400 mb-4 md:mb-6">Experience</h2>
+      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400 mb-4 md:mb-6">
+        Experience
+      </h2>
       <div className="space-y-2">
         {experiences.map((exp, i) => {
           const isOpen = open === i;
@@ -206,7 +212,9 @@ function Experience({ experiences }: ExperienceProps) {
               <div className="hidden md:flex w-full">
                 {/* Left column: Year + Present */}
                 <div className="flex items-start gap-2 w-32 shrink-0 pt-3">
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">{exp.year}</span>
+                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                    {exp.year}
+                  </span>
                   {Number(exp.isWorking) === 1 && (
                     <span className="px-2 py-1 text-xs rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
                       Present
@@ -227,16 +235,21 @@ function Experience({ experiences }: ExperienceProps) {
                         ) : (
                           <ChevronDown size={16} className="text-zinc-400" />
                         )}
-                        <span className="font-medium text-zinc-900 dark:text-zinc-100">{exp.company}</span>
+                        <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                          {exp.company}
+                        </span>
                       </span>
-                      <span className="text-sm text-zinc-500 dark:text-zinc-400">{exp.role}</span>
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                        {exp.role}
+                      </span>
                     </div>
                   </button>
 
                   {/* Dropdown */}
                   <div
-                    className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 mt-3" : "max-h-0"
-                      }`}
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                      isOpen ? "max-h-48 mt-3" : "max-h-0"
+                    }`}
                   >
                     {exp.summary?.length > 0 && (
                       <div className="text-sm p-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
@@ -263,17 +276,24 @@ function Experience({ experiences }: ExperienceProps) {
                     ) : (
                       <ChevronDown size={14} className="text-zinc-400" />
                     )}
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{exp.company}</span>
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                      {exp.company}
+                    </span>
                     <span className="text-zinc-500 dark:text-zinc-400">•</span>
-                    <span className="text-zinc-500 dark:text-zinc-400">{exp.role}</span>
+                    <span className="text-zinc-500 dark:text-zinc-400">
+                      {exp.role}
+                    </span>
                   </span>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">{exp.year}</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {exp.year}
+                  </span>
                 </button>
 
                 {/* Dropdown */}
                 <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 mt-3" : "max-h-0"
-                    }`}
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                    isOpen ? "max-h-48 mt-3" : "max-h-0"
+                  }`}
                 >
                   {exp.summary?.length > 0 && (
                     <div className="text-xs py-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
@@ -298,7 +318,9 @@ type CertificationsProps = {
 function Certifications({ certifications }: CertificationsProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">Certifications</h2>
+      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">
+        Certifications
+      </h2>
       <div className="space-y-3">
         {certifications.map((cert, i) => (
           <div
@@ -334,14 +356,18 @@ function Socials({ socials }: SocialLinksProps) {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">Connect</h2>
+      <h2 className="text-lg md:text-xl font-semibold text-indigo-600 dark:text-indigo-400">
+        Connect
+      </h2>
       <div className="space-y-4">
         {entries.map(([key, value], i) => (
           <div
             key={i}
             className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pb-1 border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 last:pb-0"
           >
-            <span className="capitalize text-sm text-zinc-600 dark:text-zinc-400">{key}</span>
+            <span className="capitalize text-sm text-zinc-600 dark:text-zinc-400">
+              {key}
+            </span>
             <a
               href={key === "email" ? `mailto:${value}` : value}
               target="_blank"

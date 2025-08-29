@@ -1,13 +1,34 @@
 import { motion } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
-import { Link, useLoaderData, Form, Outlet, useActionData } from "@remix-run/react";
+import {
+  Link,
+  useLoaderData,
+  Form,
+  Outlet,
+  useActionData,
+} from "@remix-run/react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { lazy, Suspense, useState, useEffect, useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import toast from "react-hot-toast";
-import { Search, Filter, Plus, Edit, Trash2, Eye, MessageCircle, Heart, Calendar, FileText } from "lucide-react";
-import { getPosts, getAllCategories, deletePost } from "../Services/post.server";
+import {
+  Search,
+  Filter,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  MessageCircle,
+  Heart,
+  Calendar,
+  FileText,
+} from "lucide-react";
+import {
+  getPosts,
+  getAllCategories,
+  deletePost,
+} from "../Services/post.server";
 import type { Post, Category } from "../Types/types";
 import Mock from "../assets/yahya_glass.png";
 
@@ -15,7 +36,10 @@ const ArticleCard = lazy(() => import("../components/ArticleCard"));
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
-    const [posts, categories] = await Promise.all([getPosts(), getAllCategories()]);
+    const [posts, categories] = await Promise.all([
+      getPosts(),
+      getAllCategories(),
+    ]);
     return json({ posts, categories });
   } catch (error) {
     console.error("Loader error:", error);
@@ -63,7 +87,8 @@ export default function AdminPosts() {
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
-      const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      const matchesSearch =
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         post.summary?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory
         ? post.categories?.some((cat: Category) => cat._id === selectedCategory)
@@ -75,12 +100,15 @@ export default function AdminPosts() {
     });
   }, [posts, searchTerm, selectedCategory, selectedStatus]);
 
-  const stats = useMemo(() => ({
-    total: posts.length,
-    published: posts.filter(p => p.status === "published").length,
-    drafts: posts.filter(p => p.status === "draft").length,
-    categories: categories.length
-  }), [posts, categories]);
+  const stats = useMemo(
+    () => ({
+      total: posts.length,
+      published: posts.filter((p) => p.status === "published").length,
+      drafts: posts.filter((p) => p.status === "draft").length,
+      categories: categories.length,
+    }),
+    [posts, categories]
+  );
 
   return (
     <div className="min-h-screen text-zinc-900 dark:text-zinc-100">
@@ -108,15 +136,40 @@ export default function AdminPosts() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total", value: stats.total, icon: FileText, color: "text-zinc-500" },
-            { label: "Published", value: stats.published, icon: Eye, color: "text-green-500" },
-            { label: "Drafts", value: stats.drafts, icon: Edit, color: "text-amber-500" },
-            { label: "Categories", value: stats.categories, icon: Filter, color: "text-blue-500" },
+            {
+              label: "Total",
+              value: stats.total,
+              icon: FileText,
+              color: "text-zinc-500",
+            },
+            {
+              label: "Published",
+              value: stats.published,
+              icon: Eye,
+              color: "text-green-500",
+            },
+            {
+              label: "Drafts",
+              value: stats.drafts,
+              icon: Edit,
+              color: "text-amber-500",
+            },
+            {
+              label: "Categories",
+              value: stats.categories,
+              icon: Filter,
+              color: "text-blue-500",
+            },
           ].map((item, idx) => (
-            <div key={idx} className="bg-white dark:bg-zinc-950 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700">
+            <div
+              key={idx}
+              className="bg-white dark:bg-zinc-950 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700"
+            >
               <div className="flex items-center gap-2 mb-1">
                 <item.icon size={16} className={item.color} />
-                <span className="text-sm text-zinc-500 dark:text-zinc-400">{item.label}</span>
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                  {item.label}
+                </span>
               </div>
               <p className="text-2xl font-light">{item.value}</p>
             </div>
@@ -140,7 +193,11 @@ export default function AdminPosts() {
             className="px-4 py-2 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-600 rounded-md"
           >
             <option value="">All Categories</option>
-            {categories.map((cat) => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
           </select>
           <select
             value={selectedStatus}
@@ -166,9 +223,15 @@ export default function AdminPosts() {
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center">
                 <FileText className="w-8 h-8 text-zinc-400" />
               </div>
-              <h3 className="text-xl font-light mb-2">{searchTerm || selectedCategory || selectedStatus ? "No posts found" : "No posts yet"}</h3>
+              <h3 className="text-xl font-light mb-2">
+                {searchTerm || selectedCategory || selectedStatus
+                  ? "No posts found"
+                  : "No posts yet"}
+              </h3>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-                {searchTerm || selectedCategory || selectedStatus ? "Try adjusting your search or filters" : "Create your first post to get started"}
+                {searchTerm || selectedCategory || selectedStatus
+                  ? "Try adjusting your search or filters"
+                  : "Create your first post to get started"}
               </p>
               <Link
                 to="/admin/post/create"
@@ -181,7 +244,10 @@ export default function AdminPosts() {
         ) : (
           <div className="space-y-4">
             {filteredPosts.map((post, idx) => {
-              const createdAt = typeof post.createdAt === "string" ? new Date(post.createdAt) : post.createdAt;
+              const createdAt =
+                typeof post.createdAt === "string"
+                  ? new Date(post.createdAt)
+                  : post.createdAt;
               return (
                 <motion.div
                   key={post._id}
@@ -194,25 +260,52 @@ export default function AdminPosts() {
                     <div className="flex flex-col-reverse md:flex-row md:items-start md:justify-between gap-4 mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-medium line-clamp-1">{post.title}</h3>
-                          <span className={`px-2 py-1 text-xs rounded-full ${post.status === "published"
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"}`}>
+                          <h3 className="text-lg font-medium line-clamp-1">
+                            {post.title}
+                          </h3>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              post.status === "published"
+                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                            }`}
+                          >
                             {post.status}
                           </span>
                         </div>
-                        {post.summary && <p className="text-sm mb-3 line-clamp-2">{post.summary}</p>}
+                        {post.summary && (
+                          <p className="text-sm mb-3 line-clamp-2">
+                            {post.summary}
+                          </p>
+                        )}
                         <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
-                          <div className="flex items-center gap-1"><Calendar size={12} />{createdAt.toLocaleDateString()}</div>
-                          <div className="flex items-center gap-1"><Eye size={12} />{post.views || 0} views</div>
-                          <div className="flex items-center gap-1"><Heart size={12} />{post.likes || 0} likes</div>
-                          <div className="flex items-center gap-1"><MessageCircle size={12} />{post.commentsCount || 0} comments</div>
+                          <div className="flex items-center gap-1">
+                            <Calendar size={12} />
+                            {createdAt.toLocaleDateString()}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye size={12} />
+                            {post.views || 0} views
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Heart size={12} />
+                            {post.likes || 0} likes
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MessageCircle size={12} />
+                            {post.commentsCount || 0} comments
+                          </div>
                           <span>{post.minuteRead || 5} min read</span>
                         </div>
                         {post.categories && post.categories.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-3">
                             {post.categories.slice(0, 3).map((cat, i) => (
-                              <span key={i} className="px-2 py-1 bg-zinc-100 dark:bg-zinc-700 text-xs rounded">{cat.name}</span>
+                              <span
+                                key={i}
+                                className="px-2 py-1 bg-zinc-100 dark:bg-zinc-700 text-xs rounded"
+                              >
+                                {cat.name}
+                              </span>
                             ))}
                             {post.categories.length > 3 && (
                               <span className="px-2 py-1 bg-zinc-100 dark:bg-zinc-700 text-xs rounded">
@@ -235,10 +328,18 @@ export default function AdminPosts() {
 
                     <div className="flex flex-wrap items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-700 gap-2">
                       <div className="flex items-center gap-2">
-                        <Link to={`/admin/post/edit/${post._id}`} className="inline-flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md">
+                        <Link
+                          prefetch="render"
+                          to={`/admin/post/edit/${post._id}`}
+                          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md"
+                        >
                           <Edit size={14} /> Edit
                         </Link>
-                        <Link to={`/blog/post/${post.slug}`} className="inline-flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md">
+                        <Link
+                          prefetch="render"
+                          to={`/blog/post/${post.slug}`}
+                          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md"
+                        >
                           <Eye size={14} /> View
                         </Link>
                       </div>
@@ -247,7 +348,9 @@ export default function AdminPosts() {
                         <input type="hidden" name="postId" value={post._id} />
                         <button
                           type="submit"
-                          onClick={(e) => !confirm("Are you sure?") && e.preventDefault()}
+                          onClick={(e) =>
+                            !confirm("Are you sure?") && e.preventDefault()
+                          }
                           className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md"
                         >
                           <Trash2 size={14} /> Delete

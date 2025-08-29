@@ -60,7 +60,11 @@ export default function ArticleCard({
       transition={{ type: "spring", stiffness: 300 }}
       whileHover={{ scale: 1.02 }}
     >
-      <Link to={`/blog/post/${post.slug}`} className="block h-full">
+      <Link
+        prefetch="render"
+        to={`/blog/post/${post.slug}`}
+        className="block h-full"
+      >
         {post.coverImage && (
           <div className="relative h-48 overflow-hidden">
             <img

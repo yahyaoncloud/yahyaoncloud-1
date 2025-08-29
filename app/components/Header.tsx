@@ -5,7 +5,7 @@ import { Sun, Moon, Menu, X, User } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
 import Logo from "../assets/yoc-logo.png";
 import PalestineSVG from "../assets/palestine-svgrepo-com.svg";
-import dummyImage from "../assets/yahya_glass.png"
+import dummyImage from "../assets/yahya_glass.png";
 interface NavLink {
   name: string;
   href: string;
@@ -18,7 +18,10 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 const MOTION_VARIANTS = {
-  hover: { scale: 1.00, transition: { type: "spring", stiffness: 400, damping: 17 } },
+  hover: {
+    scale: 1.0,
+    transition: { type: "spring", stiffness: 400, damping: 17 },
+  },
   tap: { scale: 0.95 },
 };
 
@@ -32,16 +35,21 @@ const MobileNavLinkItem = ({
   onClick: () => void;
 }) => (
   <motion.div
-
-    transition={{ delay: NAV_LINKS.indexOf(link) * 0.05 + 0.1, type: "spring", stiffness: 100, damping: 12 }}
+    transition={{
+      delay: NAV_LINKS.indexOf(link) * 0.05 + 0.1,
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+    }}
   >
     <motion.div transition={MOTION_VARIANTS}>
       <Link
         to={link.href}
-        className={`block px-4 py-3 mx-2 rounded-md font-medium transition-colors duration-200 ${isActive
-          ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-zinc-800"
-          : "text-zinc-700 dark:text-zinc-300 hover:text-indigo-500 dark:hover:text-indigo-300 hover:bg-zinc-100 dark:hover:bg-zinc-900/50"
-          }`}
+        className={`block px-4 py-3 mx-2 rounded-md font-medium transition-colors duration-200 ${
+          isActive
+            ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-zinc-800"
+            : "text-zinc-700 dark:text-zinc-300 hover:text-indigo-500 dark:hover:text-indigo-300 hover:bg-zinc-100 dark:hover:bg-zinc-900/50"
+        }`}
         onClick={onClick}
       >
         {link.name}
@@ -86,14 +94,18 @@ export default function Header() {
 
   const isActive = (href: string) => {
     const currentPath = location.pathname;
-    return href === "/" ? currentPath === "/" : currentPath === href || currentPath.startsWith(`${href}/`);
+    return href === "/"
+      ? currentPath === "/"
+      : currentPath === href || currentPath.startsWith(`${href}/`);
   };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setIsVisible(currentScrollY <= 10 || currentScrollY < lastScrollY.current);
+      setIsVisible(
+        currentScrollY <= 10 || currentScrollY < lastScrollY.current
+      );
       lastScrollY.current = currentScrollY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -103,8 +115,10 @@ export default function Header() {
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
     const handleClickOutside = (event: MouseEvent) => {
-      if (!(event.target as Element).closest(".mobile-menu-container")) setIsMenuOpen(false);
-      if (!(event.target as Element).closest(".profile-dropdown")) setIsProfileOpen(false);
+      if (!(event.target as Element).closest(".mobile-menu-container"))
+        setIsMenuOpen(false);
+      if (!(event.target as Element).closest(".profile-dropdown"))
+        setIsProfileOpen(false);
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
@@ -118,10 +132,23 @@ export default function Header() {
     >
       <div className="max-w-3xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <motion.div whileHover={MOTION_VARIANTS.hover} whileTap={MOTION_VARIANTS.tap}>
-          <Link to="/blog" className="flex items-center space-x-2">
-            <img src={Logo} alt="yahyaoncloud logo" className="w-16 h-16 rounded-md object-cover" />
-            <span className="text-xl mrs-saint-delafield-regular">Yahya On Cloud</span>
+        <motion.div
+          whileHover={MOTION_VARIANTS.hover}
+          whileTap={MOTION_VARIANTS.tap}
+        >
+          <Link
+            prefetch="render"
+            to="/blog"
+            className="flex items-center space-x-2"
+          >
+            <img
+              src={Logo}
+              alt="yahyaoncloud logo"
+              className="w-16 h-16 rounded-md object-cover"
+            />
+            <span className="text-xl mrs-saint-delafield-regular">
+              Yahya On Cloud
+            </span>
           </Link>
         </motion.div>
 
@@ -158,10 +185,18 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <Link to="/admin" className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                  <Link
+                    prefetch="render"
+                    to="/admin"
+                    className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
                     Admin Login
                   </Link>
-                  <Link to="/dashboard" className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                  <Link
+                    prefetch="render"
+                    to="/dashboard"
+                    className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
                     User Login
                   </Link>
                 </motion.div>
@@ -194,17 +229,16 @@ export default function Header() {
           >
             <div className="mobile-menu-container w-full max-w-3xl bg-white dark:bg-zinc-950 border dark:border-zinc-800 shadow-md flex flex-col p-4 space-y-2 rounded-md">
               {NAV_LINKS.map((link) => (
-                <MobileNavLinkItem key={link.name} link={link} isActive={isActive(link.href)} onClick={() => setIsMenuOpen(false)} />
+                <MobileNavLinkItem
+                  key={link.name}
+                  link={link}
+                  isActive={isActive(link.href)}
+                  onClick={() => setIsMenuOpen(false)}
+                />
               ))}
-              <div
-                className="flex items-center justify-between"
-              >
-
-
+              <div className="flex items-center justify-between">
                 <SupportButton onClick={() => setIsMenuOpen(false)} />
               </div>
-
-
             </div>
           </motion.div>
         )}

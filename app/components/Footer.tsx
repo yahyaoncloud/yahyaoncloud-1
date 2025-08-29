@@ -85,12 +85,17 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="lg:col-span-2">
-            <Link to="/blog" className="flex items-center space-x-2 mb-4 group">
+            <Link
+              prefetch="render"
+              to="/blog"
+              className="flex items-center space-x-2 mb-4 group"
+            >
               <img
                 src={Logo}
                 alt="yahyaoncloud logo"
-                className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${scrolled ? "w-16 h-16" : "w-24 h-24"
-                  }`}
+                className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${
+                  scrolled ? "w-16 h-16" : "w-24 h-24"
+                }`}
               />
               <span className="font-thin text-2xl text-zinc-900 dark:text-white mrs-saint-delafield-regular">
                 Yahya On Cloud
@@ -126,10 +131,11 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className={`underline transition-colors duration-200 ${link.name === "Privacy" || link.name === "Terms"
-                      ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
-                      : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
-                      }`}
+                    className={`underline transition-colors duration-200 ${
+                      link.name === "Privacy" || link.name === "Terms"
+                        ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
+                        : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
+                    }`}
                   >
                     {link.name}
                   </Link>

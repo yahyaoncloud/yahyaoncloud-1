@@ -2,13 +2,27 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
-import { getAuthorByAuthorId, getPostBySlug, getPosts } from "../Services/post.server";
+import {
+  getAuthorByAuthorId,
+  getPostBySlug,
+  getPosts,
+} from "../Services/post.server";
 import { marked } from "marked";
 import type { Author, Post } from "../Types/types";
 import { proseClasses } from "../styles/prose";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Clock, Eye, Calendar, Share2, ChevronLeft, ChevronRight, Copy } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  Eye,
+  Calendar,
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+} from "lucide-react";
 import dummyImage from "../assets/yahya_glass.png";
+import { cacheHeader } from "pretty-cache-header";
 // --- Meta ---
 export function meta({
   data,
@@ -74,28 +88,41 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const authorId = post.authorId;
 
-
-
   const [author, allPosts] = await Promise.all([
     authorId ? getAuthorByAuthorId(authorId) : null,
-    getPosts("published", 20, 1)
+    getPosts("published", 20, 1),
   ]);
 
   const serializedPost = serializePost(post);
 
-
   const htmlContent = marked(serializedPost.content || "");
 
   const otherPosts = allPosts
-    .filter(p => p.slug !== slug)
+    .filter((p) => p.slug !== slug)
     .map(serializePost)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
-  return json({
-    post: { ...serializedPost, content: htmlContent },
-    author,
-    relatedPosts: otherPosts
-  });
+  return json(
+    {
+      post: { ...serializedPost, content: htmlContent },
+      author,
+      relatedPosts: otherPosts,
+    },
+    {
+      headers: {
+        "Cache-Control": cacheHeader({
+          public: true,
+          maxAge: "5min",
+          sMaxAge: "15min",
+          staleWhileRevalidate: "1day",
+          staleIfError: "1h",
+        }),
+      },
+    }
+  );
 };
 
 // --- Enhance Blog Content ---
@@ -150,8 +177,6 @@ export function useEnhanceBlogContent() {
   </svg>
 `;
 
-
-
       button.addEventListener("click", async () => {
         if (!codeElement) return;
         try {
@@ -189,17 +214,17 @@ export function useEnhanceBlogContent() {
 // --- More Articles Component ---
 const CarouselArticles = ({ posts }: { posts: Post[] }) => {
   const [index, setIndex] = useState(0);
-  const visible = 2; // Show 2 cards at a time
+  const visible = 2;
 
   const formatDate = (date: Date | string) => {
     const d = new Date(date);
     return isNaN(d.getTime())
-      ? "Invalid date"
+      ? ""
       : d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
   };
 
   const next = () => setIndex((prev) => (prev + visible) % posts.length);
@@ -210,24 +235,23 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
 
   const currentPosts = posts.slice(index, index + visible);
   if (currentPosts.length < visible) {
-    // Wrap around for last item
     currentPosts.push(...posts.slice(0, visible - currentPosts.length));
   }
 
   return (
     <motion.section
-      className="mt-16 pt-8 md:h-60 border-t border-zinc-200 dark:border-zinc-700"
+      className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           More Articles
         </h2>
         <Link
           to="/blog/posts"
-          className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
         >
           View all →
         </Link>
@@ -237,26 +261,26 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
         {/* Left Button */}
         <button
           onClick={prev}
-          className="p-2   dark:hover:text-indigo-400 hover:text-indigo-800 text-zinc-900 dark:text-zinc-200 transition-colors"
+          className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={18} />
         </button>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 py-4 md:grid-cols-2 gap-4 flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
           {currentPosts.map((post, idx) => (
             <motion.div
               key={post._id + idx}
-              className="relative flex rounded border border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden"
+              className="relative flex rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.3 }}
             >
-              {/* Left: Background color with text */}
-              <div className="w-2/3 p-4 bg-white dark:bg-zinc-950 z-10">
+              {/* Text */}
+              <div className="w-2/3 p-4 bg-white dark:bg-zinc-950">
                 <Link
                   to={`/blog/post/${post.slug}`}
-                  className="block text-lg font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="block text-base font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
                 >
                   {post.title}
                 </Link>
@@ -268,27 +292,25 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
                 </span>
               </div>
 
-              {/* Right: Background image with smooth blend */}
+              {/* Image */}
               <div
                 className="w-1/3 bg-cover bg-center"
                 style={{
                   backgroundImage: `url(${post.image || dummyImage})`,
                 }}
               >
-                {/* Optional: Gradient overlay for smooth blending */}
-                <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-transparent to-white dark:to-zinc-950 pointer-events-none"></div>
+                <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-transparent to-white dark:to-zinc-950 pointer-events-none"></div>
               </div>
             </motion.div>
           ))}
         </div>
 
-
         {/* Right Button */}
         <button
           onClick={next}
-          className="p-2 dark:hover:text-indigo-400 hover:text-indigo-800 text-zinc-900 dark:text-zinc-200 transition-colors"
+          className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors"
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={18} />
         </button>
       </div>
     </motion.section>
@@ -335,10 +357,10 @@ export default function PostPage() {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
   };
 
   const handleShare = async () => {

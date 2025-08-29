@@ -11,7 +11,7 @@ import {
   ITypeDoc,
   Author,
   Draft,
-  IDraftDoc
+  IDraftDoc,
 } from "../models";
 import { Types } from "mongoose";
 import { uploadImage } from "../utils/cloudinary.server";
@@ -22,12 +22,20 @@ export async function createPost(
   postData: Partial<IPostDoc>,
   files?: { coverImage?: File; gallery?: File[] }
 ) {
-  const slug = postData.slug || postData.title?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const slug =
+    postData.slug ||
+    postData.title
+      ?.toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
   // Upload cover image
   let coverImageUrl: string = "/default-cover.jpg";
   if (files?.coverImage) {
-    const uploaded = await uploadImage(files.coverImage, `${slug}-cover-image.${files.coverImage.name.split(".").pop()}`);
+    const uploaded = await uploadImage(
+      files.coverImage,
+      `${slug}-cover-image.${files.coverImage.name.split(".").pop()}`
+    );
     coverImageUrl = uploaded.url; // must be a string
   }
 
@@ -36,7 +44,10 @@ export async function createPost(
   if (files?.gallery?.length) {
     for (let i = 0; i < files.gallery.length; i++) {
       const img = files.gallery[i];
-      const uploaded = await uploadImage(img, `${slug}-gallery-${i + 1}.${img.name.split(".").pop()}`);
+      const uploaded = await uploadImage(
+        img,
+        `${slug}-gallery-${i + 1}.${img.name.split(".").pop()}`
+      );
       galleryUrls.push(uploaded.url);
     }
   }
@@ -51,7 +62,6 @@ export async function createPost(
   });
 }
 
-
 export async function getPostById(id: string) {
   return (
     Post.findById(id)
@@ -65,13 +75,15 @@ export async function getPostById(id: string) {
 }
 
 export async function getPostBySlug(slug: string) {
-  return Post.findOne({ slug })
-    // .populate("author")
-    .populate("categories")
-    .populate("tags")
-    .populate("types")
-    .populate("coverImage")
-    .populate("gallery");
+  return (
+    Post.findOne({ slug })
+      // .populate("author")
+      .populate("categories")
+      .populate("tags")
+      .populate("types")
+      .populate("coverImage")
+      .populate("gallery")
+  );
 }
 
 export async function getPosts(
@@ -89,9 +101,7 @@ export async function getPosts(
   }
   // return query.populate("author").populate("categories").populate("coverImage");
   return query.populate("categories").populate("coverImage");
-
 }
-
 
 export async function updatePost(
   id: string,
@@ -131,7 +141,6 @@ export async function updatePost(
     .populate("tags")
     .populate("types");
 }
-
 
 export async function deletePost(id: string) {
   return Post.findByIdAndDelete(id);
@@ -180,13 +189,15 @@ export async function getTopPosts(limit: number = 3) {
   return sortedPosts.slice(0, limit);
 }
 
-
 // ==================== DRAFT OPERATIONS ====================
 
 // Create a new draft
 export async function saveDraft(draftData: Partial<IDraftDoc>) {
   const slug = draftData.title
-    ? draftData.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+    ? draftData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "")
     : "untitled-draft";
 
   // Set expiration date (30 days from now)
@@ -203,10 +214,7 @@ export async function saveDraft(draftData: Partial<IDraftDoc>) {
 
   // Check if draft already exists for this author/session
   const existingDraft = await Draft.findOne({
-    $or: [
-      { authorId: draftData.authorId },
-      { sessionId: draftData.sessionId }
-    ]
+    $or: [{ authorId: draftData.authorId }, { sessionId: draftData.sessionId }],
   });
 
   if (existingDraft) {
@@ -234,7 +242,7 @@ export async function deleteDraft(id: string) {
 // Delete expired drafts (utility function)
 export async function cleanupExpiredDrafts() {
   return Draft.deleteMany({
-    expiresAt: { $lt: new Date() }
+    expiresAt: { $lt: new Date() },
   });
 }
 
@@ -252,7 +260,7 @@ export async function convertDraftToPost(
     title: draft.title,
     summary: draft.summary,
     content: draft.content,
-    categories: draft.categories?.map(id => ({ _id: id })),
+    categories: draft.categories?.map((id) => ({ _id: id })),
     tags: draft.tags,
     types: draft.types,
     authorId: draft.authorId,
@@ -268,7 +276,7 @@ export async function convertDraftToPost(
     date: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
-    ...additionalPostData
+    ...additionalPostData,
   };
 
   const post = await createPost(postData, files);
@@ -288,7 +296,7 @@ export async function autoSaveDraft(
   sessionId?: string,
   debounceMs: number = 2000
 ) {
-  const key = authorId || sessionId || 'anonymous';
+  const key = authorId || sessionId || "anonymous";
 
   // Clear existing timeout
   if (draftSaveTimeouts.has(key)) {
@@ -424,33 +432,39 @@ export async function deleteType(id: string) {
 // ==================== RELATIONSHIP OPERATIONS ====================
 
 export async function getPostsByCategory(categoryId: string) {
-  return Post.find({
-    categories: new Types.ObjectId(categoryId),
-    status: "published",
-  })
-    .sort({ date: -1 })
-    // .populate("author") 
-    .populate("coverImage");
+  return (
+    Post.find({
+      categories: new Types.ObjectId(categoryId),
+      status: "published",
+    })
+      .sort({ date: -1 })
+      // .populate("author")
+      .populate("coverImage")
+  );
 }
 
 export async function getPostsByTag(tagId: string) {
-  return Post.find({
-    tags: new Types.ObjectId(tagId),
-    status: "published",
-  })
-    .sort({ date: -1 })
-    // .populate("author") 
-    .populate("coverImage");
+  return (
+    Post.find({
+      tags: new Types.ObjectId(tagId),
+      status: "published",
+    })
+      .sort({ date: -1 })
+      // .populate("author")
+      .populate("coverImage")
+  );
 }
 
 export async function getPostsByType(typeId: string) {
-  return Post.find({
-    types: new Types.ObjectId(typeId),
-    status: "published",
-  })
-    .sort({ date: -1 })
-    // .populate("author") 
-    .populate("coverImage");
+  return (
+    Post.find({
+      types: new Types.ObjectId(typeId),
+      status: "published",
+    })
+      .sort({ date: -1 })
+      // .populate("author")
+      .populate("coverImage")
+  );
 }
 
 export async function getRelatedPosts(postId: string, limit: number = 3) {
@@ -558,20 +572,23 @@ export async function createAuthor(data: {
   }
 }
 
-export async function updateAuthor(id: string, data: {
-  authorId?: string;
-  authorName?: string;
-  authorProfession?: string;
-  userId?: string;
-  contactDetails?: Partial<{
-    email: string;
-    phone: string;
-    linkedin: string;
-    github: string;
-    twitter: string;
-    website: string;
-  }>;
-}) {
+export async function updateAuthor(
+  id: string,
+  data: {
+    authorId?: string;
+    authorName?: string;
+    authorProfession?: string;
+    userId?: string;
+    contactDetails?: Partial<{
+      email: string;
+      phone: string;
+      linkedin: string;
+      github: string;
+      twitter: string;
+      website: string;
+    }>;
+  }
+) {
   try {
     const author = await Author.findById(id);
     if (!author) {
@@ -586,7 +603,9 @@ export async function updateAuthor(id: string, data: {
       },
       updatedAt: new Date().toISOString(),
     };
-    const updatedAuthor = await Author.findByIdAndUpdate(id, updatedData, { new: true });
+    const updatedAuthor = await Author.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
     if (!updatedAuthor) {
       throw new Error("Failed to update author");
     }

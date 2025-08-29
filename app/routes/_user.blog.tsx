@@ -9,21 +9,15 @@ import {
   Globe,
   ExternalLink,
 } from "lucide-react";
-import {
-  FaGithub,
-  FaInstagram,
-  FaLinkedin,
-  FaYoutube,
-} from "react-icons/fa";
+import { FaGithub, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
 
-import {
-  FaSquareXTwitter,
-} from "react-icons/fa6";
+import { FaSquareXTwitter } from "react-icons/fa6";
 import {
   getPosts,
   getAllCategories,
   getAllPortfolios,
 } from "../Services/post.server";
+import { cacheHeader } from "pretty-cache-header";
 
 // Types
 interface Post {
@@ -50,8 +44,6 @@ interface LoaderData {
   socials: SocialLink[];
 }
 
-
-
 // Constants
 const SOCIAL_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   linkedin: FaLinkedin,
@@ -71,7 +63,7 @@ const fadeIn = {
 export const loader: LoaderFunction = async () => {
   try {
     const [posts, categories, portfolioData] = await Promise.all([
-      getPosts("published", 50, 1),
+      getPosts(),
       getAllCategories(),
       getAllPortfolios(),
     ]);
@@ -81,16 +73,32 @@ export const loader: LoaderFunction = async () => {
       .map(([id, href]) => ({ id, href: String(href) }))
       .filter((social) => social.href);
 
-    return json<LoaderData>({ posts, categories, socials });
+    return json<LoaderData>(
+      { posts, categories, socials },
+      {
+        headers: {
+          "Cache-Control": cacheHeader({
+            public: true,
+            maxAge: "2min",
+            sMaxAge: "5min",
+            staleWhileRevalidate: "1day",
+          }),
+        },
+      }
+    );
   } catch (error) {
     console.error("Loader error:", error);
     return json<LoaderData>(
       { posts: [], categories: [], socials: [] },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+      }
     );
   }
 };
-
 // Utility Components
 const SocialIcon = ({ social }: { social: SocialLink }) => {
   const Icon = SOCIAL_ICONS[social.id];
@@ -246,16 +254,12 @@ const TopicSections = ({ posts }: { posts: Post[] }) => {
 const TopCards = () => (
   <div className="max-w-3xl mx-auto mb-8 md:mb-12 px-4 md:px-0">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-      <MotionSection
-        className="rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6"
-      >
+      <MotionSection className="rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6">
         <h3 className="text-lg md:text-xl text-zinc-300 dark:text-zinc-700 font-semibold">
           No Events
         </h3>
       </MotionSection>
-      <MotionSection
-        className="rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6"
-      >
+      <MotionSection className="rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6">
         <h3 className="text-lg md:text-xl text-zinc-300 dark:text-zinc-700 font-semibold">
           No News
         </h3>
@@ -263,7 +267,6 @@ const TopCards = () => (
     </div>
   </div>
 );
-
 
 const SupportCard = () => (
   <div className="max-w-3xl mx-auto mt-12 md:mt-16 px-4 md:px-0">
@@ -274,7 +277,11 @@ const SupportCard = () => (
       viewport={{ once: true }}
       variants={{
         hidden: { opacity: 0, y: 10 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.4, ease: "easeOut" },
+        },
       }}
     >
       {/* Background Pattern/Image */}
@@ -287,13 +294,35 @@ const SupportCard = () => (
           >
             {/* Abstract geometric pattern representing solidarity */}
             <defs>
-              <pattern id="solidarity" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="2" fill="currentColor" opacity="0.3" />
-                <path d="M5 5 L15 15 M15 5 L5 15" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
+              <pattern
+                id="solidarity"
+                x="0"
+                y="0"
+                width="20"
+                height="20"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle
+                  cx="10"
+                  cy="10"
+                  r="2"
+                  fill="currentColor"
+                  opacity="0.3"
+                />
+                <path
+                  d="M5 5 L15 15 M15 5 L5 15"
+                  stroke="currentColor"
+                  strokeWidth="0.5"
+                  opacity="0.2"
+                />
               </pattern>
             </defs>
             <rect width="100" height="100" fill="url(#solidarity)" />
-            <path d="M60 20 Q80 40 60 60 Q40 40 60 20" fill="currentColor" opacity="0.1" />
+            <path
+              d="M60 20 Q80 40 60 60 Q40 40 60 20"
+              fill="currentColor"
+              opacity="0.1"
+            />
           </svg>
         </div>
       </div>
@@ -309,9 +338,9 @@ const SupportCard = () => (
             transition: {
               duration: 0.6,
               ease: "easeOut",
-              delay: 0.2
-            }
-          }
+              delay: 0.2,
+            },
+          },
         }}
       >
         <motion.h3
@@ -321,8 +350,8 @@ const SupportCard = () => (
             visible: {
               y: 0,
               opacity: 1,
-              transition: { delay: 0.3, duration: 0.4 }
-            }
+              transition: { delay: 0.3, duration: 0.4 },
+            },
           }}
         >
           Stand in Solidarity
@@ -335,11 +364,12 @@ const SupportCard = () => (
             visible: {
               y: 0,
               opacity: 1,
-              transition: { delay: 0.4, duration: 0.4 }
-            }
+              transition: { delay: 0.4, duration: 0.4 },
+            },
           }}
         >
-          Supporting those affected by ongoing conflicts in Gaza, Syria, and Sudan.
+          Supporting those affected by ongoing conflicts in Gaza, Syria, and
+          Sudan.
         </motion.p>
 
         <motion.div
@@ -349,14 +379,20 @@ const SupportCard = () => (
             visible: {
               y: 0,
               opacity: 1,
-              transition: { delay: 0.5, duration: 0.4 }
-            }
+              transition: { delay: 0.5, duration: 0.4 },
+            },
           }}
         >
           {[
             { href: "https://www.unrwa.org/donate", label: "Gaza Relief" },
-            { href: "https://www.unicef.org/emergencies/war-syria", label: "Help Syria" },
-            { href: "https://donate.unhcr.org/int/en/sudan", label: "Support Sudan" },
+            {
+              href: "https://www.unicef.org/emergencies/war-syria",
+              label: "Help Syria",
+            },
+            {
+              href: "https://donate.unhcr.org/int/en/sudan",
+              label: "Support Sudan",
+            },
           ].map(({ href, label }, index) => (
             <motion.a
               key={href}
@@ -370,10 +406,10 @@ const SupportCard = () => (
                   x: 0,
                   opacity: 1,
                   transition: {
-                    delay: 0.6 + (index * 0.1),
-                    duration: 0.3
-                  }
-                }
+                    delay: 0.6 + index * 0.1,
+                    duration: 0.3,
+                  },
+                },
               }}
             >
               <Globe className="mr-2 h-3 w-3 opacity-60 group-hover:opacity-100 transition-opacity" />
@@ -396,9 +432,9 @@ const SupportCard = () => (
             transition: {
               delay: 0.7,
               duration: 0.8,
-              ease: "easeOut"
-            }
-          }
+              ease: "easeOut",
+            },
+          },
         }}
       />
     </motion.section>
@@ -484,13 +520,13 @@ export default function Homepage() {
     () =>
       query
         ? posts.filter(
-          (post) =>
-            post.title.toLowerCase().includes(query.toLowerCase()) ||
-            post.summary?.toLowerCase().includes(query.toLowerCase()) ||
-            post.categories?.some((category) =>
-              category.name.toLowerCase().includes(query.toLowerCase())
-            )
-        )
+            (post) =>
+              post.title.toLowerCase().includes(query.toLowerCase()) ||
+              post.summary?.toLowerCase().includes(query.toLowerCase()) ||
+              post.categories?.some((category) =>
+                category.name.toLowerCase().includes(query.toLowerCase())
+              )
+          )
         : posts,
     [query, posts]
   );

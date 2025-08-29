@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Clock, User, LogOut } from "lucide-react";
 import { FaGithub, FaTwitter } from "react-icons/fa";
-import {
-  FaSquareXTwitter, FaGoogle
-} from "react-icons/fa6";
+import { FaSquareXTwitter, FaGoogle } from "react-icons/fa6";
 import {
   json,
   type LoaderFunction,
@@ -255,7 +253,12 @@ export default function MinimalistGuestbook() {
     <div className="min-h-screen md:w-[500px] ">
       <div className="py-12 px-4 sm:px-6 md:px-8 w-full max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div className="mb-8 w-full" variants={fadeIn} initial="hidden" animate="visible">
+        <motion.div
+          className="mb-8 w-full"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+        >
           <h1 className="text-3xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
             Guestbook
           </h1>
@@ -265,7 +268,12 @@ export default function MinimalistGuestbook() {
         </motion.div>
 
         {/* Authentication & Form */}
-        <motion.div className="mb-8 w-full" variants={fadeIn} initial="hidden" animate="visible">
+        <motion.div
+          className="mb-8 w-full flex items-center justify-center"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+        >
           {!user ? (
             <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 p-6 w-full">
               <div className="text-center mb-6">
@@ -277,7 +285,7 @@ export default function MinimalistGuestbook() {
                   Choose your preferred method
                 </p>
               </div>
-              <div className="grid gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 {[
                   {
                     name: "Google",
@@ -295,16 +303,16 @@ export default function MinimalistGuestbook() {
                     name: "Twitter",
                     provider: twitterProvider,
                     icon: FaSquareXTwitter,
-                    color: "text-white",
+                    color: "text-zinc-900 dark:text-white",
                   },
                 ].map(({ name, provider, icon: Icon, color }) => (
                   <button
                     key={name}
                     onClick={() => handleSignIn(provider)}
-                    className="group flex items-center justify-center gap-3 py-2.5 px-4 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors duration-200 w-full"
+                    className="group flex items-center justify-center gap-3 py-2.5 px-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors duration-200 w-full"
                   >
-                    <Icon className={`w-4 h-4 ${color}`} />
-                    <span className="text-sm font-medium">Sign in with {name}</span>
+                    <Icon className={`w-6 h-6 ${color}`} />
+                    {/* <span className="text-sm font-medium">Sign in with {name}</span> */}
                   </button>
                 ))}
               </div>
@@ -359,10 +367,11 @@ export default function MinimalistGuestbook() {
                   <button
                     type="submit"
                     disabled={!newMessage.trim() || isSubmitting}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${!newMessage.trim() || isSubmitting
-                      ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-                      : "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
-                      }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                      !newMessage.trim() || isSubmitting
+                        ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
+                        : "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
+                    }`}
                   >
                     {isSubmitting ? (
                       <>
@@ -383,7 +392,12 @@ export default function MinimalistGuestbook() {
         </motion.div>
 
         {/* Messages */}
-        <motion.div variants={fadeIn} className="max-w-xl" initial="hidden" animate="visible">
+        <motion.div
+          variants={fadeIn}
+          className="max-w-xl"
+          initial="hidden"
+          animate="visible"
+        >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium text-zinc-900 dark:text-white">
               Messages
@@ -402,7 +416,7 @@ export default function MinimalistGuestbook() {
             {pinnedMessage && (
               <motion.div
                 variants={itemVariants}
-                className="pb-6 border-b border-indigo-300 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 p-4 mb-4 flex gap-3"
+                className="pb-6 border-b border-indigo-300 dark:border-indigo-500  bg-gradient-to-t from-indigo-900/5 to-transparent flex gap-3"
               >
                 {pinnedMessage.user.photo ? (
                   <img
