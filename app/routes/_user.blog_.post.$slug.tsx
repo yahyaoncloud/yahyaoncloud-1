@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import dummyImage from "../assets/yahya_glass.png";
 import { cacheHeader } from "pretty-cache-header";
+import { getMarkdownContent } from "../utils/cloudinary.server";
 // --- Meta ---
 export function meta({
   data,
@@ -46,23 +47,25 @@ function serializePost(post: any) {
     slug: String(post.slug || ""),
     content: post.content || "",
     summary: post.summary || "",
-    date: post.date,
+    date: post.date?.$date || post.date, // Handle MongoDB date object
     authorId: post.authorId,
     createdAt:
-      post.createdAt instanceof Date
+      post.createdAt?.$date || // Extract $date if it exists
+      (post.createdAt instanceof Date
         ? post.createdAt.toISOString()
-        : post.createdAt,
+        : post.createdAt),
     updatedAt:
-      post.updatedAt instanceof Date
+      post.updatedAt?.$date || // Extract $date if it exists
+      (post.updatedAt instanceof Date
         ? post.updatedAt.toISOString()
-        : post.updatedAt,
-    categories: post.categories?.map((c: any) => ({
+        : post.updatedAt),
+    categories: (post.categories || []).map((c: any) => ({
       _id: c._id?.toString(),
       catID: c.catID,
       name: c.name,
       slug: c.slug,
     })),
-    tags: post.tags?.map((t: any) => ({
+    tags: (post.tags || []).map((t: any) => ({
       tagID: t.tagID?.toString?.() ?? t.tagID,
       name: t.name,
     })),
@@ -73,7 +76,6 @@ function serializePost(post: any) {
     views: post.views ?? 0,
   };
 }
-
 // --- Loader ---
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { slug } = params;
@@ -88,18 +90,36 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const authorId = post.authorId;
 
+  let content = post.content || "";
+
+  if (content.startsWith("https://res.cloudinary.com")) {
+    try {
+      const publicId = content.match(/\/raw\/upload\/(.+)$/)?.[1];
+      content = await getMarkdownContent(slug, publicId);
+    } catch (error) {
+      console.error(`Failed to fetch Markdown for post ${slug}:`, error);
+      content = post.summary || "";
+    }
+  }
+
+  // If still no usable content, block this post
+  if (!content || content.trim() === "") {
+    throw new Response("Content not available", { status: 404 });
+  }
+
   const [author, allPosts] = await Promise.all([
     authorId ? getAuthorByAuthorId(authorId) : null,
     getPosts("published", 20, 1),
   ]);
 
-  const serializedPost = serializePost(post);
+  const serializedPost = serializePost({ ...post, content });
 
-  const htmlContent = marked(serializedPost.content || "");
+  const htmlContent = marked(content);
 
   const otherPosts = allPosts
     .filter((p) => p.slug !== slug)
     .map(serializePost)
+    .filter((p) => p.content && p.content.trim() !== "") // only show posts with real content
     .sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -216,22 +236,31 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
   const [index, setIndex] = useState(0);
   const visible = 2;
 
-  const formatDate = (date: Date | string) => {
-    const d = new Date(date);
+  const formatDate = (date: Date | string | { $date?: string } | null | undefined) => {
+    let dateString: string | undefined;
+
+    if (date instanceof Date) {
+      dateString = date.toISOString();
+    } else if (typeof date === "string") {
+      dateString = date;
+    } else if (date && typeof date === "object" && "$date" in date) {
+      dateString = date.$date;
+    }
+
+    const d = dateString ? new Date(dateString) : new Date();
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
         year: "numeric",
+        month: "long",
+        day: "numeric",
       });
   };
-
   const next = () => setIndex((prev) => (prev + visible) % posts.length);
   const prev = () =>
     setIndex((prev) => (prev - visible + posts.length) % posts.length);
 
-  if (posts.length === 0) return null;
+  if (posts.length === 2) return null;
 
   const currentPosts = posts.slice(index, index + visible);
   if (currentPosts.length < visible) {
@@ -251,7 +280,7 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
         </h2>
         <Link
           to="/blog/posts"
-          className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
+          className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
         >
           View all →
         </Link>
@@ -276,16 +305,16 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
             >
               <Link
                 to={`/blog/post/${post.slug}`}
-                className="block text-base font-medium font-mono text-zinc-900 dark:text-zinc-100 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors line-clamp-2"
+                className="block text-base font-medium font-mono text-zinc-900 dark:text-zinc-100 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors line-clamp-2"
               >
                 {post.title}
               </Link>
               <p className="text-sm font-mono text-zinc-500 dark:text-zinc-400 line-clamp-2">
                 {post.summary}
               </p>
-              <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+              {/* <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
                 {formatDate(post.createdAt)}
-              </span>
+              </span> */}
             </motion.div>
           ))}
         </div>
@@ -338,8 +367,18 @@ export default function PostPage() {
     );
   }
 
-  const formatDate = (date: Date | string) => {
-    const d = new Date(date);
+  const formatDate = (date: Date | string | { $date?: string } | null | undefined) => {
+    let dateString: string | undefined;
+
+    if (date instanceof Date) {
+      dateString = date.toISOString();
+    } else if (typeof date === "string") {
+      dateString = date;
+    } else if (date && typeof date === "object" && "$date" in date) {
+      dateString = date.$date;
+    }
+
+    const d = dateString ? new Date(dateString) : new Date();
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
@@ -348,7 +387,6 @@ export default function PostPage() {
         day: "numeric",
       });
   };
-
   const handleShare = async () => {
     const shareData = {
       title: post.title,
@@ -384,7 +422,7 @@ export default function PostPage() {
       <motion.div variants={fadeInUp}>
         <Link
           to="/blog/posts"
-          className="inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
         >
           <ArrowLeft size={14} /> Articles
         </Link>
@@ -403,7 +441,7 @@ export default function PostPage() {
               href="https://www.linkedin.com/in/ykinwork1"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors cursor-pointer"
+              className="hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors cursor-pointer"
             >
               @{author.authorName?.toLowerCase().replace(/\s+/g, '') || "anonymous"}
             </a>
@@ -423,7 +461,7 @@ export default function PostPage() {
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors ml-auto"
+            className="flex items-center gap-1.5 text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors ml-auto"
           >
             <Share2 size={14} />
             <span className="hidden sm:inline">Share</span>
@@ -437,24 +475,24 @@ export default function PostPage() {
         )}
 
         {/* Categories & Tags - Simplified */}
-        {(post.categories?.length || post.tags?.length) && (
+        {(post.categories?.length || post.tags?.length) > 0 && (
           <div className="flex flex-wrap gap-3 text-xs">
             {post.categories?.map((category) => (
               <Link
                 key={category._id}
                 to={`/blog/posts?category=${category.slug}`}
-                className="text-zinc-600 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
               >
-                {category.name}
+                {category.name || " "}
               </Link>
             ))}
             {post.tags?.map((tag) => (
               <Link
                 key={tag.tagID || tag.name}
                 to={`/blog/posts?tag=${tag.slug}`}
-                className="text-zinc-500 dark:text-zinc-500 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
+                className="text-zinc-500 dark:text-zinc-500 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
               >
-                #{tag.name}
+                #{tag.name || " "}
               </Link>
             ))}
           </div>

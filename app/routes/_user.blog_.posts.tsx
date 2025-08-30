@@ -3,7 +3,7 @@ import { useLoaderData, Link, useSearchParams } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { Search, Calendar } from "lucide-react";
-import { getPosts, getAllCategories } from "../Services/post.server";
+import { getPosts } from "../Services/post.server";
 
 // --- Meta ---
 export function meta() {
@@ -28,8 +28,9 @@ function serializePost(post) {
     _id: post._id?.toString(),
     title: String(post.title || "Untitled"),
     slug: String(post.slug || ""),
+    content: post.content || "",   // <-- add this
     summary: post.summary || "",
-    categories: post.categories || [], // Assuming categories contain both name and slug
+    categories: post.categories || [], // Array of category objects with name and slug
     createdAt:
       post.createdAt instanceof Date
         ? post.createdAt.toISOString()
@@ -44,23 +45,34 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const search = url.searchParams.get("search") || "";
     const selectedCategorySlug = url.searchParams.get("category") || "";
 
-    const [posts, categories] = await Promise.all([
-      getPosts(),
-      getAllCategories()
-    ]);
+    const posts = await getPosts();
 
+    console.log(posts);
     const serializedPosts = posts.map(serializePost);
+    const validPosts = serializedPosts.filter(
+      post => post.content && post.content.trim() !== ""
+    );
+
+    // Derive unique categories from posts
+    const categories = Array.from(
+      new Map(
+        validPosts
+          .flatMap(post => post.categories)
+          .map(cat => [cat.slug, { name: cat.name, slug: cat.slug }])
+      ).values()
+    );
+
     return json({
-      posts: serializedPosts,
+      posts: validPosts,
       categories,
-      filters: { search, selectedCategorySlug }
+      filters: { search, selectedCategorySlug },
     });
   } catch (error) {
     console.error("Loader error:", error);
     return json({
       posts: [],
       categories: [],
-      filters: { search: "", selectedCategorySlug: "" }
+      filters: { search: "", selectedCategorySlug: "" },
     });
   }
 };
@@ -88,19 +100,29 @@ export default function ArticlesListPage() {
   const [searchTerm, setSearchTerm] = useState(filters.search);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState(filters.selectedCategorySlug);
 
-  const formatDate = (date) => {
-    const d = new Date(date);
+  const formatDate = (date: Date | string | { $date?: string } | null | undefined) => {
+    let dateString: string | undefined;
+
+    if (date instanceof Date) {
+      dateString = date.toISOString();
+    } else if (typeof date === "string") {
+      dateString = date;
+    } else if (date && typeof date === "object" && "$date" in date) {
+      dateString = date.$date;
+    }
+
+    const d = dateString ? new Date(dateString) : new Date();
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
         year: "numeric",
+        month: "long",
+        day: "numeric",
       });
   };
 
   const filteredPosts = useMemo(() => {
-    let filtered = posts;
+    let filtered = posts.filter(post => post.content && post.content.trim() !== ""); // <-- filter empty content
 
     // Filter by search term
     if (searchTerm) {
@@ -113,7 +135,7 @@ export default function ArticlesListPage() {
     // Filter by category slug
     if (selectedCategorySlug) {
       filtered = filtered.filter((post) =>
-        post.categories?.some(cat => cat.slug === selectedCategorySlug)
+        post.categories?.some((cat) => cat.slug === selectedCategorySlug)
       );
     }
 
@@ -129,13 +151,25 @@ export default function ArticlesListPage() {
       return { "Search Results": filteredPosts };
     }
 
-    const groups = {};
+    const groups: Record<string, typeof filteredPosts> = {};
+
     filteredPosts.forEach((post) => {
+      if (!post.content || !post.content.trim()) return; // skip posts with empty content
+
       const category = post.categories?.[0]?.name || "Other";
+
       if (!groups[category]) {
         groups[category] = [];
       }
+
       groups[category].push(post);
+    });
+
+    // Remove empty categories (in case some categories ended up with no posts)
+    Object.keys(groups).forEach((cat) => {
+      if (groups[cat].length === 0) {
+        delete groups[cat];
+      }
     });
 
     return groups;

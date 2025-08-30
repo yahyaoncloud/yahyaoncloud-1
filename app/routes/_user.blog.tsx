@@ -19,30 +19,15 @@ import {
   getAllPortfolios,
 } from "../Services/post.server";
 import { cacheHeader } from "pretty-cache-header";
+import { getMarkdownContent } from "../utils/cloudinary.server";
+import { Post, Category } from "../Types/types"
+import { SocialLinks } from "../Types/portfolio";
 
-// Types
-interface Post {
-  _id: string;
-  title: string;
-  slug: string;
-  summary?: string;
-  createdAt: string;
-  categories?: Array<{ name: string }>;
-}
-
-interface SocialLink {
-  id: string;
-  href: string;
-}
-
-interface Category {
-  name: string;
-}
 
 interface LoaderData {
   posts: Post[];
   categories: Category[];
-  socials: SocialLink[];
+  socials: SocialLinks[];
 }
 
 // Constants
@@ -63,19 +48,61 @@ const fadeIn = {
 // Loader
 export const loader: LoaderFunction = async () => {
   try {
-    const [posts, categories, portfolioData] = await Promise.all([
+    const [posts, _, portfolioData] = await Promise.all([
       getPosts(),
       getAllCategories(),
       getAllPortfolios(),
     ]);
 
+    // Fetch content and filter out empty posts
+    const postsWithContent = (
+      await Promise.all(
+        posts.map(async (post) => {
+          let content = post.content;
+
+          if (content?.startsWith("https://res.cloudinary.com")) {
+            try {
+              const publicId = content.match(/\/raw\/upload\/(.+)$/)?.[1];
+              content = await getMarkdownContent(post.slug, publicId);
+            } catch (error) {
+              console.error(`Failed to fetch Markdown for post ${post.slug}:`, error);
+              content = post.summary || "";
+            }
+          }
+
+          return {
+            _id: post._id.toString(),
+            title: post.title,
+            slug: post.slug,
+            content: content || "", // Ensure string
+            summary: post.summary,
+            coverImage: post.coverImage || "/default-cover.jpg",
+            gallery: post.gallery || [],
+            createdAt: typeof post.createdAt === "string"
+              ? post.createdAt
+              : post.createdAt?.toISOString(),
+            categories: post.categories || [],
+          };
+        })
+      )
+    ).filter(post => post.content && post.content.trim() !== ""); // <-- remove posts with empty content
+
+    // Derive categories from posts that actually have content
+    const categories = Array.from(
+      new Map(
+        postsWithContent
+          .flatMap((post) => post.categories)
+          .map((cat) => [cat.slug, { name: cat.name, slug: cat.slug }])
+      ).values()
+    );
+
     const socialLinksObj = portfolioData[0]?.socialLinks || {};
-    const socials: SocialLink[] = Object.entries(socialLinksObj)
+    const socials: SocialLinks[] = Object.entries(socialLinksObj)
       .map(([id, href]) => ({ id, href: String(href) }))
       .filter((social) => social.href);
 
     return json<LoaderData>(
-      { posts, categories, socials },
+      { posts: postsWithContent, categories, socials },
       {
         headers: {
           "Cache-Control": cacheHeader({
@@ -90,7 +117,12 @@ export const loader: LoaderFunction = async () => {
   } catch (error) {
     console.error("Loader error:", error);
     return json<LoaderData>(
-      { posts: [], categories: [], socials: [] },
+      {
+        posts: [],
+        categories: [],
+        socials: [],
+        error: "Failed to load data. Please try again later.",
+      },
       {
         status: 500,
         headers: {
@@ -101,7 +133,7 @@ export const loader: LoaderFunction = async () => {
   }
 };
 // Utility Components
-const SocialIcon = ({ social }: { social: SocialLink }) => {
+const SocialIcon = ({ social }: { social: SocialLinks }) => {
   const Icon = SOCIAL_ICONS[social.id];
   if (!Icon) return null;
   return (

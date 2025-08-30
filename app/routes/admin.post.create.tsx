@@ -3,6 +3,7 @@ import { json, redirect, type LoaderFunction, type ActionFunction } from "@remix
 import { useLoaderData, useFetcher } from "@remix-run/react";
 import {
   createPost,
+  createPostFromMarkdown, // Add this import
   getAllCategories,
   getAllTags,
   getAllTypes,
@@ -19,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "../components/ui/textarea";
 import { useDropzone } from "react-dropzone";
 import ReactMarkdown from "react-markdown";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
 import { Category, Tag, Type, SEO } from "../Types/types";
 import { Author } from "../models";
 import { Types } from "mongoose";
@@ -86,7 +87,6 @@ export const loader: LoaderFunction = async () => {
       getAuthorByAuthorId("auth-001")
     ]);
 
-    // Load saved draft from MongoDB
     let savedDraft = null;
     if (author) {
       savedDraft = await getDraftByAuthorId(author._id);
@@ -134,26 +134,64 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ success: true, message: "Draft deleted", type: "deleteDraft" });
   }
 
-  // Handle post creation (existing logic)
+  // Handle post creation
   const title = formData.get("title")?.toString().trim() || "Untitled Post";
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const status = formData.get("status")?.toString() as "draft" | "published" || "draft";
+  const dateInput = formData.get("date")?.toString();
+  const postDate = dateInput ? new Date(dateInput) : new Date();
+  const categories = formData.getAll("categories").filter(Boolean).map(id => ({ _id: String(id) }));
+  const tags = formData.getAll("tags").filter(Boolean).map(String);
+  const types = formData.getAll("types").filter(Boolean).map(String);
+  const coverImage = formData.get("coverImage") as File | null;
+  const gallery = formData.getAll("gallery").filter((f): f is File => f instanceof File);
+
+  // Check if a Markdown file was uploaded
+  const markdownFile = formData.get("markdownFile") as File | null;
+  if (markdownFile && markdownFile.size > 0) {
+    // Handle Markdown-based post creation
+    const post = await createPostFromMarkdown(slug);
+
+    // Update post with additional form data (if needed)
+    const updatedPost = await createPost(
+      {
+        ...post,
+        date: postDate,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        authorId: author._id.toString(),
+        author: new Types.ObjectId(author._id),
+        status,
+        categories,
+        tags,
+        types,
+        seo: {
+          title: formData.get("seoTitle")?.toString() || post.title,
+          description: formData.get("seoDescription")?.toString() || "",
+          keywords: formData.get("seoKeywords")?.toString().split(',').map(k => k.trim()).filter(Boolean) || [],
+          canonicalUrl: "",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+      { coverImage, gallery }
+    );
+
+    // Delete any existing draft
+    const existingDraft = await getDraftByAuthorId(author._id);
+    if (existingDraft) {
+      await deleteDraft(existingDraft._id);
+    }
+
+    return redirect("/admin/posts");
+  }
+
+  // Fallback to existing manual post creation
   const content = formData.get("content")?.toString() || "";
   const summary = formData.get("summary")?.toString() || "";
   const seoTitle = formData.get("seoTitle")?.toString() || title;
   const seoDescription = formData.get("seoDescription")?.toString() || summary;
   const seoKeywords = formData.get("seoKeywords")?.toString().split(',').map(k => k.trim()).filter(Boolean) || [];
-  const status = formData.get("status")?.toString() as "draft" | "published" || "draft";
-
-  // Date handling - use provided date or current date
-  const dateInput = formData.get("date")?.toString();
-  const postDate = dateInput ? new Date(dateInput) : new Date();
-
-  const categories = formData.getAll("categories").filter(Boolean).map(id => ({ _id: String(id) }));
-  const tags = formData.getAll("tags").filter(Boolean).map(String);
-  const types = formData.getAll("types").filter(Boolean).map(String);
-
-  const coverImage = formData.get("coverImage") as File | null;
-  const gallery = formData.getAll("gallery").filter((f): f is File => f instanceof File);
 
   const seo: SEO = {
     title: seoTitle,
@@ -184,7 +222,7 @@ export const action: ActionFunction = async ({ request }) => {
     { coverImage, gallery }
   );
 
-  // Delete any existing draft after successful post creation
+  // Delete any existing draft
   const existingDraft = await getDraftByAuthorId(author._id);
   if (existingDraft) {
     await deleteDraft(existingDraft._id);
@@ -218,7 +256,7 @@ export default function AdminPostCreate() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
 
-  // Load saved form state and draft on component mount
+  // Load saved form state and draft
   useEffect(() => {
     if (savedDraft) {
       const draftFormState: FormState = {
@@ -239,7 +277,6 @@ export default function AdminPostCreate() {
       setDraftId(savedDraft._id || null);
       setLastSaveTime(new Date(savedDraft.updatedAt));
     } else {
-      // Fall back to localStorage if no server draft
       const savedState = localStorage.getItem(FORM_STATE_KEY);
       if (savedState) {
         try {
@@ -287,7 +324,7 @@ export default function AdminPostCreate() {
       setShowDraftIndicator(true);
       const hideTimeout = setTimeout(() => setShowDraftIndicator(false), 2000);
       return () => clearTimeout(hideTimeout);
-    }, 3000); // Auto-save after 3 seconds of inactivity
+    }, 3000);
 
     return () => clearTimeout(timeoutId);
   }, [formState, autoSaveDraft]);
@@ -301,11 +338,10 @@ export default function AdminPostCreate() {
     return () => clearTimeout(timeoutId);
   }, [formState]);
 
-  // Clear saved state when form is successfully submitted
+  // Clear saved state on successful submission
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data && !error) {
       if (fetcher.data.type === "draft") {
-        // Don't clear on draft save
         return;
       }
       localStorage.removeItem(FORM_STATE_KEY);
@@ -317,7 +353,7 @@ export default function AdminPostCreate() {
     setFormState(prev => ({ ...prev, ...updates }));
   };
 
-  // Handle array field updates (categories, tags, types)
+  // Handle array field updates
   const handleArrayFieldChange = (fieldName: keyof Pick<FormState, 'categories' | 'tags' | 'types'>, value: string) => {
     setFormState(prev => {
       const currentArray = prev[fieldName];
@@ -370,10 +406,16 @@ export default function AdminPostCreate() {
     accept: { "text/markdown": [".md"] },
     multiple: false,
     onDrop: async (files) => {
-      const text = await files[0].text();
+      const file = files[0];
+      const text = await file.text();
       updateFormState({ content: text });
+      // Store the file for form submission
+      setMarkdownFile(file);
     },
   });
+
+  // Add state for markdown file
+  const [markdownFile, setMarkdownFile] = useState<File | null>(null);
 
   const removeCoverImage = () => {
     setCoverFile(null);
@@ -401,6 +443,7 @@ export default function AdminPostCreate() {
     setGalleryFiles([]);
     setCoverPreview(null);
     setGalleryPreviews([]);
+    setMarkdownFile(null);
     localStorage.removeItem(FORM_STATE_KEY);
   };
 
@@ -413,7 +456,6 @@ export default function AdminPostCreate() {
             <div className="w-12 h-0.5 bg-zinc-900 dark:bg-zinc-100"></div>
           </div>
 
-          {/* Draft status and actions */}
           <div className="flex items-center space-x-3">
             {lastSaveTime && (
               <div className="text-xs text-zinc-600 dark:text-zinc-400">
@@ -482,7 +524,6 @@ export default function AdminPostCreate() {
 
             {/* Tab 1: General Data */}
             <TabsContent value="general" className="space-y-8">
-              {/* Basic Information */}
               <section>
                 <h2 className="text-lg font-medium mb-4 text-zinc-700 dark:text-zinc-300">Basic Information</h2>
                 <div className="space-y-4">
@@ -532,7 +573,6 @@ export default function AdminPostCreate() {
                 </div>
               </section>
 
-              {/* Classification */}
               <section>
                 <h2 className="text-lg font-medium mb-4 text-zinc-700 dark:text-zinc-300">Classification</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -560,7 +600,6 @@ export default function AdminPostCreate() {
                 </div>
               </section>
 
-              {/* SEO */}
               <section>
                 <h2 className="text-lg font-medium mb-4 text-zinc-700 dark:text-zinc-300">SEO</h2>
                 <div className="space-y-4">
@@ -596,21 +635,31 @@ export default function AdminPostCreate() {
               <section>
                 <h2 className="text-lg font-medium mb-4 text-zinc-700 dark:text-zinc-300">Content</h2>
                 <div className="space-y-4">
-                  {/* Markdown File Upload */}
                   <div>
                     <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1 block">Upload Markdown File (Optional)</Label>
                     <div
                       {...getMdProps()}
                       className="p-4 border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-md cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors bg-white dark:bg-zinc-800"
                     >
-                      <input {...getMdInput()} />
+                      <input {...getMdInput()} name="markdownFile" />
                       <p className="text-zinc-500 dark:text-zinc-400 text-center text-sm">
                         Drop a .md file here or click to browse
                       </p>
                     </div>
+                    {markdownFile && (
+                      <div className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                        Selected file: {markdownFile.name}
+                        <button
+                          type="button"
+                          onClick={() => setMarkdownFile(null)}
+                          className="ml-2 text-red-600 dark:text-red-400 hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Content Textarea */}
                   <div>
                     <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1 block">Content (Markdown)</Label>
                     <Textarea
@@ -623,7 +672,6 @@ export default function AdminPostCreate() {
                     />
                   </div>
 
-                  {/* Content Preview */}
                   {formState.content && (
                     <div>
                       <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1 block">Preview</Label>
@@ -644,8 +692,6 @@ export default function AdminPostCreate() {
             <TabsContent value="media" className="space-y-6">
               <section>
                 <h2 className="text-lg font-medium mb-4 text-zinc-700 dark:text-zinc-300">Media</h2>
-
-                {/* Cover Image */}
                 <div className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1 block">Cover Image</Label>
@@ -678,7 +724,6 @@ export default function AdminPostCreate() {
                     )}
                   </div>
 
-                  {/* Gallery Images */}
                   <div>
                     <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1 block">Gallery Images</Label>
                     <div
@@ -718,7 +763,6 @@ export default function AdminPostCreate() {
             </TabsContent>
           </Tabs>
 
-          {/* Hidden inputs to include form state in submission */}
           {formState.categories.map((categoryId) => (
             <input key={`category-${categoryId}`} type="hidden" name="categories" value={categoryId} />
           ))}
@@ -728,12 +772,16 @@ export default function AdminPostCreate() {
           {formState.types.map((typeId) => (
             <input key={`type-${typeId}`} type="hidden" name="types" value={typeId} />
           ))}
+          {coverFile && (
+            <input type="hidden" name="coverImage" value={coverFile.name} />
+          )}
+          {galleryFiles.map((file, index) => (
+            <input key={`gallery-${index}`} type="hidden" name="gallery" value={file.name} />
+          ))}
 
-          {/* Actions */}
           <div className="pt-6 border-t border-zinc-200 dark:border-zinc-700">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
-                {/* Manual save draft button */}
                 <Button
                   type="button"
                   variant="outline"
@@ -761,8 +809,6 @@ export default function AdminPostCreate() {
                     : "Save Draft"
                   }
                 </Button>
-
-                {/* Draft info */}
                 {draftId && (
                   <span className="text-xs text-zinc-500 dark:text-zinc-400">
                     Draft available

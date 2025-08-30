@@ -14,41 +14,64 @@ import {
   IDraftDoc,
 } from "../models";
 import { Types } from "mongoose";
-import { uploadImage } from "../utils/cloudinary.server";
-
+import {
+  uploadPostResources,
+  updatePostResources,
+  deletePostResources,
+  parseMarkdownWithCloudinary,
+  uploadImage,
+} from "../utils/cloudinary.server";
 // ==================== POST OPERATIONS ====================
 
 export async function createPost(
   postData: Partial<IPostDoc>,
-  files?: { coverImage?: File; gallery?: File[] }
+  files?: { markdownFile?: File; coverImage?: File; gallery?: File[] }
 ) {
   const slug =
     postData.slug ||
     postData.title
       ?.toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+      .replace(/(^-|-$)/g, "") ||
+    "untitled-post";
 
-  // Upload cover image
-  let coverImageUrl: string = "/default-cover.jpg";
-  if (files?.coverImage) {
-    const uploaded = await uploadImage(
-      files.coverImage,
-      `${slug}-cover-image.${files.coverImage.name.split(".").pop()}`
-    );
-    coverImageUrl = uploaded.url; // must be a string
-  }
+  let coverImageUrl = "/default-cover.jpg";
+  let galleryUrls: string[] = [];
+  let content = postData.content || "";
 
-  // Upload gallery images
-  const galleryUrls: string[] = [];
-  if (files?.gallery?.length) {
-    for (let i = 0; i < files.gallery.length; i++) {
-      const img = files.gallery[i];
+  // Handle Markdown-based post creation
+  if (files?.markdownFile && files.markdownFile.size > 0) {
+    const { contentUrl, coverImageUrl: uploadedCover, galleryUrls: uploadedGallery, parsedMarkdown } =
+      await uploadPostResources(slug, files.markdownFile, files.coverImage, files.gallery);
+
+    content = contentUrl;
+    coverImageUrl = uploadedCover;
+    galleryUrls = uploadedGallery;
+
+    // Merge parsed Markdown frontmatter with postData
+    postData.title = postData.title || parsedMarkdown.frontmatter.title || "Untitled Post";
+    postData.categories = postData.categories || parsedMarkdown.frontmatter.categories || [];
+    postData.tags = postData.tags || parsedMarkdown.frontmatter.tags || [];
+    postData.status = postData.status || parsedMarkdown.frontmatter.status || "draft";
+  } else {
+    // Manual post creation: Upload cover and gallery images
+    if (files?.coverImage) {
       const uploaded = await uploadImage(
-        img,
-        `${slug}-gallery-${i + 1}.${img.name.split(".").pop()}`
+        files.coverImage,
+        `posts/${slug}/${slug}-cover-image`
       );
-      galleryUrls.push(uploaded.url);
+      coverImageUrl = uploaded.url;
+    }
+
+    if (files?.gallery?.length) {
+      for (let i = 0; i < files.gallery.length; i++) {
+        const img = files.gallery[i];
+        const uploaded = await uploadImage(
+          img,
+          `posts/${slug}/gallery/${slug}-gallery-${i + 1}`
+        );
+        galleryUrls.push(uploaded.url);
+      }
     }
   }
 
@@ -57,33 +80,57 @@ export async function createPost(
     slug,
     coverImage: coverImageUrl,
     gallery: galleryUrls,
-    author: new Types.ObjectId(postData.authorId), // this must exist
-    authorId: postData.authorId, // add this line if schema still expects it
+    content,
+    author: new Types.ObjectId(postData.authorId), // Must exist
+    authorId: postData.authorId, // For backward compatibility
+    createdAt: postData.createdAt || new Date(),
+    updatedAt: new Date(),
+  });
+}
+
+export async function createPostFromMarkdown(
+  slug: string,
+  markdownFile: File,
+  coverImage?: File,
+  galleryImages: File[] = [],
+  additionalPostData?: Partial<IPostDoc>
+) {
+  const { contentUrl, coverImageUrl, galleryUrls, parsedMarkdown } = await uploadPostResources(
+    slug,
+    markdownFile,
+    coverImage,
+    galleryImages
+  );
+
+  return Post.create({
+    slug,
+    title: parsedMarkdown.frontmatter.title || additionalPostData?.title || "Untitled Post",
+    content: contentUrl,
+    coverImage: coverImageUrl,
+    gallery: galleryUrls,
+    categories: parsedMarkdown.frontmatter.categories || additionalPostData?.categories || [],
+    tags: parsedMarkdown.frontmatter.tags || additionalPostData?.tags || [],
+    status: parsedMarkdown.frontmatter.status || additionalPostData?.status || "draft",
+    author: new Types.ObjectId(additionalPostData?.authorId),
+    authorId: additionalPostData?.authorId,
+    createdAt: additionalPostData?.createdAt || new Date(),
+    updatedAt: new Date(),
+    ...additionalPostData,
   });
 }
 
 export async function getPostById(id: string) {
-  return (
-    Post.findById(id)
-      // .populate("author")
-      .populate("categories")
-      .populate("tags")
-      .populate("types")
-      .populate("coverImage")
-      .populate("gallery")
-  );
+  return Post.findById(id)
+    .populate("categories")
+    .populate("tags")
+    .populate("types").lean();
 }
 
 export async function getPostBySlug(slug: string) {
-  return (
-    Post.findOne({ slug })
-      // .populate("author")
-      .populate("categories")
-      .populate("tags")
-      .populate("types")
-      .populate("coverImage")
-      .populate("gallery")
-  );
+  return Post.findOne({ slug })
+    .populate("categories")
+    .populate("tags")
+    .populate("types").lean();
 }
 
 export async function getPosts(
@@ -92,48 +139,40 @@ export async function getPosts(
   page: number = 1,
   options?: { populate?: string }
 ) {
-  const query = Post.find({ status })
+  const query = Post.find(status === "published" ? {} : { status })
     .sort({ date: -1 })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit)
+    .select("_id title slug content summary coverImage gallery createdAt categories");
   if (options?.populate) {
     query.populate(options.populate);
   }
-  // return query.populate("author").populate("categories").populate("coverImage");
-  return query.populate("categories").populate("coverImage");
+  return query.populate("categories").lean();
 }
 
 export async function updatePost(
   id: string,
   updateData: Partial<IPostDoc>,
-  files?: { coverImage?: File; gallery?: File[] }
+  files?: { markdownFile?: File; coverImage?: File; gallery?: File[]; deleteGalleryImages?: string[] }
 ) {
   const post = await Post.findById(id);
   if (!post) throw new Error("Post not found");
 
   const slug = updateData.slug || post.slug;
 
-  // Upload new cover image if provided
-  if (files?.coverImage) {
-    const uploadedCover = await uploadImage(
-      files.coverImage,
-      `${slug}-cover-image.${files.coverImage.name.split(".").pop()}`
+  // Handle updates with Cloudinary
+  if (files?.markdownFile || files?.coverImage || files?.gallery || files?.deleteGalleryImages) {
+    const { contentUrl, coverImageUrl, galleryUrls } = await updatePostResources(
+      slug,
+      files?.markdownFile,
+      files?.coverImage,
+      files?.gallery,
+      files?.deleteGalleryImages
     );
-    updateData.coverImage = uploadedCover;
-  }
 
-  // Upload gallery images if provided
-  if (files?.gallery && files.gallery.length > 0) {
-    const galleryUrls = [];
-    for (let i = 0; i < files.gallery.length; i++) {
-      const img = files.gallery[i];
-      const uploaded = await uploadImage(
-        img,
-        `${slug}-gallery-${i + 1}.${img.name.split(".").pop()}`
-      );
-      galleryUrls.push(uploaded);
-    }
-    updateData.gallery = galleryUrls;
+    if (contentUrl) updateData.content = contentUrl;
+    if (coverImageUrl) updateData.coverImage = coverImageUrl;
+    if (galleryUrls) updateData.gallery = galleryUrls;
   }
 
   return Post.findByIdAndUpdate(id, updateData, { new: true })
@@ -143,6 +182,12 @@ export async function updatePost(
 }
 
 export async function deletePost(id: string) {
+  const post = await Post.findById(id);
+  if (!post) throw new Error("Post not found");
+
+  // Delete Cloudinary resources
+  await deletePostResources(post.slug);
+
   return Post.findByIdAndDelete(id);
 }
 
@@ -151,16 +196,13 @@ export async function incrementPostViews(id: string) {
 }
 
 export async function getTopPosts(limit: number = 3) {
-  // Fetch all published posts
   const posts = await Post.find({ status: "published" })
     .populate("categories")
     .populate("tags")
-    .populate("coverImage")
     .lean();
 
   if (!posts || posts.length === 0) return [];
 
-  // Check if all metrics are zero
   const allMetricsZero = posts.every(
     (p) =>
       (p.views || 0) === 0 &&
@@ -171,14 +213,12 @@ export async function getTopPosts(limit: number = 3) {
   let sortedPosts;
 
   if (!allMetricsZero) {
-    // Sort by combined score: views + likes + commentsCount
     sortedPosts = posts.sort((a, b) => {
       const scoreA = (a.views || 0) + (a.likes || 0) + (a.commentsCount || 0);
       const scoreB = (b.views || 0) + (b.likes || 0) + (b.commentsCount || 0);
       return scoreB - scoreA;
     });
   } else {
-    // Fallback: sort by average of categories.length and tags.length
     sortedPosts = posts.sort((a, b) => {
       const avgA = ((a.categories?.length || 0) + (a.tags?.length || 0)) / 2;
       const avgB = ((b.categories?.length || 0) + (b.tags?.length || 0)) / 2;
@@ -191,16 +231,14 @@ export async function getTopPosts(limit: number = 3) {
 
 // ==================== DRAFT OPERATIONS ====================
 
-// Create a new draft
 export async function saveDraft(draftData: Partial<IDraftDoc>) {
   const slug = draftData.title
     ? draftData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
     : "untitled-draft";
 
-  // Set expiration date (30 days from now)
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
@@ -212,7 +250,6 @@ export async function saveDraft(draftData: Partial<IDraftDoc>) {
     createdAt: draftData.createdAt || new Date(),
   };
 
-  // Check if draft already exists for this author/session
   const existingDraft = await Draft.findOne({
     $or: [{ authorId: draftData.authorId }, { sessionId: draftData.sessionId }],
   });
@@ -224,38 +261,32 @@ export async function saveDraft(draftData: Partial<IDraftDoc>) {
   }
 }
 
-// Get draft by author ID
 export async function getDraftByAuthorId(authorId: string) {
   return Draft.findOne({ authorId }).sort({ updatedAt: -1 });
 }
 
-// Get draft by session ID (for anonymous users)
 export async function getDraftBySessionId(sessionId: string) {
   return Draft.findOne({ sessionId }).sort({ updatedAt: -1 });
 }
 
-// Delete a draft
 export async function deleteDraft(id: string) {
   return Draft.findByIdAndDelete(id);
 }
 
-// Delete expired drafts (utility function)
 export async function cleanupExpiredDrafts() {
   return Draft.deleteMany({
     expiresAt: { $lt: new Date() },
   });
 }
 
-// Convert draft to post
 export async function convertDraftToPost(
   draftId: string,
   additionalPostData?: Partial<IPostDoc>,
-  files?: { coverImage?: File; gallery?: File[] }
+  files?: { markdownFile?: File; coverImage?: File; gallery?: File[] }
 ) {
   const draft = await Draft.findById(draftId);
   if (!draft) throw new Error("Draft not found");
 
-  // Create post from draft data
   const postData: Partial<IPostDoc> = {
     title: draft.title,
     summary: draft.summary,
@@ -281,13 +312,11 @@ export async function convertDraftToPost(
 
   const post = await createPost(postData, files);
 
-  // Delete the draft after successful conversion
   await deleteDraft(draftId);
 
   return post;
 }
 
-// Auto-save draft function (debounced)
 const draftSaveTimeouts = new Map<string, NodeJS.Timeout>();
 
 export async function autoSaveDraft(
@@ -298,7 +327,6 @@ export async function autoSaveDraft(
 ) {
   const key = authorId || sessionId || "anonymous";
 
-  // Clear existing timeout
   if (draftSaveTimeouts.has(key)) {
     clearTimeout(draftSaveTimeouts.get(key)!);
   }
