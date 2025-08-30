@@ -167,7 +167,8 @@ export function useEnhanceBlogContent() {
       if (pre.parentElement?.classList.contains("code-block-wrapper")) return;
 
       const wrapper = document.createElement("div");
-      wrapper.className = "code-block-wrapper relative overflow-hidden rounded my-4";
+      wrapper.className =
+        "code-block-wrapper relative overflow-hidden rounded my-4";
       pre.parentNode?.insertBefore(wrapper, pre);
       wrapper.appendChild(pre);
 
@@ -236,7 +237,9 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
   const [index, setIndex] = useState(0);
   const visible = 2;
 
-  const formatDate = (date: Date | string | { $date?: string } | null | undefined) => {
+  const formatDate = (
+    date: Date | string | { $date?: string } | null | undefined
+  ) => {
     let dateString: string | undefined;
 
     if (date instanceof Date) {
@@ -251,10 +254,10 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
   };
   const next = () => setIndex((prev) => (prev + visible) % posts.length);
   const prev = () =>
@@ -330,8 +333,6 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
   );
 };
 
-
-
 // --- Animation Variants ---
 const fadeInUp = {
   hidden: { opacity: 0, y: 15 },
@@ -367,7 +368,9 @@ export default function PostPage() {
     );
   }
 
-  const formatDate = (date: Date | string | { $date?: string } | null | undefined) => {
+  const formatDate = (
+    date: Date | string | { $date?: string } | null | undefined
+  ) => {
     let dateString: string | undefined;
 
     if (date instanceof Date) {
@@ -382,10 +385,10 @@ export default function PostPage() {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
   };
   const handleShare = async () => {
     const shareData = {
@@ -413,7 +416,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="max-w-2xl mx-auto px-6 py-12 space-y-12"
+      className="max-w-2xl xs:max-w-xs sm:max-w-sm mx-auto px-6 py-12 space-y-12"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}
@@ -443,7 +446,9 @@ export default function PostPage() {
               rel="noopener noreferrer"
               className="hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors cursor-pointer"
             >
-              @{author.authorName?.toLowerCase().replace(/\s+/g, '') || "anonymous"}
+              @
+              {author.authorName?.toLowerCase().replace(/\s+/g, "") ||
+                "anonymous"}
             </a>
           )}
 
