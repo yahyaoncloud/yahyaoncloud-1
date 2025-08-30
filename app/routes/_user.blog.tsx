@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { LoaderFunction, json, Link, useLoaderData } from "@remix-run/react";
+import Vanta from "../assets/vanta.webp"
 import {
   Github,
   Linkedin,
@@ -254,17 +255,30 @@ const TopicSections = ({ posts }: { posts: Post[] }) => {
 const TopCards = () => (
   <div className="max-w-3xl mx-auto mb-8 md:mb-12 px-4 md:px-0">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-      <MotionSection className="rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6">
-        <h3 className="text-lg md:text-xl text-zinc-300 dark:text-zinc-700 font-semibold">
+      <MotionSection className="relative rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden">
+        <img
+          src={Vanta} // replace with your Vantablack image path
+          alt="Vantablack background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <h3 className="relative text-lg md:text-xl text-zinc-300 dark:text-zinc-700 font-semibold bg-black/60 px-3 py-1 rounded">
           No Events
         </h3>
       </MotionSection>
-      <MotionSection className="rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/20 shadow-sm p-4 md:p-6">
-        <h3 className="text-lg md:text-xl text-zinc-300 dark:text-zinc-700 font-semibold">
+
+      <MotionSection className="relative rounded border text-center items-center flex flex-col justify-center h-32 md:h-44 border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden">
+        <img
+          src={Vanta} // replace with your Vantablack image path
+
+          alt="Vantablack background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <h3 className="relative text-lg md:text-xl text-zinc-300 dark:text-zinc-700 font-semibold bg-black/60 px-3 py-1 rounded">
           No News
         </h3>
       </MotionSection>
     </div>
+
   </div>
 );
 
@@ -520,13 +534,13 @@ export default function Homepage() {
     () =>
       query
         ? posts.filter(
-            (post) =>
-              post.title.toLowerCase().includes(query.toLowerCase()) ||
-              post.summary?.toLowerCase().includes(query.toLowerCase()) ||
-              post.categories?.some((category) =>
-                category.name.toLowerCase().includes(query.toLowerCase())
-              )
-          )
+          (post) =>
+            post.title.toLowerCase().includes(query.toLowerCase()) ||
+            post.summary?.toLowerCase().includes(query.toLowerCase()) ||
+            post.categories?.some((category) =>
+              category.name.toLowerCase().includes(query.toLowerCase())
+            )
+        )
         : posts,
     [query, posts]
   );

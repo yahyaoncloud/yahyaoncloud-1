@@ -1,5 +1,6 @@
 export const proseClasses = `
   prose mx-auto  py-12 xs:prose-p:text-sm
+  prose:font-mono
   prose md:prose-p:text-base prose-p:text-sm
 
   text-base sm:text-lg leading-relaxed

@@ -4,7 +4,7 @@ import UserLayout from "../components/layouts/UserLayout";
 import { json } from "@remix-run/node";
 import { getAuthorByAuthorId, getTopPosts } from "../Services/post.server";
 import { Author, Post } from "../Types/types";
-import BackgroundDark from "../assets/Gemini_Generated_Image_96zg1h96zg1h96zg.jpg";
+import BackgroundDark from "../assets/Vanta2.webp";
 
 export async function loader() {
   try {
@@ -47,22 +47,20 @@ function ThemedContainer() {
         key="dark-bg"
         src={BackgroundDark}
         alt="Dark Background"
-        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${
-          isDarkTheme ? "opacity-100" : "opacity-0"
-        }`}
+        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${isDarkTheme ? "opacity-100" : "opacity-0"
+          }`}
       />
       <img
         key="bright-bg"
         src={BackgroundDark} // Fixed incorrect src
         alt="Bright Background"
-        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${
-          isDarkTheme ? "opacity-0" : "opacity-100"
-        }`}
+        className={`fixed inset-0 w-full h-full object-cover -z-10 transition-opacity duration-500 ease-in-out ${isDarkTheme ? "opacity-0" : "opacity-100"
+          }`}
       />
 
       {/* Overlay for readability with smooth transition */}
       <div
-        className={`fixed inset-0 -z-15 transition-opacity duration-500 ease-in-out dark:bg-zinc-950/95 bg-white/95
+        className={`fixed inset-0 -z-15 transition-opacity duration-500 ease-in-out dark:bg-black/70 bg-white/95
           }`}
       />
 

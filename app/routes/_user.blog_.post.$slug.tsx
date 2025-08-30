@@ -135,7 +135,7 @@ export function useEnhanceBlogContent() {
       if (table.parentElement?.classList.contains("overflow-x-auto")) return;
       const wrapper = document.createElement("div");
       wrapper.className =
-        "overflow-x-auto shadow-sm bg-white dark:bg-zinc-900 rounded border border-zinc-200 dark:border-zinc-700 mb-4";
+        "overflow-x-auto bg-white dark:bg-zinc-900 rounded border border-zinc-200 dark:border-zinc-700 my-4";
       table.parentNode?.insertBefore(wrapper, table);
       wrapper.appendChild(table);
       table.className +=
@@ -147,7 +147,7 @@ export function useEnhanceBlogContent() {
       if (pre.parentElement?.classList.contains("code-block-wrapper")) return;
 
       const wrapper = document.createElement("div");
-      wrapper.className = "code-block-wrapper relative overflow-hidden rounded";
+      wrapper.className = "code-block-wrapper relative overflow-hidden rounded my-4";
       pre.parentNode?.insertBefore(wrapper, pre);
       wrapper.appendChild(pre);
 
@@ -169,13 +169,13 @@ export function useEnhanceBlogContent() {
       const button = document.createElement("button");
       button.setAttribute("aria-label", "Copy code");
       button.className =
-        "copy-button absolute top-2 right-2 p-1 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 opacity-0 transition-opacity hover:opacity-100 hover:bg-zinc-300 dark:hover:bg-zinc-600";
+        "copy-button absolute top-2 right-2 p-1 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 opacity-0 transition-opacity hover:opacity-100";
       button.innerHTML = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-  </svg>
-`;
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      `;
 
       button.addEventListener("click", async () => {
         if (!codeElement) return;
@@ -221,10 +221,10 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
     return isNaN(d.getTime())
       ? ""
       : d.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
   };
 
   const next = () => setIndex((prev) => (prev + visible) % posts.length);
@@ -357,10 +357,10 @@ export default function PostPage() {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
   };
 
   const handleShare = async () => {
@@ -389,117 +389,85 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="max-w-xs sm:max-w-sm md:max-w-4xl mx-auto px-6 md:px-8 py-8 md:py-12 space-y-8 md:space-y-12"
+      className="max-w-2xl mx-auto px-6 py-12 space-y-12"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}
     >
-      {/* Hero Section */}
-      <motion.section variants={fadeInUp}>
-        {post.coverImage && (
-          <img
-            src={dummyImage}
-            alt={post.title}
-            className="w-full h-48 md:h-64 object-cover rounded border border-zinc-200 dark:border-zinc-700 mb-6"
-          />
-        )}
-        <div className="space-y-4">
-          <Link
-            to="/blog/posts"
-            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-          >
-            <ArrowLeft size={14} /> Back to Articles
-          </Link>
-          <h1 className="text-2xl md:text-4xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
-            {post.title}
-          </h1>
-          {post.summary && (
-            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              {post.summary}
-            </p>
-          )}
-        </div>
-      </motion.section>
+      {/* Navigation */}
+      <motion.div variants={fadeInUp}>
+        <Link
+          to="/blog/posts"
+          className="inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
+        >
+          <ArrowLeft size={14} /> Articles
+        </Link>
+      </motion.div>
 
-      {/* Meta & Author Section */}
-      <motion.section variants={fadeInUp}>
-        <div className="flex flex-col gap-4 md:gap-6  border-b border-zinc-200 dark:border-zinc-700 pb-6">
-          {/* Author */}
+      {/* Header */}
+      <motion.header variants={fadeInUp} className="space-y-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
+          {post.title}
+        </h1>
+
+        {/* Minimalist Meta Line */}
+        <div className="flex items-center gap-3 text-base text-zinc-500 dark:text-zinc-400 pb-8 border-b border-zinc-200 dark:border-zinc-700">
           {author && (
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-sm">
-                {author.authorName?.charAt(0).toUpperCase() || "A"}
-              </div>
-              <div>
-                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                  {author.authorName || "Unknown"}
-                </p>
-                {author.authorProfession && (
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {author.authorProfession}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Meta Info */}
-          <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400">
-            {post.minuteRead > 0 && (
-              <span className="flex items-center gap-1">
-                <Clock size={14} /> {post.minuteRead} min read
-              </span>
-            )}
-            {post.views > 0 && (
-              <span className="flex items-center gap-1">
-                <Eye size={14} />
-                {post.views > 1000
-                  ? `${(post.views / 1000).toFixed(1)}k`
-                  : post.views}{" "}
-                views
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Calendar size={14} />
-              <time dateTime={post.createdAt}>
-                {formatDate(post.createdAt)}
-              </time>
+            <span className="hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors cursor-pointer">
+              @{author.authorName?.toLowerCase().replace(/\s+/g, '') || "anonymous"}
             </span>
-          </div>
-
-          {/* Categories & Tags */}
-          {(post.categories?.length || post.tags?.length) && (
-            <div className="flex flex-wrap gap-2">
-              {post.categories?.map((category) => (
-                <span
-                  key={category._id}
-                  className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
-                >
-                  {category.name}
-                </span>
-              ))}
-              {post.tags?.map((tag) => (
-                <span
-                  key={tag.tagID || tag.name}
-                  className="px-3 py-1 rounded-full text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700"
-                >
-                  #{tag.name}
-                </span>
-              ))}
-            </div>
+          )}
+          <span>|</span>
+          <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
+          {post.minuteRead > 0 && (
+            <>
+              {/* <span>|</span>
+              <span className="flex items-center gap-1">
+                <Clock size={12} />
+                {post.minuteRead} min read
+              </span> */}
+            </>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-1 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200"
-            >
-              <Share2 size={14} /> Share
-            </button>
-          </div>
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-1.5 text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors ml-auto"
+          >
+            <Share2 size={14} />
+            <span className="hidden sm:inline">Share</span>
+          </button>
         </div>
-      </motion.section>
+
+        {post.summary && (
+          <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            {post.summary}
+          </p>
+        )}
+
+        {/* Categories & Tags - Simplified */}
+        {(post.categories?.length || post.tags?.length) && (
+          <div className="flex flex-wrap gap-3 text-xs">
+            {post.categories?.map((category) => (
+              <Link
+                key={category._id}
+                to={`/blog/posts?category=${category.slug}`}
+                className="text-zinc-600 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
+              >
+                {category.name}
+              </Link>
+            ))}
+            {post.tags?.map((tag) => (
+              <Link
+                key={tag.tagID || tag.name}
+                to={`/blog/posts?tag=${tag.slug}`}
+                className="text-zinc-500 dark:text-zinc-500 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
+              >
+                #{tag.name}
+              </Link>
+            ))}
+          </div>
+        )}
+      </motion.header>
 
       {/* Article Content */}
       <motion.section variants={fadeInUp}>
