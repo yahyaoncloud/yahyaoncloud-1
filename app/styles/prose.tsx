@@ -2,7 +2,7 @@ export const proseClasses = `
   prose mx-auto  py-12 xs:prose-p:text-sm
   prose:font-mono
   prose md:prose-p:text-base prose-p:text-sm
-
+  prose-p:text-base/8
   text-base sm:text-lg leading-relaxed
   
 
@@ -15,7 +15,7 @@ export const proseClasses = `
   prose-h4:text-lg sm:prose-h4:text-lg prose-h4:font-medium prose-h4:mb-2 xl:prose-h4:text-lg
 
   /* Paragraphs */
-  prose-p:text-zinc-800 dark:prose-p:text-zinc-200 prose-p:leading-7 prose-p:mb-6  md:prose-p:text-base prose-p:text-sm prose-p:leading-relaxed  
+  prose-p:text-zinc-800 dark:prose-p:text-zinc-200 prose-p:leading-7 prose-p:mb-6  md:prose-p:text-lg/7 prose-p:text-base/6  
 
   /* Emphasis and strong */
   prose-strong:font-semibold prose-strong:text-zinc-900 dark:prose-strong:text-zinc-100 
@@ -28,8 +28,8 @@ export const proseClasses = `
   prose-blockquote:text-zinc-700 dark:prose-blockquote:text-zinc-300 prose-blockquote:italic
 
   /* Lists */
-  prose-ul:pl-6 prose-ul:mb-6 prose-ol:pl-6 prose-ol:mb-6 dark:prose-ul:text-zinc-200 dark:prose-ol:text-zinc-200 md:prose-ol:text-base prose-ol:text-sm md:prose-ul:text-base prose-ul:text-sm leading-relaxed
-  prose-li:marker:text-teal-600 dark:prose-li:marker:text-teal-400 prose-li:mb-1  prose-li:prose-p:text-zinc-950 dark:prose-li:prose-p:text-white md:prose-li:text-base prose-li:text-sm leading-relaxed
+  prose-ul:pl-6 prose-ul:mb-6 prose-ol:pl-6 prose-ol:mb-6 dark:prose-ul:text-zinc-200 dark:prose-ol:text-zinc-200 md:prose-ol:text-lg/7 prose-ol:text-base/6 md:prose-ul:text-lg/7 prose-ul:text-base/6 leading-relaxed
+  prose-li:marker:text-teal-600 dark:prose-li:marker:text-teal-400 prose-li:mb-1  prose-li:prose-p:text-zinc-950 dark:prose-li:prose-p:text-white md:prose-li:text-lg/7 prose-li:text-base/6 leading-relaxed
 
   /* Links */
   prose-a:text-indigo-600 dark:prose-a:text-indigo-400 hover:prose-a:underline 

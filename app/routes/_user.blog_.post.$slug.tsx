@@ -219,7 +219,7 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
   const formatDate = (date: Date | string) => {
     const d = new Date(date);
     return isNaN(d.getTime())
-      ? ""
+      ? "Invalid date"
       : d.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -243,72 +243,56 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
       className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.5 }}
     >
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-lg font-medium font-mono text-zinc-900 dark:text-zinc-100">
           More Articles
         </h2>
         <Link
           to="/blog/posts"
-          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+          className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors"
         >
           View all →
         </Link>
       </div>
 
-      <div className="relative flex items-center gap-4">
-        {/* Left Button */}
+      <div className="relative flex items-center gap-6">
         <button
           onClick={prev}
-          className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors"
+          className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
         >
           <ChevronLeft size={18} />
         </button>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
           {currentPosts.map((post, idx) => (
             <motion.div
               key={post._id + idx}
-              className="relative flex rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700"
+              className="space-y-2"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4 }}
             >
-              {/* Text */}
-              <div className="w-2/3 p-4 bg-white dark:bg-zinc-950">
-                <Link
-                  to={`/blog/post/${post.slug}`}
-                  className="block text-base font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
-                >
-                  {post.title}
-                </Link>
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-3">
-                  {post.summary}
-                </p>
-                <span className="block mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  {formatDate(post.createdAt)}
-                </span>
-              </div>
-
-              {/* Image */}
-              <div
-                className="w-1/3 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(${post.image || dummyImage})`,
-                }}
+              <Link
+                to={`/blog/post/${post.slug}`}
+                className="block text-base font-medium font-mono text-zinc-900 dark:text-zinc-100 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors line-clamp-2"
               >
-                <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-transparent to-white dark:to-zinc-950 pointer-events-none"></div>
-              </div>
+                {post.title}
+              </Link>
+              <p className="text-sm font-mono text-zinc-500 dark:text-zinc-400 line-clamp-2">
+                {post.summary}
+              </p>
+              <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+                {formatDate(post.createdAt)}
+              </span>
             </motion.div>
           ))}
         </div>
 
-        {/* Right Button */}
         <button
           onClick={next}
-          className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors"
+          className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
         >
           <ChevronRight size={18} />
         </button>
@@ -316,6 +300,8 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
     </motion.section>
   );
 };
+
+
 
 // --- Animation Variants ---
 const fadeInUp = {
