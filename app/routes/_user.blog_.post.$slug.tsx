@@ -416,7 +416,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="max-w-2xl xs:max-w-xs sm:max-w-sm mx-auto px-6 py-12 space-y-12"
+      className="w-[90vw] max-w-[1200px] mx-auto px-[5vw] py-[5vh] space-y-[5vh]"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}
@@ -425,7 +425,7 @@ export default function PostPage() {
       <motion.div variants={fadeInUp}>
         <Link
           to="/blog/posts"
-          className="inline-flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
+          className="inline-flex mb-4 items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
         >
           <ArrowLeft size={14} /> Articles
         </Link>
@@ -433,7 +433,7 @@ export default function PostPage() {
 
       {/* Header */}
       <motion.header variants={fadeInUp} className="space-y-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
+        <h1 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
           {post.title}
         </h1>
 
