@@ -28,7 +28,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     console.log("Token verified successfully");
 
     // Check if user is admin
-    const adminEmails = process.env.ADMIN_VER_EMAILS_FOR_AUTH;
+    const adminEmails = JSON.parse(
+      process.env.ADMIN_VER_EMAILS_FOR_AUTH || "[]"
+    );
     const userEmail = decodedToken.email;
 
     if (!userEmail) {
