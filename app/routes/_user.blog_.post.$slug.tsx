@@ -413,10 +413,16 @@ export default function PostPage() {
         {/* Minimalist Meta Line */}
         <div className="flex items-center gap-3 text-base text-zinc-500 dark:text-zinc-400 pb-8 border-b border-zinc-200 dark:border-zinc-700">
           {author && (
-            <span className="hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors cursor-pointer">
+            <a
+              href="https://www.linkedin.com/in/ykinwork1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors cursor-pointer"
+            >
               @{author.authorName?.toLowerCase().replace(/\s+/g, '') || "anonymous"}
-            </span>
+            </a>
           )}
+
           <span>|</span>
           <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
           {post.minuteRead > 0 && (
