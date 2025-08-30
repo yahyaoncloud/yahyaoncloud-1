@@ -27,7 +27,7 @@ import type {
   Certification,
   SocialLinks,
 } from "../Types/portfolio";
-import fallbackPortrait from "../assets/Gallery/glass.png";
+import fallbackPortrait from "../assets/Gallery/glass.jpg";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   try {
@@ -247,9 +247,8 @@ function Experience({ experiences }: ExperienceProps) {
 
                   {/* Dropdown */}
                   <div
-                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                      isOpen ? "max-h-48 mt-3" : "max-h-0"
-                    }`}
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 mt-3" : "max-h-0"
+                      }`}
                   >
                     {exp.summary?.length > 0 && (
                       <div className="text-sm p-2 ml-5 leading-relaxed text-zinc-600 dark:text-zinc-300">
@@ -295,9 +294,8 @@ function Experience({ experiences }: ExperienceProps) {
 
                 {/* Dropdown */}
                 <div
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isOpen ? "max-h-48 mt-3" : "max-h-0"
-                  }`}
+                  className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-48 mt-3" : "max-h-0"
+                    }`}
                 >
                   {exp.summary?.length > 0 && (
                     <div className="text-sm ml-6 p-1 py-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
