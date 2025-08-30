@@ -33,7 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   try {
     const data = await getAllPortfolios();
     const portfolio = Array.isArray(data) && data.length > 0 ? data[0] : null;
-    console.log(portfolio.certifications);
+    // console.log(portfolio.certifications);
     return json({ portfolio });
   } catch (error) {
     console.error("Loader error:", error);
