@@ -254,10 +254,10 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
   };
   const next = () => setIndex((prev) => (prev + visible) % posts.length);
   const prev = () =>
@@ -385,10 +385,10 @@ export default function PostPage() {
     return isNaN(d.getTime())
       ? "Invalid date"
       : d.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
   };
   const handleShare = async () => {
     const shareData = {
@@ -416,7 +416,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="w-[90vw] max-w-[1200px] mx-auto px-[5vw] py-[5vh] space-y-[5vh]"
+      className="w-[90vw] md:w-auto max-w-[1200px] mx-auto px-[5vw] py-[5vh] space-y-[5vh]"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}
