@@ -416,7 +416,7 @@ export default function PostPage() {
 
   return (
     <motion.div
-      className="w-[90vw] md:w-auto max-w-[1200px] mx-auto px-[5vw] py-[5vh] space-y-[5vh]"
+      className="w-[90vw] md:w-auto max-w-[1200px] mx-auto md:px-[2vw] px-[5vw] py-[5vh] space-y-[5vh]"
       initial="hidden"
       animate="visible"
       variants={fadeInUp}

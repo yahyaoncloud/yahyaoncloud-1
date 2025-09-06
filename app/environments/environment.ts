@@ -1,14 +1,10 @@
-// /environemnts/environment.ts
+//* /environemnts/environment.ts
 
 import { config } from "dotenv";
-import mongoose from "mongoose";
-
-// Load .env file
 config();
 
 export const getEnv = () => {
   const environment = {
-    GO_BACKEND_URL: "https://yahyaoncloud.onrender.com/api",
     MONGODB_URI: process.env.MONGODB_URI,
     NODE_ENV: process.env.NODE_ENV,
     GITHUB_CALLBACK_URL: process.env.GITHUB_CALLBACK_URL,
@@ -30,17 +26,6 @@ export const getEnv = () => {
   }
 
   return environment;
-};
-
-export const initMongoDB = async () => {
-  const { MONGODB_URI } = getEnv();
-  try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    throw error;
-  }
 };
 
 export const environment = getEnv();

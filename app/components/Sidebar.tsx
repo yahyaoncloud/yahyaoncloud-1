@@ -55,10 +55,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         className="hidden md:flex flex-col h-screen w-64 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-r border-zinc-200 dark:border-zinc-700 fixed top-0 left-0 z-40"
       >
         <div className="flex flex-col h-full p-4 overflow-y-auto space-y-2">
-          {/* Logo */}
-          <div className="flex items-center space-x-3 mb-6">
+          {/* Logo Only */}
+          <div className="flex items-center justify-center mb-6">
             <img src={Logo} alt="YOC Logo" className="w-10 h-10 rounded-md object-cover" />
-            <h2 className="text-2xl  text-zinc-900 dark:text-zinc-100  mrs-saint-delafield-regular">YahyaOnCloud</h2>
           </div>
 
           {/* Nav Links */}
@@ -91,10 +90,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         className="fixed top-0 left-0 z-50 h-screen w-64 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-r border-zinc-200 dark:border-zinc-700 md:hidden"
       >
         <div className="flex flex-col h-full p-4 overflow-y-auto space-y-2">
-          {/* Logo */}
-          <div className="flex items-center space-x-3 mb-6">
+          {/* Logo Only */}
+          <div className="flex items-center justify-center mb-6">
             <img src={Logo} alt="YOC Logo" className="w-10 h-10 rounded-md object-cover" />
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">YOC</h2>
           </div>
 
           {/* Nav Links */}

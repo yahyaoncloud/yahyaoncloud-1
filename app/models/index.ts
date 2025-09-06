@@ -579,5 +579,3 @@ export const Draft: Model<IDraftDoc> = mongoose.models.Draft || mongoose.model<I
 
 
 
-
-// Export the model
