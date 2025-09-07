@@ -80,7 +80,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900 border-t border-zinc-200 dark:border-zinc-700">
+    <footer className="bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:via-black via-zinc-50 dark:to-black border-t border-zinc-200 dark:border-zinc-700">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
@@ -93,9 +93,8 @@ export default function Footer() {
               <img
                 src={Logo}
                 alt="yahyaoncloud logo"
-                className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${
-                  scrolled ? "w-16 h-16" : "w-24 h-24"
-                }`}
+                className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${scrolled ? "w-16 h-16" : "w-24 h-24"
+                  }`}
               />
               <span className="font-thin text-2xl text-zinc-900 dark:text-white mrs-saint-delafield-regular">
                 Yahya On Cloud
@@ -112,11 +111,10 @@ export default function Footer() {
                 href="https://coff.ee/yahyaoncloud"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400 text-zinc-800 font-medium rounded-md transition-all duration-200 shadow-md hover:shadow-lg"
+                className="inline-flex text-xs items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400 text-zinc-800 font-medium rounded-md transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                <Coffee size={18} />
+                <Coffee size={14} />
                 <span>Buy me a coffee</span>
-                <ExternalLink size={14} />
               </a>
             </div>
           </div>
@@ -131,11 +129,10 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className={`underline transition-colors duration-200 ${
-                      link.name === "Privacy" || link.name === "Terms"
-                        ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
-                        : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
-                    }`}
+                    className={`underline transition-colors duration-200 ${link.name === "Privacy" || link.name === "Terms"
+                      ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
+                      : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
+                      }`}
                   >
                     {link.name}
                   </Link>

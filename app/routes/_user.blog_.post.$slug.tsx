@@ -155,7 +155,7 @@ export function useEnhanceBlogContent() {
       if (table.parentElement?.classList.contains("overflow-x-auto")) return;
       const wrapper = document.createElement("div");
       wrapper.className =
-        "overflow-x-auto bg-white dark:bg-zinc-900 rounded border border-zinc-200 dark:border-zinc-700 my-4";
+        "overflow-x-auto bg-white dark:bg-zinc-900 rounded border border-zinc-200 dark:border-zinc-700 ";
       table.parentNode?.insertBefore(wrapper, table);
       wrapper.appendChild(table);
       table.className +=
@@ -233,10 +233,7 @@ export function useEnhanceBlogContent() {
 }
 
 // --- More Articles Component ---
-const CarouselArticles = ({ posts }: { posts: Post[] }) => {
-  const [index, setIndex] = useState(0);
-  const visible = 2;
-
+const MoreArticlesCards = ({ posts }: { posts: Post[] }) => {
   const formatDate = (
     date: Date | string | { $date?: string } | null | undefined
   ) => {
@@ -259,16 +256,8 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
         day: "numeric",
       });
   };
-  const next = () => setIndex((prev) => (prev + visible) % posts.length);
-  const prev = () =>
-    setIndex((prev) => (prev - visible + posts.length) % posts.length);
 
-  if (posts.length === 2) return null;
-
-  const currentPosts = posts.slice(index, index + visible);
-  if (currentPosts.length < visible) {
-    currentPosts.push(...posts.slice(0, visible - currentPosts.length));
-  }
+  if (posts.length === 0) return null;
 
   return (
     <motion.section
@@ -289,50 +278,71 @@ const CarouselArticles = ({ posts }: { posts: Post[] }) => {
         </Link>
       </div>
 
-      <div className="relative flex items-center gap-6">
-        <button
-          onClick={prev}
-          className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-        >
-          <ChevronLeft size={18} />
-        </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {posts.slice(0, 4).map((post, idx) => (
+          <motion.article
+            key={post._id}
+            className="group relative bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-700 p-6 hover:shadow-lg transition-all duration-300 hover:border-zinc-300 dark:hover:border-zinc-600 overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: idx * 0.1 }}
+          >
+            {/* Optional: Cover image if available */}
+            {post.coverImage && (
+              <div className="mb-4 overflow-hidden rounded">
+                <img
+                  src={post.coverImage}
+                  alt={post.title}
+                  className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-          {currentPosts.map((post, idx) => (
-            <motion.div
-              key={post._id + idx}
-              className="space-y-2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-            >
+            <div className="space-y-3">
               <Link
                 to={`/blog/post/${post.slug}`}
-                className="block text-base font-medium font-mono text-zinc-900 dark:text-zinc-100 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors line-clamp-2"
+                className="block text-base font-medium font-mono text-zinc-900 dark:text-zinc-100 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors line-clamp-2 leading-tight"
               >
                 {post.title}
               </Link>
-              <p className="text-sm font-mono text-zinc-500 dark:text-zinc-400 line-clamp-2">
+
+              <p className="text-sm font-mono text-zinc-500 dark:text-zinc-400 line-clamp-3 leading-relaxed">
                 {post.summary}
               </p>
-              {/* <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
-                {formatDate(post.createdAt)}
-              </span> */}
-            </motion.div>
-          ))}
-        </div>
 
-        <button
-          onClick={next}
-          className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-        >
-          <ChevronRight size={18} />
-        </button>
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+                  {formatDate(post.createdAt)}
+                </span>
+
+                {post.minuteRead > 0 && (
+                  <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
+                    <Clock size={12} />
+                    {post.minuteRead} min
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Subtle hover effect overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          </motion.article>
+        ))}
       </div>
+
+      {posts.length > 4 && (
+        <div className="text-center mt-8">
+          <Link
+            to="/blog/posts"
+            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline transition-colors"
+          >
+            View all articles →
+          </Link>
+        </div>
+      )}
     </motion.section>
   );
 };
-
 // --- Animation Variants ---
 const fadeInUp = {
   hidden: { opacity: 0, y: 15 },
@@ -513,7 +523,7 @@ export default function PostPage() {
       </motion.section>
 
       {/* More Articles Section */}
-      <CarouselArticles posts={relatedPosts} />
+      <MoreArticlesCards posts={relatedPosts} />
     </motion.div>
   );
 }

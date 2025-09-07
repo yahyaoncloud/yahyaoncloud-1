@@ -250,7 +250,7 @@ export default function MinimalistGuestbook() {
   });
 
   return (
-    <div className="min-h-screen md:w-[500px] ">
+    <div className="min-h-screen md:w-[700px] ">
       <div className="py-12 px-4 sm:px-6 md:px-8 w-full max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -394,7 +394,7 @@ export default function MinimalistGuestbook() {
         {/* Messages */}
         <motion.div
           variants={fadeIn}
-          className="max-w-xl"
+          className="max-w-2xl"
           initial="hidden"
           animate="visible"
         >
