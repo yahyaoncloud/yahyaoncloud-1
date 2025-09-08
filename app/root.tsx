@@ -32,13 +32,13 @@ export const meta: MetaFunction = () => {
     { title: "YahyaOnCloud Blog" },
     {
       name: "description",
-      content: "yahyaoncloud Official Blog Platform built with RemixJS",
+      content: "Yahya's blog website",
     },
     { name: "viewport", content: "width=device-width,initial-scale=1" },
-    { property: "og:title", content: "yahyaoncloud Official Blog" },
+    { property: "og:title", content: "yahyaoncloud blog" },
     {
       property: "og:description",
-      content: "yahyaoncloud Official Blog Platform built with RemixJS",
+      content: "Yahya's blog website",
     },
     { property: "og:type", content: "website" },
   ];
