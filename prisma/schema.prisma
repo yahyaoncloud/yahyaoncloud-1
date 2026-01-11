@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String   @unique
+  password  String
+  email     String?
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Author {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  authorId           String   @unique
+  username           String   @unique
+  password           String?
+  email              String?
+  authorName         String
+  authorProfession   String?
+  description        String?
+  avatar             String?
+  linkedin           String?
+  github             String?
+  twitter            String?
+  website            String?
+  buyCoffee          String?
+  role               String   @default("author")
+  mustChangePassword Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  posts              Post[]
+}
+
+model Post {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String   @unique
+  title       String
+  content     String
+  summary     String?
+  coverImage  String?
+  type        String   @default("ARTICLE") // ARTICLE, PORTFOLIO, etc.
+  status      String   @default("draft") // draft, published, archived
+  pricing     String   @default("free")
+  price       Float?
+  accessLevel String   @default("public")
+  featured    Boolean  @default(false)
+  minuteRead  Int      @default(1)
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  
+  authorId    String   @db.ObjectId
+  author      Author   @relation(fields: [authorId], references: [id])
+  
+  categoryIds String[] @db.ObjectId
+  categories  Category[] @relation(fields: [categoryIds], references: [id])
+  
+  tagIds      String[] @db.ObjectId
+  tags        Tag[]      @relation(fields: [tagIds], references: [id])
+  
+  gallery     String[]
+  
+  comments    Comment[]
+  purchases   Purchase[]
+  
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Category {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  catID       String   @unique
+  name        String
+  slug        String   @unique
+  
+  postIds     String[] @db.ObjectId
+  posts       Post[]   @relation(fields: [postIds], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tagID       String   @unique
+  name        String   @unique
+  
+  postIds     String[] @db.ObjectId
+  posts       Post[]   @relation(fields: [postIds], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  name      String
+  email     String
+  approved  Boolean  @default(false)
+  
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Purchase {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount    Float
+  currency  String   @default("USD")
+  status    String   // completed, pending, failed
+  
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Linktree {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  displayName    String
+  tagline        String?
+  shortCode      String   @unique
+  theme          String   @default("dark")
+  avatarUrl      String?
+  backgroundUrl  String?
+  qrCodeUrl      String?
+  
+  resumeUrl      String?
+  linkedinUrl    String?
+  instagramUrl   String?
+  twitterUrl     String?
+  githubUrl      String?
+  emailUrl       String?
+  selectedResumeId String?
+  
+  showcaseTitle  String?
+  showcaseItems  Json?    // Array of { name, url, description, icon }
+  customLinks    Json?    // Array of { title, url, icon, color }
+  
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Announcement {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  slot          String   // card1, card2, etc.
+  title         String
+  description   String?
+  backgroundUrl String?
+  linkUrl       String?
+  linkText      String?
+  order         Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Portfolio {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  imageUrl    String?
+  projectUrl  String?
+  githubUrl   String?
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Analytics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  path      String
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+  country   String?
+  device    String?
+  browser   String?
+  os        String?
+  createdAt DateTime @default(now())
+}

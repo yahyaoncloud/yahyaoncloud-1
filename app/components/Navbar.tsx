@@ -1,29 +1,41 @@
-import { Link } from "@remix-run/react"; // ✅ not remix-node
+import { Link } from "@remix-run/react";
 import { Sun, Moon, User, ChevronDown, Menu } from "lucide-react";
 import { useTheme } from "../Contexts/ThemeContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { useUIStore } from "../store/uiStore";
+
+interface MenuItem {
+  name: string;
+  href: string;
+}
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
+  showSidebarToggle?: boolean;
+  menuItems?: MenuItem[];
 }
 
-export default function Navbar({ onToggleSidebar }: NavbarProps) {
-  const { theme, toggleTheme } = useTheme();
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-
-  const profileMenuItems = [
+export default function Navbar({ 
+  showSidebarToggle = true,
+  menuItems = [
     { name: "Profile", href: "/admin/profile" },
     { name: "Settings", href: "/admin/settings" },
     { name: "Sign Out", href: "/admin/logout" },
-  ];
+  ]
+}: NavbarProps) {
+  const { theme, toggleTheme } = useTheme();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { toggleSidebar } = useUIStore();
+  
+  const profileMenuItems = menuItems;
 
   return (
     <header className="sticky top-0 left-0 right-0 z-10">
       <div className="flex items-center justify-between px-4 py-2 min-h-[4rem]">
         {/* Sidebar Toggle */}
         <motion.button
-          onClick={onToggleSidebar}
+          onClick={toggleSidebar}
           className="p-3 rounded-xl bg-zinc-100/80 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700/80 shadow-sm hover:shadow-md transition-all duration-300"
           aria-label="Toggle sidebar"
           whileHover={{ scale: 1.05 }}
@@ -78,7 +90,7 @@ export default function Navbar({ onToggleSidebar }: NavbarProps) {
                     <Link
                       key={item.name}
                       to={item.href}
-                      prefetch="intent" // ✅ enables fast load
+                      prefetch="intent" 
                       className="block px-4 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                       onClick={() => setIsProfileMenuOpen(false)}
                     >

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: { 600: '#0f766e', 700: '#00734f' },
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+        
+        /* Custom styles for contact items to match icon colors */
+        .contact-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem; /* Slightly more gap for FA icons */
+            color: #4b5563;
+        }
+        .contact-item i {
+            color: #0f766e;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-900">
+    <!-- Clean Document Layout: Max width A4, centered, no shadows/skeuomorphism -->
+    <div class="max-w-[210mm] mx-auto border-t-4 border-teal-700 bg-white">
+        <div class="px-6 py-6 md:px-8 md:py-8 prose prose-slate max-w-none 
+            prose-headings:font-serif prose-headings:font-bold 
+            prose-h1:text-3xl prose-h1:mb-1 prose-h1:text-slate-900 
+            prose-h2:text-sm prose-h2:uppercase prose-h2:tracking-widest prose-h2:font-bold prose-h2:text-teal-800 prose-h2:border-b prose-h2:border-teal-200 prose-h2:pb-1 prose-h2:mt-3 prose-h2:mb-1
+            prose-h3:text-lg prose-h3:text-teal-700 prose-h3:mb-0 prose-h3:mt-2
+            prose-p:text-sm prose-p:leading-snug prose-p:my-0.5 prose-p:text-slate-700
+            prose-li:text-sm prose-li:leading-snug prose-li:my-0 prose-li:text-slate-700 prose-li:marker:text-teal-600
+            prose-hr:my-2 prose-hr:border-gray-200
+            prose-strong:text-slate-900 prose-strong:font-semibold
+            prose-a:text-teal-700 prose-a:no-underline hover:prose-a:underline
+            prose-td:py-1 prose-td:px-2 prose-td:text-sm prose-th:py-1 prose-th:px-2 prose-th:text-sm prose-tr:border-b-0 prose-thead:hidden">
+<h1>YAHYA</h1>
+<p><strong>Cloud Engineer</strong> | AWS &amp; Azure Certified | DevOps &amp; Infrastructure Specialist</p>
+<p><span class="contact-item"><i class="fa-solid fa-phone mx-1"></i></span> +91 8096278589 | <span class="contact-item"><i class="fa-solid fa-envelope mx-1"></i></span> ykinwork1@gmail.com | <span class="contact-item"><i class="fa-brands fa-linkedin mx-1"></i></span> <a href="https://linkedin.com/in/ykinwork1">linkedin.com/in/ykinwork1  </a> | 
+<span class="contact-item"><i class="fa-solid fa-location-dot mx-1"></i></span> Hyderabad, India</p>
+<hr />
+<h2>Professional Summary</h2>
+<p>Cloud Engineer with 3+ years of experience designing, deploying, and optimizing cloud infrastructure on <strong>AWS and Azure</strong>. Proven track record in cloud migrations, cost optimization (35%+ savings), CI/CD pipeline automation, and maintaining 99.5% uptime for production workloads. Recently delivered AWS infrastructure for a <strong>Riyadh-based ride-hailing platform</strong> serving 8,000+ users. Eager to contribute to UAE's digital transformation initiatives in a challenging Cloud/DevOps role.</p>
+<hr />
+<h2>Certifications</h2>
+<table>
+<thead>
+<tr>
+<th>Certification</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AWS Solutions Architect Associate (SAA-C03)</td>
+<td>Amazon Web Services</td>
+</tr>
+<tr>
+<td>Azure Solutions Architect Expert (AZ-305)</td>
+<td>Microsoft</td>
+</tr>
+<tr>
+<td>Azure Fundamentals (AZ-900)</td>
+<td>Microsoft</td>
+</tr>
+<tr>
+<td>Cisco Certified Network Professional (CCNP)</td>
+<td>Cisco</td>
+</tr>
+<tr>
+<td>Cisco Certified Network Associate (CCNA)</td>
+<td>Cisco</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Technical Skills</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Technologies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cloud Platforms</strong></td>
+<td>AWS (ECS, EC2, VPC, Route 53, CloudFront, CodePipeline, Secrets Manager, ALB/NLB, RDS, S3), Azure (VNets, Virtual WAN, Peering)</td>
+</tr>
+<tr>
+<td><strong>Containers &amp; Orchestration</strong></td>
+<td>Docker, Kubernetes, ECS Fargate, Argo CD</td>
+</tr>
+<tr>
+<td><strong>Infrastructure as Code</strong></td>
+<td>Terraform, Ansible, CloudFormation</td>
+</tr>
+<tr>
+<td><strong>CI/CD</strong></td>
+<td>AWS CodePipeline, CodeBuild, CodeDeploy, Jenkins, Git/GitHub</td>
+</tr>
+<tr>
+<td><strong>Monitoring &amp; Security</strong></td>
+<td>CloudWatch, Prometheus, Grafana, GuardDuty, AWS Config, IAM</td>
+</tr>
+<tr>
+<td><strong>Scripting</strong></td>
+<td>Python, Bash, Go, YAML</td>
+</tr>
+<tr>
+<td><strong>Networking</strong></td>
+<td>L2/L3 Switching, VLANs, OSPF, BGP, VPN (IPsec/SSL), SD-WAN, FortiGate, Cisco ASA, Palo Alto</td>
+</tr>
+<tr>
+<td><strong>Databases</strong></td>
+<td>PostgreSQL, RDS, DynamoDB</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Professional Experience</h2>
+<h3>Cloud Engineer</h3>
+<p><strong>Minute KSA</strong> | Riyadh, Saudi Arabia | Nov 2024 - Dec 2025</p>
+<ul>
+<li>Architected and maintained AWS infrastructure for production ride-hailing platform with <strong>~8,000 users</strong>, achieving <strong>99.5% uptime</strong> during peak traffic</li>
+<li>Led cloud migration from Mobily Cloud to AWS: PostgreSQL databases, Spring Boot &amp; Remix.js applications, and CI/CD pipelines with zero data loss</li>
+<li>Reduced cloud costs by <strong>35%</strong> through Fargate task optimization, S3 Infrequent Access tiering, and API call auditing</li>
+<li>Managed Infrastructure as Code using <strong>Terraform</strong> with Git-based workflows and <strong>Argo CD</strong> deployments</li>
+<li>Implemented <strong>blue/green deployments</strong> on ECS via AWS CodeDeploy with post-deployment monitoring</li>
+<li>Configured Application Load Balancers with target groups, listener rules, and health checks for high availability</li>
+<li>Integrated Google Maps APIs with secure key management via <strong>AWS Secrets Manager</strong></li>
+<li>Executed security hardening: IAM policy reviews, GuardDuty threat detection, and AWS Config compliance</li>
+<li>Established centralized logging with CloudWatch and ELK Stack for proactive alerting</li>
+<li>Managed RDS PostgreSQL with Multi-AZ failover, automated backups, and performance tuning</li>
+<li>Automated infrastructure provisioning with Terraform modules, reducing deployment time by 60%</li>
+<li>Configured CloudFront distributions for static content delivery with custom SSL certificates via ACM</li>
+<li>Implemented cost monitoring dashboards using CloudWatch metrics and AWS Cost Explorer</li>
+<li>Collaborated with development team on containerization strategies using Docker and ECS task definitions</li>
+</ul>
+<h3>Network Infrastructure Engineer</h3>
+<p><strong>Fabee Technologies</strong> | Hyderabad, India | Jun 2022 – Sep 2024</p>
+<ul>
+<li>Delivered L2/L3 Azure cloud support via Jira Service Management with <strong>95% SLA compliance</strong></li>
+<li>Designed Azure VNets, VNet peering, and Virtual WAN hubs, improving cross-region connectivity by <strong>20%</strong></li>
+<li>Configured site-to-site VPNs with IPsec tunnels between Azure and FortiGate/Cisco firewalls</li>
+<li>Built OSPF adjacency and tuned BGP sessions for hybrid cloud routing optimization</li>
+<li>Deployed Cisco Catalyst SD-WAN Edge Routers, reducing SaaS workload latency by <strong>15%</strong></li>
+<li>Supported Microsoft O365 enterprise environments (Exchange Online, SharePoint, Teams)</li>
+<li>Managed FortiGate NGFW with IPS/IDS policies, NAT/PAT rules, and security profiles</li>
+<li>Implemented VLAN segmentation, 802.1Q trunking, and EtherChannel for network redundancy</li>
+<li>Configured Azure ExpressRoute and VPN Gateway for hybrid cloud connectivity</li>
+<li>Administered VMware vSphere environments including VM provisioning and snapshot management</li>
+<li>Set up network monitoring with Azure Monitor, Syslog, and FortiAnalyzer for proactive alerting</li>
+<li>Participated in change management processes and documented network configurations</li>
+<li>Provided 24/7 on-call support for critical network incidents and outages</li>
+<li>Trained junior engineers on network troubleshooting methodologies and best practices</li>
+</ul>
+<hr />
+<h2>Education</h2>
+<p><strong>Bachelor of Technology</strong> – Computer Science Engineering
+Global Institute of Engineering &amp; Technology | 2018 – 2022
+<em>Coursework: Cloud Computing, Computer Networks, Cryptography &amp; Network Security</em></p>
+<hr />
+<h2>Languages</h2>
+<ul>
+<li><strong>English</strong>: Proficient</li>
+<li><strong>Arabic</strong>: Basic (Conversational)</li>
+<li><strong>Hindi</strong>: Native</li>
+</ul>
+<hr />
+<h2>Additional</h2>
+<ul>
+<li><strong>GCC Experience</strong>: 1+ year working with Saudi Arabia-based company</li>
+<li><strong>Visa Status</strong>: Ready to relocate; eligible for UAE Employment Visa</li>
+<li><strong>Interests</strong>: Cloud cost optimization, infrastructure automation, GITEX technology events</li>
+</ul>
+        </div>
+        <!-- Simple footer for print attribution, hidden in print view typically -->
+        <div class="print:hidden border-t border-gray-100 p-4 text-center text-gray-400 text-xs mt-8">
+            Generated by Dubai Job Search Toolkit
+        </div>
+    </div>
+</body>
+</html>

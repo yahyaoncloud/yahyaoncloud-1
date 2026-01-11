@@ -69,8 +69,8 @@ export default function Header() {
 
   return (
     <header
-      className="fixed top-0 z-[9999] w-full max-w-[760px] border-b dark:border-zinc-700 border-zinc-300 px-3 sm:px-4 lg:px-6 py-3 dark:bg-zinc-950/95 bg-zinc-50/95 backdrop-blur-md transition-transform"
-      style={{ transform: isVisible ? "translateY(0)" : "translateY(-100%)" }}
+      className="fixed top-0 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-[760px] border-b dark:border-zinc-700 border-zinc-300 px-3 sm:px-4 lg:px-6 py-3 dark:bg-zinc-950/95 bg-zinc-50/95 backdrop-blur-md transition-transform"
+      style={{ transform: isVisible ? "translate(-50%, 0)" : "translate(-50%, -100%)" }}
     >
       <div className=" mx-auto flex items-center justify-between">
         {/* Logo */}
@@ -82,96 +82,106 @@ export default function Header() {
         </Link>
 
         {/* Right side controls */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-indigo-500"
+            className="p-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 transition-colors"
             aria-label="Toggle theme"
           >
-            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+            {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
 
-          {/* Menu Toggle (always visible, even on desktop) */}
+          {/* Menu Toggle */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500"
+            className="p-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 transition-colors relative z-50"
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
-            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+             {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
+
+          {/* Dropdown Menu */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-40 h-screen w-screen left-0 top-0"
+                    style={{ position: 'fixed' }} 
+                />
+                
+                {/* Menu */}
+                <motion.div
+                  className="absolute top-full right-0 mt-4 w-72 p-2 z-50"
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-black/5">
+                    <div className="p-2 space-y-1">
+                      {NAV_LINKS.map((link) => (
+                        <Link
+                          key={link.name}
+                          to={link.href}
+                          onClick={() => setIsMenuOpen(false)}
+                          className={`relative flex items-center px-4 py-3 rounded-xl transition-all duration-200 group ${
+                            isActive(link.href)
+                              ? "bg-zinc-100 dark:bg-zinc-800/50 text-indigo-600 dark:text-indigo-400 font-medium"
+                              : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                          }`}
+                        >
+                          <span className="text-sm">{link.name}</span>
+                          {isActive(link.href) && (
+                              <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+
+                    <div className="h-px bg-zinc-200 dark:bg-zinc-800 mx-4 my-1" />
+
+                    <div className="p-2 grid grid-cols-2 gap-2">
+                        <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="col-span-1">
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="w-full justify-start text-xs h-9 border-dashed border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600"
+                            >
+                                Admin
+                            </Button>
+                        </Link>
+                        <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="col-span-1">
+                             <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="w-full justify-start text-xs h-9 border-dashed border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600"
+                            >
+                                User
+                            </Button>
+                        </Link>
+                        <div className="col-span-2 mt-1">
+                             <SupportButton />
+                        </div>
+                    </div>
+
+                    <div className="bg-zinc-50/50 dark:bg-zinc-900/50 p-3 text-center border-t border-zinc-100 dark:border-zinc-800">
+                        <p className="text-[10px] text-zinc-400 font-medium">
+                            Designed by Yahya
+                        </p>
+                    </div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-
-      {/* Dropdown Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            className="absolute left-0 right-0 mt-4  px-3 sm:px-4 z-50"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
-            <div className="w-full  px-4 py-2 my-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xl flex flex-col p-4 space-y-2 rounded-lg">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  prefetch="intent"
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`relative block px-4 py-2 rounded-lg ${isActive(link.href)
-                    ? "text-indigo-600 dark:text-indigo-400"
-                    : "text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-                    }`}
-                >
-                  {link.name}
-                  <span
-                    className={`absolute bottom-0 left-0 h-0.5 md:hidden bg-indigo-600 dark:bg-indigo-400 transition-all duration-300 ${isActive(link.href) ? "w-full" : "w-0 group-hover:w-full"
-                      }`}
-                  />
-                </Link>
-              ))}
-
-              {/* Inline Admin/User + Support */}
-              <div className="flex flex-col gap-2 pt-2 border-t dark:border-zinc-700">
-                <div className="flex gap-2">
-                  <div className="flex gap-2">
-                    <Link to="/admin" prefetch="intent" onClick={() => setIsMenuOpen(false)}>
-                      <Button
-                        className="w-full border dark:bg-indigo-900 bg-indigo-400 dark:text-indigo-200  text-zinc-900 border-zinc-300 dark:border-zinc-700 hover:bg-indigo-50 dark:hover:bg-indigo-950 hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        Admin Login
-                      </Button>
-                    </Link>
-                    <Link to="/dashboard" prefetch="intent" onClick={() => setIsMenuOpen(false)}>
-                      <Button
-                        className="w-full border dark:bg-indigo-900 bg-indigo-400 dark:text-indigo-200  text-zinc-900 border-zinc-300 dark:border-zinc-700 hover:bg-indigo-50 dark:hover:bg-indigo-950 hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        User Login
-                      </Button>
-                    </Link>
-                  </div>
-
-                </div>
-                <SupportButton />
-              </div>
-
-              {/* Footer */}
-              <p className="text-xs text-center text-zinc-500 pt-2">
-                Developed by{" "}
-                <a
-                  href="https://github.com/yahyadev"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-indigo-500"
-                >
-                  Yahya
-                </a>
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 }

@@ -1,0 +1,80 @@
+YAHYA
+Network Infrastructure Engineer  |  CCNP & CCNA Certified  |  SD-WAN & Security Specialist
+
+Phone: +91 8096278589  |  Email: ykinwork1@gmail.com  |  LinkedIn: linkedin.com/in/ykinwork1
+Location: Hyderabad, India  |  Relocation: Open to Dubai, UAE
+
+Professional Summary
+
+Network Infrastructure Engineer with 3+ years of experience in enterprise network design, SD-WAN implementations, and hybrid cloud networking. Expert in Cisco, Fortinet, and Ubiquiti platforms with deep knowledge of routing protocols (OSPF, BGP), VPN technologies, and network security. Proven track record maintaining 95%+ SLA compliance and reducing network latency by 15-20%. GCC experience with Riyadh-based operations. Seeking challenging network engineering roles in Dubai to support UAE's digital infrastructure growth.
+
+Certifications
+
+ |  Certification  |  Provider  | 
+---------- | 
+ |  Cisco Certified Network Professional (CCNP)  |  Cisco  | 
+ |  Cisco Certified Network Associate (CCNA)  |  Cisco  | 
+ |  Azure Solutions Architect Expert (AZ-305)  |  Microsoft  | 
+ |  AWS Solutions Architect Associate (SAA-C03)  |  Amazon Web Services  | 
+ |  Azure Fundamentals (AZ-900)  |  Microsoft  | 
+
+Technical Skills
+
+ |  Category  |  Technologies  | 
+------------- | 
+ |  Routing & Switching  |  Cisco IOS, Juniper, OSPF, BGP, EIGRP, VLANs, STP, EtherChannel  | 
+ |  SD-WAN  |  Cisco Catalyst SD-WAN, Viptela, Site-to-Site Connectivity  | 
+ |  Firewalls & Security  |  FortiGate NGFW, Cisco ASA, Cisco Umbrella, IPsec/SSL VPN, IDS/IPS, Zero Trust  | 
+ |  Wireless  |  Ubiquiti UniFi, Cisco Wireless Controllers  | 
+ |  Cloud Networking  |  Azure VNets, Virtual WAN, VNet Peering, AWS VPC, Transit Gateway  | 
+ |  Monitoring  |  Wireshark, FortiAnalyzer, Azure Monitor, Syslog, SNMP  | 
+ |  Automation  |  Python, Bash, Ansible, Terraform  | 
+
+Professional Experience
+
+Network Infrastructure Engineer
+Fabee Technologies  |  Hyderabad, India  |  Jun 2022 – Sep 2024
+• Delivered L2/L3 network support via Jira Service Management, maintaining 95% SLA compliance across hybrid environments
+• Designed and implemented Azure VNets, VNet peering, and Virtual WAN hubs, improving inter-region connectivity by 20%
+• Configured site-to-site VPNs with IPsec tunnels and NAT-T between Azure gateways and FortiGate/Cisco edge firewalls
+• Deployed NAT and static/dynamic PAT rules on FortiGate and Cisco routers for secure traffic management
+• Built OSPF adjacency between datacenter core routers and Azure virtual appliances with route redistribution
+• Tuned BGP sessions with Azure VNet appliances and branch routers for optimal egress selection and failover
+• Implemented network segmentation, VLAN tagging, and EtherChannel for performance and redundancy
+• Managed Cisco Catalyst SD-WAN Edge Routers to onboard new sites, reducing SaaS workload latency by 15%
+• Set up continuous monitoring with Azure Monitor, Syslog, and FortiAnalyzer with alerting for tunnel drops and BGP flaps
+• Participated in change management and capacity planning, coordinating link upgrades and failover validation
+• Supported Microsoft O365 enterprise environments (Exchange Online, SharePoint, Teams)
+• Configured Cisco ASA firewalls with ACLs, NAT policies, and VPN terminations for remote access
+• Managed Ubiquiti UniFi wireless networks with controller-based deployments across multiple sites
+• Implemented QoS policies for voice and video traffic prioritization over WAN links
+• Documented network diagrams, runbooks, and disaster recovery procedures
+• Provided 24/7 on-call support for critical network incidents with root cause analysis
+
+Cloud Engineer (Network Operations Focus)
+Minute KSA  |  Riyadh, Saudi Arabia  |  Nov 2024 – Present
+• Managed AWS VPC networking, security groups, and NACLs for production ride-hailing platform
+• Configured Application Load Balancers with target groups, listener rules, and health checks
+• Assisted DNS and SSL changes using Route 53 and ACM for production releases
+• Supported VPC security rules and network configurations for feature deployments
+• Established centralized logging with CloudWatch for network monitoring and incident response
+• Contributed to security hardening with IAM reviews, GuardDuty, and Config rules
+• Configured Transit Gateway for multi-VPC connectivity and route management
+• Implemented CloudWatch alarms for network metrics including packet loss and latency
+• Collaborated with DevOps team on network automation using Terraform and Ansible
+
+Education
+
+Bachelor of Technology – Computer Science Engineering
+Global Institute of Engineering & Technology  |  2018 – 2022
+Coursework: Computer Networks, Cryptography & Network Security, Cloud Computing
+
+Languages
+• English: Proficient
+• Arabic: Basic (Conversational)
+• Hindi: Native
+
+Additional
+• GCC Experience: 1+ year working with Saudi Arabia-based company
+• Visa Status: Ready to relocate; eligible for UAE Employment Visa
+• Professional Focus: Enterprise network design, SD-WAN optimization, hybrid cloud connectivity

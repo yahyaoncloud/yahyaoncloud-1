@@ -1,11 +1,7 @@
-import LOGO from "../assets/yoc-logo.png";
+﻿import NotFoundComponent from "~/components/404";
 import React from "react";
-import "../styles/tailwind.css";
 
 export default function NotFound() {
-  return (
-    <>
-      <NotFound />
-    </>
-  );
+  return <NotFoundComponent />;
 }
+

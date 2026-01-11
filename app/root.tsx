@@ -96,7 +96,7 @@ function RootLayout() {
       </head>
 
       <body
-        className={`dark:bg-zinc-900 dark:text-dark-100 bg-zinc-50 text-dark-800 min-h-screen transition-colors duration-300`}
+        className={`dark:bg-zinc-900 dark:text-zinc-100 bg-zinc-50 text-zinc-800 min-h-screen transition-colors duration-300`}
       >
         <Outlet />
         <Toaster position="top-right" richColors />
