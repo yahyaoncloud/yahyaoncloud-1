@@ -37,7 +37,7 @@ project-root/
 
 Blog homepage:
 
-![Blog Homepage](./snapshots/blog-home.png)
+![Blog Homepage](./app/assets/sample.png)
 
 ## Features
 

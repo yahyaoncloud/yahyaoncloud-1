@@ -1,0 +1,80 @@
+YAHYA
+Cloud & Network Engineer  |  AWS/Azure Certified  |  CCNP  |  Multi-Cloud & SD-WAN Specialist
+
+Phone: +91 8096278589  |  Email: ykinwork1@gmail.com  |  LinkedIn: linkedin.com/in/ykinwork1
+Location: Hyderabad, India  |  Relocation: Open to Dubai, UAE
+
+Professional Summary
+
+Versatile Cloud & Network Engineer with 3+ years of experience bridging cloud infrastructure and enterprise networking. Expert in AWS, Azure, Cisco, and Fortinet technologies with proven success in cloud migrations, SD-WAN deployments, and hybrid connectivity solutions. Delivered 99.5% uptime for production workloads, 35% cost optimization, and 15-20% latency improvements. GCC experience with Riyadh-based operations. Seeking to leverage dual expertise in cloud and networking to drive UAE Vision 2031 digital transformation initiatives.
+
+Certifications
+
+ |  Certification  |  Provider  | 
+---------- | 
+ |  AWS Solutions Architect Associate (SAA-C03)  |  Amazon Web Services  | 
+ |  Azure Solutions Architect Expert (AZ-305)  |  Microsoft  | 
+ |  Cisco Certified Network Professional (CCNP)  |  Cisco  | 
+ |  Cisco Certified Network Associate (CCNA)  |  Cisco  | 
+ |  Azure Fundamentals (AZ-900)  |  Microsoft  | 
+
+Technical Skills
+
+ |  Category  |  Technologies  | 
+------------- | 
+ |  Cloud Platforms  |  AWS (ECS, EC2, VPC, Route 53, CloudFront, ALB/NLB, RDS), Azure (VNets, Virtual WAN, Peering)  | 
+ |  Networking  |  Routing & Switching (OSPF, BGP, VLANs, STP), SD-WAN (Cisco Catalyst), VPN (IPsec/SSL)  | 
+ |  Security  |  FortiGate NGFW, Cisco Umbrella, GuardDuty, IAM, IDS/IPS, Zero Trust  | 
+ |  Infrastructure as Code  |  Terraform, Ansible, CloudFormation  | 
+ |  Containers & CI/CD  |  Docker, Kubernetes, ECS Fargate, CodePipeline, Jenkins, Argo CD  | 
+ |  Monitoring  |  CloudWatch, Prometheus, Grafana, FortiAnalyzer, Wireshark  | 
+ |  Scripting  |  Python, Bash, Go, YAML  | 
+
+Professional Experience
+
+Cloud Engineer
+Minute KSA  |  Riyadh, Saudi Arabia  |  Nov 2024 – Present
+• Architected AWS infrastructure for ride-hailing platform with 8,000+ users, achieving 99.5% uptime
+• Led cloud migration from Mobily Cloud to AWS: databases, application servers, and CI/CD pipelines
+• Reduced cloud costs by 35% through Fargate optimization, S3 tiering, and API call auditing
+• Managed Infrastructure as Code using Terraform with Git workflows and Argo CD deployments
+• Automated infrastructure provisioning reducing deployment time by 60%
+• Managed RDS PostgreSQL with Multi-AZ failover and automated backups
+• Configured Application Load Balancers with target groups, listener rules, and health checks
+• Managed VPC security groups, NACLs, and Route 53 DNS for production environments
+• Executed security hardening: IAM reviews, GuardDuty alerts, and AWS Config compliance
+• Implemented blue/green deployments via CodeDeploy with zero-downtime releases
+• Integrated Google Maps APIs with secure key management via AWS Secrets Manager
+• Established centralized logging with CloudWatch and ELK Stack for proactive alerting
+
+Network Infrastructure Engineer
+Fabee Technologies  |  Hyderabad, India  |  Jun 2022 – Sep 2024
+• Designed Azure VNets, VNet peering, and Virtual WAN, improving cross-region connectivity by 20%
+• Configured site-to-site VPNs (IPsec/NAT-T) between Azure and FortiGate/Cisco edge firewalls
+• Built OSPF/BGP hybrid routing for seamless datacenter-to-cloud connectivity
+• Configured Azure ExpressRoute and VPN Gateway for enterprise hybrid connectivity
+• Delivered L2/L3 support via Jira with 95% SLA compliance across hybrid environments
+• Deployed Cisco Catalyst SD-WAN Edge Routers, reducing SaaS latency by 15%
+• Implemented VLAN segmentation, EtherChannel, and STP for network redundancy
+• Managed FortiGate firewalls with IPS/IDS, NAT/PAT, and VPN configurations
+• Set up monitoring with Azure Monitor, FortiAnalyzer, and Syslog alerting
+• Administered VMware vSphere environments including VM provisioning and snapshots
+• Managed Ubiquiti UniFi wireless networks across multiple sites
+• Provided 24/7 on-call support for critical network incidents
+
+Education
+
+Bachelor of Technology – Computer Science Engineering
+Global Institute of Engineering & Technology  |  2018 – 2022
+Coursework: Cloud Computing, Computer Networks, Cryptography & Network Security
+
+Languages
+• English: Proficient
+• Arabic: Basic (Conversational)
+• Hindi: Native
+
+Additional
+• GCC Experience: 1+ year working with Saudi Arabia-based company
+• MOHRE Classification: Level 2 Professional (Cloud/Network Engineer)
+• Visa Status: Ready to relocate; eligible for UAE Employment Visa
+• Interests: Hybrid cloud architecture, network automation, GITEX technology events

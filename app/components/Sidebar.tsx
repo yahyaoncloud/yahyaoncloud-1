@@ -1,4 +1,3 @@
-// Sidebar.tsx
 import {
   Home,
   FileText,
@@ -7,312 +6,228 @@ import {
   Settings,
   Users,
   MessageSquare,
-  BarChart3,
-  BookOpen,
-  Folder,
-  Eye,
   PlusCircle,
-  ChevronLeft,
+  Briefcase,
+  Tag,
+  QrCode,
+  Share2,
+  ChevronDown,
+  Layout,
+  Globe,
+  Mail,
   ChevronRight,
+  type LucideIcon,
 } from "lucide-react";
-import { NavLink } from "@remix-run/react";
-import { useTheme } from "../Contexts/ThemeContext";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { NavLink, useLocation } from "@remix-run/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import Logo from "../assets/yoc-logo.png";
 
 interface SidebarProps {
-  isOpen?: boolean;
+  isOpen: boolean;
   onClose?: () => void;
-  visible?: boolean;
-  onToggleVisible?: () => void;
 }
 
-const navItems = [
+interface NavItem {
+  name: string;
+  icon: LucideIcon;
+  href?: string;
+  children?: NavItem[];
+}
+
+const navItems: NavItem[] = [
+  { name: "Dashboard", href: "/admin/dashboard", icon: Home },
   {
-    name: "Dashboard",
-    icon: Home,
-    href: "/admin/blog",
-    description: "Overview & Analytics",
-  },
-  {
-    name: "Posts",
+    name: "Blog Management",
     icon: FileText,
-    href: "/admin/posts",
-    description: "Manage blog posts",
+    children: [
+      { name: "All Posts", icon: FileText, href: "/admin/posts" },
+      { name: "Create Post", icon: PlusCircle, href: "/admin/post/create" },
+      { name: "Categories", icon: Tags, href: "/admin/categories" },
+      { name: "Tags", icon: Tag, href: "/admin/tags" },
+      { name: "Featured", icon: FileText, href: "/admin/featured-articles" },
+      { name: "Media", icon: Image, href: "/admin/media" },
+    ],
   },
   {
-    name: "Create Post",
-    icon: PlusCircle,
-    href: "/admin/blog/create",
-    description: "Write new content",
+    name: "Site Content",
+    icon: Globe,
+    children: [
+      { name: "Homepage Cards", icon: Layout, href: "/admin/homepage-cards" },
+      { name: "About Page", icon: FileText, href: "/admin/about" },
+      { name: "Linktree", icon: Share2, href: "/admin/linktree" },
+      { name: "Business Card", icon: Briefcase, href: "/admin/business-card" },
+      { name: "PDF Assets", icon: FileText, href: "/admin/assets" },
+    ],
   },
   {
-    name: "Categories",
-    icon: Folder,
-    href: "/admin/categories",
-    description: "Organize content",
-  },
-  {
-    name: "Tags",
-    icon: Tags,
-    href: "/admin/tags",
-    description: "Content labels",
-  },
-  {
-    name: "Media",
-    icon: Image,
-    href: "/admin/media",
-    description: "Images & files",
-  },
-  {
-    name: "Comments",
-    icon: MessageSquare,
-    href: "/admin/comments",
-    description: "User feedback",
-  },
-  {
-    name: "Pages",
-    icon: BookOpen,
-    href: "/admin/pages",
-    description: "Static pages",
-  },
-  {
-    name: "Users",
+    name: "Users & Resumes",
     icon: Users,
-    href: "/admin/users",
-    description: "User management",
+    children: [
+      { name: "Authors", icon: Users, href: "/admin/authors" },
+      { name: "Resumes", icon: FileText, href: "/admin/resumes" },
+      { name: "Resume QR", icon: QrCode, href: "/admin/resume/qr" },
+    ],
   },
   {
-    name: "Analytics",
-    icon: BarChart3,
-    href: "/admin/analytics",
-    description: "Site statistics",
+    name: "Communication",
+    icon: Mail,
+    children: [
+      { name: "Messages", icon: MessageSquare, href: "/admin/messages" },
+    ],
   },
   {
     name: "Settings",
     icon: Settings,
-    href: "/admin/settings",
-    description: "Site configuration",
+    children: [
+      { name: "My Account", icon: Users, href: "/admin/settings" },
+      { name: "Site Settings", icon: Settings, href: "/admin/site-settings" },
+      { name: "Blog Config", icon: Settings, href: "/admin/blog-settings" },
+    ],
   },
 ];
 
-export default function Sidebar({
-  isOpen = true,
-  onClose,
-  visible = true,
-  onToggleVisible,
-}: SidebarProps) {
-  const { theme } = useTheme();
+function SidebarItem({ item, onClose }: { item: NavItem; onClose?: () => void }) {
+  const location = useLocation();
+  
+  // Check if any child is active
+  const hasActiveChild = item.children?.some(
+    (child) => child.href && location.pathname.startsWith(child.href)
+  );
+
+  // Initialize state based on active child status
+  const [isOpen, setIsOpen] = useState(() => hasActiveChild || false);
+
+  useEffect(() => {
+    if (hasActiveChild) {
+      setIsOpen(true);
+    }
+  }, [hasActiveChild]);
+
+  if (item.children) {
+    return (
+      <div className="mb-1">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            hasActiveChild
+              ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/50"
+              : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <item.icon className="w-5 h-5 flex-shrink-0" />
+            <span>{item.name}</span>
+          </div>
+          {isOpen ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+        </button>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="ml-4 pl-2 border-l border-zinc-200 dark:border-zinc-700 mt-1 space-y-1">
+                {item.children.map((child) => (
+                  <NavLink
+                    key={child.name}
+                    to={child.href!}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-zinc-800 dark:bg-zinc-700 text-white"
+                          : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                      }`
+                    }
+                  >
+                    <child.icon className="w-4 h-4 flex-shrink-0" />
+                    <span>{child.name}</span>
+                  </NavLink>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  return (
+    <NavLink
+      to={item.href!}
+      onClick={onClose}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors mb-1 ${
+          isActive
+            ? "bg-zinc-800 dark:bg-zinc-700 text-white"
+            : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+        }`
+      }
+    >
+      <item.icon className="w-5 h-5 flex-shrink-0" />
+      <span>{item.name}</span>
+    </NavLink>
+  );
+}
+
+function SidebarNavContent({ onClose }: { onClose?: () => void }) {
+  return (
+    <div className="flex flex-col h-full p-4 overflow-y-auto">
+      {/* Logo */}
+      <div className="flex items-center mb-6 justify-start gap-4 px-2">
+        <img src={Logo} alt="YOC Logo" className="w-12 h-12 rounded-md object-cover" />
+        <div>
+          <h1 className="text-xl mrs-saint-delafield-regular">YahyaOnCloud</h1>
+          <span className="text-xs  text-zinc-500 lacquer-regular">Admin Console</span>
+        </div>
+      </div>
+
+      {/* Nav Links */}
+      <nav className="flex-1">
+        {navItems.map((item) => (
+          <SidebarItem key={item.name} item={item} onClose={onClose} />
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const location = useLocation();
+  const isLogoutPage = location.pathname === "/admin/logout";
+  
+  if (isLogoutPage) {
+    return null;
+  }
 
   return (
     <>
-      {/* Toggle Button - Shows when sidebar is hidden */}
-      {!visible && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          onClick={onToggleVisible}
-          className="fixed top-3 left-4 z-50 hidden md:flex items-center justify-center w-10 h-10 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-xl transition-all duration-200"
-          title="Show Sidebar"
-        >
-          <ChevronRight size={20} />
-        </motion.button>
-      )}
-
       {/* Desktop Sidebar */}
       <motion.aside
         initial={{ x: -256 }}
-        animate={{
-          x: visible ? 0 : -256,
-          width: 256,
-        }}
+        animate={{ x: isOpen ? 0 : -256 }}
         transition={{ type: "spring", stiffness: 400, damping: 40 }}
-        className="hidden md:flex flex-col h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 fixed top-0 left-0 z-40"
+        className="hidden md:flex flex-col h-screen w-64 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-r border-zinc-200 dark:border-zinc-700 fixed top-0 left-0 z-40"
       >
-        <div className="p-3 h-full flex flex-col overflow-hidden">
-          {/* Hide Button */}
-          <button
-            onClick={onToggleVisible}
-            className="absolute top-4 right-4 z-10 text-gray-500 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
-            title="Hide Sidebar"
-          >
-            <ChevronLeft size={20} />
-          </button>
-
-          {/* Logo */}
-          <motion.div
-            className="mb-6 flex items-center space-x-3"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-          >
-            <motion.img
-              src={Logo}
-              alt="YOC Logo"
-              className="w-10 h-10 rounded-xl object-cover   flex-shrink-0"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            />
-            <div className="overflow-hidden">
-              <h2 className="mrs-saint-delafield-regular text-2xl bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white bg-clip-text text-transparent">
-                YahyaOnCloud
-              </h2>
-              <p className="text-xs pt-2 text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
-                Content Management
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Nav Links */}
-          <nav className="space-y-1 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-            {navItems.map((item, index) => (
-              <motion.div
-                key={item.name}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + index * 0.05 }}
-              >
-                <NavLink
-                  to={item.href}
-                  className={({ isActive }) =>
-                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
-                      isActive
-                        ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
-                    }`
-                  }
-                >
-                  <motion.div
-                    className="flex-shrink-0"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  >
-                    <item.icon className="w-5 h-5" />
-                  </motion.div>
-
-                  <div className="flex-1 overflow-hidden">
-                    <span className="block">{item.name}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-navy-500 dark:group-hover:text-blue-400 transition-colors duration-300">
-                      {item.description}
-                    </span>
-                  </div>
-                </NavLink>
-              </motion.div>
-            ))}
-          </nav>
-
-          {/* Footer */}
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
-              <Eye size={12} />
-              <span>Blog CMS v2.0</span>
-            </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              Manage your content with ease
-            </p>
-          </div>
-        </div>
+        <SidebarNavContent onClose={onClose} />
       </motion.aside>
 
       {/* Mobile Sidebar */}
       <motion.aside
-        initial={{ x: -300 }}
-        animate={{ x: isOpen ? 0 : -300 }}
+        initial={{ x: -256 }}
+        animate={{ x: isOpen ? 0 : -256 }}
         transition={{ type: "spring", stiffness: 400, damping: 40 }}
-        className="fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 md:hidden"
+        className="fixed top-0 left-0 z-50 h-screen w-64 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-r border-zinc-200 dark:border-zinc-700 md:hidden"
       >
-        <div className="p-3 h-full flex flex-col overflow-hidden">
-          {/* Mobile Header */}
-          <div className="flex items-center justify-between mb-6">
-            <motion.div
-              className="flex items-center space-x-3"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-            >
-              <motion.img
-                src={Logo}
-                alt="YOC Logo"
-                className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-blue-500/25"
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              />
-              <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-gray-900 dark:from-white dark:via-blue-300 dark:to-white bg-clip-text text-transparent">
-                  YOC
-                </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">
-                  Content Management
-                </p>
-              </div>
-            </motion.div>
-
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
-            >
-              <ChevronLeft size={20} />
-            </button>
-          </div>
-
-          {/* Nav Links */}
-          <nav className="space-y-1 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-            {navItems.map((item, index) => (
-              <motion.div
-                key={item.name}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + index * 0.05 }}
-              >
-                <NavLink
-                  to={item.href}
-                  onClick={onClose}
-                  className={({ isActive }) =>
-                    `group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
-                      isActive
-                        ? "bg-gradient-to-r from-navy-500 to-blue-600 text-white shadow-lg shadow-blue-500/25 dark:from-blue-500 dark:to-blue-400"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/80 dark:hover:bg-gray-800/50 hover:text-navy-600 dark:hover:text-blue-400"
-                    }`
-                  }
-                >
-                  <motion.div
-                    className="relative z-10"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  >
-                    <item.icon className="w-5 h-5" />
-                  </motion.div>
-
-                  <div className="flex-1 relative z-10">
-                    <span className="block">{item.name}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500 group-hover:text-navy-500 dark:group-hover:text-blue-400 transition-colors duration-300">
-                      {item.description}
-                    </span>
-                  </div>
-                </NavLink>
-              </motion.div>
-            ))}
-          </nav>
-
-          {/* Footer */}
-          <motion.div
-            className="pt-4 border-t border-gray-200 dark:border-gray-700"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-          >
-            <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
-              <Eye size={12} />
-              <span>Blog CMS v2.0</span>
-            </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              Manage your content with ease
-            </p>
-          </motion.div>
-        </div>
+        <SidebarNavContent onClose={onClose} />
       </motion.aside>
 
       {/* Mobile Overlay */}
@@ -320,9 +235,6 @@ export default function Sidebar({
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={onClose}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") onClose();
-          }}
           role="button"
           tabIndex={0}
           aria-label="Close sidebar"

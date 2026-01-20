@@ -1,11 +1,13 @@
-import LOGO from "../assets/yoc-logo.png";
+﻿import NotFoundComponent from "~/components/404";
 import React from "react";
-import "../styles/tailwind.css";
+
+import { json } from "@remix-run/node";
+
+export const action = async () => {
+  return json(null, { status: 404 });
+};
 
 export default function NotFound() {
-  return (
-    <>
-      <NotFound />
-    </>
-  );
+  return <NotFoundComponent />;
 }
+

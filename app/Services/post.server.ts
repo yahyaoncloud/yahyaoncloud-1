@@ -10,35 +10,128 @@ import {
   ITagDoc,
   ITypeDoc,
   Author,
+  Draft,
+  IDraftDoc,
 } from "../models";
 import { Types } from "mongoose";
-
+import {
+  uploadPostResources,
+  updatePostResources,
+  deletePostResources,
+  parseMarkdownWithCloudinary,
+  uploadImage,
+} from "../utils/cloudinary.server";
 // ==================== POST OPERATIONS ====================
 
-export async function createPost(postData: Partial<IPostDoc>) {
-  return Post.create(postData);
+export async function createPost(
+  postData: Partial<IPostDoc>,
+  files?: { markdownFile?: File; coverImage?: File; gallery?: File[] }
+) {
+  const slug =
+    postData.slug ||
+    postData.title
+      ?.toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") ||
+    "untitled-post";
+
+  let coverImageUrl = "/default-cover.jpg";
+  let galleryUrls: string[] = [];
+  let content = postData.content || "";
+
+  // Handle Markdown-based post creation
+  if (files?.markdownFile && files.markdownFile.size > 0) {
+    const { contentUrl, coverImageUrl: uploadedCover, galleryUrls: uploadedGallery, parsedMarkdown } =
+      await uploadPostResources(slug, files.markdownFile, files.coverImage, files.gallery);
+
+    content = contentUrl;
+    coverImageUrl = uploadedCover;
+    galleryUrls = uploadedGallery;
+
+    // Merge parsed Markdown frontmatter with postData
+    postData.title = postData.title || parsedMarkdown.frontmatter.title || "Untitled Post";
+    postData.categories = postData.categories || parsedMarkdown.frontmatter.categories || [];
+    postData.tags = postData.tags || parsedMarkdown.frontmatter.tags || [];
+    postData.status = postData.status || parsedMarkdown.frontmatter.status || "draft";
+  } else {
+    // Manual post creation: Upload cover and gallery images
+    if (files?.coverImage) {
+      const uploaded = await uploadImage(
+        files.coverImage,
+        `posts/${slug}/${slug}-cover-image`
+      );
+      coverImageUrl = uploaded.url;
+    }
+
+    if (files?.gallery?.length) {
+      for (let i = 0; i < files.gallery.length; i++) {
+        const img = files.gallery[i];
+        const uploaded = await uploadImage(
+          img,
+          `posts/${slug}/gallery/${slug}-gallery-${i + 1}`
+        );
+        galleryUrls.push(uploaded.url);
+      }
+    }
+  }
+
+  return Post.create({
+    ...postData,
+    slug,
+    coverImage: coverImageUrl,
+    gallery: galleryUrls,
+    content,
+    author: new Types.ObjectId(postData.authorId), // Must exist
+    authorId: postData.authorId, // For backward compatibility
+    date: postData.date || new Date(), // Auto-set date
+    createdAt: postData.createdAt || new Date(),
+    updatedAt: new Date(),
+  });
+}
+
+export async function createPostFromMarkdown(
+  slug: string,
+  markdownFile: File,
+  coverImage?: File,
+  galleryImages: File[] = [],
+  additionalPostData?: Partial<IPostDoc>
+) {
+  const { contentUrl, coverImageUrl, galleryUrls, parsedMarkdown } = await uploadPostResources(
+    slug,
+    markdownFile,
+    coverImage,
+    galleryImages
+  );
+
+  return Post.create({
+    slug,
+    title: parsedMarkdown.frontmatter.title || additionalPostData?.title || "Untitled Post",
+    content: contentUrl,
+    coverImage: coverImageUrl,
+    gallery: galleryUrls,
+    categories: parsedMarkdown.frontmatter.categories || additionalPostData?.categories || [],
+    tags: parsedMarkdown.frontmatter.tags || additionalPostData?.tags || [],
+    status: parsedMarkdown.frontmatter.status || additionalPostData?.status || "draft",
+    author: new Types.ObjectId(additionalPostData?.authorId),
+    authorId: additionalPostData?.authorId,
+    createdAt: additionalPostData?.createdAt || new Date(),
+    updatedAt: new Date(),
+    ...additionalPostData,
+  });
 }
 
 export async function getPostById(id: string) {
-  return (
-    Post.findById(id)
-      // .populate("authorId") // Changed from authorId to author
-      .populate("categories")
-      .populate("tags")
-      .populate("types")
-      .populate("coverImage")
-      .populate("gallery")
-  );
+  return Post.findById(id)
+    .populate("categories")
+    .populate("tags")
+    .populate("types").lean();
 }
 
 export async function getPostBySlug(slug: string) {
   return Post.findOne({ slug })
-    .populate("authorId")
     .populate("categories")
     .populate("tags")
-    .populate("types")
-    .populate("coverImage")
-    .populate("gallery");
+    .populate("types").lean();
 }
 
 export async function getPosts(
@@ -47,17 +140,42 @@ export async function getPosts(
   page: number = 1,
   options?: { populate?: string }
 ) {
-  const query = Post.find({ status })
+  const query = Post.find(status === "published" ? {} : { status })
     .sort({ date: -1 })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit)
+    .select("_id title slug content summary coverImage gallery createdAt categories");
   if (options?.populate) {
     query.populate(options.populate);
   }
-  return query.populate("author").populate("categories").populate("coverImage");
+  return query.populate("categories").lean();
 }
 
-export async function updatePost(id: string, updateData: Partial<IPostDoc>) {
+export async function updatePost(
+  id: string,
+  updateData: Partial<IPostDoc>,
+  files?: { markdownFile?: File; coverImage?: File; gallery?: File[]; deleteGalleryImages?: string[] }
+) {
+  const post = await Post.findById(id);
+  if (!post) throw new Error("Post not found");
+
+  const slug = updateData.slug || post.slug;
+
+  // Handle updates with Cloudinary
+  if (files?.markdownFile || files?.coverImage || files?.gallery || files?.deleteGalleryImages) {
+    const { contentUrl, coverImageUrl, galleryUrls } = await updatePostResources(
+      slug,
+      files?.markdownFile,
+      files?.coverImage,
+      files?.gallery,
+      files?.deleteGalleryImages
+    );
+
+    if (contentUrl) updateData.content = contentUrl;
+    if (coverImageUrl) updateData.coverImage = coverImageUrl;
+    if (galleryUrls) updateData.gallery = galleryUrls;
+  }
+
   return Post.findByIdAndUpdate(id, updateData, { new: true })
     .populate("categories")
     .populate("tags")
@@ -65,6 +183,12 @@ export async function updatePost(id: string, updateData: Partial<IPostDoc>) {
 }
 
 export async function deletePost(id: string) {
+  const post = await Post.findById(id);
+  if (!post) throw new Error("Post not found");
+
+  // Delete Cloudinary resources
+  await deletePostResources(post.slug);
+
   return Post.findByIdAndDelete(id);
 }
 
@@ -73,16 +197,13 @@ export async function incrementPostViews(id: string) {
 }
 
 export async function getTopPosts(limit: number = 3) {
-  // Fetch all published posts
   const posts = await Post.find({ status: "published" })
     .populate("categories")
     .populate("tags")
-    .populate("coverImage")
     .lean();
 
   if (!posts || posts.length === 0) return [];
 
-  // Check if all metrics are zero
   const allMetricsZero = posts.every(
     (p) =>
       (p.views || 0) === 0 &&
@@ -93,14 +214,12 @@ export async function getTopPosts(limit: number = 3) {
   let sortedPosts;
 
   if (!allMetricsZero) {
-    // Sort by combined score: views + likes + commentsCount
     sortedPosts = posts.sort((a, b) => {
       const scoreA = (a.views || 0) + (a.likes || 0) + (a.commentsCount || 0);
       const scoreB = (b.views || 0) + (b.likes || 0) + (b.commentsCount || 0);
       return scoreB - scoreA;
     });
   } else {
-    // Fallback: sort by average of categories.length and tags.length
     sortedPosts = posts.sort((a, b) => {
       const avgA = ((a.categories?.length || 0) + (a.tags?.length || 0)) / 2;
       const avgB = ((b.categories?.length || 0) + (b.tags?.length || 0)) / 2;
@@ -109,6 +228,128 @@ export async function getTopPosts(limit: number = 3) {
   }
 
   return sortedPosts.slice(0, limit);
+}
+
+// ==================== DRAFT OPERATIONS ====================
+
+export async function saveDraft(draftData: Partial<IDraftDoc>) {
+  const slug = draftData.title
+    ? draftData.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+    : "untitled-draft";
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 30);
+
+  const draft = {
+    ...draftData,
+    slug,
+    updatedAt: new Date(),
+    expiresAt,
+    createdAt: draftData.createdAt || new Date(),
+  };
+
+  const existingDraft = await Draft.findOne({
+    $or: [{ authorId: draftData.authorId }, { sessionId: draftData.sessionId }],
+  });
+
+  if (existingDraft) {
+    return Draft.findByIdAndUpdate(existingDraft._id, draft, { new: true });
+  } else {
+    return Draft.create(draft);
+  }
+}
+
+export async function getDraftByAuthorId(authorId: string) {
+  return Draft.findOne({ authorId }).sort({ updatedAt: -1 });
+}
+
+export async function getDraftBySessionId(sessionId: string) {
+  return Draft.findOne({ sessionId }).sort({ updatedAt: -1 });
+}
+
+export async function deleteDraft(id: string) {
+  return Draft.findByIdAndDelete(id);
+}
+
+export async function cleanupExpiredDrafts() {
+  return Draft.deleteMany({
+    expiresAt: { $lt: new Date() },
+  });
+}
+
+export async function convertDraftToPost(
+  draftId: string,
+  additionalPostData?: Partial<IPostDoc>,
+  files?: { markdownFile?: File; coverImage?: File; gallery?: File[] }
+) {
+  const draft = await Draft.findById(draftId);
+  if (!draft) throw new Error("Draft not found");
+
+  const postData: Partial<IPostDoc> = {
+    title: draft.title,
+    summary: draft.summary,
+    content: draft.content,
+    categories: draft.categories?.map((id) => ({ _id: id })),
+    tags: draft.tags,
+    types: draft.types,
+    authorId: draft.authorId,
+    seo: {
+      title: draft.seoTitle || draft.title,
+      description: draft.seoDescription || draft.summary || "",
+      keywords: draft.seoKeywords || [],
+      canonicalUrl: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    status: "draft",
+    date: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...additionalPostData,
+  };
+
+  const post = await createPost(postData, files);
+
+  await deleteDraft(draftId);
+
+  return post;
+}
+
+const draftSaveTimeouts = new Map<string, NodeJS.Timeout>();
+
+export async function autoSaveDraft(
+  authorId: string,
+  draftData: Partial<IDraftDoc>,
+  sessionId?: string,
+  debounceMs: number = 2000
+) {
+  const key = authorId || sessionId || "anonymous";
+
+  if (draftSaveTimeouts.has(key)) {
+    clearTimeout(draftSaveTimeouts.get(key)!);
+  }
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(async () => {
+      try {
+        const result = await saveDraft({
+          ...draftData,
+          authorId,
+          sessionId,
+        });
+        draftSaveTimeouts.delete(key);
+        resolve(result);
+      } catch (error) {
+        draftSaveTimeouts.delete(key);
+        reject(error);
+      }
+    }, debounceMs);
+
+    draftSaveTimeouts.set(key, timeout);
+  });
 }
 
 // ==================== CATEGORY OPERATIONS ====================
@@ -220,33 +461,39 @@ export async function deleteType(id: string) {
 // ==================== RELATIONSHIP OPERATIONS ====================
 
 export async function getPostsByCategory(categoryId: string) {
-  return Post.find({
-    categories: new Types.ObjectId(categoryId),
-    status: "published",
-  })
-    .sort({ date: -1 })
-    .populate("author") // Changed from authorId to author
-    .populate("coverImage");
+  return (
+    Post.find({
+      categories: new Types.ObjectId(categoryId),
+      status: "published",
+    })
+      .sort({ date: -1 })
+      // .populate("author")
+      .populate("coverImage")
+  );
 }
 
 export async function getPostsByTag(tagId: string) {
-  return Post.find({
-    tags: new Types.ObjectId(tagId),
-    status: "published",
-  })
-    .sort({ date: -1 })
-    .populate("author") // Changed from authorId to author
-    .populate("coverImage");
+  return (
+    Post.find({
+      tags: new Types.ObjectId(tagId),
+      status: "published",
+    })
+      .sort({ date: -1 })
+      // .populate("author")
+      .populate("coverImage")
+  );
 }
 
 export async function getPostsByType(typeId: string) {
-  return Post.find({
-    types: new Types.ObjectId(typeId),
-    status: "published",
-  })
-    .sort({ date: -1 })
-    .populate("author") // Changed from authorId to author
-    .populate("coverImage");
+  return (
+    Post.find({
+      types: new Types.ObjectId(typeId),
+      status: "published",
+    })
+      .sort({ date: -1 })
+      // .populate("author")
+      .populate("coverImage")
+  );
 }
 
 export async function getRelatedPosts(postId: string, limit: number = 3) {
@@ -267,9 +514,34 @@ export async function getRelatedPosts(postId: string, limit: number = 3) {
 
 // ==================== AUTHOR OPERATIONS ====================
 
-export async function getAuthorByAuthorId(authorId: string) {
+export async function getAllAuthors() {
   try {
-    const author = await Author.findOne({ authorId });
+    const authors = await Author.find().sort({ createdAt: -1 });
+    return authors.map((author) => ({
+      _id: author._id.toString(),
+      authorId: author.authorId,
+      authorName: author.authorName,
+      authorProfession: author.authorProfession,
+      userId: author.userId.toString(),
+      contactDetails: author.contactDetails,
+      createdAt: author.createdAt,
+      updatedAt: author.updatedAt,
+    }));
+  } catch (error) {
+    console.error("Error fetching all authors:", error);
+    return [];
+  }
+}
+
+export async function getAuthorByAuthorId(id: string) {
+  try {
+    if (!id) return null;
+    let query: any = { authorId: id };
+    if (Types.ObjectId.isValid(id)) {
+      // If it's a valid ObjectId, also try by _id
+      query = { $or: [{ authorId: id }, { _id: new Types.ObjectId(id) }] };
+    }
+    const author = await Author.findOne(query).lean();
     if (!author) {
       return null;
     }
@@ -279,7 +551,7 @@ export async function getAuthorByAuthorId(authorId: string) {
       authorName: author.authorName,
       authorProfession: author.authorProfession,
       userId: author.userId.toString(),
-      contactDetails: author.contactDetails, // Now embedded, no population needed
+      contactDetails: author.contactDetails,
       createdAt: author.createdAt,
       updatedAt: author.updatedAt,
     };
@@ -289,6 +561,111 @@ export async function getAuthorByAuthorId(authorId: string) {
   }
 }
 
+export async function createAuthor(data: {
+  authorId: string;
+  authorName: string;
+  authorProfession: string;
+  userId: string;
+  contactDetails: {
+    email: string;
+    phone: string;
+    linkedin: string;
+    github: string;
+    twitter: string;
+    website: string;
+  };
+}) {
+  try {
+    const author = await Author.create({
+      ...data,
+      contactDetails: {
+        ...data.contactDetails,
+        createdAt: new Date().toISOString(),
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    return {
+      _id: author._id.toString(),
+      authorId: author.authorId,
+      authorName: author.authorName,
+      authorProfession: author.authorProfession,
+      userId: author.userId.toString(),
+      contactDetails: author.contactDetails,
+      createdAt: author.createdAt,
+      updatedAt: author.updatedAt,
+    };
+  } catch (error) {
+    console.error("Error creating author:", error);
+    throw new Error("Failed to create author");
+  }
+}
+
+export async function updateAuthor(
+  id: string,
+  data: {
+    authorId?: string;
+    authorName?: string;
+    authorProfession?: string;
+    userId?: string;
+    contactDetails?: Partial<{
+      email: string;
+      phone: string;
+      linkedin: string;
+      github: string;
+      twitter: string;
+      website: string;
+    }>;
+  }
+) {
+  try {
+    const author = await Author.findById(id);
+    if (!author) {
+      throw new Error("Author not found");
+    }
+    const updatedData = {
+      ...data,
+      contactDetails: {
+        ...author.contactDetails,
+        ...data.contactDetails,
+        updatedAt: new Date().toISOString(),
+      },
+      updatedAt: new Date().toISOString(),
+    };
+    const updatedAuthor = await Author.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
+    if (!updatedAuthor) {
+      throw new Error("Failed to update author");
+    }
+    return {
+      _id: updatedAuthor._id.toString(),
+      authorId: updatedAuthor.authorId,
+      authorName: updatedAuthor.authorName,
+      authorProfession: updatedAuthor.authorProfession,
+      userId: updatedAuthor.userId.toString(),
+      contactDetails: updatedAuthor.contactDetails,
+      createdAt: updatedAuthor.createdAt,
+      updatedAt: updatedAuthor.updatedAt,
+    };
+  } catch (error) {
+    console.error("Error updating author:", error);
+    throw new Error("Failed to update author");
+  }
+}
+
+export async function deleteAuthor(id: string) {
+  try {
+    const author = await Author.findByIdAndDelete(id);
+    if (!author) {
+      throw new Error("Author not found");
+    }
+    return { success: true, message: "Author deleted" };
+  } catch (error) {
+    console.error("Error deleting author:", error);
+    throw new Error("Failed to delete author");
+  }
+}
 // ==================== STATISTICS ====================
 
 export async function getPostCountByStatus() {

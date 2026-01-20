@@ -1,34 +1,36 @@
-// app/utils/session.server.ts
-import { createCookieSessionStorage } from "@remix-run/node";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
+export { destroyAdminSession } from "./admin-auth.server";
 
-const sessionSecret = process.env.SESSION_SECRET || "yahyaoncloud";
+// Export the session storage object
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
-    name: "__firebase_session",
-    secrets: [sessionSecret],
-    sameSite: "lax",
-    path: "/",
+    name: "__session",
     httpOnly: true,
-    maxAge: 3600, // 1 hour
+    path: "/",
+    sameSite: "lax",
+    secrets: [process.env.SESSION_SECRET || "s3cr3t"],
+    secure: process.env.NODE_ENV === "production",
   },
 });
 
-export async function getUserSession(request: Request) {
+// Helper to get session object
+export function getSession(request: Request) {
   return sessionStorage.getSession(request.headers.get("Cookie"));
 }
 
-export async function getUser(request: Request) {
-  const session = await getUserSession(request);
-  return session.get("user");
+// Helper to commit session
+export function commitSession(session: any) {
+  return sessionStorage.commitSession(session);
 }
 
-export async function requireUser(request: Request) {
-  const user = await getUser(request);
-  if (!user) throw new Response("Unauthorized", { status: 401 });
-  return user;
-}
-
-export async function logout(request: Request) {
-  const session = await getUserSession(request);
+// Helper to destroy session
+export function destroySession(session: any) {
   return sessionStorage.destroySession(session);
+}
+
+// RESTORED: getUser functionality for Firebase Auth (from auth/login.tsx inference)
+export async function getUser(request: Request) {
+  const session = await getSession(request);
+  const user = session.get("user");
+  return user || null;
 }

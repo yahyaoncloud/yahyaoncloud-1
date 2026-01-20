@@ -6,7 +6,7 @@ export type Post = {
   content: string;
   summary: string;
   date: Date;
-  // author: Author;
+  author: Author;
   authorId: string;
   categories: Category[];
   tags: Tag[];

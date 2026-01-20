@@ -1,20 +1,18 @@
 import { Link } from "@remix-run/react";
 import {
-  Twitter,
   Github,
   Linkedin,
   Mail,
   Heart,
   ExternalLink,
-  Rss,
   Youtube,
   Instagram,
   Coffee,
 } from "lucide-react";
-
 import Logo from "../assets/yoc-logo.png";
 import { useEffect, useState } from "react";
 import { useTheme } from "../Contexts/ThemeContext";
+import { FaSquareXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -26,15 +24,15 @@ export default function Footer() {
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
     { name: "Guestbook", href: "/guestbook" },
-    { name: "Privacy", href: "/privacy" },
-    // { name: "RSS", href: "/rss.xml" },
+    { name: "Privacy", href: "/privacy-policy" }, // Updated to match Privacy Policy route
+    { name: "Terms", href: "/terms-and-conditions" }, // Added Terms and Conditions
   ];
 
   const socialLinks = [
     {
-      name: "Twitter",
-      href: "https://twitter.com/yahyaoncloud",
-      icon: Twitter,
+      name: "X",
+      href: "https://x.com/yahyaoncloud", // Updated to X URL
+      icon: FaSquareXTwitter,
     },
     { name: "GitHub", href: "https://github.com/yahyaoncloud", icon: Github },
     {
@@ -82,28 +80,27 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-slate-900 border-t border-gray-200 dark:border-gray-700">
+    <footer className="bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:via-black via-zinc-50 dark:to-black border-t border-zinc-200 dark:border-zinc-700">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <Link
-              to="/admin/home"
+              prefetch="render"
+              to="/blog"
               className="flex items-center space-x-2 mb-4 group"
             >
               <img
                 src={Logo}
                 alt="yahyaoncloud logo"
-                className={`rounded-xl object-cover group-hover:scale-105 transition-all duration-200 ${
-                  scrolled ? "w-16 h-16" : "w-24 h-24"
-                }`}
+                className={`rounded-md object-cover group-hover:scale-105 transition-all duration-200 ${scrolled ? "w-16 h-16" : "w-24 h-24"
+                  }`}
               />
-              <span className="mrs-saint-delafield-regular font-thin text-2xl text-gray-900 dark:text-white">
+              <span className="font-thin text-2xl text-zinc-900 dark:text-white mrs-saint-delafield-regular">
                 Yahya On Cloud
               </span>
             </Link>
-            <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
+            <p className="text-zinc-600 dark:text-zinc-400 mb-4 max-w-md">
               Sharing insights on web development, cloud computing, and
               technology. Building the future one line of code at a time.
             </p>
@@ -114,28 +111,17 @@ export default function Footer() {
                 href="https://coff.ee/yahyaoncloud"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400 dark:bg-yellow-600 text-gray-900 font-medium rounded-lg transition-all duration-200 transform shadow-md hover:shadow-lg"
+                className="inline-flex text-xs items-center space-x-2 px-4 py-2 bg-yellow-300 hover:bg-yellow-400 text-zinc-800 font-medium rounded-md transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                <Coffee size={18} />
+                <Coffee size={14} />
                 <span>Buy me a coffee</span>
-                <ExternalLink size={14} />
               </a>
             </div>
-
-            {/* <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-              <Rss size={16} />
-              <Link
-                to="/rss.xml"
-                className="hover:text-navy-600 dark:hover:text-copper-400 transition-colors duration-200"
-              >
-                Subscribe to RSS feed
-              </Link>
-            </div> */}
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="font-semibold text-zinc-900 dark:text-white mb-4">
               Quick Links
             </h3>
             <ul className="space-y-2">
@@ -143,9 +129,16 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-gray-600 hover:text-navy-600 dark:text-gray-400 dark:hover:text-copper-400 transition-colors duration-200"
+                    className={`group relative inline-block transition-colors duration-200 ${
+                      link.name === "Privacy" || link.name === "Terms"
+                        ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
+                        : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
+                    }`}
                   >
-                    {link.name}
+                    <span className="relative">
+                      {link.name}
+                      <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -154,11 +147,7 @@ export default function Footer() {
 
           {/* Social Links */}
           <div>
-            <h3
-              className={`font-semibold mb-4 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
+            <h3 className="font-semibold text-zinc-900 dark:text-white mb-4">
               Connect
             </h3>
             <div className="grid grid-cols-3 gap-3">
@@ -170,16 +159,12 @@ export default function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2 items-center justify-center flex rounded-lg transition-all duration-200 group ${
-                      theme === "dark"
-                        ? "bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-blue-400"
-                        : "bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600"
-                    }`}
+                    className="p-2 flex items-center justify-center rounded-md transition-all duration-200 bg-zinc-100 hover:bg-indigo-100 text-zinc-700 hover:text-indigo-600 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-300 dark:hover:text-indigo-400"
                     aria-label={`Connect on ${social.name}`}
                   >
                     <IconComponent
                       size={20}
-                      className="group-hover:scale-110 transition-transform duration-200"
+                      className="transition-transform duration-200 group-hover:scale-110"
                     />
                   </a>
                 );
@@ -188,20 +173,14 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Palestine Support Section */}
-
         {/* Bottom Footer */}
-        <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-              <span>© {currentYear} yahyaoncloud. All rights reserved.</span>
-            </div>
-            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-              <span className="flex items-center">
-                Built with <Heart size={14} className="text-red-500 mx-1" />{" "}
-                using RemixJS
-              </span>
-            </div>
+        <div className="pt-8 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-sm text-zinc-500 dark:text-zinc-400">
+            <span>© {currentYear} yahyaoncloud. All rights reserved.</span>
+            <span className="flex items-center">
+              Built with <Heart size={14} className="text-red-500 mx-1" /> By
+              Yahya
+            </span>
           </div>
         </div>
       </div>

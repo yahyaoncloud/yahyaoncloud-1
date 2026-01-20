@@ -1,7 +1,7 @@
 export interface Portfolio {
   _id?: string; // Optional, as MongoDB adds this
   name: string;
-  bio: string;
+  bio: string[];
   portraitUrl: string;
   location?: string;
   contact?: {
@@ -29,10 +29,15 @@ export interface Portfolio {
 
 export interface Experience {
   title: string;
-  summary: string;
+  role: string;
+  year: string;
+  isWorking: number;
+  company: string;
   description: string[];
   location: string;
   period: string;
+  location: string;
+  summary: string;
 }
 
 export interface Certification {

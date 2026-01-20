@@ -32,13 +32,13 @@ export const meta: MetaFunction = () => {
     { title: "YahyaOnCloud Blog" },
     {
       name: "description",
-      content: "yahyaoncloud Official Blog Platform built with RemixJS",
+      content: "Yahya's blog website",
     },
     { name: "viewport", content: "width=device-width,initial-scale=1" },
-    { property: "og:title", content: "yahyaoncloud Official Blog" },
+    { property: "og:title", content: "yahyaoncloud blog" },
     {
       property: "og:description",
-      content: "yahyaoncloud Official Blog Platform built with RemixJS",
+      content: "Yahya's blog website",
     },
     { property: "og:type", content: "website" },
   ];
@@ -49,13 +49,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     theme: "dark",
     ENV: {
       FIREBASE_CONFIG: {
-        apiKey: process.env.VITE_PUBLIC_FIREBASE_API_KEY,
-        authDomain: process.env.VITE_PUBLIC_FIREBASE_AUTH_DOMAIN,
-        databaseURL: process.env.VITE_PUBLIC_FIREBASE_DATABASE_URL,
-        projectId: process.env.VITE_PUBLIC_FIREBASE_PROJECT_ID,
-        storageBucket: process.env.VITE_PUBLIC_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: process.env.VITE_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-        appId: process.env.VITE_PUBLIC_FIREBASE_APP_ID,
+        apiKey: process.env.FIREBASE_API_KEY,
+        authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.FIREBASE_APP_ID,
       },
     },
   });
@@ -74,18 +74,32 @@ function RootLayout() {
   }, []);
 
   return (
-    <html lang="en" className={theme === "dark" ? "dark" : ""}>
+    <html lang="en" className={theme === "dark" ? "dark" : ""} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+        (function() {
+          try {
+            var theme = localStorage.getItem('theme');
+            if (!theme) theme = 'dark'; // default theme
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+          } catch(e) {}
+        })();
+      `,
+          }}
+        />
       </head>
+
       <body
-        className={`dark:bg-slate-900 dark:text-dark-100 bg-white text-dark-800 min-h-screen transition-colors duration-300`}
+        className={`dark:bg-zinc-900 dark:text-zinc-100 bg-zinc-50 text-zinc-800 min-h-screen transition-colors duration-300`}
       >
         <Outlet />
-        <Toaster position="top-right" richColors />
+        <Toaster position="top-right" richColors theme={theme as "light" | "dark" | "system"} />
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
@@ -123,34 +137,34 @@ export default function App() {
 //     message = (error as any).statusText;
 //   }
 
-//   return (
-//     <ThemeProvider>
-//       <html lang="en" className="dark">
-//         <head>
-//           <meta charSet="utf-8" />
-//           <meta name="viewport" content="width=device-width,initial-scale=1" />
-//           <title>{`${status} - ${message}`}</title>
-//           <Meta />
-//           <Links />
-//         </head>
-//         <body className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900">
-//           <div className="text-center">
-//             <h1 className="text-6xl font-bold text-gray-800 dark:text-indigo-100">
-//               {status}
-//             </h1>
-//             <p className="text-lg text-gray-500 dark:text-indigo-300 mt-2">
-//               {message}
-//             </p>
-//             <a
-//               href="/"
-//               className="mt-4 text-blue-500 dark:text-blue-800 hover:text-blue-600 dark:hover:text-blue-900 underline"
-//             >
-//               Back to Home
-//             </a>
-//           </div>
-//           <Scripts />
-//         </body>
-//       </html>
-//     </ThemeProvider>
-//   );
-// }
+  return (
+    <ThemeProvider>
+      <html lang="en" className="dark">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width,initial-scale=1" />
+          <title>{`${status} - ${message}`}</title>
+          <Meta />
+          <Links />
+        </head>
+        <body className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+          <div className="text-center">
+            <h1 className="text-6xl font-bold text-zinc-800 dark:text-indigo-100">
+              {status}
+            </h1>
+            <p className="text-lg text-zinc-500 dark:text-indigo-300 mt-2">
+              {message}
+            </p>
+            <a
+              href="/"
+              className="mt-4 text-indigo-500 dark:text-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-900 underline"
+            >
+              Back to Home
+            </a>
+          </div>
+          <Scripts />
+        </body>
+      </html>
+    </ThemeProvider>
+  );
+}

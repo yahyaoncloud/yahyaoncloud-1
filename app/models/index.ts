@@ -6,6 +6,7 @@ interface IUser extends Document {
   _id: Types.ObjectId;
   username: string;
   email: string;
+  password: string;
   passwordHash: string;
   role: "admin" | "user" | "guest";
   contactDetails: IContactDetails;
@@ -18,23 +19,23 @@ interface ICategory extends Document {
   catID: string;
   name: string;
   slug: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface ITag extends Document {
   _id: Types.ObjectId;
   tagID: string;
   name: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IType extends Document {
   _id: Types.ObjectId;
   type: PostType; // enforce the enum here
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IMediaAsset extends Document {
@@ -45,8 +46,8 @@ interface IMediaAsset extends Document {
   uploadedBy: string;
   postId: string;
   type: "image" | "video" | "file";
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IComment extends Document {
@@ -57,8 +58,8 @@ interface IComment extends Document {
     name: string;
   };
   content: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   approved: boolean;
 }
 
@@ -69,38 +70,49 @@ interface IPost extends Document {
   content: string;
   summary: string;
   date: Date;
-  author: Types.ObjectId; // Changed from IAuthor to Types.ObjectId
   authorId: string;
   categories: ICategory[];
   tags: ITag[];
-  types: IType;
+  types: IType[];
   coverImage: string;
-  gallery: IMediaAsset[];
+  gallery: string[];
   minuteRead: number;
   likes: number;
   views: number;
   createdAt: Date;
   updatedAt: Date;
   commentsCount: number;
-  status: "draft" | "published";
-  seo: ISEO;
+  status: "draft" | "published" | "scheduled" | "archived";
+  // Monetization fields
+  pricing: "free" | "paid" | "subscription";
+  price?: number;
+  accessLevel: "public" | "premium" | "exclusive";
+  featured: boolean;
+  downloadUrl?: string;
 }
 
-interface ISEO extends Document {
-  title: string;
-  description: string;
-  keywords: string[];
-  canonicalUrl: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// interface ISEO extends Document {
+//   title: string;
+//   description: string;
+//   keywords: string[];
+//   canonicalUrl: string;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 interface IPortfolio extends Document {
+  _id: Types.ObjectId;
   name: string;
-  bio: string;
+  bio: string[];
+  location: string;
   portraitUrl: string;
   experiences: {
     title: string;
+    year: string;
+    isWorking: number;
+    company: string;
+    location: string;
+    role: string;
     description: string[];
     period: string;
   }[];
@@ -129,9 +141,16 @@ interface IPortfolio extends Document {
 }
 
 interface IExperience extends Document {
+  _id: Types.ObjectId;
   title: string;
   company: string;
   skills: string[];
+  isWorking: number;
+  year: string;
+  description: string[];
+  location: string;
+  role: string;
+  period: string;
 }
 
 interface ICertification extends Document {
@@ -160,15 +179,13 @@ interface IGuestbook extends Document {
   content: string;
 }
 
-interface IContactDetails extends Document {
+interface IContactDetails {
   email: string;
   phone: string;
   linkedin: string;
   github: string;
   twitter: string;
   website: string;
-  createdAt: string;
-  updatedAt: string;
   buyCoffee: string;
 }
 
@@ -179,8 +196,27 @@ interface IAuthor extends Document {
   authorProfession: string;
   userId: Types.ObjectId;
   contactDetails: IContactDetails;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Draft interface
+export interface IDraftDoc extends Document {
+  _id: string;
+  title: string;
+  summary?: string;
+  content?: string;
+  categories?: string[];
+  tags?: string[];
+  types?: string[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string[];
+  authorId?: string;
+  sessionId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  expiresAt?: Date;
 }
 
 // Schemas
@@ -199,16 +235,16 @@ export type ICertificationDoc = ICertification & Document;
 export type IHobbyDoc = IHobby & Document;
 export type ISettingsDoc = ISettings & Document;
 export type IGuestbookDoc = IGuestbook & Document;
-export type IContactDetailsDoc = IContactDetails & Document;
+export type IContactDetailsDoc = IContactDetails;
 export type IAuthorDoc = IAuthor & Document;
-export type ISEODoc = ISEO & Document;
+// export type ISEODoc = ISEO & Document;
 
 const UserSchema = new Schema<IUser>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
+    password: { type: String, required: true, unique: true },
+    passwordHash: { type: String },
     role: { type: String, enum: ["admin", "user", "guest"], default: "user" },
     contactDetails: {
       email: { type: String, required: true },
@@ -217,8 +253,6 @@ const UserSchema = new Schema<IUser>(
       github: { type: String, required: true },
       twitter: { type: String, required: true },
       website: { type: String, required: true },
-      createdAt: { type: String, required: true },
-      updatedAt: { type: String, required: true },
       buyCoffee: { type: String, required: true },
     },
   },
@@ -227,37 +261,28 @@ const UserSchema = new Schema<IUser>(
 
 const CategorySchema = new Schema<ICategory>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     catID: { type: String, required: true },
     name: { type: String, required: true },
     slug: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   defaultOptions
 );
 
 const TagSchema = new Schema<ITag>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     tagID: { type: String, required: true },
     name: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   defaultOptions
 );
 
 const TypeSchema = new Schema<IType>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     type: {
       type: String,
       required: true,
       enum: Object.values(PostType), // enforce enum
     },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   defaultOptions
 );
@@ -270,23 +295,18 @@ const MediaAssetSchema = new Schema<IMediaAsset>(
     uploadedBy: { type: String, required: true },
     postId: { type: String, required: true },
     type: { type: String, enum: ["image", "video", "file"], required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
   },
   { timestamps: true }
 );
 
 const CommentSchema = new Schema<IComment>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     postId: { type: String, required: true },
     author: {
       id: { type: String, required: true },
       name: { type: String, required: true },
     },
     content: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
     approved: { type: Boolean, default: false },
   },
   defaultOptions
@@ -294,51 +314,141 @@ const CommentSchema = new Schema<IComment>(
 
 const PostSchema = new Schema<IPost>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true, index: true },
     content: { type: String, required: true },
-    authorId: { type: String, required: true },
-    summary: { type: String, required: true },
+    summary: { type: String, required: false },
     date: { type: Date, required: true },
-    author: { type: Schema.Types.ObjectId, ref: "Author", required: true },
+    authorId: { type: String, required: true },
     categories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
     types: [{ type: Schema.Types.ObjectId, ref: "Type" }],
-    coverImage: { type: String, required: true },
-    gallery: [{ type: Schema.Types.ObjectId, ref: "MediaAsset" }],
+    coverImage: { type: String, required: false, default: "/default-cover.jpg" }, // Made optional with default
+    gallery: [{ type: String }],
     minuteRead: { type: Number, default: 0 },
     likes: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
-    status: { type: String, enum: ["draft", "published"], default: "draft" },
-    seo: { type: Schema.Types.ObjectId, ref: "SEO", required: true },
+    status: { 
+      type: String, 
+      enum: ["draft", "published", "scheduled", "archived"], 
+      default: "draft" 
+    },
+    // Monetization fields
+    pricing: {
+      type: String,
+      enum: ["free", "paid", "subscription"],
+      default: "free"
+    },
+    price: {
+      type: Number,
+      min: [0, 'Price cannot be negative'],
+      validate: {
+        validator: function(this: IPost, v: number) {
+          // Price required only for paid content
+          if (this.pricing === 'paid') return v > 0;
+          return true;
+        },
+        message: 'Paid content must have a price greater than 0'
+      }
+    },
+    accessLevel: {
+      type: String,
+      enum: ["public", "premium", "exclusive"],
+      default: "public"
+    },
+    featured: { type: Boolean, default: false },
+    downloadUrl: { type: String },
   },
-  defaultOptions
+  { timestamps: true }
 );
 
-const SEOSchema = new Schema<ISEO>(
+// Add indexes for better query performance
+PostSchema.index({ status: 1, date: -1 });
+PostSchema.index({ pricing: 1, accessLevel: 1 });
+PostSchema.index({ featured: 1, status: 1 });
+PostSchema.index({ 'categories': 1, status: 1 });
+PostSchema.index({ 'tags': 1, status: 1 });
+PostSchema.index({ authorId: 1, status: 1 });
+
+// Subscription Interface for content access
+interface ISubscription extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  tier: 'free' | 'premium' | 'exclusive';
+  status: 'active' | 'cancelled' | 'expired';
+  startDate: Date;
+  endDate?: Date;
+  paymentId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Subscription Schema
+const SubscriptionSchema = new Schema<ISubscription>(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    keywords: [{ type: String, required: true }],
-    canonicalUrl: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    updatedAt: { type: String, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    tier: {
+      type: String,
+      enum: ['free', 'premium', 'exclusive'],
+      default: 'free'
+    },
+    status: {
+      type: String,
+      enum: ['active', 'cancelled', 'expired'],
+      default: 'active'
+    },
+    startDate: { type: Date, default: Date.now },
+    endDate: { type: Date },
+    paymentId: { type: String }
   },
-  defaultOptions
+  { timestamps: true }
 );
+
+SubscriptionSchema.index({ userId: 1, status: 1 });
+SubscriptionSchema.index({ tier: 1, status: 1 });
+
+// Purchase Interface for one-time content purchases
+interface IPurchase extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  postId: Types.ObjectId;
+  amount: number;
+  paymentId: string;
+  purchasedAt: Date;
+}
+
+// Purchase Schema
+const PurchaseSchema = new Schema<IPurchase>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    postId: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
+    amount: { type: Number, required: true, min: 0 },
+    paymentId: { type: String, required: true },
+    purchasedAt: { type: Date, default: Date.now }
+  },
+  { timestamps: true }
+);
+
+PurchaseSchema.index({ userId: 1, postId: 1 }, { unique: true });
+PurchaseSchema.index({ paymentId: 1 });
 
 const PortfolioSchema = new Schema<IPortfolio>(
   {
     name: { type: String, required: true },
-    bio: { type: String, required: true },
+    bio: [{ type: String, required: true }],
+    location: { type: String, required: false }, // Added location
     portraitUrl: { type: String, required: true },
     experiences: [
       {
         title: { type: String, required: true },
+        role: { type: String, required: true },
+        company: { type: String, required: true },
+        isWorking: { type: Number, required: true },
+        location: { type: String, required: true },
         description: [{ type: String, required: true }],
         period: { type: String, required: true },
+        year: { type: String, required: true },
       },
     ],
     certifications: [
@@ -376,8 +486,13 @@ const PortfolioSchema = new Schema<IPortfolio>(
 const ExperienceSchema = new Schema<IExperience>(
   {
     title: { type: String, required: true },
+    role: { type: String, required: true },
     company: { type: String, required: true },
-    skills: [String],
+    isWorking: { type: Number, required: true },
+    location: { type: String, required: true },
+    description: [{ type: String, required: true }],
+    period: { type: String, required: true },
+    year: { type: String, required: true },
   },
   defaultOptions
 );
@@ -401,7 +516,6 @@ const HobbySchema = new Schema<IHobby>(
 
 const SettingsSchema = new Schema<ISettings>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     siteTitle: { type: String, required: true },
     siteDescription: { type: String, required: true },
     logoUrl: { type: String, required: true },
@@ -420,12 +534,10 @@ const GuestbookSchema = new Schema<IGuestbook>(
 
 const AuthorSchema = new Schema<IAuthor>(
   {
-    _id: { type: Schema.Types.ObjectId, auto: true },
     authorId: { type: String, unique: true },
     authorName: { type: String, required: true },
     authorProfession: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-
     contactDetails: {
       email: { type: String, required: true },
       phone: { type: String, required: true },
@@ -433,13 +545,93 @@ const AuthorSchema = new Schema<IAuthor>(
       github: { type: String, required: true },
       twitter: { type: String, required: true },
       website: { type: String, required: true },
-      createdAt: { type: String, required: true },
-      updatedAt: { type: String, required: true },
       buyCoffee: { type: String, required: true },
     },
   },
   defaultOptions
 );
+
+// Draft schema
+const DraftSchema = new Schema<IDraftDoc>({
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 200
+  },
+  summary: {
+    type: String,
+    trim: true,
+    maxlength: 500
+  },
+  content: {
+    type: String,
+    trim: true
+  },
+  categories: [{
+    type: String,
+    ref: 'Category'
+  }],
+  tags: [{
+    type: String,
+    ref: 'Tag'
+  }],
+  types: [{
+    type: String,
+    ref: 'Type'
+  }],
+  seoTitle: {
+    type: String,
+    trim: true,
+    maxlength: 200
+  },
+  seoDescription: {
+    type: String,
+    trim: true,
+    maxlength: 500
+  },
+  seoKeywords: [{
+    type: String,
+    trim: true
+  }],
+  authorId: {
+    type: String,
+    ref: 'Author',
+    sparse: true // Allows null for anonymous drafts
+  },
+  sessionId: {
+    type: String,
+    sparse: true // For anonymous users
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  },
+  expiresAt: {
+    type: Date,
+    index: { expireAfterSeconds: 0 } // MongoDB TTL index for auto-deletion
+  }
+}, {
+  timestamps: true, // Automatically manage createdAt and updatedAt
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Indexes for better performance
+DraftSchema.index({ authorId: 1, updatedAt: -1 });
+DraftSchema.index({ sessionId: 1, updatedAt: -1 });
+// DraftSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // Already defined in schema
+
+// Pre-save middleware to update the updatedAt field
+DraftSchema.pre('save', function (this: IDraftDoc, next) {
+  this.updatedAt = new Date();
+  next();
+});
+
 
 // Models
 export const User: Model<IUserDoc> =
@@ -451,9 +643,9 @@ export const Tag: Model<ITagDoc> =
   mongoose.models.Tag || mongoose.model<ITagDoc>("Tag", TagSchema);
 export const Type: Model<ITypeDoc> =
   mongoose.models.Type || mongoose.model<ITypeDoc>("Type", TypeSchema);
-export const MediaAsset =
+export const MediaAsset: Model<IMediaAssetDoc> =
   mongoose.models.MediaAsset ||
-  mongoose.model<IMediaAsset>("MediaAsset", MediaAssetSchema);
+  mongoose.model<IMediaAssetDoc>("MediaAsset", MediaAssetSchema);
 export const Comment: Model<ICommentDoc> =
   mongoose.models.Comment ||
   mongoose.model<ICommentDoc>("Comment", CommentSchema);
@@ -478,5 +670,75 @@ export const Guestbook: Model<IGuestbookDoc> =
   mongoose.model<IGuestbookDoc>("Guestbook", GuestbookSchema);
 export const Author: Model<IAuthorDoc> =
   mongoose.models.Author || mongoose.model<IAuthorDoc>("Author", AuthorSchema);
-export const SEO: Model<ISEODoc> =
-  mongoose.models.SEO || mongoose.model<ISEODoc>("SEO", SEOSchema);
+export const Draft: Model<IDraftDoc> = mongoose.models.Draft || mongoose.model<IDraftDoc>('Draft', DraftSchema);
+// export const SEO: Model<ISEODoc> =
+//   mongoose.models.SEO || mongoose.model<ISEODoc>("SEO", SEOSchema);
+
+// Resume Interface
+interface IResume extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  title: string;
+  htmlContent?: string;
+  pdfUrl?: string;
+  pdfData?: Buffer; // Binary data for direct DB storage
+  contentType?: string;
+  qrCodeUrl?: string;
+  fileName?: string;
+  version: number;
+  isActive: boolean;
+  metadata: {
+    theme: string;
+    lastPdfGenerated?: Date;
+    lastQrGenerated?: Date;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Resume Schema
+const ResumeSchema = new Schema<IResume>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: false }, // Optional for single-user blog
+    title: {
+      type: String,
+      required: [true, 'Resume title is required'],
+      trim: true,
+      maxlength: [100, 'Title cannot exceed 100 characters'],
+      default: 'My Resume'
+    },
+    htmlContent: {
+      type: String,
+      required: false, // Changed to optional as we support PDF-only uploads
+    },
+    pdfUrl: { type: String },
+    pdfData: { type: Buffer }, // New field
+    contentType: { type: String, default: 'application/pdf' }, // New field
+    qrCodeUrl: { type: String },
+    fileName: { type: String },
+    version: { type: Number, default: 1 },
+    isActive: { type: Boolean, default: true },
+    metadata: {
+      theme: { type: String, default: 'default' },
+      lastPdfGenerated: { type: Date },
+      lastQrGenerated: { type: Date }
+    }
+  },
+  { timestamps: true }
+);
+
+// Indexes for Resume
+ResumeSchema.index({ userId: 1, isActive: 1 });
+ResumeSchema.index({ version: -1 });
+ResumeSchema.index({ isActive: 1 });
+
+export const Resume: Model<IResume> =
+  mongoose.models.Resume || mongoose.model<IResume>('Resume', ResumeSchema);
+
+export const Subscription: Model<ISubscription> =
+  mongoose.models.Subscription || mongoose.model<ISubscription>('Subscription', SubscriptionSchema);
+
+export const Purchase: Model<IPurchase> =
+  mongoose.models.Purchase || mongoose.model<IPurchase>('Purchase', PurchaseSchema);
+
+export type { IResume, ISubscription, IPurchase, IPost };

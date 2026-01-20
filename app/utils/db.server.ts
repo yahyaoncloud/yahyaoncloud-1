@@ -1,22 +1,30 @@
-import { MongoClient } from "mongodb";
+import mongoose from "mongoose";
+import { getEnv } from "../environments/environment"; // adjust path if needed
 
-declare global {
-  // eslint-disable-next-line no-var
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
-}
+let isConnected = false;
 
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017";
-const client = new MongoClient(uri);
-
-const clientPromise: Promise<MongoClient> = (async () => {
-  if (!global._mongoClientPromise) {
-    global._mongoClientPromise = client.connect();
+export const initMongoDB = async (): Promise<typeof mongoose> => {
+  if (isConnected) {
+    return mongoose;
   }
-  return global._mongoClientPromise;
-})() as Promise<MongoClient>;
 
-export async function getBlogCollection() {
-  const client = await clientPromise;
-  const db = client.db("blog");
-  return db.collection("articles");
-}
+  const { MONGODB_URI } = getEnv();
+
+  if (!MONGODB_URI) {
+    throw new Error("MONGODB_URI is not defined in environment variables");
+  }
+
+  try {
+    const conn = await mongoose.connect(MONGODB_URI, {
+      autoIndex: true, // enable/disable depending on your needs
+      maxPoolSize: 10, // control connection pool size
+    });
+
+    isConnected = true;
+    console.log("✅ Connected to MongoDB");
+    return conn;
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error);
+    throw error;
+  }
+};
