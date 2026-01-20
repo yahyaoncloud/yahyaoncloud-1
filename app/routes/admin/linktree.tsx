@@ -8,14 +8,23 @@ import {
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
-import { useLoaderData, useNavigation, Form, Link } from "@remix-run/react";
+import { useLoaderData, useNavigation, Form, Link, useFetcher } from "@remix-run/react";
 import { 
   getLinktree, 
-  updateLinktree, 
+  updateLinktree,
   type ShowcaseItem,
   type CustomLink
 } from "~/Services/linktree.prisma.server";
-import { uploadToSupabase } from "~/utils/supabase.server";
+import {
+  getActiveQR,
+  createQR,
+  regenerateQR,
+  updateQRCodeUrl,
+  getQRStats,
+  getRecentScans,
+  getQRUrl,
+} from "~/Services/linktree-qr.prisma.server";
+import { uploadImage, uploadDocument } from "~/utils/cloudinary.server";
 import { initMongoDB } from "~/utils/db.server";
 import { getAllResumes } from "~/Services/resume.server";
 import { Button } from "~/components/ui/button";
@@ -39,8 +48,20 @@ import {
   Upload,
   Camera,
   Link as LinkIcon,
-  Palette
+  Palette,
+  QrCode,
+  Download,
+  RefreshCw,
+  Copy,
+  Check,
+  BarChart3,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Clock,
+  AlertTriangle
 } from "lucide-react";
+import QRCode from "qrcode";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await initMongoDB();
@@ -51,6 +72,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   if (!linktree) {
     throw new Response("Linktree not found", { status: 404 });
+  }
+
+  // Get the origin from request for QR code URL
+  const url = new URL(request.url);
+  
+  // Get active QR for this linktree
+  const activeQR = await getActiveQR(linktree.id);
+  
+  // Get QR stats and recent scans if we have an active QR
+  let qrStats = null;
+  let recentScans: { id: string; sessionId: string; device: string | null; browser: string | null; os: string | null; country: string | null; createdAt: Date }[] = [];
+  let permanentQrUrl = null;
+  
+  if (activeQR) {
+    qrStats = await getQRStats(activeQR.id);
+    recentScans = await getRecentScans(activeQR.id, 10);
+    permanentQrUrl = `${url.origin}/qr/${activeQR.qrId}`;
   }
 
   return json({
@@ -68,14 +106,29 @@ export async function loader({ request }: LoaderFunctionArgs) {
       githubUrl: linktree.githubUrl,
       emailUrl: linktree.emailUrl,
       showcaseTitle: linktree.showcaseTitle,
-      showcaseItems: (linktree.showcaseItems as ShowcaseItem[]) || [],
-      customLinks: (linktree.customLinks as CustomLink[]) || [],
+      showcaseItems: (linktree.showcaseItems as unknown as ShowcaseItem[]) || [],
+      customLinks: (linktree.customLinks as unknown as CustomLink[]) || [],
       shortCode: linktree.shortCode,
     },
     resumes: resumes.map((r) => ({
       _id: r._id.toString(),
       title: r.title || "Untitled Resume",
     })),
+    activeQR: activeQR ? {
+      id: activeQR.id,
+      qrId: activeQR.qrId,
+      qrCodeUrl: activeQR.qrCodeUrl,
+      qrTheme: activeQR.qrTheme,
+      totalScans: activeQR.totalScans,
+      createdAt: activeQR.createdAt.toISOString(),
+    } : null,
+    qrStats,
+    recentScans: recentScans.map(scan => ({
+      ...scan,
+      createdAt: scan.createdAt.toISOString(),
+    })),
+    permanentQrUrl,
+    baseUrl: url.origin,
   });
 }
 
@@ -102,18 +155,16 @@ export async function action({ request }: ActionFunctionArgs) {
         const avatarFile = formData.get("avatarFile") as File;
 
         if (avatarFile && avatarFile.size > 0) {
-          // Upload to Supabase
-          const filename = `avatar-${Date.now()}-${avatarFile.name}`;
-          const { url, error } = await uploadToSupabase(
-            "avatars",
-            `${linktree.id}/${filename}`,
-            avatarFile
-          );
-
-          if (error) {
-            throw new Error(`Avatar upload failed: ${error}`);
+          // Upload to Cloudinary
+          const cleanFileName = avatarFile.name.split('.')[0].replace(/[^a-zA-Z0-9]/g, '-');
+          const publicId = `linktrees/${linktree.id}/avatar-${cleanFileName}-${Date.now()}`;
+          
+          try {
+            const { url } = await uploadImage(avatarFile, publicId);
+            avatarUrl = url;
+          } catch (error) {
+             throw new Error(`Avatar upload failed: ${error}`);
           }
-          avatarUrl = url;
         }
 
         await updateLinktree(linktree.id, {
@@ -182,6 +233,66 @@ export async function action({ request }: ActionFunctionArgs) {
         return json({ success: true, message: "Custom links updated" });
     }
 
+    // QR Code Generation - Creates new persistent QR with tracking
+    if (intent === "generateQR") {
+      const theme = formData.get("theme") as string || "light";
+      const isRegenerate = formData.get("regenerate") === "true";
+      const url = new URL(request.url);
+
+      // Create or regenerate QR record
+      let qr;
+      if (isRegenerate) {
+        qr = await regenerateQR(linktree.id, undefined, theme);
+      } else {
+        // Check if we already have an active QR
+        const existingQR = await getActiveQR(linktree.id);
+        if (existingQR) {
+          qr = existingQR;
+        } else {
+          qr = await createQR(linktree.id, undefined, theme);
+        }
+      }
+
+      // Generate QR code image for the tracking URL
+      const trackingUrl = `${url.origin}/qr/${qr.qrId}`;
+      const isDark = theme === "dark";
+      const qrBuffer = await QRCode.toBuffer(trackingUrl, {
+        type: "png",
+        width: 512,
+        margin: 2,
+        color: {
+          dark: isDark ? "#FFFFFF" : "#4f46e5",
+          light: isDark ? "#1e1b4b" : "#FFFFFF",
+        },
+      });
+
+      // Upload to Cloudinary
+      // We need to convert Buffer to File/Blob for our utility
+      // OR update uploadImage to accept Buffer. 
+      // Current utility expects File. Buffer -> Blob -> File logic.
+      const blob = new Blob([new Uint8Array(qrBuffer)], { type: "image/png" });
+      const file = new File([blob], `qr-${qr.qrId}.png`, { type: "image/png" });
+      
+      const publicId = `linktrees/${linktree.id}/qr-${qr.qrId}-${theme}`;
+      
+      try {
+          const { url: qrUrl } = await uploadImage(file, publicId);
+          // Update QR record with the image URL
+          await updateQRCodeUrl(qr.id, qrUrl);
+
+          return json({ 
+            success: true, 
+            message: isRegenerate ? "New QR code generated! Old QR is now invalid." : "QR code generated!", 
+            qrCodeUrl: qrUrl, 
+            qrId: qr.qrId,
+            theme 
+          });
+
+      } catch (error) {
+           throw new Error(`QR upload failed: ${error}`);
+      }
+    }
+
     return json({ success: false, error: "Unknown intent" }, { status: 400 });
   } catch (error) {
     console.error("Linktree action error:", error);
@@ -196,9 +307,10 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function AdminLinktree() {
-  const { linktree, resumes } = useLoaderData<typeof loader>();
+  const { linktree, resumes, activeQR, qrStats, recentScans, permanentQrUrl, baseUrl } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fetcher = useFetcher<{ success: boolean; message: string; qrCodeUrl?: string; qrId?: string; theme?: string }>();
 
   // State for showcase items (client-side management)
   const [showcaseItems, setShowcaseItems] = useState<ShowcaseItem[]>(
@@ -216,6 +328,54 @@ export default function AdminLinktree() {
   
   // State for avatar preview
   const [avatarPreview, setAvatarPreview] = useState<string | null>(linktree.avatarUrl || null);
+
+  // State for QR code display
+  const [currentQrUrl, setCurrentQrUrl] = useState<string | null>(activeQR?.qrCodeUrl || null);
+  const [copied, setCopied] = useState(false);
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
+
+  // Update QR URL when fetcher returns
+  useEffect(() => {
+    if (fetcher.data?.success && fetcher.data.qrCodeUrl) {
+      setCurrentQrUrl(fetcher.data.qrCodeUrl);
+      setShowRegenerateConfirm(false);
+    }
+  }, [fetcher.data]);
+
+
+  const handleGenerateQR = (regenerate: boolean = false) => {
+    fetcher.submit({ intent: "generateQR", theme: "light", regenerate: regenerate.toString() }, { method: "post" });
+  };
+
+  const handleCopyUrl = async () => {
+    if (permanentQrUrl) {
+      await navigator.clipboard.writeText(permanentQrUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const getDeviceIcon = (device: string | null) => {
+    switch (device) {
+      case 'mobile': return <Smartphone size={14} />;
+      case 'tablet': return <Tablet size={14} />;
+      default: return <Monitor size={14} />;
+    }
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
 
   const handleResumeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
@@ -648,6 +808,225 @@ export default function AdminLinktree() {
                 </Button>
               </div>
             </Form>
+          </div>
+
+          {/* QR Code Section - Enhanced with Tracking */}
+          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6">
+            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+              <QrCode size={20} className="text-indigo-600 dark:text-indigo-400" />
+              <div>
+                <h2 className="font-semibold text-zinc-900 dark:text-white">QR Code with Tracking</h2>
+                <p className="text-xs text-zinc-500 mt-0.5">Single persistent QR code that tracks every scan</p>
+              </div>
+            </div>
+
+            {/* No QR Generated Yet */}
+            {!activeQR && !currentQrUrl && (
+              <div className="text-center py-12 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50/30 dark:bg-zinc-900/30">
+                <QrCode size={48} className="mx-auto mb-4 text-zinc-400" />
+                <h3 className="text-lg font-medium text-zinc-700 dark:text-zinc-300 mb-2">No QR Code Generated</h3>
+                <p className="text-sm text-zinc-500 mb-6 max-w-md mx-auto">
+                  Generate a QR code for your linktree. Every scan will be tracked with user metadata.
+                </p>
+                <Button
+                  type="button"
+                  onClick={() => handleGenerateQR(false)}
+                  disabled={fetcher.state === "submitting"}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                >
+                  {fetcher.state === "submitting" ? (
+                    <RefreshCw size={16} className="animate-spin" />
+                  ) : (
+                    <QrCode size={16} />
+                  )}
+                  Generate QR Code
+                </Button>
+              </div>
+            )}
+
+            {/* QR Code Display */}
+            {(activeQR || currentQrUrl) && (
+              <div className="space-y-6">
+                {/* Main QR and Stats Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* QR Code Display */}
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-48 h-48 flex items-center justify-center bg-white dark:bg-zinc-950 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                      {currentQrUrl ? (
+                        <img src={currentQrUrl} alt="Linktree QR Code" className="w-full h-full object-contain p-2" />
+                      ) : (
+                        <div className="text-center text-zinc-400">
+                          <RefreshCw size={24} className="mx-auto animate-spin" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 w-full max-w-[200px]">
+                      {currentQrUrl && (
+                        <a href={currentQrUrl} download="linktree-qr.png" className="flex-1">
+                          <Button type="button" variant="outline" size="sm" className="w-full text-xs gap-1">
+                            <Download size={12} />
+                            Download
+                          </Button>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Stats Cards */}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                        <div className="flex items-center gap-2 text-zinc-500 mb-1">
+                          <BarChart3 size={14} />
+                          <span className="text-xs font-medium">Total Scans</span>
+                        </div>
+                        <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+                          {qrStats?.totalScans || 0}
+                        </p>
+                      </div>
+                      <div className="p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                        <div className="flex items-center gap-2 text-zinc-500 mb-1">
+                          <Clock size={14} />
+                          <span className="text-xs font-medium">Today</span>
+                        </div>
+                        <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+                          {qrStats?.scansToday || 0}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                      <div className="flex items-center gap-2 text-zinc-500 mb-1">
+                        <BarChart3 size={14} />
+                        <span className="text-xs font-medium">This Week</span>
+                      </div>
+                      <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+                        {qrStats?.scansThisWeek || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Permanent URL Display */}
+                <div className="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-lg border border-indigo-100 dark:border-indigo-900/30">
+                  <Label className="text-xs text-indigo-700 dark:text-indigo-300 font-medium mb-2 block">Trackable QR URL</Label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 px-3 py-2 bg-white dark:bg-zinc-950 border border-indigo-200 dark:border-indigo-800 rounded-md text-sm font-mono text-indigo-900 dark:text-indigo-100 truncate">
+                      {permanentQrUrl || `${baseUrl}/qr/${activeQR?.qrId}`}
+                    </code>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyUrl}
+                      className="gap-1.5 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    >
+                      {copied ? <Check size={14} /> : <Copy size={14} />}
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 mt-2">
+                    This URL tracks every scan. Use it for business cards, resumes, or print materials.
+                  </p>
+                </div>
+
+                {/* Recent Scans */}
+                {recentScans.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-3">Recent Scans</h3>
+                    <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 text-xs">
+                            <th className="px-4 py-2 text-left font-medium">Device</th>
+                            <th className="px-4 py-2 text-left font-medium">Browser</th>
+                            <th className="px-4 py-2 text-left font-medium">OS</th>
+                            <th className="px-4 py-2 text-right font-medium">Time</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                          {recentScans.slice(0, 5).map((scan) => (
+                            <tr key={scan.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/30">
+                              <td className="px-4 py-2.5 flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
+                                {getDeviceIcon(scan.device)}
+                                <span className="capitalize">{scan.device || 'Unknown'}</span>
+                              </td>
+                              <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400">{scan.browser || 'Unknown'}</td>
+                              <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-400">{scan.os || 'Unknown'}</td>
+                              <td className="px-4 py-2.5 text-right text-zinc-500 text-xs">{formatTimeAgo(scan.createdAt)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Regenerate Section */}
+                <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                  {!showRegenerateConfirm ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowRegenerateConfirm(true)}
+                      className="gap-2 text-amber-600 border-amber-200 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-900 dark:hover:bg-amber-900/20"
+                    >
+                      <RefreshCw size={14} />
+                      Generate New QR Code
+                    </Button>
+                  ) : (
+                    <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle size={20} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">
+                            Generate New QR Code?
+                          </h4>
+                          <p className="text-xs text-amber-700 dark:text-amber-400 mb-3">
+                            The old QR code will become invalid. Anyone scanning the old QR will see an error message for 3 seconds and then be redirected to the about page.
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => handleGenerateQR(true)}
+                              disabled={fetcher.state === "submitting"}
+                              className="bg-amber-600 hover:bg-amber-700 text-white text-xs"
+                            >
+                              {fetcher.state === "submitting" ? (
+                                <RefreshCw size={12} className="mr-1 animate-spin" />
+                              ) : null}
+                              Yes, Generate New
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowRegenerateConfirm(false)}
+                              className="text-xs"
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Status Message */}
+                {fetcher.data && (
+                  <div className={`p-3 rounded-lg flex items-center gap-2 text-sm ${
+                    fetcher.data.success
+                      ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900"
+                      : "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900"
+                  }`}>
+                    {fetcher.data.success ? <Check size={14} /> : null}
+                    <span className="font-medium">{fetcher.data.message}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

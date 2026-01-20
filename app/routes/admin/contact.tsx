@@ -82,7 +82,7 @@ export default function ContactPage() {
       icon: FaLinkedin,
       display: "linkedin.com/in/yahya",
       color:
-        "from-indigo-500/20 to-purple-500/20 border-indigo-200/50 hover:border-indigo-300/70",
+        "from-indigo-500/20 to-indigo-500/20 border-indigo-200/50 hover:border-indigo-300/70",
     },
     {
       name: "GitHub",
@@ -101,7 +101,7 @@ export default function ContactPage() {
       <div className="max-w-6xl mx-auto relative">
         {/* Modern Header */}
         <header className="text-start mb-16">
-          <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-zinc-900 via-indigo-800 to-purple-800 dark:from-white dark:via-indigo-200 dark:to-purple-200 bg-clip-text text-transparent mb-6">
+          <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-zinc-900 via-indigo-800 to-indigo-800 dark:from-white dark:via-indigo-200 dark:to-indigo-200 bg-clip-text text-transparent mb-6">
             Let's Connect
           </h1>
         </header>
@@ -200,11 +200,11 @@ export default function ContactPage() {
                     !formData.message ||
                     isSubmitting
                       ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-                      : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                      : "bg-gradient-to-r from-indigo-600 to-indigo-600 hover:from-indigo-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
                   }`}
                 >
                   {!isSubmitting && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   )}
 
                   {isSubmitting ? (

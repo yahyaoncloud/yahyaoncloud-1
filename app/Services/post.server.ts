@@ -83,6 +83,7 @@ export async function createPost(
     content,
     author: new Types.ObjectId(postData.authorId), // Must exist
     authorId: postData.authorId, // For backward compatibility
+    date: postData.date || new Date(), // Auto-set date
     createdAt: postData.createdAt || new Date(),
     updatedAt: new Date(),
   });

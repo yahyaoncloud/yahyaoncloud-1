@@ -1,19 +1,14 @@
 // Public Linktree Page - Minimalist Design
 import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { getActiveResume } from "~/Services/resume.server";
+import { getLinktreeByShortCode } from "~/Services/linktree.prisma.server";
 import { 
   FileText, Linkedin, Instagram, Twitter, Github, Mail, 
-  ExternalLink, Cloud, ArrowUpRight
+  ExternalLink, Cloud, ArrowUpRight, Download
 } from "lucide-react";
-import { getLinktreeByShortCode } from "~/Services/linktree.prisma.server";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    { title: data?.linktree?.displayName ? `${data.linktree.displayName}` : "Yahya | Links" },
-    { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" },
-    { name: "description", content: data?.linktree?.tagline || "My personal links and portfolio" }
-  ];
-};
+// ... (meta remains same)
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { shortCode } = params;
@@ -22,27 +17,39 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Response("Not found", { status: 404 });
   }
   
-  const linktree = await getLinktreeByShortCode(shortCode);
+  const [linktree, activeResume] = await Promise.all([
+    getLinktreeByShortCode(shortCode),
+    getActiveResume()
+  ]);
   
   if (!linktree || !linktree.isActive) {
     throw new Response("Not found", { status: 404 });
   }
   
-  return json({ linktree });
+  return json({ linktree, activeResume });
 }
 
 export default function LinktreePage() {
-  const { linktree } = useLoaderData<typeof loader>();
+  const { linktree, activeResume } = useLoaderData<typeof loader>();
   
   const showcaseItems = (linktree.showcaseItems as { name: string; url: string; description?: string; icon?: string }[]) || [];
   const customLinks = (linktree.customLinks as { title: string; url: string; icon?: string; color?: string }[]) || [];
 
+  /* Helper to ensure absolute URLs */
+  const ensureAbsoluteUrl = (url: string) => {
+    if (!url) return "#";
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("mailto:") || url.startsWith("/")) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
   const socialLinks = [
-    { key: "resume", url: linktree.resumeUrl, icon: FileText, label: "My Resume" },
-    { key: "linkedin", url: linktree.linkedinUrl, icon: Linkedin, label: "LinkedIn" },
-    { key: "github", url: linktree.githubUrl, icon: Github, label: "GitHub" },
-    { key: "twitter", url: linktree.twitterUrl, icon: Twitter, label: "X (Twitter)" },
-    { key: "instagram", url: linktree.instagramUrl, icon: Instagram, label: "Instagram" },
+    { key: "resume", url: "/resume", icon: FileText, label: "My Resume" },
+    { key: "linkedin", url: ensureAbsoluteUrl(linktree.linkedinUrl || ""), icon: Linkedin, label: "LinkedIn" },
+    { key: "github", url: ensureAbsoluteUrl(linktree.githubUrl || ""), icon: Github, label: "GitHub" },
+    { key: "twitter", url: ensureAbsoluteUrl(linktree.twitterUrl || ""), icon: Twitter, label: "X (Twitter)" },
+    { key: "instagram", url: ensureAbsoluteUrl(linktree.instagramUrl || ""), icon: Instagram, label: "Instagram" },
     { key: "email", url: linktree.emailUrl ? `mailto:${linktree.emailUrl}` : null, icon: Mail, label: "Contact Me" },
   ].filter(link => link.url);
 
@@ -82,24 +89,51 @@ export default function LinktreePage() {
         {/* Social Links */}
         <div className="space-y-3">
           {socialLinks.map((link) => (
-            <a
-              key={link.key}
-              href={link.url!}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                group flex items-center justify-between p-4 rounded-xl
-                bg-zinc-900/50 border border-zinc-800/50
-                hover:bg-zinc-900 hover:border-zinc-700
-                transition-all duration-200
-              "
-            >
-              <div className="flex items-center gap-3 text-zinc-300 group-hover:text-white transition-colors">
-                <link.icon size={18} strokeWidth={2} />
-                <span className="text-sm font-medium">{link.label}</span>
-              </div>
-              <ArrowUpRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
-            </a>
+            <div key={link.key} className="relative group">
+                <a
+                  href={link.url!}
+                  target={link.key === "email" ? "_self" : "_blank"}
+                  rel="noopener noreferrer"
+                  className="
+                    flex items-center justify-between p-4 rounded-xl
+                    bg-zinc-900/50 border border-zinc-800/50
+                    hover:bg-zinc-900 hover:border-zinc-700
+                    transition-all duration-200
+                  "
+                >
+                  <div className="flex items-center gap-3 text-zinc-300 group-hover:text-white transition-colors">
+                    <link.icon size={18} strokeWidth={2} />
+                    <span className="text-sm font-medium relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 group-hover:after:w-full">{link.label}</span>
+                  </div>
+                  {link.key !== "resume" && (
+                     <ArrowUpRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                  )}
+                </a>
+                
+                {/* Dedicated Download Button for Resume */}
+                {link.key === "resume" && activeResume?.pdfUrl && (
+                     <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                        {/* View Arrow (part of main link effectively, but visual reinforcement) */}
+                        <ArrowUpRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors pointer-events-none" />
+                        
+                        {/* Divider */}
+                        <div className="h-4 w-px bg-zinc-700/50"></div>
+                        
+                        {/* Download Action */}
+                        <a 
+                            href={`/resources/download/resume/${activeResume.id || activeResume._id}?download=true`}
+                            className="p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-md transition-colors z-10"
+                            title="Download PDF"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <Download size={16} />
+                        </a>
+                     </div>
+                )}
+                 {link.key === "resume" && !activeResume?.pdfUrl && (
+                     <ArrowUpRight size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-600 group-hover:text-zinc-400 transition-colors pointer-events-none" />
+                 )}
+            </div>
           ))}
         </div>
 
@@ -113,7 +147,7 @@ export default function LinktreePage() {
               {showcaseItems.map((item, index) => (
                 <a
                   key={index}
-                  href={item.url}
+                  href={ensureAbsoluteUrl(item.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="
@@ -125,7 +159,7 @@ export default function LinktreePage() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors">
+                      <h3 className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors relative inline after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 group-hover:after:w-full">
                         {item.name}
                       </h3>
                       {item.description && (

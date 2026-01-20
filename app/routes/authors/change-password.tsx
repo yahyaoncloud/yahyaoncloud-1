@@ -55,7 +55,21 @@ export async function action({ request }: ActionFunctionArgs) {
   // Update password
   await updateAuthorPassword(authorDetails.id, newPassword, false);
   
-  return redirect('/authors/dashboard');
+  // Regenerate token with mustChangePassword: false
+  const { generateAuthorToken, createAuthorSession } = await import('~/utils/author-auth.server');
+  const newToken = generateAuthorToken({
+    authorId: author.authorId,
+    username: author.username,
+    email: author.email,
+    role: author.role,
+    mustChangePassword: false,
+  });
+  
+  return redirect('/authors/dashboard', {
+    headers: {
+      'Set-Cookie': createAuthorSession(newToken),
+    },
+  });
 }
 
 export default function ChangePassword() {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon, Menu, X } from "lucide-react";
@@ -47,6 +48,7 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const location = useLocation();
   const lastScrollY = useRef(0);
 
@@ -58,6 +60,7 @@ export default function Header() {
   };
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setIsVisible(currentScrollY <= 10 || currentScrollY < lastScrollY.current);
@@ -69,7 +72,8 @@ export default function Header() {
 
   return (
     <header
-      className="fixed top-0 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-[760px] border-b dark:border-zinc-700 border-zinc-300 px-3 sm:px-4 lg:px-6 py-3 dark:bg-zinc-950/95 bg-zinc-50/95 backdrop-blur-md transition-transform"
+   
+      className="fixed top-0 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-[760px] border-b dark:border-zinc-700 backdrop-blur-md border-zinc-200 px-3 sm:px-4 lg:px-6 py-3 dark:bg-zinc-950/70 bg-white/70 transition-transform"
       style={{ transform: isVisible ? "translate(-50%, 0)" : "translate(-50%, -100%)" }}
     >
       <div className=" mx-auto flex items-center justify-between">
@@ -101,85 +105,91 @@ export default function Header() {
              {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          {/* Dropdown Menu */}
-          <AnimatePresence>
-            {isMenuOpen && (
-              <>
-                {/* Backdrop */}
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-40 h-screen w-screen left-0 top-0"
-                    style={{ position: 'fixed' }} 
-                />
-                
-                {/* Menu */}
-                <motion.div
-                  className="absolute top-full right-0 mt-4 w-72 p-2 z-50"
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                >
-                  <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-black/5">
-                    <div className="p-2 space-y-1">
-                      {NAV_LINKS.map((link) => (
-                        <Link
-                          key={link.name}
-                          to={link.href}
-                          onClick={() => setIsMenuOpen(false)}
-                          className={`relative flex items-center px-4 py-3 rounded-xl transition-all duration-200 group ${
-                            isActive(link.href)
-                              ? "bg-zinc-100 dark:bg-zinc-800/50 text-indigo-600 dark:text-indigo-400 font-medium"
-                              : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
-                          }`}
-                        >
-                          <span className="text-sm">{link.name}</span>
-                          {isActive(link.href) && (
-                              <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                          )}
-                        </Link>
-                      ))}
-                    </div>
+          {/* Dropdown Menu Portal */}
+          {/* We render the portal only on the client (mounted) */}
+          {/* AnimatePresence must be INSIDE the portal to handle animations correctly */}
+          {mounted && createPortal(
+            <AnimatePresence>
+              {isMenuOpen && (
+                <div className="fixed inset-0 z-[99999]">
+                   {/* Backdrop */}
+                  <motion.div 
+                      key="backdrop"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-md"
+                  />
+                  
+                  {/* Menu Container */}
+                  <motion.div
+                    key="menu"
+                    className="absolute top-20 right-4 sm:right-[max(1rem,calc(50vw-380px+1rem))] w-72 z-50 origin-top-right"
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                  >
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-black/5">
+                      <div className="p-2 space-y-1">
+                        {NAV_LINKS.map((link) => (
+                          <Link
+                            key={link.name}
+                            to={link.href}
+                            onClick={() => setIsMenuOpen(false)}
+                            className={`relative group flex items-center px-4 py-3 rounded-xl transition-all duration-200 ${
+                              isActive(link.href)
+                                ? "text-indigo-600 dark:text-indigo-400 font-medium bg-zinc-50/50 dark:bg-zinc-800/30"
+                                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                            }`}
+                          >
+                            <span className="relative text-sm">
+                              {link.name}
+                               <span className={`absolute bottom-0 left-0 h-px bg-current transition-all duration-200 ${isActive(link.href) ? "w-full" : "w-0 group-hover:w-full"}`} />
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
 
-                    <div className="h-px bg-zinc-200 dark:bg-zinc-800 mx-4 my-1" />
+                      <div className="h-px bg-zinc-200 dark:bg-zinc-800 mx-4 my-1" />
 
-                    <div className="p-2 grid grid-cols-2 gap-2">
-                        <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="col-span-1">
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="w-full justify-start text-xs h-9 border-dashed border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600"
-                            >
-                                Admin
-                            </Button>
-                        </Link>
-                        <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="col-span-1">
-                             <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="w-full justify-start text-xs h-9 border-dashed border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600"
-                            >
-                                User
-                            </Button>
-                        </Link>
-                        <div className="col-span-2 mt-1">
-                             <SupportButton />
-                        </div>
-                    </div>
+                      <div className="p-2 grid grid-cols-2 gap-2">
+                          <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="col-span-1">
+                              <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="w-full justify-start text-xs h-9 border-dashed border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600"
+                              >
+                                  Admin
+                              </Button>
+                          </Link>
+                          <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="col-span-1">
+                               <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="w-full justify-start text-xs h-9 border-dashed border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600"
+                              >
+                                  User
+                              </Button>
+                          </Link>
+                          <div className="col-span-2 mt-1">
+                               <SupportButton />
+                          </div>
+                      </div>
 
-                    <div className="bg-zinc-50/50 dark:bg-zinc-900/50 p-3 text-center border-t border-zinc-100 dark:border-zinc-800">
-                        <p className="text-[10px] text-zinc-400 font-medium">
-                            Designed by Yahya
-                        </p>
+                      <div className="bg-zinc-50/50 dark:bg-zinc-900/50 p-3 text-center border-t border-zinc-100 dark:border-zinc-800">
+                          <p className="text-[10px] text-zinc-400 font-medium">
+                              Designed by Yahya
+                          </p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
         </div>
       </div>
     </header>

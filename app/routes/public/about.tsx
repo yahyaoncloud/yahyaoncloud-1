@@ -20,6 +20,7 @@ import {
   ChevronUp,
   LocateIcon,
 } from "lucide-react";
+import { Badge } from "~/components/ui/badge";
 import { getAllPortfolios } from "~/Services/post.server";
 import type {
   Portfolio,
@@ -139,13 +140,13 @@ export default function AdminAbout() {
           <h2 className="text-lg mb-8 md:text-xl font-semibold mb-4 text-indigo-600 dark:text-indigo-400">
             Skills
           </h2>
-          <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+          <div className="flex flex-wrap gap-2 text-sm">
             {getSkills().map((skill, i) => (
-              <li key={i} className="opacity-80">
+              <Badge key={i} variant="secondary" className="px-3 py-1 text-sm font-normal">
                 {skill}
-              </li>
+              </Badge>
             ))}
-          </ul>
+          </div>
         </motion.section>
       )}
 
@@ -158,16 +159,20 @@ export default function AdminAbout() {
           <div className="space-y-4 sm:space-y-6">
             {portfolio.projects.slice(0, 3).map((project, i) => (
               <div key={i} className="space-y-1">
-                <h3 className="font-medium">{project.title}</h3>
+                <h3 className=" text-lg">{project.title}</h3>
                 <p className="text-sm text-zinc-500">{project.description}</p>
                 {project.url && (
                   <a
                     href={project.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center text-sm text-indigo-600 hover:underline"
+                    className="group inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400"
                   >
-                    <ExternalLink size={14} className="mr-1" /> View
+                    <ExternalLink size={14} className="mr-1" /> 
+                    <span className="relative">
+                      View
+                      <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                    </span>
                   </a>
                 )}
               </div>
@@ -251,7 +256,14 @@ function Experience({ experiences }: ExperienceProps) {
                   >
                     {exp.summary?.length > 0 && (
                       <div className="text-sm p-2 ml-5 leading-relaxed text-zinc-600 dark:text-zinc-300">
-                        <p className="mb-3">{exp.summary}</p>
+                        {exp.summary && <p className="mb-3">{exp.summary}</p>}
+                        {exp.description && exp.description.length > 0 && (
+                          <ul className="list-disc pl-4 space-y-1 mb-3">
+                            {exp.description.map((desc, idx) => (
+                              <li key={idx}>{desc}</li>
+                            ))}
+                          </ul>
+                        )}
                         <div className="flex items-center justify-end gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                           <MapPin size={14} />
                           {exp.location}
@@ -298,7 +310,14 @@ function Experience({ experiences }: ExperienceProps) {
                 >
                   {exp.summary?.length > 0 && (
                     <div className="text-sm ml-6 p-1 py-2 leading-relaxed text-zinc-600 dark:text-zinc-300">
-                      <p>{exp.summary}</p>
+                      {exp.summary && <p className="mb-2">{exp.summary}</p>}
+                      {exp.description && exp.description.length > 0 && (
+                        <ul className="list-disc pl-4 space-y-1 mb-2">
+                          {exp.description.map((desc, idx) => (
+                            <li key={idx}>{desc}</li>
+                          ))}
+                        </ul>
+                      )}
                       <div className="flex items-center justify-end gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                         <MapPin size={14} />
                         {exp.location}
@@ -377,9 +396,12 @@ function Socials({ socials }: SocialLinksProps) {
               href={key === "email" ? `mailto:${value}` : value}
               target="_blank"
               rel="noreferrer"
-              className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline break-all sm:break-normal transition-colors duration-200"
+              className="group text-sm font-medium text-indigo-600 dark:text-indigo-400 break-all sm:break-normal transition-colors duration-200"
             >
-              {value}
+              <span className="relative">
+                {value}
+                <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+              </span>
             </a>
           </div>
         ))}

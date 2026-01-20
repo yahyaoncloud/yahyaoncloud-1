@@ -1,8 +1,7 @@
-// Admin Resumes - Manage PDF resumes
 import { json, LoaderFunctionArgs, ActionFunctionArgs, unstable_composeUploadHandlers, unstable_createMemoryUploadHandler, unstable_parseMultipartFormData } from "@remix-run/node";
 import { useLoaderData, useActionData, Form, useNavigation, Link } from "@remix-run/react";
 import { getAllResumes, createResume, deleteResume, toggleResumeActive } from "~/Services/resume.server";
-import { uploadToSupabase } from "~/utils/supabase.server";
+import { uploadDocument } from "~/utils/cloudinary.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -21,7 +20,6 @@ import {
   EyeOff, 
   FileText, 
   Upload, 
-  QrCode,
   Download
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -51,19 +49,30 @@ export async function action({ request }: ActionFunctionArgs) {
           return json({ success: false, error: "Please select a PDF file" }, { status: 400 });
         }
 
-        // Upload to Supabase
-        const filename = `resume-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
-        const { url, error } = await uploadToSupabase(
-          "resumes",
-          filename,
-          file
-        );
+        // 1. Read file into Buffer for Database Storage (Reliable)
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
 
-        if (error) throw new Error(`Upload failed: ${error}`);
+        // 2. (Optional/Legacy) Upload to Cloudinary just for public URL reference if needed
+        // We will prioritize DB storage for serving, so this is just a backup.
+        // If Cloudinary fails, we can still proceed with DB storage!
+        let cloudinaryUrl = "";
+        try {
+            const timestamp = Date.now();
+            const cleanFileName = file.name.split('.')[0].replace(/[^a-zA-Z0-9]/g, '-');
+            const publicId = `${cleanFileName}-${timestamp}`;
+            const { url } = await uploadDocument(file, publicId, "resume");
+            cloudinaryUrl = url;
+            console.log("DEBUG: Cloudinary Upload Success:", url);
+        } catch (err) {
+            console.warn("WARNING: Cloudinary upload failed, but proceeding with DB storage.", err);
+        }
 
         await createResume({
           title,
-          pdfUrl: url,
+          pdfUrl: cloudinaryUrl, // Can be empty if failed
+          pdfData: buffer,       // Primary storage
+          contentType: file.type || "application/pdf",
           fileName: file.name
         });
 
@@ -122,11 +131,6 @@ export default function AdminResumes() {
           <p className="text-zinc-500 dark:text-zinc-400">Manage your PDF resumes and CVs</p>
         </div>
         <div className="flex gap-2">
-            <Link to="/admin/resume/qr">
-                <Button variant="outline" className="gap-2">
-                    <QrCode size={16} /> QR Generator
-                </Button>
-            </Link>
             <Button 
             onClick={() => setIsUploading(true)} 
             disabled={isUploading}
@@ -222,7 +226,7 @@ export default function AdminResumes() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <a href={resume.pdfUrl} target="_blank" rel="noreferrer">
+                      <a href={`/resources/download/resume/${resume.id || resume._id}?download=true`} target="_blank" rel="noreferrer">
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-indigo-600" title="View PDF">
                           <Download size={14} />
                         </Button>

@@ -57,6 +57,7 @@ const navItems: NavItem[] = [
       { name: "About Page", icon: FileText, href: "/admin/about" },
       { name: "Linktree", icon: Share2, href: "/admin/linktree" },
       { name: "Business Card", icon: Briefcase, href: "/admin/business-card" },
+      { name: "PDF Assets", icon: FileText, href: "/admin/assets" },
     ],
   },
   {
@@ -79,7 +80,8 @@ const navItems: NavItem[] = [
     name: "Settings",
     icon: Settings,
     children: [
-      { name: "General Settings", icon: Settings, href: "/admin/settings" },
+      { name: "My Account", icon: Users, href: "/admin/settings" },
+      { name: "Site Settings", icon: Settings, href: "/admin/site-settings" },
       { name: "Blog Config", icon: Settings, href: "/admin/blog-settings" },
     ],
   },

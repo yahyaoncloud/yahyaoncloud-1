@@ -1,6 +1,7 @@
 ﻿import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { LoaderFunction, json, Link, useLoaderData } from "@remix-run/react";
+import { json, Link, useLoaderData } from "@remix-run/react";
+import type { LoaderFunction } from "@remix-run/node";
 import Vanta from "~/assets/vanta.webp"
 import {
   Github,
@@ -9,6 +10,7 @@ import {
   Search,
   Globe,
   ExternalLink,
+  ArrowRight,
 } from "lucide-react";
 import { FaGithub, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
 
@@ -301,10 +303,14 @@ const TopicSections = ({ posts }: { posts: Post[] }) => {
             {posts.length > 2 && (
               <motion.div className="mt-3" variants={fadeIn}>
                 <Link
-                  to={`/blog/posts?category=${category}`}
-                  className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                  to="/blog/posts"
+                  className="group flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
-                  See all {posts.length} posts â†’
+                  <span className="relative">
+                    See all {posts.length} posts
+                    <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                  </span>
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
               </motion.div>
             )}
@@ -348,12 +354,12 @@ const TopCards = ({ announcements }: { announcements: AnnouncementData[] }) => {
         )}
         {card?.linkUrl && (
           <a 
-            href={card.linkUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-block mt-2 text-sm text-indigo-300 hover:text-indigo-100 underline"
+            className="group inline-block mt-2 text-sm text-indigo-300 hover:text-indigo-100"
           >
-            {card.linkText || "Learn more"}
+            <span className="relative">
+              {card.linkText || "Learn more"}
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+            </span>
           </a>
         )}
       </div>
@@ -567,9 +573,12 @@ const LifeBlogSection = ({ posts }: { posts: Post[] }) => {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-2">
                 <Link
                   to={`/blog/post/${post.slug}`}
-                  className="font-medium text-indigo-200 dark:text-indigo-400 hover:underline leading-tight"
+                  className="group font-medium text-indigo-200 dark:text-indigo-400 leading-tight"
                 >
-                  {post.title}
+                   <span className="relative">
+                    {post.title}
+                    <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                  </span>
                 </Link>
                 <div className="hidden md:flex items-center flex-1 mx-3">
                   <span className="h-px w-full bg-zinc-300 dark:bg-zinc-700" />
@@ -643,9 +652,12 @@ export default function Homepage() {
       <div className="flex w-full items-center justify-center px-4 md:px-0">
         <Link
           to="/blog/posts"
-          className="px-4 py-2 rounded text-lg text-center w-full max-w-56  text-indigo-800 dark:text-indigo-400 hover:underline"
+          className="group px-4 py-2 rounded text-lg text-center w-full max-w-56 text-indigo-800 dark:text-indigo-400"
         >
-          Browse more articles
+          <span className="relative">
+            Browse more articles
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+          </span>
         </Link>
       </div>
       <SupportCard />

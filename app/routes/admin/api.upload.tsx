@@ -4,33 +4,29 @@ import { uploadImage } from "~/utils/cloudinary.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   // 1. Ensure Admin
-  await requireAdmin(request);
+  const user = await requireAdmin(request);
+  if (!user) {
+    return json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  // 2. Parse FormData
-  // Use a memory upload handler (files are small enough usually, or specific cloudinary handler if preferred, 
-  // but here we just need the File object to pass to our utility)
-  const uploadHandler = unstable_createMemoryUploadHandler({
-    maxPartSize: 5_000_000, // 5MB
-  });
-  
+  // 2. Parse FormData directly
+  // Note: For this to work with files, the Remix adapter must support standard Request.formData() parsing of files
+  // which is standard in Remix v2+ with Node.
   try {
-    const formData = await unstable_parseMultipartFormData(request, uploadHandler);
-    
+    const formData = await request.formData();
     const file = formData.get("file") as File;
     const slug = formData.get("slug") as string;
-    const type = formData.get("type") as string || "gallery"; // 'cover' or 'gallery'
+    const type = formData.get("type") as string || "gallery";
 
     if (!file || !slug) {
         return json({ error: "Missing file or slug" }, { status: 400 });
     }
 
     // 3. Construct Public ID
-    // Standardize folder structure: posts/[slug]/[type]/[filename]
-    // or posts/[slug]/gallery/[filename_timestamp]
     const timestamp = Date.now();
     const cleanFileName = file.name.split('.')[0].replace(/[^a-zA-Z0-9]/g, '-');
     const publicId = type === 'cover' 
-        ? `posts/${slug}/${slug}-cover` // Fixed name for cover
+        ? `posts/${slug}/${slug}-cover` 
         : `posts/${slug}/gallery/${cleanFileName}-${timestamp}`;
 
     // 4. Upload
@@ -44,6 +40,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   } catch (error) {
     console.error("Upload API Error:", error);
-    return json({ error: "Upload failed" }, { status: 500 });
+    return json({ error: "Upload failed: " + (error instanceof Error ? error.message : "Unknown error") }, { status: 500 });
   }
 }

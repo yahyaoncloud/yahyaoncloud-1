@@ -98,7 +98,7 @@ export default function AdminGuestbook() {
       {/* Header */}
       <div className="px-6 py-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl mt-8 lg:text-6xl font-bold bg-gradient-to-r from-zinc-900 via-indigo-800 to-purple-800 dark:from-white dark:via-indigo-200 dark:to-purple-200 bg-clip-text text-transparent mb-6">
+          <h1 className="text-5xl mt-8 lg:text-6xl font-bold bg-gradient-to-r from-zinc-900 via-indigo-800 to-indigo-800 dark:from-white dark:via-indigo-200 dark:to-indigo-200 bg-clip-text text-transparent mb-6">
             Guestbook
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-2">

@@ -15,7 +15,7 @@ import {
   twitterProvider,
   db,
 } from "~/utils/firebase.client";
-import { getUserSession } from "~/utils/session.server";
+import { getSession } from "~/utils/session.server";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { onValue, push, ref } from "firebase/database";
 import { motion } from "framer-motion";
@@ -34,13 +34,18 @@ interface Message {
 
 // Loader and Action Functions
 export const loader: LoaderFunction = async ({ request }) => {
-  const session = await getUserSession(request);
-  const user = session.get("user") || null;
-  return json({ user });
+  try {
+    const session = await getSession(request);
+    const user = session.get("user") || null;
+    return json({ user });
+  } catch (error) {
+    console.error("Guestbook Loader Error:", error);
+    return json({ user: null, error: "Failed to load user session" }, { status: 200 });
+  }
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  const session = await getUserSession(request);
+  const session = await getSession(request);
   const formData = await request.formData();
   const message = formData.get("message") as string;
 

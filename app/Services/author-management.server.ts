@@ -38,6 +38,20 @@ export async function getAuthorByAuthorId(authorId: string) {
 }
 
 /**
+ * Get author by username or email
+ */
+export async function getAuthorByEmailOrUsername(identifier: string) {
+  return prisma.author.findFirst({
+    where: {
+      OR: [
+        { username: identifier },
+        { email: identifier }
+      ]
+    }
+  });
+}
+
+/**
  * Create new author
  */
 export async function createAuthor(data: {

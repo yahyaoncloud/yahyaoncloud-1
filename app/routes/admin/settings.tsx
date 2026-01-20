@@ -1,27 +1,51 @@
 ﻿import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useNavigation, Form, useActionData } from "@remix-run/react";
 import { requireAdmin } from "~/utils/admin-auth.server";
-import { getAdminById, updateAdmin } from "~/Services/admin.prisma.server";
+import { getAdminByUsername, updateAdmin } from "~/Services/admin.prisma.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { User, Shield, Save, Loader2 } from "lucide-react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { id } = await requireAdmin(request);
-  const admin = await getAdminById(id);
+  const adminPayload = await requireAdmin(request);
   
+  // Try to find admin in database by username or email
+  let admin = await getAdminByUsername(adminPayload.username);
+  
+  // If not found by username, the admin is Firebase-only (no MongoDB record)
+  // Use JWT payload data for display
   if (!admin) {
-    throw new Response("Admin not found", { status: 404 });
+    // Return JWT payload data as admin info
+    return json({ 
+      admin: {
+        id: adminPayload.id,
+        username: adminPayload.username,
+        email: adminPayload.email,
+        role: adminPayload.role,
+        isFirebaseOnly: true, // Flag to indicate no DB record
+      }
+    });
   }
 
-  return json({ admin });
+  return json({ admin: { ...admin, isFirebaseOnly: false } });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { id } = await requireAdmin(request);
+  const adminPayload = await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
+  
+  // Look up admin by username to get MongoDB ID
+  const admin = await getAdminByUsername(adminPayload.username);
+  if (!admin) {
+    // Firebase-only admin - can't update in database
+    return json({ 
+      success: false, 
+      error: "Your account is managed by Firebase. Profile changes cannot be saved to the database.",
+      intent: intent as string
+    });
+  }
 
   if (intent === "profile") {
     const username = formData.get("username") as string;
@@ -32,7 +56,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     try {
-        await updateAdmin(id, { username, email });
+        await updateAdmin(admin.id, { username, email });
         return json({ success: true, message: "Profile updated successfully", intent: "profile" });
     } catch (error) {
         console.error("Update error:", error);
@@ -53,7 +77,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     try {
-        await updateAdmin(id, { password });
+        await updateAdmin(admin.id, { password });
         return json({ success: true, message: "Password updated successfully", intent: "security" });
     } catch (error) {
          console.error("Update error:", error);

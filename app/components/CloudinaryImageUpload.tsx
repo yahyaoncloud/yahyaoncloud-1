@@ -30,7 +30,37 @@ export default function CloudinaryImageUpload({
   useEffect(() => {
     // Handle fetcher response
     if (fetcher.state === "idle" && fetcher.data) {
-        const data = fetcher.data as any;
+        let data: any = fetcher.data;
+        
+        // Handle Single Fetch raw stream if decoding failed on client side
+        // Format: [{"_1":rootIndex}, ...keys/values]
+        // Example: [{"_1":2},"data",{"_3":4,"_5":6,"_7":8},"success",true,"url","https..."]
+        if (Array.isArray(data) && data.length > 0 && data[0]?._1) {
+            try {
+                const rootIndex = data[0]._1;
+                const rootObject = data[rootIndex];
+                
+                // Reconstruct object from the stream map
+                const decoded: any = {};
+                if (rootObject && typeof rootObject === 'object') {
+                    Object.keys(rootObject).forEach(key => {
+                        if (key.startsWith('_')) {
+                            const keyIndex = parseInt(key.substring(1)); // e.g. _3 -> 3
+                            const valIndex = rootObject[key]; // e.g. 4
+                            
+                            const realKey = data[keyIndex];
+                            const realVal = data[valIndex];
+                            decoded[realKey] = realVal;
+                        }
+                    });
+                     console.log("Decoded raw stream:", decoded);
+                     data = decoded;
+                }
+            } catch (e) {
+                console.error("Failed to decode raw stream:", e);
+            }
+        }
+
         if (data.success && data.url) {
             toast.success("Image uploaded successfully!");
             onUploadComplete(data.url);
@@ -38,7 +68,11 @@ export default function CloudinaryImageUpload({
                 setPreview(data.url);
             }
         } else if (data.error) {
+            console.error("Upload error:", data.error);
             toast.error(data.error);
+        } else {
+             // If we got here, it's neither success nor explicit error, so log it
+             console.log("Unexpected upload response:", data);
         }
     }
   }, [fetcher.state, fetcher.data]);

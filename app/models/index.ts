@@ -679,9 +679,12 @@ interface IResume extends Document {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   title: string;
-  htmlContent: string;
+  htmlContent?: string;
   pdfUrl?: string;
+  pdfData?: Buffer; // Binary data for direct DB storage
+  contentType?: string;
   qrCodeUrl?: string;
+  fileName?: string;
   version: number;
   isActive: boolean;
   metadata: {
@@ -706,11 +709,13 @@ const ResumeSchema = new Schema<IResume>(
     },
     htmlContent: {
       type: String,
-      required: [true, 'HTML content is required'],
-      minlength: [50, 'HTML content must be at least 50 characters']
+      required: false, // Changed to optional as we support PDF-only uploads
     },
     pdfUrl: { type: String },
+    pdfData: { type: Buffer }, // New field
+    contentType: { type: String, default: 'application/pdf' }, // New field
     qrCodeUrl: { type: String },
+    fileName: { type: String },
     version: { type: Number, default: 1 },
     isActive: { type: Boolean, default: true },
     metadata: {

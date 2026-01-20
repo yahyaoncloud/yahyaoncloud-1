@@ -1,263 +1,144 @@
 import type { Linktree } from "@prisma/client";
+import { Linkedin, Github, Twitter, Instagram } from "lucide-react";
 
-// Utility type to handle serialization of Dates
 type Serialized<T> = {
   [P in keyof T]: T[P] extends Date ? string | Date : T[P];
 };
 
 interface BusinessCardProps {
-  svgContent: string;
   profile: Serialized<Linktree>;
   qrCodeUrl: string;
   linktreeUrl: string;
+  svgContent?: string;
 }
 
-export function BusinessCard({ svgContent, profile, qrCodeUrl, linktreeUrl }: BusinessCardProps) {
-  // Enhanced print styles for professional PDF output
-  const printStyles = `
-    @media print {
-      @page {
-        size: 3.75in 2.25in; /* Card size + 0.125" bleed on all sides */
-        margin: 0;
-      }
-      
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        color-adjust: exact;
-      }
-      
-      .business-card-container {
-        width: 3.75in !important;
-        height: 2.25in !important;
-        max-width: none !important;
-        page-break-after: always;
-        position: relative;
-        padding: 9px !important;
-      }
-      
-      /* Fix text sizing for print - convert cqw to px */
-      .business-card-container h2 {
-        font-size: 32px !important;
-      }
-      
-      .business-card-container .tagline-text {
-        font-size: 18px !important;
-      }
-      
-      .business-card-container .email-text {
-        font-size: 16px !important;
-      }
-      
-      .business-card-container .social-label {
-        font-size: 15px !important;
-      }
-      
-      .business-card-container .social-value {
-        font-size: 13px !important;
-      }
-      
-      .business-card-container .scan-text {
-        font-size: 32px !important;
-      }
-      
-      /* Crop marks for professional printing */
-      .crop-marks {
-        display: block !important;
-      }
-      
-      /* Ensure fonts render properly */
-      * {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-    }
-    
-    @media screen {
-      .crop-marks {
-        display: none;
-      }
-    }
-  `;
+export function BusinessCard({ profile, qrCodeUrl, linktreeUrl }: BusinessCardProps) {
+  const socialLinks = [
+    { label: 'LinkedIn', value: profile.linkedinUrl, icon: Linkedin },
+    { label: 'Instagram', value: profile.instagramUrl, icon: Instagram },
+    { label: 'Twitter', value: profile.twitterUrl, icon: Twitter },
+  ].filter(s => s.value);
 
   return (
     <>
-    <style>{printStyles}</style>
-    
-    {/* Crop Marks for Professional Printing */}
-    <svg className="crop-marks absolute" style={{ width: '3.75in', height: '2.25in', position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-      {/* Top-left crop marks */}
-      <line x1="0" y1="9" x2="18" y2="9" stroke="black" strokeWidth="0.5" />
-      <line x1="9" y1="0" x2="9" y2="18" stroke="black" strokeWidth="0.5" />
-      
-      {/* Top-right crop marks */}
-      <line x1="100%" y1="9" x2="calc(100% - 18px)" y2="9" stroke="black" strokeWidth="0.5" />
-      <line x1="calc(100% - 9px)" y1="0" x2="calc(100% - 9px)" y2="18" stroke="black" strokeWidth="0.5" />
-      
-      {/* Bottom-left crop marks */}
-      <line x1="0" y1="calc(100% - 9px)" x2="18" y2="calc(100% - 9px)" stroke="black" strokeWidth="0.5" />
-      <line x1="9" y1="100%" x2="9" y2="calc(100% - 18px)" stroke="black" strokeWidth="0.5" />
-      
-      {/* Bottom-right crop marks */}
-      <line x1="100%" y1="calc(100% - 9px)" x2="calc(100% - 18px)" y2="calc(100% - 9px)" stroke="black" strokeWidth="0.5" />
-      <line x1="calc(100% - 9px)" y1="100%" x2="calc(100% - 9px)" y2="calc(100% - 18px)" stroke="black" strokeWidth="0.5" />
-    </svg>
-    
-    {/* Business Card with Bleed Zone (0.125" = 9px at 72dpi) */}
-    <div className="relative w-full max-w-[540px] aspect-[1050/1268] shadow-2xl rounded-xl overflow-hidden bg-white business-card-container print:rounded-none print:shadow-none" style={{ containerType: 'inline-size', padding: '9px' }}>
+      <style>{`
+        @media print {
+          @page { size: 7in 4in; margin: 0; }
+          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .business-card-print { width: 7in !important; height: 4in !important; page-break-after: always; }
+          .no-print { display: none !important; }
+        }
+      `}</style>
 
-      {/* SVG Background Layer */}
-      <div 
-        dangerouslySetInnerHTML={{ __html: svgContent }} 
-        className="absolute inset-[9px] w-[calc(100%-18px)] h-[calc(100%-18px)] select-none pointer-events-none [&>svg]:w-full [&>svg]:h-full"
-      />
-
-      {/* 
-         Overlay Layer - Positioned absolutely over the SVG.
-         The SVG viewBox is 0 0 1050 1268.
-         We use percentage-based positioning or viewBox coordinate mapping.
-         Since the container width scales, we should use % for positions if possible 
-         or use a container query / transform scale.
-         
-         Easier approach: 
-         Set the container to be relative and the content to be absolute.
-         We assume the SVG fills the container.
-      */}
-      
-      {/* Front Card Content Area (Top Half: 0 - 600) */}
-      <div className="absolute top-0 left-0 w-full aspect-[1050/1268] pointer-events-none">
+      {/* Two-sided card layout for print */}
+      <div className="business-card-print flex gap-0" style={{ width: '700px', height: '200px' }}>
         
-        {/* Avatar Placeholder: x=403, y=64, w=244, h=244 */}
-        <div style={{
-            position: 'absolute',
-            top: `${(64 / 1268) * 100}%`,
-            left: `${(403 / 1050) * 100}%`,
-            width: `${(244 / 1050) * 100}%`,
-            height: `${(244 / 1268) * 100}%`, // Note: aspect ratio might skew if container isn't matching SVG AR exactly
-          }}
-          className="flex items-center justify-center overflow-hidden"
-        >
-           {profile.avatarUrl ? (
-             <img 
-               src={profile.avatarUrl} 
-               alt="Avatar" 
-               className="w-full h-full object-cover rounded-lg" // Matching the SVG rect rx might be needed if visible
-             />
-           ) : (
-             <div className="w-full h-full bg-gray-300" />
-           )}
-        </div>
+        {/* ===== FRONT SIDE ===== */}
+        <div className="relative overflow-hidden flex-shrink-0" style={{ width: '350px', height: '200px', background: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #0f0a1f 100%)' }}>
+          
+          {/* Content */}
+          <div className="relative h-full flex flex-col items-center justify-center p-3 text-center z-10">
+            {/* Avatar */}
+            <div className="w-16 h-16 rounded-full p-1 bg-gradient-to-br from-indigo-400 to-purple-500 mb-2 shadow-[0_0_15px_rgba(139,92,246,0.4)]">
+              <div className="w-full h-full rounded-full overflow-hidden bg-white border border-white">
+                {profile.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-zinc-900 text-lg font-bold">
+                    {profile.displayName?.charAt(0) || "Y"}
+                  </div>
+                )}
+              </div>
+            </div>
 
-        {/* Name: Previously at y ~ 320-360. Centered horizontally? 
-            Original path bounds were roughly x=467 to 533? No, multiple paths.
-            Let's assume centered text for Name.
-        */}
-        <div style={{
-            position: 'absolute',
-            top: `${(320 / 1268) * 100}%`,
-            left: '0',
-            width: '100%',
-            textAlign: 'center'
-          }}
-        >
-          <h2 className="text-white capitalize mrs-saint-delafield-regular text-[4.5cqw] drop-shadow-lg" >
-            {profile.displayName || "YOUR NAME"}
-          </h2>
-        </div>
+            {/* Name & Title */}
+            <h1 className="text-white font-bold text-xl tracking-wide uppercase" style={{ textShadow: '0 2px 10px rgba(139,92,246,0.5)' }}>
+              {profile.displayName || "Yahya"}
+            </h1>
+            <p className="text-[#a78bfa] font-medium text-[9px] mt-1.5 tracking-wider uppercase">
+              {profile.tagline || "Cloud & Network Engineer"}
+            </p>
+            
+            {/* Contact Email */}
+            {profile.emailUrl && (
+              <p className="text-zinc-300 font-light tracking-wide text-[8px] mt-1.5 uppercase opacity-80">
+                {profile.emailUrl.replace('mailto:', '')}
+              </p>
+            )}
 
-        {/* Tagline / Title: Below Name. y ~ 370 */}
-        <div style={{
-            position: 'absolute',
-            top: `${(380 / 1268) * 102}%`,
-            left: '0',
-            width: '100%',
-            textAlign: 'center'
-          }}
-        >
-          <p className="tagline-text text-gray-300 text-[2.5cqw] font-medium tracking-widest uppercase font-sans">
-            {profile.tagline || "CREATIVE DIRECTOR"}
-          </p>
-        </div>
-
-        {/* Primary Contact / Email: y ~ 440? */}
-        <div style={{
-            position: 'absolute',
-            top: `${(440 / 1268) * 96}%`,
-            left: '0',
-            width: '100%',
-            textAlign: 'center'
-          }}
-        >
-           <p className="email-text text-gray-400 text-[2.2cqw] font-light tracking-wide font-sans">
-             {(profile.emailUrl || "").replace('mailto:', '') || "hello@example.com"}
-           </p>
-        </div>
-
-      </div>
-
-      {/* Back Card Content Area (Bottom Half: starts at 668) */}
-      <div className="absolute top-0 left-0 w-full aspect-[1050/1268] pointer-events-none">
-        
-        {/* QR Code Container: x=73.5, y=830.5, w=276, h=266 */}
-        <div style={{
-            position: 'absolute',
-            top: `${(830.5 / 1268) * 100}%`,
-            left: `${(73.5 / 1050) * 100}%`,
-            width: `${(276 / 1050) * 100}%`,
-            height: `${(266 / 1268) * 100}%`,
-          }}
-          className="flex items-center justify-center p-2 bg-gray-900 rounded-xl"
-        >
-          {qrCodeUrl && (
-            <img src={qrCodeUrl} alt="QR Code" className="w-full h-full object-contain" />
-          )}
-        </div>
-        
-      
-        {/* Maximum 3-4 specific social links if available */}
-        <div style={{
-            position: 'absolute',
-            top: `${(720 / 1268) * 115}%`,
-            left: `${(420 / 1050) * 100}%`,
-            width: `${(580 / 1050) * 100}%`,
-            textAlign: 'left'
-          }}
-          className="flex flex-col gap-[1.5cqw]"
-        >
-           {/* Socials */}
-           {[
-             { label: 'LinkedIn', value: profile.linkedinUrl },
-             { label: 'GitHub', value: profile.githubUrl },
-             { label: 'Twitter', value: profile.twitterUrl },
-             { label: 'Instagram', value: profile.instagramUrl },
-           ].filter(s => s.value).slice(0, 4).map((s) => (
-             <div key={s.label} className="flex flex-col gap-[0.3cqw]">
-                <div className="social-label text-gray-200 text-[2.1cqw] text-end font-extrabold font-sans uppercase tracking-[0.12em]" style={{ letterSpacing: '0.12em' }}>{s.label}</div>
-                <div className="social-value text-gray-400 text-[1.8cqw] text-end font-sans truncate tracking-wide">
-                  {s.value?.replace(/^https?:\/\/(www\.)?/, '').split('/')[0] === 'linkedin.com' 
-                    ? s.value?.replace(/^https?:\/\/(www\.)?/, '') 
-                    : s.value?.split('/').pop()}
+            {/* Social Icons */}
+            <div className="flex gap-3 mt-2.5">
+              {socialLinks.map((s) => (
+                <div key={s.label} className="w-6 h-6 rounded-full border border-indigo-400/30 flex items-center justify-center text-indigo-300">
+                  <s.icon size={12} />
                 </div>
-             </div>
-           ))}
-        </div>
-        
-  {/* Bottom Text / Role */}
-        <div style={{
-            position: 'absolute',
-            top: `${(680 / 1268) * 110}%`,
-            left: `${(420 / 1050) * 100}%`,
-            width: `${(580 / 1050) * 100}%`,
-            textAlign: 'right'
-          }}
-        >
-          <h1 className="text-zinc-100 story-script-regular text-[4cqw]  drop-shadow-md">
-            Aspiring Cloud Architect
-          </h1>
+              ))}
+            </div>
+
+            {/* Domain */}
+            <div className="absolute top-2.5 right-3 text-zinc-400 text-[6px] tracking-widest font-light uppercase opacity-50">
+              {linktreeUrl?.replace(/^https?:\/\//, '') || 'yahyaoncloud.vercel.com'}
+            </div>
+          </div>
         </div>
 
+        {/* ===== BACK SIDE ===== */}
+        <div className="relative overflow-hidden flex-shrink-0 bg-black" style={{ width: '350px', height: '200px' }}>
+          {/* Solid Split Background */}
+          <div className="absolute left-0 top-0 bottom-0 w-[35%] bg-[#1e1e3f]" />
+
+          {/* Content */}
+          <div className="relative h-full w-full p-5 flex flex-col justify-between z-10">
+            {/* Domain */}
+            <div className="absolute top-3 right-4 text-zinc-700 text-[6.5px] tracking-[0.2em] uppercase">
+               {linktreeUrl?.replace(/^https?:\/\//, '') || 'yahyaoncloud.vercel.com'}
+            </div>
+
+            {/* Main Statement */}
+            <div className="self-end text-right w-[65%] mt-3">
+              <h2 className="text-white text-[9px] font-light leading-relaxed tracking-wider uppercase opacity-80" style={{ textShadow: '0 2px 8px rgba(139,92,246,0.2)' }}>
+                Building the foundations for <br/>
+                scalable Cloud Architecture <br/>
+                and Network systems.
+              </h2>
+            </div>
+            
+            {/* Bottom Section */}
+            <div className="flex items-end justify-between w-full mt-auto">
+              {/* Left Side: Scan Info + QR */}
+              <div className="text-left mb-1 ml-1.5">
+                 <p className="text-white/70 text-[5px] font-bold tracking-[0.25em] italic uppercase">SCAN HERE FOR MORE</p>
+                 <p className="text-white/70 text-[5px] font-bold tracking-[0.25em] italic uppercase">INFORMATION</p>
+                 
+                 <div className="mt-1.5 w-11 h-11 bg-white/5 backdrop-blur-sm rounded p-0.5 border border-white/10">
+                    <img src={qrCodeUrl} alt="QR" className="w-full h-full object-contain opacity-70" />
+                 </div>
+              </div>
+
+              {/* Right Side: Contact */}
+              <div className="flex flex-col items-end gap-1">
+                 <div className="flex flex-col items-end gap-0.5 mb-1.5">
+                    {socialLinks.map(s => (
+                       <div key={s.label} className="flex items-center gap-1.5 text-zinc-500">
+                          <s.icon size={8} className="text-[#6366f1]" />
+                          <span className="text-[7.5px] font-light tracking-widest uppercase">@{profile.displayName?.toLowerCase().replace(/\s+/g,'') || "yahyaoncloud"}</span>
+                       </div>
+                    ))}
+                 </div>
+
+                 <div className="bg-[#4338ca] text-white px-2.5 py-0.5 rounded-full flex flex-col items-end shadow-lg shadow-purple-900/40">
+                    <span className="text-[6.5px] font-bold tracking-[0.1em] border-b border-white/20 pb-0.5 mb-0.5 w-full text-right uppercase">
+                       {profile.emailUrl?.replace('mailto:', '') || 'email@example.com'}
+                    </span>
+                    <span className="text-[6px] font-bold tracking-[0.2em]">
+                       +918096278589
+                    </span>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     </>
   );
 }

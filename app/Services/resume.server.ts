@@ -70,7 +70,8 @@ export async function generateResumePdf(resumeId: string) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1200, height: 1600 });
-    await page.setContent(resume.htmlContent, { waitUntil: 'networkidle0' });
+    const content = resume.htmlContent || "<h1>No Content</h1>";
+    await page.setContent(content, { waitUntil: 'networkidle0' });
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
@@ -176,22 +177,69 @@ export async function getResumeById(resumeId: string) {
 // ... (remaining functions)
 
 /**
+ * Create a new resume from uploaded PDF
+ */
+export async function createResume(data: {
+  title: string;
+  pdfUrl?: string; // Optional if using pure DB storage, but good to keep if hybrid
+  pdfData?: Buffer; // NEW: Binary content
+  contentType?: string;
+  fileName: string;
+  userId?: string;
+}) {
+  const resume = new Resume({
+    userId: data.userId,
+    title: data.title,
+    pdfUrl: data.pdfUrl || "",
+    pdfData: data.pdfData,
+    contentType: data.contentType || "application/pdf",
+    fileName: data.fileName,
+    htmlContent: "PDF_ONLY", // satisfy validation if schema update delayed
+    version: 1,
+    isActive: false // Default to inactive
+  });
+
+  await resume.save();
+  return resume;
+}
+
+/**
+ * Toggle resume active status
+ */
+export async function toggleResumeActive(resumeId: string) {
+  const resume = await Resume.findById(resumeId);
+  if (!resume) throw new Error('Resume not found');
+
+  // If we are activating, we might want to deactivate others
+  // For now, let's just toggle. But usually "Active" means "The One".
+  // Let's implement robust "Set Active" logic.
+  
+  if (!resume.isActive) {
+      // Activating: Deactivate others for this user (or global if no user)
+      // Assuming single user for now or global admin
+      await Resume.updateMany({}, { isActive: false });
+      resume.isActive = true;
+  } else {
+      // Deactivating
+      resume.isActive = false;
+  }
+
+  await resume.save();
+  return resume;
+}
+
+/**
  * Delete a resume and its associated files
  */
 export async function deleteResume(resumeId: string) {
   const resume = await Resume.findById(resumeId);
   if (!resume) throw new Error('Resume not found');
 
-  const userId = resume.userId?.toString() || 'default';
-
-  // Delete associated files from Supabase
-  if (resume.pdfUrl) {
-    await deleteFromSupabase('resumes', `resumes/${userId}/${resumeId}.pdf`);
-  }
-  if (resume.qrCodeUrl) {
-    await deleteFromSupabase('resumes', `resumes/${userId}/qr-${resumeId}.png`);
-  }
-
+  // TODO: Delete from Cloudinary if possible. 
+  // Needs public_id stored. Currently we store PDF URL.
+  // We can extract public_id from URL or just accept it's orphaned in Cloudinary for now.
+  // Or parsing URL: .../resumes/filename-timestamp.pdf
+  
   await Resume.findByIdAndDelete(resumeId);
   return { success: true };
 }
@@ -200,15 +248,5 @@ export async function deleteResume(resumeId: string) {
  * Set resume as active (deactivates others)
  */
 export async function setActiveResume(resumeId: string, userId?: string) {
-  // Deactivate all resumes for user
-  if (userId) {
-    await Resume.updateMany({ userId }, { isActive: false });
-  } else {
-    await Resume.updateMany({}, { isActive: false });
-  }
-
-  // Activate the specified resume
-  await Resume.findByIdAndUpdate(resumeId, { isActive: true });
-
-  return await Resume.findById(resumeId);
+  return toggleResumeActive(resumeId);
 }

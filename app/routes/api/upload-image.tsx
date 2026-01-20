@@ -50,8 +50,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
     return json({
       success: true,
-      url: result.secure_url,
-      publicId: result.public_id,
+      url: result.url,
+      publicId: result.publicId,
       width: result.width,
       height: result.height
     });
@@ -65,7 +65,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-// Only allow POST requests
+// Return 200 to prevent 405 errors if accessed via GET
 export async function loader() {
-  return json({ error: 'Method not allowed' }, { status: 405 });
+  return json({ message: 'Image upload endpoint' }, { status: 200 });
 }

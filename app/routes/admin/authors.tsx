@@ -18,7 +18,7 @@ import {
 import { AdminDataTable, type Column } from "~/components/AdminDataTable";
 import { Plus, Trash2, Edit, Search } from "lucide-react";
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const authors = await getAllAuthors();
@@ -36,10 +36,14 @@ export async function action({ request }: ActionFunctionArgs) {
       const email = formData.get("email") as string;
       const role = formData.get("role") as "author" | "superadmin";
       
+      if (!email) {
+        return json({ success: false, error: "Email is required", message: undefined, temporaryPassword: undefined }, { status: 400 });
+      }
+
       const { temporaryPassword } = await createAuthor({
         username,
         authorName,
-        email: email || undefined,
+        email,
         role: role || "author"
       });
       
@@ -89,7 +93,18 @@ export default function AdminAuthors() {
           toast.success(actionData.message, { duration: 5000 });
       }
       if (actionData.temporaryPassword) {
-        alert(`Author Created!\n\nUsername: ${authors.find(a => !a.id)?.username || 'New User'}\nTemporary Password: ${actionData.temporaryPassword}\n\nPlease copy this now.`);
+        // Show persistent toast with password
+        toast.success(
+            <div className="space-y-2">
+                <p className="font-bold">Author Created Successfully!</p>
+                <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded text-xs font-mono break-all select-all">
+                    User: {authors.find((a: any) => !a.id)?.username || 'New User'}<br/>
+                    Pass: {actionData.temporaryPassword}
+                </div>
+                <p className="text-xs">Copy credentials now. The password will not be shown again.</p>
+            </div>,
+            { duration: Infinity, closeButton: true } // format: persistent
+        );
       }
       setIsCreating(false);
     }
@@ -132,7 +147,7 @@ export default function AdminAuthors() {
         cell: (author) => (
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                 author.role === 'superadmin' 
-                ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300'
+                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-300'
                 : 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300'
             }`}>
                 {author.role}
@@ -209,8 +224,8 @@ export default function AdminAuthors() {
                   <Input id="username" name="username" required placeholder="jdoe" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" placeholder="john@example.com" />
+                  <Label htmlFor="email">Email *</Label>
+                  <Input id="email" name="email" type="email" required placeholder="john@example.com" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>

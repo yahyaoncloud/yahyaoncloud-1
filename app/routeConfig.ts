@@ -7,11 +7,12 @@ export const routes = (defineRoutes: any) => {
       route("", "routes/public/_index.tsx", { index: true });
       route("about", "routes/public/about.tsx");
       route("contact", "routes/public/contact.tsx");
-      route("resume", "routes/public/resume.tsx");
+      // route("contact", "routes/public/contact.tsx");
+      // route("resume", "routes/public/resume.tsx"); // Removed in favor of root redirect
       
       // Blog
       route("blog", "routes/public/blog.tsx");
-      route("blog/:slug", "routes/public/blog_.post.$slug.tsx");
+      route("blog/post/:slug", "routes/public/blog_.post.$slug.tsx");
       route("blog/posts", "routes/public/blog_.posts.tsx");
       
       // Guestbook
@@ -52,20 +53,30 @@ export const routes = (defineRoutes: any) => {
       route("authors", "routes/admin/authors.tsx");
       route("authors/:id", "routes/admin/authors.$id.tsx");
       route("settings", "routes/admin/settings.tsx");
+      route("site-settings", "routes/admin/site-settings.tsx");
       route("blog-settings", "routes/admin/blog-settings.tsx");
       route("announcements", "routes/admin/announcements.tsx");
       route("media", "routes/admin/media.tsx");
       
       // Resumes
       route("resumes", "routes/admin/resumes.tsx");
-      route("resume/editor", "routes/admin/resume.editor.tsx");
-      route("resume/qr", "routes/admin/resume.qr.tsx");
-      route("resume/view/:id", "routes/admin/resume.view.$id.tsx");
+      route("assets", "routes/admin/assets.tsx"); // New PDF Assets Manager
+      route("logout", "routes/admin/logout.tsx");
+      // route("resume/editor", "routes/admin/resume.editor.tsx");
+      // route("resume/qr", "routes/admin/resume.qr.tsx");
+      // route("resume/view/:id", "routes/admin/resume.view.$id.tsx");
     });
 
     // Author Portal
     route("authors", "routes/authors/layout.tsx", () => {
       route("", "routes/authors/dashboard.tsx", { index: true });
+      route("dashboard", "routes/authors/dashboard.tsx", { id: "authors-dashboard-alias" });
+      route("posts", "routes/authors/posts.tsx");
+      route("post/create", "routes/authors/post.create.tsx");
+      route("post/edit/:slug", "routes/authors/post.edit.$slug.tsx");
+      route("assets", "routes/authors/assets.tsx");
+      route("profile", "routes/authors/profile.tsx");
+      route("api/upload", "routes/authors/api.upload.tsx");
       route("change-password", "routes/authors/change-password.tsx");
       route("logout", "routes/authors/logout.tsx");
     });
@@ -73,14 +84,14 @@ export const routes = (defineRoutes: any) => {
     // Auth & API (Root Level / Layoutless)
     route("login", "routes/login.tsx"); // Unified login page
     
-    route("logout", "routes/admin/logout.tsx");
-    
     // API Routes are Resource Routes (no layout)
     route("api/upload-image", "routes/api/upload-image.tsx");
+    route("admin/api/upload", "routes/admin/api.upload.tsx");
     route("api/upload-resume", "routes/api/upload-resume.tsx");
     route("api/analytics", "routes/api/analytics.tsx");
     route("api/auth", "routes/api/auth.ts"); 
     route("api/logout", "routes/api/logout.ts"); 
+    route("api/track", "routes/api/track.ts");
     route("api/media", "routes/api/media.tsx");
     route("api/generate-business-card-pdf", "routes/api/generate-business-card-pdf.tsx");
     // route("api/supabase-keepalive", "routes/api/supabase-keepalive.ts");
@@ -94,7 +105,10 @@ export const routes = (defineRoutes: any) => {
 
     // Utilities
     route("me/:shortCode", "routes/me.$shortCode.tsx");
-    route("resume/view/:id", "routes/resume.view.$id.tsx"); // Public resume view?
+    route("resources/download/resume/:id", "routes/resources.download.resume.$id.tsx"); // Proxy download
+    route("links", "routes/links.tsx"); // Permanent QR code URL for linktree
+    route("resume", "routes/resume.tsx"); // Public resume viewer
+    // route("resume/view/:id", "routes/resume.view.$id.tsx"); // Public resume view?
     
     // 404
     route("*", "routes/404.tsx");

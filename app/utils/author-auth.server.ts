@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { redirect } from '@remix-run/node';
-import { getAuthorByUsername } from '~/Services/author-management.server';
+import { getAuthorByEmailOrUsername } from '~/Services/author-management.server';
 import { verifyPassword } from './password.server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
@@ -35,8 +35,8 @@ export function verifyAuthorToken(token: string): AuthorPayload | null {
 /**
  * Authenticate author with username and password
  */
-export async function authenticateAuthor(username: string, password: string) {
-  const author = await getAuthorByUsername(username);
+export async function authenticateAuthor(identifier: string, password: string) {
+  const author = await getAuthorByEmailOrUsername(identifier);
   
   if (!author || !author.password) {
     return null;

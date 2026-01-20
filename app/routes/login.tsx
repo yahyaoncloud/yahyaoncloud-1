@@ -1,5 +1,5 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node';
-import { Form, useActionData, useNavigation, useSearchParams } from '@remix-run/react';
+import { Form, useActionData, useNavigation, useSearchParams, useSubmit } from '@remix-run/react';
 import { useState, useEffect } from 'react';
 import { FaGoogle, FaGithub, FaDiscord } from 'react-icons/fa';
 import { Button } from '~/components/ui/button';
@@ -9,6 +9,9 @@ import YOC from "~/assets/yoc-logo5.png"
 import { authenticateAuthor, createAuthorSession, generateAuthorToken } from '~/utils/author-auth.server';
 import { authenticateAdmin, createAdminSession, generateAdminToken, getAdminFromRequest } from '~/utils/admin-auth.server';
 import { getAuthorFromRequest } from '~/utils/author-auth.server';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '~/utils/firebase.client';
+import { toast } from 'sonner';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   // Check if already logged in
@@ -102,6 +105,28 @@ export default function UnifiedLogin() {
     setSearchParams({ type: tab });
     setError(null);
   };
+
+  const submit = useSubmit();
+
+  const handleGoogleLogin = async () => {
+    if (!auth || !googleProvider) {
+      toast.error("Firebase Auth not initialized");
+      return;
+    }
+    
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const idToken = await user.getIdToken();
+      
+      // Submit token to server to create session
+      submit({ idToken, loginType: 'google' }, { method: "post", action: "/api/auth" });
+      
+    } catch (error: any) {
+      console.error("Google Sign-In Error:", error);
+      toast.error(error.message || "Failed to sign in with Google");
+    }
+  };
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 px-4 relative overflow-hidden">
@@ -118,14 +143,14 @@ export default function UnifiedLogin() {
       
       <div className="w-full max-w-md relative z-10">
         {/* Animated gradient border */}
-        <div className="relative p-[2px] rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient-x">
+        <div className="relative p-[2px] rounded-lg bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 animate-gradient-x">
           <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-8 h-[650px] flex flex-col">
             {/* Logo and Branding */}
             <div className="text-center mb-6">
               <img 
                 src={YOC} 
                 alt="YahyaOnCloud Logo" 
-                className="w-16 h-16 mx-auto mb-3"
+                className="w-24 h-24 mx-auto mb-3"
               />
               <h1 className="text-2xl font-light mb-1 mrs-saint-delafield-regular">YahyaOnCloud</h1>
               <p className="text-sm text-zinc-600 dark:text-zinc-400">Sign in to your account</p>
@@ -166,7 +191,7 @@ export default function UnifiedLogin() {
               {/* SSO Providers */}
               <div className="flex gap-3">
                 <Button
-                  onClick={() => window.location.href = '/auth/sso/google'}
+                  onClick={handleGoogleLogin}
                   className="flex-1 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 dark:text-white dark:border-zinc-600"
                   variant="outline"
                   type="button"
@@ -266,7 +291,7 @@ export default function UnifiedLogin() {
               <input type="hidden" name="loginType" value="author" />
               
               <div>
-                <Label htmlFor="author-username">Username</Label>
+                <Label htmlFor="author-username">Username or Email</Label>
                 <Input
                   id="author-username"
                   name="username"
@@ -274,7 +299,7 @@ export default function UnifiedLogin() {
                   required
                   autoComplete="username"
                   className="mt-1"
-                  placeholder="Enter your username"
+                  placeholder="Enter your username or email"
                 />
               </div>
               

@@ -11,11 +11,12 @@ cloudinary.config({
 });
 
 // Interface for Cloudinary upload result
-// Interface for Cloudinary upload result
 interface CloudinaryUploadResult {
   url: string;
   publicId: string;
   secure_url?: string;
+  width?: number;
+  height?: number;
 }
 
 // Interface for parsed Markdown data
@@ -354,10 +355,44 @@ export async function uploadImage(file: File, publicId: string): Promise<Cloudin
     return {
       url: result.secure_url,
       publicId: result.public_id,
+      width: result.width,
+      height: result.height,
     };
   } catch (error) {
     console.error("Error uploading image to Cloudinary:", error);
     throw new Error("Failed to upload image to Cloudinary");
+  }
+}
+
+// Upload a generic file (PDF, etc)
+export async function uploadDocument(file: File, publicId: string, folder: string = "resume"): Promise<CloudinaryUploadResult> {
+  try {
+    const buffer = await file.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    const mimeType = file.type || "application/pdf";
+
+    // Force 'image' resource_type for PDFs.
+    // Cloudinary treats PDFs as images, which places them in the public 'image' bucket.
+    // The 'raw' bucket is restricted for new accounts ("Untrusted"), so we MUST avoid it.
+    const result = await cloudinary.uploader.upload(
+      `data:${mimeType};base64,${base64}`,
+      {
+        public_id: publicId,
+        folder: folder,
+        overwrite: true,
+        resource_type: "image" 
+      }
+    );
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      width: result.width,
+      height: result.height,
+    };
+  } catch (error) {
+    console.error("Error uploading document to Cloudinary:", error);
+    throw new Error("Failed to upload document to Cloudinary");
   }
 }
 

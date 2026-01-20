@@ -129,12 +129,16 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className={`underline transition-colors duration-200 ${link.name === "Privacy" || link.name === "Terms"
-                      ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
-                      : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
-                      }`}
+                    className={`group relative inline-block transition-colors duration-200 ${
+                      link.name === "Privacy" || link.name === "Terms"
+                        ? "text-indigo-800 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300"
+                        : "text-zinc-700 hover:text-indigo-600 dark:text-zinc-300 dark:hover:text-indigo-400"
+                    }`}
                   >
-                    {link.name}
+                    <span className="relative">
+                      {link.name}
+                      <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                    </span>
                   </Link>
                 </li>
               ))}

@@ -22,6 +22,7 @@ export interface CreatePostInput {
   price?: number;
   accessLevel?: string;
   featured?: boolean;
+  date?: string | Date; // Allow manual date override
 }
 
 export interface UpdatePostInput extends Partial<CreatePostInput> {
@@ -84,7 +85,7 @@ export async function createPost(input: CreatePostInput) {
       minuteRead: calculateReadingTime(input.content),
     },
     include: {
-      author: { select: { id: true, name: true, email: true } },
+      author: { select: { id: true, authorName: true, email: true } },
     }
   });
 }
@@ -114,7 +115,7 @@ export async function getPosts(options: GetPostsOptions = {}) {
       take: limit,
       orderBy: { date: 'desc' },
       include: {
-        author: { select: { id: true, name: true, email: true } },
+        author: { select: { id: true, authorName: true, email: true } },
       }
     }),
     prisma.post.count({ where })
@@ -130,7 +131,8 @@ export async function getPosts(options: GetPostsOptions = {}) {
 }
 
 // READ - Get single post by slug
-export async function getPostBySlug(slug: string) {
+// READ - Get single post by slug
+export async function findPostBySlug(slug: string) {
   return prisma.post.findUnique({
     where: { slug },
     include: {
@@ -148,7 +150,7 @@ export async function getPostById(id: string) {
   return prisma.post.findUnique({
     where: { id },
     include: {
-      author: { select: { id: true, name: true, email: true } },
+      author: { select: { id: true, authorName: true, email: true } },
     }
   });
 }
@@ -156,6 +158,8 @@ export async function getPostById(id: string) {
 // UPDATE - Update a post
 export async function updatePost(input: UpdatePostInput) {
   const { id, ...data } = input;
+  console.log(`[updatePost] Updating post ${id}. Data keys:`, Object.keys(data));
+  if ('date' in data) console.log(`[updatePost] New date value:`, data.date);
   
   // Recalculate reading time if content changed
   const updateData: Prisma.PostUpdateInput = { ...data };
@@ -178,7 +182,7 @@ export async function updatePost(input: UpdatePostInput) {
     where: { id },
     data: updateData,
     include: {
-      author: { select: { id: true, name: true, email: true } },
+      author: { select: { id: true, authorName: true, email: true } },
     }
   });
 }

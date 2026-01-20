@@ -35,6 +35,7 @@ function serializePost(post) {
       post.createdAt instanceof Date
         ? post.createdAt.toISOString()
         : post.createdAt,
+    date: post.date ? (post.date instanceof Date ? post.date.toISOString() : post.date) : null // Include date field
   };
 }
 
@@ -157,7 +158,11 @@ export default function ArticlesListPage() {
 
     // Sort by date (newest first)
     return filtered.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => {
+          const dateA = new Date(a.date || a.createdAt).getTime();
+          const dateB = new Date(b.date || b.createdAt).getTime();
+          return dateB - dateA;
+      }
     );
   }, [posts, searchTerm, selectedCategorySlug]);
 
@@ -206,7 +211,7 @@ export default function ArticlesListPage() {
   return (
     <div className="min-h-screen p-4">
       <motion.div
-        className="py-8 px-4 md:px-0 w-full max-w-3xl mx-auto"
+        className="py-8 px-4 md:px-0 md:w-[660px] w-full max-w-5xl"
         initial="hidden"
         animate="visible"
         variants={fadeIn}
@@ -321,7 +326,7 @@ export default function ArticlesListPage() {
 
                             <div className="flex items-center gap-2 text-xs md:text-sm text-zinc-500 dark:text-zinc-400 mt-1 md:mt-0">
                               <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-                              <span>{formatDate(post.createdAt)}</span>
+                              <span>{formatDate(post.date || post.createdAt)}</span>
                             </div>
                           </div>
                           {post.summary && (

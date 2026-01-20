@@ -3,7 +3,7 @@ import { useLoaderData, Link } from "@remix-run/react";
 import { motion } from "framer-motion";
 import { useTheme } from "~/Contexts/ThemeContext";
 import {
-  getPostBySlug,
+  findPostBySlug,
   getPosts,
 } from "~/Services/post.prisma.server";
 import { getCategories } from "~/Services/category.prisma.server";
@@ -13,6 +13,7 @@ import { proseClasses } from "~/styles/prose";
 import { useEffect } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   Clock,
   Eye,
   Calendar,
@@ -46,7 +47,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     throw new Response("Slug is required", { status: 400 });
   }
 
-  const post = await getPostBySlug(slug);
+  const post = await findPostBySlug(slug);
   if (!post) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -213,15 +214,20 @@ const MoreArticlesCards = ({ posts }: { posts: any[] }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-lg font-medium font-mono text-zinc-900 dark:text-zinc-100">
           More Articles
         </h2>
         <Link
           to="/blog/posts"
-          className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
+          className="group flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors"
         >
-          View all â†’
+          <span className="relative">
+            View all
+            <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+          </span>
+          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
 
@@ -247,9 +253,12 @@ const MoreArticlesCards = ({ posts }: { posts: any[] }) => {
             <div className="space-y-3">
               <Link
                 to={`/blog/post/${post.slug}`}
-                className="block text-base font-medium font-mono text-zinc-900 dark:text-zinc-100 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors line-clamp-2 leading-tight"
+                className="group block text-base font-medium font-mono text-zinc-900 dark:text-zinc-100 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors line-clamp-2 leading-tight"
               >
-                {post.title}
+                <span className="relative">
+                  {post.title}
+                  <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                </span>
               </Link>
 
               <p className="text-sm font-mono text-zinc-500 dark:text-zinc-400 line-clamp-3 leading-relaxed">
@@ -331,9 +340,13 @@ export default function PostPage() {
       <motion.div variants={fadeInUp}>
         <Link
           to="/blog/posts"
-          className="inline-flex mb-4 items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
+          className="group inline-flex mb-4 items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors"
         >
-          <ArrowLeft size={14} /> Articles
+          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> 
+          <span className="relative">
+             Articles
+             <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+          </span>
         </Link>
       </motion.div>
       
@@ -345,27 +358,31 @@ export default function PostPage() {
 
         {/* Minimalist Meta Line */}
         <div className="flex items-center gap-3 text-base text-zinc-500 dark:text-zinc-400 pb-8 border-b border-zinc-200 dark:border-zinc-700">
-          {author && (
             <a
               href="https://www.linkedin.com/in/ykinwork1"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors cursor-pointer flex items-center gap-1"
+              className="group hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors cursor-pointer flex items-center gap-1"
             >
               <Linkedin size={14} />
-              {author.name || "Anonymous"}
+              <span className="relative">
+                {author?.authorName || "Yahya"}
+                <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+              </span>
             </a>
-          )}
 
           <span>|</span>
-          <time dateTime={post.createdAt as any}>{formatDate(post.createdAt)}</time>
+          <time dateTime={(post.date || post.createdAt) as any}>{formatDate(post.date || post.createdAt)}</time>
           
            <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors ml-auto"
+            className="group flex items-center gap-1.5 text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors ml-auto"
           >
             <Share2 size={14} />
-            <span className="hidden sm:inline">Share</span>
+            <span className="hidden sm:inline relative">
+              Share
+               <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+            </span>
           </button>
         </div>
 
@@ -375,6 +392,17 @@ export default function PostPage() {
           </p>
         )}
 
+        {/* Cover Image */}
+        {post.coverImage && (
+          <div className="w-full overflow-hidden rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+             <img
+              src={post.coverImage}
+              alt={post.title}
+              className="w-full h-auto max-h-[60vh] object-cover"
+            />
+          </div>
+        )}
+
         {/* Categories & Tags */}
         {(post.categories?.length > 0 || post.tags?.length > 0) && (
           <div className="flex flex-wrap gap-3 text-xs">
@@ -382,18 +410,24 @@ export default function PostPage() {
               <Link
                 key={category.id}
                 to={`/blog/posts?category=${category.slug || category.id}`}
-                className="text-zinc-600 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
+                className="group text-zinc-600 dark:text-zinc-400 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors"
               >
-                {category.name}
+                <span className="relative">
+                  {category.name}
+                  <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                </span>
               </Link>
             ))}
             {post.tags?.map((tag: any) => (
               <Link
                 key={tag.id}
-                to={`/blog/posts?tag=${tag.id}`} // Tags usually filtered by ID or Name
-                className="text-zinc-500 dark:text-zinc-500 hover:text-indigo-700 dark:hover:text-indigo-400 hover:underline transition-colors"
+                to={`/blog/posts?tag=${tag.id}`} 
+                className="group text-zinc-500 dark:text-zinc-500 hover:text-indigo-700 dark:hover:text-indigo-400 transition-colors"
               >
-                #{tag.name}
+                <span className="relative">
+                  #{tag.name}
+                  <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                </span>
               </Link>
             ))}
           </div>

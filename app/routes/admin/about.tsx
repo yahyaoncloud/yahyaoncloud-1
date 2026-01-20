@@ -303,7 +303,7 @@ export default function AdminAbout() {
               <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <Layers size={20} className="text-purple-500" />
+                        <Layers size={20} className="text-indigo-500" />
                         <div>
                             <CardTitle className="text-lg">Projects</CardTitle>
                             <CardDescription>Showcase your work</CardDescription>
