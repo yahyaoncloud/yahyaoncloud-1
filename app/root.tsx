@@ -120,22 +120,22 @@ export default function App() {
   );
 }
 
-// export function ErrorBoundary() {
-//   const error = useRouteError();
-//   console.error("ErrorBoundary caught:", error);
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error("ErrorBoundary caught:", error);
 
-//   let status = 500;
-//   let message = "Something went wrong";
+  let status = 500;
+  let message = "Something went wrong";
 
-//   if (
-//     error &&
-//     typeof error === "object" &&
-//     "status" in error &&
-//     "statusText" in error
-//   ) {
-//     status = (error as any).status;
-//     message = (error as any).statusText;
-//   }
+  if (
+    error &&
+    typeof error === "object" &&
+    "status" in error &&
+    "statusText" in error
+  ) {
+    status = (error as any).status;
+    message = (error as any).statusText;
+  }
 
   return (
     <ThemeProvider>

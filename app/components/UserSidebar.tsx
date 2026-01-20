@@ -1,8 +1,7 @@
-// Sidebar.tsx
 import { motion } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
 import { Link, useRouteLoaderData } from "@remix-run/react";
-import { Mail, ChevronRight, Zap } from "lucide-react";
+import { Mail, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Author, ContactDetails, Post } from "../Types/types";
 import {
@@ -27,15 +26,14 @@ interface SidebarProps {
   className?: string;
 }
 
-interface RootLoaderData {
+type LoaderData = {
   data: {
     posts: Post[];
-    author: Author | null;
+    author: Author;
   };
-  message: string | null;
-  isEmpty: boolean;
-}
+};
 
+// Animation variants for consistent motion
 const containerVariants = {
   hidden: { opacity: 0, x: -20 },
   visible: {
@@ -65,37 +63,75 @@ const buttonVariants = {
   tap: { scale: 0.97 },
 };
 
-function convertContactDetailsToSocialLinks(contactDetails: ContactDetails): SocialLink[] {
+// Helper function to convert ContactDetails to SocialLinks
+function convertContactDetailsToSocialLinks(
+  contactDetails: ContactDetails
+): SocialLink[] {
   const socialLinks: SocialLink[] = [];
+
   if (contactDetails?.email) {
-    socialLinks.push({ id: "email", label: "Email", href: `mailto:${contactDetails.email}`, icon: Mail });
+    socialLinks.push({
+      id: "email",
+      label: "Email",
+      href: `mailto:${contactDetails.email}`,
+      icon: Mail,
+    });
   }
+
   if (contactDetails?.linkedin) {
-    socialLinks.push({ id: "linkedin", label: "LinkedIn", href: contactDetails.linkedin, icon: FaLinkedin });
+    socialLinks.push({
+      id: "linkedin",
+      label: "LinkedIn",
+      href: contactDetails.linkedin,
+      icon: FaLinkedin,
+    });
   }
+
   if (contactDetails?.github) {
-    socialLinks.push({ id: "github", label: "GitHub", href: contactDetails.github, icon: FaGithub });
+    socialLinks.push({
+      id: "github",
+      label: "GitHub",
+      href: contactDetails.github,
+      icon: FaGithub,
+    });
   }
+
   if (contactDetails?.twitter) {
-    socialLinks.push({ id: "twitter", label: "Twitter", href: contactDetails.twitter, icon: FaTwitter });
+    socialLinks.push({
+      id: "twitter",
+      label: "Twitter",
+      href: contactDetails.twitter,
+      icon: FaTwitter,
+    });
   }
+
   if (contactDetails?.website) {
-    socialLinks.push({ id: "website", label: "Website", href: contactDetails.website, icon: FaGlobe });
+    socialLinks.push({
+      id: "website",
+      label: "Website",
+      href: contactDetails.website,
+      icon: FaGlobe,
+    });
   }
   if (contactDetails?.buyCoffee) {
-    socialLinks.push({ id: "buyCoffee", label: "Buy Me Coffee", href: contactDetails.buyCoffee, icon: FaCoffee });
+    socialLinks.push({
+      id: "buyCoffee",
+      label: "Buy Me Coffee",
+      href: contactDetails.buyCoffee,
+      icon: FaCoffee,
+    });
   }
+
   return socialLinks;
 }
 
+// Safe data extraction with error handling
 function useSafeLoaderData() {
   try {
-    const loaderData = useRouteLoaderData<RootLoaderData>("routes/_user");
+    const loaderData = useRouteLoaderData<LoaderData>("routes/_user");
     return {
       posts: loaderData?.data?.posts || [],
-      author: loaderData?.data?.author?.contactDetails || null,
-      message: loaderData?.message || null,
-      isEmpty: loaderData?.isEmpty || false,
+      author: loaderData?.data?.author.contactDetails || null,
       hasError: false,
     };
   } catch (error) {
@@ -103,8 +139,6 @@ function useSafeLoaderData() {
     return {
       posts: [],
       author: null,
-      message: "Failed to load sidebar content",
-      isEmpty: true,
       hasError: true,
     };
   }
@@ -118,8 +152,15 @@ export default function Sidebar({
 }: SidebarProps) {
   const { theme } = useTheme();
   const [email, setEmail] = useState("");
-  const { posts: loaderPosts, author: loaderAuthor, message, isEmpty, hasError } = useSafeLoaderData();
 
+  // Safe data loading with error handling
+  const {
+    posts: loaderPosts,
+    author: loaderAuthor,
+    hasError,
+  } = useSafeLoaderData();
+
+  // Memoize the final data to avoid unnecessary recalculations
   const { recentPosts, socialLinks } = useMemo(() => {
     const finalRecentPosts =
       loaderPosts && loaderPosts.length > 0
@@ -135,44 +176,6 @@ export default function Sidebar({
       socialLinks: finalSocialLinks,
     };
   }, [loaderPosts, loaderAuthor, propRecentPosts, propSocialLinks]);
-
-  const renderNoPostsFallback = () => (
-    <motion.div
-      className="rounded-lg p-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
-      variants={cardVariants}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <motion.div
-        className="mb-4"
-        initial={{ y: 20 }}
-        animate={{ y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <Zap
-          size={32}
-          className={`mx-auto mb-3 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
-        />
-      </motion.div>
-      <motion.h3
-        className={`text-lg font-bold mb-3 text-center ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-        initial={{ y: 20 }}
-        animate={{ y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        {message || "No Posts Available"}
-      </motion.h3>
-      <motion.p
-        className={`text-sm text-center ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
-        initial={{ y: 20 }}
-        animate={{ y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        We're crafting new content. Subscribe below to stay updated!
-      </motion.p>
-    </motion.div>
-  );
 
   return (
     <motion.div
@@ -262,8 +265,6 @@ export default function Sidebar({
             ))}
           </div>
         </motion.div>
-      ) : (
-        isEmpty && renderNoPostsFallback()
       )}
 
       {/* Follow */}
