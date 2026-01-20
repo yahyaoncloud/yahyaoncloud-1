@@ -82,7 +82,13 @@ interface IPost extends Document {
   createdAt: Date;
   updatedAt: Date;
   commentsCount: number;
-  status: "draft" | "published";
+  status: "draft" | "published" | "scheduled" | "archived";
+  // Monetization fields
+  pricing: "free" | "paid" | "subscription";
+  price?: number;
+  accessLevel: "public" | "premium" | "exclusive";
+  featured: boolean;
+  downloadUrl?: string;
 }
 
 // interface ISEO extends Document {
@@ -98,6 +104,7 @@ interface IPortfolio extends Document {
   _id: Types.ObjectId;
   name: string;
   bio: string[];
+  location: string;
   portraitUrl: string;
   experiences: {
     title: string;
@@ -322,24 +329,115 @@ const PostSchema = new Schema<IPost>(
     likes: { type: Number, default: 0 },
     views: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
-    status: { type: String, enum: ["draft", "published"], default: "draft" },
-    // seo: {
-    //   title: { type: String, },
-    //   description: { type: String },
-    //   keywords: [{ type: String }],
-    //   canonicalUrl: { type: String },
-    //   createdAt: { type: String },
-    //   updatedAt: { type: String },
-    // },
+    status: { 
+      type: String, 
+      enum: ["draft", "published", "scheduled", "archived"], 
+      default: "draft" 
+    },
+    // Monetization fields
+    pricing: {
+      type: String,
+      enum: ["free", "paid", "subscription"],
+      default: "free"
+    },
+    price: {
+      type: Number,
+      min: [0, 'Price cannot be negative'],
+      validate: {
+        validator: function(this: IPost, v: number) {
+          // Price required only for paid content
+          if (this.pricing === 'paid') return v > 0;
+          return true;
+        },
+        message: 'Paid content must have a price greater than 0'
+      }
+    },
+    accessLevel: {
+      type: String,
+      enum: ["public", "premium", "exclusive"],
+      default: "public"
+    },
+    featured: { type: Boolean, default: false },
+    downloadUrl: { type: String },
   },
   { timestamps: true }
 );
 
+// Add indexes for better query performance
+PostSchema.index({ status: 1, date: -1 });
+PostSchema.index({ pricing: 1, accessLevel: 1 });
+PostSchema.index({ featured: 1, status: 1 });
+PostSchema.index({ 'categories': 1, status: 1 });
+PostSchema.index({ 'tags': 1, status: 1 });
+PostSchema.index({ authorId: 1, status: 1 });
+
+// Subscription Interface for content access
+interface ISubscription extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  tier: 'free' | 'premium' | 'exclusive';
+  status: 'active' | 'cancelled' | 'expired';
+  startDate: Date;
+  endDate?: Date;
+  paymentId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Subscription Schema
+const SubscriptionSchema = new Schema<ISubscription>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    tier: {
+      type: String,
+      enum: ['free', 'premium', 'exclusive'],
+      default: 'free'
+    },
+    status: {
+      type: String,
+      enum: ['active', 'cancelled', 'expired'],
+      default: 'active'
+    },
+    startDate: { type: Date, default: Date.now },
+    endDate: { type: Date },
+    paymentId: { type: String }
+  },
+  { timestamps: true }
+);
+
+SubscriptionSchema.index({ userId: 1, status: 1 });
+SubscriptionSchema.index({ tier: 1, status: 1 });
+
+// Purchase Interface for one-time content purchases
+interface IPurchase extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  postId: Types.ObjectId;
+  amount: number;
+  paymentId: string;
+  purchasedAt: Date;
+}
+
+// Purchase Schema
+const PurchaseSchema = new Schema<IPurchase>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    postId: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
+    amount: { type: Number, required: true, min: 0 },
+    paymentId: { type: String, required: true },
+    purchasedAt: { type: Date, default: Date.now }
+  },
+  { timestamps: true }
+);
+
+PurchaseSchema.index({ userId: 1, postId: 1 }, { unique: true });
+PurchaseSchema.index({ paymentId: 1 });
 
 const PortfolioSchema = new Schema<IPortfolio>(
   {
     name: { type: String, required: true },
     bio: [{ type: String, required: true }],
+    location: { type: String, required: false }, // Added location
     portraitUrl: { type: String, required: true },
     experiences: [
       {
@@ -526,7 +624,7 @@ const DraftSchema = new Schema<IDraftDoc>({
 // Indexes for better performance
 DraftSchema.index({ authorId: 1, updatedAt: -1 });
 DraftSchema.index({ sessionId: 1, updatedAt: -1 });
-DraftSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// DraftSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // Already defined in schema
 
 // Pre-save middleware to update the updatedAt field
 DraftSchema.pre('save', function (this: IDraftDoc, next) {
@@ -576,6 +674,71 @@ export const Draft: Model<IDraftDoc> = mongoose.models.Draft || mongoose.model<I
 // export const SEO: Model<ISEODoc> =
 //   mongoose.models.SEO || mongoose.model<ISEODoc>("SEO", SEOSchema);
 
+// Resume Interface
+interface IResume extends Document {
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
+  title: string;
+  htmlContent?: string;
+  pdfUrl?: string;
+  pdfData?: Buffer; // Binary data for direct DB storage
+  contentType?: string;
+  qrCodeUrl?: string;
+  fileName?: string;
+  version: number;
+  isActive: boolean;
+  metadata: {
+    theme: string;
+    lastPdfGenerated?: Date;
+    lastQrGenerated?: Date;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
 
+// Resume Schema
+const ResumeSchema = new Schema<IResume>(
+  {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: false }, // Optional for single-user blog
+    title: {
+      type: String,
+      required: [true, 'Resume title is required'],
+      trim: true,
+      maxlength: [100, 'Title cannot exceed 100 characters'],
+      default: 'My Resume'
+    },
+    htmlContent: {
+      type: String,
+      required: false, // Changed to optional as we support PDF-only uploads
+    },
+    pdfUrl: { type: String },
+    pdfData: { type: Buffer }, // New field
+    contentType: { type: String, default: 'application/pdf' }, // New field
+    qrCodeUrl: { type: String },
+    fileName: { type: String },
+    version: { type: Number, default: 1 },
+    isActive: { type: Boolean, default: true },
+    metadata: {
+      theme: { type: String, default: 'default' },
+      lastPdfGenerated: { type: Date },
+      lastQrGenerated: { type: Date }
+    }
+  },
+  { timestamps: true }
+);
 
+// Indexes for Resume
+ResumeSchema.index({ userId: 1, isActive: 1 });
+ResumeSchema.index({ version: -1 });
+ResumeSchema.index({ isActive: 1 });
 
+export const Resume: Model<IResume> =
+  mongoose.models.Resume || mongoose.model<IResume>('Resume', ResumeSchema);
+
+export const Subscription: Model<ISubscription> =
+  mongoose.models.Subscription || mongoose.model<ISubscription>('Subscription', SubscriptionSchema);
+
+export const Purchase: Model<IPurchase> =
+  mongoose.models.Purchase || mongoose.model<IPurchase>('Purchase', PurchaseSchema);
+
+export type { IResume, ISubscription, IPurchase, IPost };

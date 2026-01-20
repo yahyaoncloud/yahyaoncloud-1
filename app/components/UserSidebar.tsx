@@ -247,7 +247,7 @@ export default function Sidebar({
               >
                 <Link
                   to={`/blog/post/${post.slug}`}
-                  className={`flex items-center justify-between px-2.5 py-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 text-xs font-medium ${theme === "dark"
+                  className={`flex items-center justify-between px-2.5 py-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-indigo-100/50 dark:hover:from-indigo-900/30 dark:hover:to-indigo-900/30 transition-all duration-300 text-xs font-medium ${theme === "dark"
                     ? "text-zinc-300 hover:text-white"
                     : "text-zinc-700 hover:text-indigo-800"
                     }`}
@@ -285,7 +285,7 @@ export default function Sidebar({
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center justify-center p-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-purple-100/50 dark:hover:from-indigo-900/30 dark:hover:to-purple-900/30 transition-all duration-300 ${theme === "dark"
+                  className={`flex items-center justify-center p-2 rounded-md border border-zinc-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-zinc-100/50 to-white/50 dark:from-zinc-700/30 dark:to-zinc-800/30 hover:bg-gradient-to-r hover:from-indigo-100/50 hover:to-indigo-100/50 dark:hover:from-indigo-900/30 dark:hover:to-indigo-900/30 transition-all duration-300 ${theme === "dark"
                     ? "text-zinc-300 hover:text-white"
                     : "text-zinc-700 hover:text-indigo-800"
                     }`}

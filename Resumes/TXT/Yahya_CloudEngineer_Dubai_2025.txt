@@ -1,0 +1,83 @@
+YAHYA
+Cloud Engineer  |  AWS & Azure Certified  |  DevOps & Infrastructure Specialist
+
+Phone: +91 8096278589  |  Email: ykinwork1@gmail.com  |  LinkedIn: linkedin.com/in/ykinwork1
+Location: Hyderabad, India  |  Relocation: Open to Dubai, UAE
+
+Professional Summary
+
+Cloud Engineer with 3+ years of experience designing, deploying, and optimizing cloud infrastructure on AWS and Azure. Proven track record in cloud migrations, cost optimization (35%+ savings), CI/CD pipeline automation, and maintaining 99.5% uptime for production workloads. Recently delivered AWS infrastructure for a Riyadh-based ride-hailing platform serving 8,000+ users. Eager to contribute to UAE's digital transformation initiatives in a challenging Cloud/DevOps role.
+
+Certifications
+
+ |  Certification  |  Provider  | 
+---------- | 
+ |  AWS Solutions Architect Associate (SAA-C03)  |  Amazon Web Services  | 
+ |  Azure Solutions Architect Expert (AZ-305)  |  Microsoft  | 
+ |  Azure Fundamentals (AZ-900)  |  Microsoft  | 
+ |  Cisco Certified Network Professional (CCNP)  |  Cisco  | 
+ |  Cisco Certified Network Associate (CCNA)  |  Cisco  | 
+
+Technical Skills
+
+ |  Category  |  Technologies  | 
+------------- | 
+ |  Cloud Platforms  |  AWS (ECS, EC2, VPC, Route 53, CloudFront, CodePipeline, Secrets Manager, ALB/NLB, RDS, S3), Azure (VNets, Virtual WAN, Peering)  | 
+ |  Containers & Orchestration  |  Docker, Kubernetes, ECS Fargate, Argo CD  | 
+ |  Infrastructure as Code  |  Terraform, Ansible, CloudFormation  | 
+ |  CI/CD  |  AWS CodePipeline, CodeBuild, CodeDeploy, Jenkins, Git/GitHub  | 
+ |  Monitoring & Security  |  CloudWatch, Prometheus, Grafana, GuardDuty, AWS Config, IAM  | 
+ |  Scripting  |  Python, Bash, Go, YAML  | 
+ |  Databases  |  PostgreSQL, RDS, DynamoDB  | 
+
+Professional Experience
+
+Cloud Engineer
+Minute KSA  |  Riyadh, Saudi Arabia  |  Nov 2024 – Present
+• Architected and maintained AWS infrastructure for production ride-hailing platform with ~8,000 users, achieving 99.5% uptime during peak traffic
+• Led cloud migration from Mobily Cloud to AWS: PostgreSQL databases, Spring Boot & Remix.js applications, and CI/CD pipelines with zero data loss
+• Reduced cloud costs by 35% through Fargate task optimization, S3 Infrequent Access tiering, and API call auditing
+• Managed Infrastructure as Code using Terraform with Git-based workflows and Argo CD deployments
+• Implemented blue/green deployments on ECS via AWS CodeDeploy with post-deployment monitoring
+• Configured Application Load Balancers with target groups, listener rules, and health checks for high availability
+• Integrated Google Maps APIs with secure key management via AWS Secrets Manager
+• Executed security hardening: IAM policy reviews, GuardDuty threat detection, and AWS Config compliance
+• Established centralized logging with CloudWatch and ELK Stack for proactive alerting
+• Managed RDS PostgreSQL with Multi-AZ failover, automated backups, and performance tuning
+• Automated infrastructure provisioning with Terraform modules, reducing deployment time by 60%
+• Configured CloudFront distributions for static content delivery with custom SSL certificates via ACM
+• Implemented cost monitoring dashboards using CloudWatch metrics and AWS Cost Explorer
+• Collaborated with development team on containerization strategies using Docker and ECS task definitions
+
+Network Infrastructure Engineer
+Fabee Technologies  |  Hyderabad, India  |  Jun 2022 – Sep 2024
+• Delivered L2/L3 Azure cloud support via Jira Service Management with 95% SLA compliance
+• Designed Azure VNets, VNet peering, and Virtual WAN hubs, improving cross-region connectivity by 20%
+• Configured site-to-site VPNs with IPsec tunnels between Azure and FortiGate/Cisco firewalls
+• Built OSPF adjacency and tuned BGP sessions for hybrid cloud routing optimization
+• Deployed Cisco Catalyst SD-WAN Edge Routers, reducing SaaS workload latency by 15%
+• Supported Microsoft O365 enterprise environments (Exchange Online, SharePoint, Teams)
+• Managed FortiGate NGFW with IPS/IDS policies, NAT/PAT rules, and security profiles
+• Implemented VLAN segmentation, 802.1Q trunking, and EtherChannel for network redundancy
+• Configured Azure ExpressRoute and VPN Gateway for hybrid cloud connectivity
+• Administered VMware vSphere environments including VM provisioning and snapshot management
+• Set up network monitoring with Azure Monitor, Syslog, and FortiAnalyzer for proactive alerting
+• Participated in change management processes and documented network configurations
+• Provided 24/7 on-call support for critical network incidents and outages
+• Trained junior engineers on network troubleshooting methodologies and best practices
+
+Education
+
+Bachelor of Technology – Computer Science Engineering
+Global Institute of Engineering & Technology  |  2018 – 2022
+Coursework: Cloud Computing, Computer Networks, Cryptography & Network Security
+
+Languages
+• English: Proficient
+• Arabic: Basic (Conversational)
+• Hindi: Native
+
+Additional
+• GCC Experience: 1+ year working with Saudi Arabia-based company
+• Visa Status: Ready to relocate; eligible for UAE Employment Visa
+• Interests: Cloud cost optimization, infrastructure automation, GITEX technology events

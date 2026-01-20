@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import matter from "gray-matter";
 import { Readable } from "stream";
-import { getRedis } from "./redis.server";
+import { getLocalCache } from "./local-cache.server";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -12,14 +12,18 @@ cloudinary.config({
 
 // Interface for Cloudinary upload result
 interface CloudinaryUploadResult {
-  secure_url: string;
-  public_id: string;
+  url: string;
+  publicId: string;
+  secure_url?: string;
+  width?: number;
+  height?: number;
 }
 
 // Interface for parsed Markdown data
 interface ParsedMarkdown {
   slug: string;
   content: string;
+  galleryUrls?: string[]; // Added galleryUrls to return from parse
   frontmatter: {
     title?: string;
     categories?: string[];
@@ -29,10 +33,7 @@ interface ParsedMarkdown {
   };
 }
 
-// Utility to convert File to Readable stream
-function fileToStream(file: File): Readable {
-  return Readable.from(Buffer.from(new Uint8Array(file.arrayBuffer())));
-}
+
 
 // Utility to generate slug from title
 function generateSlug(title: string): string {
@@ -40,36 +41,6 @@ function generateSlug(title: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-}
-
-// Client Stamp Upload
-export async function uploadStampToCloudinary(file: File, clientName: string, serial: string): Promise<CloudinaryUploadResult> {
-  const safeName = clientName.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9-_]/g, "");
-  const publicId = `${safeName}_${serial}_stamp`;
-
-  try {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const base64 = buffer.toString("base64");
-    const ext = file.name.split(".").pop() || "svg";
-
-    const result = await cloudinary.uploader.upload(
-      `data:image/${ext};base64,${base64}`,
-      {
-        folder: "",
-        public_id: publicId,
-        resource_type: "auto",
-        overwrite: true,
-      }
-    );
-
-    return {
-      url: result.secure_url,
-      publicId: result.public_id,
-    };
-  } catch (err) {
-    console.error("Cloudinary upload failed for stamp:", err);
-    throw new Error("Failed to upload stamp to Cloudinary");
-  }
 }
 
 // Parse Markdown and Process Images
@@ -80,28 +51,35 @@ export async function parseMarkdownWithCloudinary(slug: string, markdownFile: Fi
     const { content, data } = matter(raw);
 
     // Replace local image refs inside Markdown
-    const imgRegex = /!\[.*?\]\((.*?)\)/g;
+    const imgRegex = /!\[(.*?)\]\((.*?)\)/g;
     let newContent = content;
     const uploadedImages: Map<string, string> = new Map();
+    const uploadedUrls: string[] = [];
 
     // Upload gallery images and map their filenames to Cloudinary URLs
     if (galleryImages.length > 0) {
       for (let i = 0; i < galleryImages.length; i++) {
         const img = galleryImages[i];
-        const ext = img.name.split(".").pop();
-        const publicId = `${slug}-gallery${i + 1}`;
+        // Use consistent naming with dash
+        const publicId = `${slug}-gallery-${i + 1}`;
         const uploaded = await uploadImage(img, `posts/${slug}/gallery/${publicId}`);
         uploadedImages.set(img.name, uploaded.url);
+        uploadedUrls.push(uploaded.url);
       }
 
       // Replace local image paths with Cloudinary URLs
-      newContent = content.replace(imgRegex, (match, localPath) => {
+      newContent = content.replace(imgRegex, (match, altText, localPath) => {
         const fileName = localPath.split("/").pop() || "";
-        const cloudinaryUrl = uploadedImages.get(fileName);
+        // Decode URI to handle spaces in filenames matching
+        const decodedFileName = decodeURIComponent(fileName);
+        
+        // Try exact match or decoded match
+        const cloudinaryUrl = uploadedImages.get(fileName) || uploadedImages.get(decodedFileName);
+        
         if (cloudinaryUrl) {
-          return match.replace(localPath, cloudinaryUrl);
+          return `![${altText}](${cloudinaryUrl})`;
         }
-        console.warn(`Image not found in gallery: ${localPath}`);
+        // console.warn(`Image not found in gallery: ${localPath}`);
         return match; // Skip if no matching image
       });
     }
@@ -110,6 +88,7 @@ export async function parseMarkdownWithCloudinary(slug: string, markdownFile: Fi
       slug,
       frontmatter: data,
       content: newContent, // Content with Cloudinary URLs
+      galleryUrls: uploadedUrls
     };
   } catch (error) {
     console.error("Error parsing Markdown with Cloudinary:", error);
@@ -130,7 +109,7 @@ export async function uploadPostResources(
   parsedMarkdown: ParsedMarkdown;
 }> {
   try {
-    // Parse Markdown and process images
+    // Parse Markdown and process images (Uploads happen here!)
     const parsedMarkdown = await parseMarkdownWithCloudinary(slug, markdownFile, galleryImages);
 
     // Upload Markdown file with updated content
@@ -153,15 +132,9 @@ export async function uploadPostResources(
       coverImageUrl = uploaded.url;
     }
 
-    // Upload gallery images (already uploaded in parseMarkdownWithCloudinary)
-    const galleryUrls: string[] = [];
-    if (galleryImages.length > 0) {
-      for (let i = 0; i < galleryImages.length; i++) {
-        const publicId = `${slug}-gallery-${i + 1}`;
-        const url = (await uploadImage(galleryImages[i], `posts/${slug}/gallery/${publicId}`)).url;
-        galleryUrls.push(url);
-      }
-    }
+    // Use URLs returned from parseMarkdownWithCloudinary
+    const galleryUrls: string[] = parsedMarkdown.galleryUrls || [];
+    // Redundant loop removed here.
 
     return {
       contentUrl: markdownResult.secure_url,
@@ -220,18 +193,33 @@ export async function getPostResources(slug: string): Promise<{
 // Read: Retrieve raw Markdown content from Cloudinary
 export async function getMarkdownContent(slug: string, publicId?: string): Promise<string> {
   try {
-    const redis = await getRedis();
     const cacheKey = `markdown:${slug}:${publicId || slug}`;
-    const cached = await redis.get(cacheKey);
-    if (cached) return cached;
+    
+    // Try local cache first
+    try {
+      const cache = getLocalCache();
+      const cached = await cache.get(cacheKey);
+      if (cached) return cached;
+    } catch (cacheError) {
+      console.warn('Cache unavailable, fetching directly from Cloudinary');
+    }
 
+    // Fetch from Cloudinary
     const path = publicId || `posts/${slug}/${slug}-index`;
     const response = await fetch(`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/raw/upload/${path}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch Markdown content for ${path}`);
     }
     const content = await response.text();
-    await redis.set(cacheKey, content, 'EX', 3600); // Cache for 1 hour
+    
+    // Try to cache locally (ignore errors)
+    try {
+      const cache = getLocalCache();
+      await cache.set(cacheKey, content, 3600); // Cache for 1 hour
+    } catch (cacheError) {
+      // Silently ignore cache errors
+    }
+    
     return content;
   } catch (error) {
     console.error(`Error fetching Markdown content for slug ${slug}:`, error);
@@ -249,6 +237,7 @@ export async function updatePostResources(
   contentUrl?: string;
   coverImageUrl?: string;
   galleryUrls: string[];
+  parsedContent?: string;
 }> {
   try {
     let contentUrl: string | undefined;
@@ -259,8 +248,16 @@ export async function updatePostResources(
     const existingResources = await getPostResources(slug);
 
     // Update Markdown file
+    let parsedMarkdownContent: string | undefined;
     if (markdownFile && markdownFile.size > 0) {
       const parsedMarkdown = await parseMarkdownWithCloudinary(slug, markdownFile, galleryImages);
+      parsedMarkdownContent = parsedMarkdown.content;
+      
+      // Add newly uploaded gallery URLs from parse
+      if (parsedMarkdown.galleryUrls) {
+          galleryUrls.push(...parsedMarkdown.galleryUrls);
+      }
+
       const markdownBuffer = Buffer.from(parsedMarkdown.content);
       const markdownResult = await cloudinary.uploader.upload(
         `data:text/markdown;base64,${markdownBuffer.toString("base64")}`,
@@ -274,6 +271,12 @@ export async function updatePostResources(
       contentUrl = markdownResult.secure_url;
     } else {
       contentUrl = existingResources.contentUrl;
+      // If we didn't parse markdown but have new gallery images?
+      // parseMarkdownWithCloudinary is ONLY called if markdownFile is provided.
+      // If user ONLY adds an image but doesn't change content (rare in logic, as we synthesise markdown file from content string usually).
+      // Logic in Action: `const markdownFile = new File([markdownBlob], "content.md", ...)`
+      // So markdownFile is ALWAYS provided in our Update Action.
+      // So this branch runs always.
     }
 
     // Update cover image
@@ -284,20 +287,14 @@ export async function updatePostResources(
       coverImageUrl = existingResources.coverImageUrl;
     }
 
-    // Handle gallery images
-    if (galleryImages.length > 0) {
-      for (let i = 0; i < galleryImages.length; i++) {
-        const publicId = `${slug}-gallery-${i + 1}`;
-        const uploaded = await uploadImage(galleryImages[i], `posts/${slug}/gallery/${publicId}`);
-        galleryUrls.push(uploaded.url);
-      }
-    } else {
-      if (existingResources.galleryUrls) {
-        galleryUrls.push(...existingResources.galleryUrls.filter(url => {
-          const publicId = url.match(/\/posts\/[^/]+\/gallery\/(.+)$/i)?.[1];
-          return !deleteGalleryImages.includes(publicId || "");
-        }));
-      }
+    // Existing logic was re-uploading loop. We rely on parsedMarkdown.galleryUrls now.
+    // Preserving existing gallery URLs not in delete list
+    if (existingResources.galleryUrls) {
+      galleryUrls.push(...existingResources.galleryUrls.filter(url => {
+        const publicId = url.match(/\/posts\/[^/]+\/gallery\/(.+)$/i)?.[1];
+        // Don't include if deleted
+        return !deleteGalleryImages.includes(publicId || "");
+      }));
     }
 
     // Delete specified gallery images
@@ -315,6 +312,7 @@ export async function updatePostResources(
         const indexB = parseInt(b.match(/gallery-(\d+)/)?.[1] || "0");
         return indexA - indexB;
       }),
+      parsedContent: parsedMarkdownContent
     };
   } catch (error) {
     console.error("Error updating post resources:", error);
@@ -348,7 +346,7 @@ export async function uploadImage(file: File, publicId: string): Promise<Cloudin
     const result = await cloudinary.uploader.upload(
       `data:image/${ext};base64,${base64}`,
       {
-        folder: "posts",
+        // folder: "posts", // Removed to rely on public_id structure
         public_id: publicId,
         overwrite: true,
       }
@@ -357,10 +355,44 @@ export async function uploadImage(file: File, publicId: string): Promise<Cloudin
     return {
       url: result.secure_url,
       publicId: result.public_id,
+      width: result.width,
+      height: result.height,
     };
   } catch (error) {
     console.error("Error uploading image to Cloudinary:", error);
     throw new Error("Failed to upload image to Cloudinary");
+  }
+}
+
+// Upload a generic file (PDF, etc)
+export async function uploadDocument(file: File, publicId: string, folder: string = "resume"): Promise<CloudinaryUploadResult> {
+  try {
+    const buffer = await file.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    const mimeType = file.type || "application/pdf";
+
+    // Force 'image' resource_type for PDFs.
+    // Cloudinary treats PDFs as images, which places them in the public 'image' bucket.
+    // The 'raw' bucket is restricted for new accounts ("Untrusted"), so we MUST avoid it.
+    const result = await cloudinary.uploader.upload(
+      `data:${mimeType};base64,${base64}`,
+      {
+        public_id: publicId,
+        folder: folder,
+        overwrite: true,
+        resource_type: "image" 
+      }
+    );
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+      width: result.width,
+      height: result.height,
+    };
+  } catch (error) {
+    console.error("Error uploading document to Cloudinary:", error);
+    throw new Error("Failed to upload document to Cloudinary");
   }
 }
 

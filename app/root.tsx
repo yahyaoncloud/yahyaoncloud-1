@@ -74,7 +74,7 @@ function RootLayout() {
   }, []);
 
   return (
-    <html lang="en" className={theme === "dark" ? "dark" : ""}>
+    <html lang="en" className={theme === "dark" ? "dark" : ""} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -96,10 +96,10 @@ function RootLayout() {
       </head>
 
       <body
-        className={`dark:bg-zinc-900 dark:text-dark-100 bg-zinc-50 text-dark-800 min-h-screen transition-colors duration-300`}
+        className={`dark:bg-zinc-900 dark:text-zinc-100 bg-zinc-50 text-zinc-800 min-h-screen transition-colors duration-300`}
       >
         <Outlet />
-        <Toaster position="top-right" richColors />
+        <Toaster position="top-right" richColors theme={theme as "light" | "dark" | "system"} />
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
