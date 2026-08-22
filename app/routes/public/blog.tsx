@@ -13,18 +13,19 @@ export default function BlogIndex() {
   return (
     <div className="space-y-8 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Blog Posts List with Hairline Connectors */}
-      <div className="space-y-4">
+      <div className="space-y-3.5">
         {posts.map((post: BlogPost) => (
           <div key={post.slug} className="group">
             <Link
               to={`/blog/${post.slug}`}
-              className="flex items-baseline justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
+              className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-3 min-w-0"
+              title={post.title}
             >
-              <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 shrink-0 text-[15px] md:text-base">
+              <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-[15px] md:text-base truncate min-w-0">
                 {post.title}
               </span>
-              <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 mx-2 md:mx-3" />
-              <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0">
+              <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
+              <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
                 {post.displayDate}
               </span>
             </Link>

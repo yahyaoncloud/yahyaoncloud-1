@@ -113,14 +113,14 @@ export default function Index() {
 
                 {/* Accordion Row */}
                 <div
-                  className={`overflow-hidden rounded-lg transition-colors ${
+                  className={`overflow-hidden rounded-lg transition-colors min-w-0 ${
                     isOpen ? "bg-zinc-50/80 dark:bg-zinc-900/60" : "hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30"
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => toggleExperience(idx)}
-                    className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all"
+                    className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all min-w-0"
                   >
                     <ChevronRight
                       size={15}
@@ -128,10 +128,10 @@ export default function Index() {
                         isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
                       }`}
                     />
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 shrink-0 text-sm md:text-[15px]">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-sm md:text-[15px]">
                       {exp.company}
                     </span>
-                    <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 mx-2" />
+                    <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[16px] shrink-0" />
                     <span className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm shrink-0">
                       {exp.role}
                     </span>
@@ -209,10 +209,11 @@ export default function Index() {
         <div className="space-y-5">
           {featuredProjects.map((project) => (
             <div key={project.slug} className="space-y-1 group">
-              <div className="flex items-baseline justify-between gap-2">
+              <div className="flex items-baseline justify-between gap-2 min-w-0">
                 <Link
                   to={`/projects/${project.slug}`}
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm md:text-base"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm md:text-base truncate"
+                  title={project.title}
                 >
                   {project.title}
                 </Link>
@@ -276,13 +277,14 @@ export default function Index() {
               <div key={post.slug} className="group">
                 <Link
                   to={`/blog/${post.slug}`}
-                  className="flex items-baseline justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
+                  className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-3 min-w-0"
+                  title={post.title}
                 >
-                  <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 shrink-0 text-sm md:text-base">
+                  <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base truncate min-w-0">
                     {post.title}
                   </span>
-                  <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 mx-2 md:mx-3" />
-                  <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0">
+                  <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
+                  <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
                     {post.displayDate}
                   </span>
                 </Link>
@@ -309,10 +311,11 @@ export default function Index() {
         <div className="space-y-4">
           {featuredResearch.map((paper) => (
             <div key={paper.slug} className="space-y-1">
-              <div className="flex items-baseline justify-between gap-2">
+              <div className="flex items-baseline justify-between gap-2 min-w-0">
                 <Link
                   to="/research"
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm md:text-base"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm md:text-base truncate"
+                  title={paper.title}
                 >
                   {paper.title}
                 </Link>
