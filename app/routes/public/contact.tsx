@@ -1,56 +1,32 @@
-import { useState } from "react";
+import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { Form, useActionData, useNavigation } from "@remix-run/react";
+import { createContactMessage } from "~/Services/content.server";
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const name = String(formData.get("name") || "").trim();
+  const email = String(formData.get("email") || "").trim();
+  const message = String(formData.get("message") || "").trim();
+
+  if (name.length < 2) {
+    return json({ error: "Please enter your name." }, { status: 400 });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return json({ error: "Please enter a valid email address." }, { status: 400 });
+  }
+  if (message.length < 8) {
+    return json({ error: "Message must be at least 8 characters long." }, { status: 400 });
+  }
+
+  await createContactMessage({ name, email, message });
+
+  return json({ success: true, message: "Thank you. Your message has been received." });
+}
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [status, setStatus] = useState<{ type: "success" | "error" | ""; message: string }>({
-    type: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    if (formData.name.trim().length < 2) {
-      setStatus({ type: "error", message: "Please enter your name." });
-      setIsSubmitting(false);
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setStatus({ type: "error", message: "Please enter a valid email address." });
-      setIsSubmitting(false);
-      return;
-    }
-    if (formData.message.trim().length < 8) {
-      setStatus({ type: "error", message: "Message must be at least 8 characters long." });
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Simulate sending message
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    setStatus({
-      type: "success",
-      message: "Thank you. Your message has been received.",
-    });
-
-    setFormData({ name: "", email: "", message: "" });
-    setIsSubmitting(false);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-    if (status.message) setStatus({ type: "", message: "" });
-  };
+  const actionData = useActionData<{ success?: boolean; message?: string; error?: string }>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   const contactLinks = [
     { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
@@ -103,7 +79,7 @@ export default function ContactPage() {
           Send a Message
         </h2>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <Form method="post" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label htmlFor="name" className="block text-xs md:text-sm font-mono text-zinc-500">
@@ -114,8 +90,6 @@ export default function ContactPage() {
                 name="name"
                 type="text"
                 required
-                value={formData.name}
-                onChange={handleChange}
                 placeholder="Alex Morgan"
                 className="w-full px-3 py-2 rounded-lg text-sm md:text-base bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors"
               />
@@ -130,8 +104,6 @@ export default function ContactPage() {
                 name="email"
                 type="email"
                 required
-                value={formData.email}
-                onChange={handleChange}
                 placeholder="alex@company.com"
                 className="w-full px-3 py-2 rounded-lg text-sm md:text-base bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors"
               />
@@ -147,33 +119,37 @@ export default function ContactPage() {
               name="message"
               rows={4}
               required
-              value={formData.message}
-              onChange={handleChange}
               placeholder="Your note..."
               className="w-full px-3 py-2 rounded-lg text-sm md:text-base bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors resize-none"
             />
           </div>
 
-          {status.message && (
+          {actionData?.message && (
             <div
               className={`p-2.5 rounded text-xs md:text-sm ${
-                status.type === "success"
+                actionData.success
                   ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800"
                   : "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900"
               }`}
             >
-              <span>{status.message}</span>
+              <span>{actionData.message}</span>
+            </div>
+          )}
+
+          {actionData?.error && (
+            <div className="p-2.5 rounded text-xs md:text-sm bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900">
+              <span>{actionData.error}</span>
             </div>
           )}
 
           <button
             type="submit"
-            disabled={isSubmitting || !formData.name || !formData.email || !formData.message}
+            disabled={isSubmitting}
             className="px-4 py-2 rounded-lg text-xs md:text-sm font-medium bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? "Sending..." : "Send Message →"}
           </button>
-        </form>
+        </Form>
       </section>
     </div>
   );

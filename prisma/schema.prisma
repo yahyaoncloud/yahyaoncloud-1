@@ -127,6 +127,63 @@ model Purchase {
   updatedAt DateTime @updatedAt
 }
 
+model ProjectCaseStudy {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String   @unique
+  title       String
+  category    String
+  period      String
+  role        String
+  summary     String
+  techStack   String[]
+  content     String
+  demoUrl     String?
+  githubUrl   String?
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ResearchPaper {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String   @unique
+  title       String
+  authors     String[]
+  venue       String
+  year        String
+  abstract    String
+  pdfUrl      String?
+  doi         String?
+  tags        String[]
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  content     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProfileInfo {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  key         String   @unique @default("homepage_profile")
+  headline    String
+  bio         String[]
+  experiences Json?    // Array of { year, present, company, role, description, projects }
+  skills      String[]
+  socialLinks Json?    // Array of { label, href, display, external }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
 model Linktree {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   displayName    String
@@ -220,4 +277,3 @@ model LinktreeScan {
   referrer  String?
   createdAt DateTime   @default(now())
 }
-

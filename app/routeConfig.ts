@@ -60,11 +60,11 @@ export const routes = (defineRoutes: any) => {
       
       // Resumes
       route("resumes", "routes/admin/resumes.tsx");
-      route("assets", "routes/admin/assets.tsx"); // PDF Assets Manager
+      route("assets", "routes/admin/assets.tsx");
       route("logout", "routes/admin/logout.tsx");
     });
 
-    // Author Portal
+    // Author Portal (Layout: authors/layout.tsx)
     route("authors", "routes/authors/layout.tsx", () => {
       route("", "routes/authors/dashboard.tsx", { index: true });
       route("dashboard", "routes/authors/dashboard.tsx", { id: "authors-dashboard-alias" });
@@ -78,8 +78,14 @@ export const routes = (defineRoutes: any) => {
       route("logout", "routes/authors/logout.tsx");
     });
 
-    // Auth & API (Root Level / Layoutless)
-    route("login", "routes/login.tsx");
+    // Auth Portal (Layout: auth/layout.tsx)
+    route("login", "routes/auth/layout.tsx", () => {
+      route("", "routes/login.tsx", { index: true });
+    });
+    route("auth", "routes/auth/layout.tsx", { id: "auth-portal-group" }, () => {
+      route("login", "routes/login.tsx", { id: "auth-login-alias" });
+      route("portal", "routes/login.tsx", { id: "auth-portal-alias" });
+    });
     
     // API Routes are Resource Routes (no layout)
     route("api/upload-image", "routes/api/upload-image.tsx");
