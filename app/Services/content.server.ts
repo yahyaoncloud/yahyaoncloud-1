@@ -98,37 +98,12 @@ function formatDateToDisplay(dateStr: string): string {
 // ----------------------------------------------------
 
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
-  try {
-    // Try Prisma DB first
-    const dbPosts = await prisma.post.findMany({
-      where: { status: "published" },
-      orderBy: { date: "desc" },
-      include: { author: true, tags: true },
-    }).catch(() => []);
+  const postsMap = new Map<string, BlogPost>();
 
-    if (dbPosts && dbPosts.length > 0) {
-      return dbPosts.map((p) => ({
-        title: p.title,
-        slug: p.slug,
-        date: p.date.toISOString().split("T")[0],
-        displayDate: formatDateToDisplay(p.date.toISOString()),
-        summary: p.summary || "",
-        tags: p.tags.map((t) => t.name),
-        author: p.author?.authorName || "@yahyaoncloud",
-        featured: p.featured,
-        order: 1,
-        content: p.content,
-      }));
-    }
-  } catch (err) {
-    console.warn("DB posts retrieval notice:", err);
-  }
-
-  // Fallback to local markdown files
+  // 1. Read local markdown files
   try {
     ensureDirectoryExists(BLOG_DIR);
     const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
-    const posts: BlogPost[] = [];
 
     for (const file of files) {
       const filePath = path.join(BLOG_DIR, file);
@@ -137,10 +112,11 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
 
       const defaultSlug = file.replace(/\.md$/, "");
       const rawDate = data.date ? String(data.date) : "2024-01-01";
+      const slug = data.slug || defaultSlug;
 
-      posts.push({
+      postsMap.set(slug, {
         title: data.title || "Untitled Article",
-        slug: data.slug || defaultSlug,
+        slug,
         date: rawDate,
         displayDate: data.displayDate || formatDateToDisplay(rawDate),
         summary: data.summary || "",
@@ -151,12 +127,41 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
         content: content.trim(),
       });
     }
-
-    return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   } catch (error) {
-    console.error("Error reading blog posts:", error);
-    return [];
+    console.error("Error reading blog posts from disk:", error);
   }
+
+  // 2. Read from Prisma DB and overlay/add
+  try {
+    const dbPosts = await prisma.post.findMany({
+      where: { status: "published" },
+      orderBy: { date: "desc" },
+      include: { author: true, tags: true },
+    }).catch(() => []);
+
+    if (dbPosts && dbPosts.length > 0) {
+      for (const p of dbPosts) {
+        postsMap.set(p.slug, {
+          title: p.title,
+          slug: p.slug,
+          date: p.date.toISOString().split("T")[0],
+          displayDate: formatDateToDisplay(p.date.toISOString()),
+          summary: p.summary || "",
+          tags: p.tags.map((t) => t.name),
+          author: p.author?.authorName || "@yahyaoncloud",
+          featured: p.featured,
+          order: 1,
+          content: p.content,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("DB posts retrieval notice:", err);
+  }
+
+  return Array.from(postsMap.values()).sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
@@ -182,6 +187,31 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     }
   } catch (err) {
     console.warn("DB single post retrieval notice:", err);
+  }
+
+  // Fallback to local markdown file
+  try {
+    ensureDirectoryExists(BLOG_DIR);
+    const filePath = path.join(BLOG_DIR, `${slug}.md`);
+    if (fs.existsSync(filePath)) {
+      const fileContent = fs.readFileSync(filePath, "utf-8");
+      const { data, content } = matter(fileContent);
+      const rawDate = data.date ? String(data.date) : "2024-01-01";
+      return {
+        title: data.title || "Untitled Article",
+        slug,
+        date: rawDate,
+        displayDate: data.displayDate || formatDateToDisplay(rawDate),
+        summary: data.summary || "",
+        tags: Array.isArray(data.tags) ? data.tags : [],
+        author: data.author || "@yahyaoncloud",
+        featured: Boolean(data.featured),
+        order: Number(data.order) || 99,
+        content: content.trim(),
+      };
+    }
+  } catch (err) {
+    console.warn("Local post retrieval notice:", err);
   }
 
   const all = await getAllBlogPosts();
@@ -581,6 +611,122 @@ export async function deleteResearchPaper(slug: string): Promise<boolean> {
     console.error("Error deleting research paper:", err);
   }
   return false;
+}
+
+// ----------------------------------------------------
+// Profile Info (Homepage Headline, Bio, Experience, Skills, Social Links)
+// ----------------------------------------------------
+
+export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
+  headline: "Cloud DevOps & Infrastructure Engineer.",
+  bio: [
+    "Over the past 3 years, I've engineered network backbones and scaled cloud environments—transitioning from 2 years in enterprise network infrastructure to building declarative Kubernetes, Terraform, and GitOps architectures.",
+    "I studied Engineering at Global Institute of Engineering & Technology (GIET), Moinabad. I focus on simple, observable, and resilient distributed systems.",
+  ],
+  experiences: [
+    {
+      year: "2024",
+      present: true,
+      company: "Cloud & DevOps",
+      role: "Engineer",
+      description:
+        "Architecting multi-region Kubernetes clusters, GitOps pipelines with ArgoCD, Terraform IaC automation, and distributed observability meshes across AWS and hybrid clouds.",
+      projects: [
+        { name: "Multi-Region Cloud GitOps Platform", url: "/projects/multi-region-cloud-gitops", internal: true },
+        { name: "Distributed Observability & Telemetry Mesh", url: "/projects/observability-mesh-telemetry", internal: true },
+      ],
+    },
+    {
+      year: "2022",
+      present: false,
+      company: "Network Infrastructure",
+      role: "Engineer",
+      description:
+        "Managed enterprise multi-vendor routing and switching, BGP peering, OSPF network backbones, hardware firewalls, site-to-site VPN tunnels, and zero-trust SDN migrations.",
+      projects: [
+        { name: "Hybrid Cloud Enterprise Network & Zero-Trust SDN", url: "/projects/hybrid-sdn-infrastructure", internal: true },
+        { name: "eBPF-Driven Cloud Traffic Engineering", url: "/research", internal: true },
+      ],
+    },
+  ],
+  skills: [
+    "AWS (EKS, VPC, Route53)",
+    "Kubernetes & ArgoCD",
+    "Terraform (IaC)",
+    "Docker & Containers",
+    "CI/CD (GitHub Actions)",
+    "Linux & Networking (BGP/OSPF)",
+    "Python & Bash Scripting",
+    "Cloud Architecture & SRE",
+    "Remix / TypeScript",
+  ],
+  socialLinks: [
+    { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
+    { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "https://github.com/yahyaoncloud", external: true },
+    { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "https://linkedin.com/in/ykinwork1", external: true },
+    { label: "Email", href: "mailto:hello@yahyaoncloud.com", display: "hello@yahyaoncloud.com", external: false },
+  ],
+};
+
+export async function getProfileInfo(): Promise<ProfileInfoData> {
+  try {
+    const profile = await prisma.profileInfo.findUnique({
+      where: { key: "homepage_profile" },
+    }).catch(() => null);
+
+    if (profile) {
+      return {
+        headline: profile.headline || DEFAULT_PROFILE_INFO.headline,
+        bio: profile.bio && profile.bio.length > 0 ? profile.bio : DEFAULT_PROFILE_INFO.bio,
+        skills: profile.skills && profile.skills.length > 0 ? profile.skills : DEFAULT_PROFILE_INFO.skills,
+        experiences: (profile.experiences as unknown as ProfileInfoData["experiences"]) || DEFAULT_PROFILE_INFO.experiences,
+        socialLinks: (profile.socialLinks as unknown as ProfileInfoData["socialLinks"]) || DEFAULT_PROFILE_INFO.socialLinks,
+      };
+    }
+
+    // Auto-seed into MongoDB if not present
+    await prisma.profileInfo.create({
+      data: {
+        key: "homepage_profile",
+        headline: DEFAULT_PROFILE_INFO.headline,
+        bio: DEFAULT_PROFILE_INFO.bio,
+        skills: DEFAULT_PROFILE_INFO.skills,
+        experiences: DEFAULT_PROFILE_INFO.experiences as unknown as object,
+        socialLinks: DEFAULT_PROFILE_INFO.socialLinks as unknown as object,
+      },
+    }).catch((err) => console.warn("DB seed profile info notice:", err));
+  } catch (err) {
+    console.warn("DB profile info query notice:", err);
+  }
+
+  return DEFAULT_PROFILE_INFO;
+}
+
+export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
+  try {
+    await prisma.profileInfo.upsert({
+      where: { key: "homepage_profile" },
+      update: {
+        headline: data.headline,
+        bio: data.bio,
+        skills: data.skills,
+        experiences: data.experiences as unknown as object,
+        socialLinks: data.socialLinks as unknown as object,
+      },
+      create: {
+        key: "homepage_profile",
+        headline: data.headline,
+        bio: data.bio,
+        skills: data.skills,
+        experiences: data.experiences as unknown as object,
+        socialLinks: data.socialLinks as unknown as object,
+      },
+    });
+    return true;
+  } catch (err) {
+    console.error("Error saving profile info:", err);
+    return false;
+  }
 }
 
 // ----------------------------------------------------
