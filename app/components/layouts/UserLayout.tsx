@@ -1,74 +1,25 @@
-import { useLocation } from "@remix-run/react";
+import React from "react";
 import { motion } from "framer-motion";
-import { ThemeProvider, useTheme } from "../../Contexts/ThemeContext";
 import Header from "../Header";
-import Footer from "../../components/Footer";
-import Sidebar from "../UserSidebar";
+import Footer from "../Footer";
 
-interface MainLayoutProps {
+interface UserLayoutProps {
   children: React.ReactNode;
-  sidebar?: React.ReactNode; // optional sidebar content
 }
 
-function LayoutContent({ children, sidebar }: MainLayoutProps) {
-  const { theme } = useTheme();
-
+export default function UserLayout({ children }: UserLayoutProps) {
   return (
-    <div className="flex flex-col max-w-3xl mx-auto items-center justify-center bg-zinc-50 dark:bg-zinc-950 min-h-screen overflow-x-clip">
+    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 selection:bg-indigo-500 selection:text-white transition-colors duration-200">
       <Header />
       <motion.main
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.25 }}
-        className="flex-grow py-12 md:p-12 p-6 "
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className="flex-grow w-full max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16"
       >
-        <div className="flex my-8 w-full">
-          {/* {sidebar && (
-            <aside className="hidden lg:block max-w-xs w-full  z-40">
-              <div className="sticky flex bg-blue-400" />
-            </aside>
-          )} */}
-          {/* Main content */}
-          <div className="flex">{children}</div>
-
-          {/* Sidebar (only on large screens) */}
-          {/* {sidebar && (
-            <aside className="hidden lg:block max-w-xs z-40">
-              <div className="sticky top-24">{sidebar}</div>
-            </aside>
-          )} */}
-        </div>
+        {children}
       </motion.main>
       <Footer />
     </div>
-  );
-}
-
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const location = useLocation();
-
-  // Render sidebar only if path matches /blog/posts/*
-  const showSidebar = location.pathname.startsWith("/blog/posts");
-
-  return (
-    <ThemeProvider>
-      <LayoutContent
-        sidebar={
-          showSidebar ? (
-            <Sidebar
-              onSubscribe={(email: string) => {
-                console.log("Subscribed:", email);
-              }}
-            />
-          ) : undefined
-        }
-      >
-        {children}
-      </LayoutContent>
-    </ThemeProvider>
   );
 }
