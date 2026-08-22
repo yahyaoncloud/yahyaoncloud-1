@@ -4,7 +4,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 pt-4 mt-10 text-[12px] text-zinc-500 dark:text-zinc-500 flex items-center justify-between">
+    <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 pt-5 mt-12 text-xs md:text-sm text-zinc-500 dark:text-zinc-500 flex items-center justify-between">
       <div>
         <span>© {currentYear} Yahya</span>
       </div>

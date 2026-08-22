@@ -36,19 +36,19 @@ export default function Header() {
   const subpage = getSubpageName();
 
   return (
-    <header className="flex items-center justify-between py-1 mb-8 text-sm text-zinc-600 dark:text-zinc-400">
+    <header className="flex items-center justify-between py-2 mb-10 text-sm text-zinc-600 dark:text-zinc-400">
       {/* Title & Breadcrumbs */}
-      <div className="flex items-center gap-1.5 min-w-0">
+      <div className="flex items-center gap-2 min-w-0">
         <Link
           to="/"
-          className="font-medium text-zinc-900 dark:text-zinc-100 text-sm sm:text-[15px] px-1.5 py-0.5 -ml-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-150 active:scale-95"
+          className="font-semibold text-zinc-900 dark:text-zinc-100 text-base px-1.5 py-0.5 -ml-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-150 active:scale-95"
         >
           Yahya
         </Link>
         {subpage && (
           <>
-            <span className="text-zinc-300 dark:text-zinc-700 select-none">/</span>
-            <span className="text-zinc-500 dark:text-zinc-400 truncate text-xs sm:text-sm">
+            <span className="text-zinc-300 dark:text-zinc-700 select-none text-base">/</span>
+            <span className="text-zinc-500 dark:text-zinc-400 truncate text-sm font-medium">
               {subpage}
             </span>
           </>
@@ -56,17 +56,17 @@ export default function Header() {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex items-center gap-1 sm:gap-2">
+      <nav className="flex items-center gap-1.5 md:gap-2">
         {NAV_LINKS.map((link) => {
           const active = isActive(link.href);
           return (
             <Link
               key={link.name}
               to={link.href}
-              className={`px-2.5 py-1 rounded text-xs sm:text-sm transition-all duration-150 active:scale-95 ${
+              className={`px-3 py-1 rounded text-sm transition-all duration-150 active:scale-95 ${
                 active
                   ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium"
-                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/70"
+                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/70 font-normal"
               }`}
             >
               {link.name}
@@ -81,7 +81,7 @@ export default function Header() {
           aria-label="Switch theme"
           title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+          {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
         </button>
       </nav>
     </header>

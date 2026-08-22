@@ -21,12 +21,12 @@ export default function ProjectDetail() {
   const { project } = useLoaderData<{ project: ProjectCaseStudy }>();
 
   return (
-    <article className="space-y-8 text-sm sm:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <article className="space-y-8 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Breadcrumb */}
       <div>
         <Link
           to="/projects"
-          className="text-xs sm:text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1"
+          className="text-xs md:text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1"
         >
           ← Projects
         </Link>
@@ -35,23 +35,23 @@ export default function ProjectDetail() {
       {/* Case Study Header */}
       <header className="space-y-4 pb-6 border-b border-zinc-200 dark:border-zinc-800">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 font-mono text-xs sm:text-sm text-zinc-400">
+          <div className="flex items-center gap-2 font-mono text-xs md:text-sm text-zinc-400">
             <span>{project.category}</span>
             <span>/</span>
             <span>{project.period}</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight">
             {project.title}
           </h1>
 
-          <p className="text-zinc-600 dark:text-zinc-400 pt-1 text-sm sm:text-base">
+          <p className="text-zinc-600 dark:text-zinc-400 pt-1 text-base">
             {project.summary}
           </p>
         </div>
 
         {/* Metadata Details */}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm pt-1">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs md:text-sm pt-1">
           <div>
             <span className="text-zinc-400">Role: </span>
             <span className="font-medium text-zinc-900 dark:text-zinc-100">{project.role}</span>
@@ -72,7 +72,7 @@ export default function ProjectDetail() {
 
         {/* Action Links */}
         {(project.demoUrl || project.githubUrl) && (
-          <div className="flex items-center gap-4 pt-2 text-xs sm:text-sm">
+          <div className="flex items-center gap-4 pt-2 text-xs md:text-sm">
             {project.demoUrl && (
               <a
                 href={project.demoUrl}
@@ -103,7 +103,7 @@ export default function ProjectDetail() {
       </main>
 
       {/* Footer Navigation */}
-      <div className="pt-8 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs sm:text-sm text-zinc-500">
+      <div className="pt-8 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs md:text-sm text-zinc-500">
         <Link
           to="/projects"
           className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"

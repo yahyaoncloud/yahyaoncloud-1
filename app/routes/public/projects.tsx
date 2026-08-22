@@ -20,13 +20,13 @@ export default function ProjectsIndex() {
       : projects.filter((p: ProjectCaseStudy) => p.category === selectedCategory);
 
   return (
-    <div className="space-y-10 text-sm sm:text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Projects
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-[15px]">
+        <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
           Engineering case studies on multi-region Kubernetes, enterprise SDN migrations, and distributed telemetry meshes.
         </p>
       </div>
@@ -37,7 +37,7 @@ export default function ProjectsIndex() {
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`text-xs sm:text-sm px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
+            className={`text-xs md:text-sm px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
               selectedCategory === cat
                 ? "bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 font-medium"
                 : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
@@ -52,19 +52,19 @@ export default function ProjectsIndex() {
       <div className="space-y-8">
         {filteredProjects.map((project: ProjectCaseStudy) => (
           <article key={project.slug} className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0">
-            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+            <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
               <Link
                 to={`/projects/${project.slug}`}
-                className="font-medium text-base sm:text-[17px] text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4"
+                className="font-medium text-base md:text-[17px] text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4"
               >
                 {project.title}
               </Link>
-              <span className="font-mono text-xs sm:text-[13px] text-zinc-400 shrink-0">
+              <span className="font-mono text-xs md:text-sm text-zinc-400 shrink-0">
                 {project.period}
               </span>
             </div>
 
-            <p className="text-sm sm:text-[15px] text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400">
               {project.summary}
             </p>
 
@@ -81,7 +81,7 @@ export default function ProjectsIndex() {
             </div>
 
             {/* Links */}
-            <div className="flex items-center gap-4 pt-1 text-xs sm:text-sm">
+            <div className="flex items-center gap-4 pt-1 text-xs md:text-sm">
               <Link
                 to={`/projects/${project.slug}`}
                 className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"
