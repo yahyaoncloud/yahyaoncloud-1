@@ -5,19 +5,11 @@ export const routes = (defineRoutes: any) => {
     // Public Routes (Layout: public/layout.tsx)
     route("/", "routes/public/layout.tsx", () => {
       route("", "routes/public/_index.tsx", { index: true });
-      route("about", "routes/public/about.tsx");
+      route("projects", "routes/public/projects.tsx");
+      route("projects/:slug", "routes/public/projects.$slug.tsx");
+      route("research", "routes/public/research.tsx");
       route("contact", "routes/public/contact.tsx");
-      // route("contact", "routes/public/contact.tsx");
-      // route("resume", "routes/public/resume.tsx"); // Removed in favor of root redirect
-      
-      // Blog
-      route("blog", "routes/public/blog.tsx");
-      route("blog/post/:slug", "routes/public/blog_.post.$slug.tsx");
-      route("blog/posts", "routes/public/blog_.posts.tsx");
-      
-      // Guestbook
-      route("guestbook", "routes/public/guestbook.tsx");
-      route("guestbook/twitter-info", "routes/public/guestbook_.twitter-info.tsx");
+      route("about", "routes/public/_index.tsx");
       
       // Policies
       route("privacy-policy", "routes/public/privacy-policy.tsx");
