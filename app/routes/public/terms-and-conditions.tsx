@@ -1,29 +1,36 @@
 import { Link } from "@remix-run/react";
-import { FaSquareXTwitter } from "react-icons/fa6";
 
 export default function TermsPage() {
-    return (
-        <div className=" px-6 py-12 max-w-3xl mx-auto  text-zinc-900 dark:text-white">
-            <div className="flex items-center mb-6">
-                <FaSquareXTwitter className="w-6 h-6 mr-2" />
-                <h1 className="text-3xl font-bold">Terms and Conditions</h1>
-            </div>
-            <p className="mb-4">
-                By using our guestbook and logging in via X, you agree to the following:
-            </p>
-            <ul className="list-disc pl-6 mb-4 space-y-2">
-                <li>Your email and X profile are used only to identify your guestbook entries.</li>
-                <li>You are responsible for the content you post in the guestbook.</li>
-                <li>We reserve the right to moderate or remove inappropriate content.</li>
-            </ul>
-            <p className="text-sm mt-6">
-                <Link
-                    to="/"
-                    className="underline text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
-                >
-                    Back to Home
-                </Link>
-            </p>
-        </div>
-    );
+  return (
+    <div className="space-y-8 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+      <div className="space-y-2">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          Terms & Conditions
+        </h1>
+        <p className="text-xs font-mono text-zinc-400">
+          Last updated: 2026
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <p>
+          By using this website, submitting inquiries, or accessing technical articles and case studies, you agree to the following terms:
+        </p>
+        <ul className="list-disc pl-6 space-y-2 marker:text-zinc-400 dark:marker:text-zinc-600">
+          <li>Content, architecture diagrams, and articles are published for educational and reference purposes.</li>
+          <li>You may freely reference and link to publicly published materials with attribution.</li>
+          <li>All original code snippets and research implementations are subject to their respective open-source licenses.</li>
+        </ul>
+      </div>
+
+      <div className="pt-4">
+        <Link
+          to="/"
+          className="text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        >
+          ← Back to home
+        </Link>
+      </div>
+    </div>
+  );
 }
