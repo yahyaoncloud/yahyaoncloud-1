@@ -33,7 +33,7 @@ export default function ContactPage() {
     }
 
     // Simulate sending message
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 600));
 
     setStatus({
       type: "success",
@@ -53,41 +53,45 @@ export default function ContactPage() {
   };
 
   const contactLinks = [
+    { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
+    { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "https://github.com/yahyaoncloud", external: true },
+    { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "https://linkedin.com/in/ykinwork1", external: true },
     { label: "Email", href: "mailto:hello@yahyaoncloud.com", display: "hello@yahyaoncloud.com", external: false },
-    { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "github.com/yahyaoncloud", external: true },
-    { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "linkedin.com/in/ykinwork1", external: true },
-    { label: "X", href: "https://x.com/yahyaoncloud", display: "@yahyaoncloud", external: true },
   ];
 
   return (
-    <div className="space-y-10 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-[14.5px] leading-[1.8] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Contact
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <p className="text-zinc-600 dark:text-zinc-400 text-sm">
           Interested in cloud infrastructure, reliability engineering, or discussing distributed systems? Reach out through any channel below.
         </p>
       </div>
 
-      {/* Direct Reach-Out Channels */}
+      {/* Direct Reach-Out Channels (2 columns) */}
       <section className="space-y-3 pt-2">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Channels
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-xs">
+        <div className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-y-2.5 items-baseline text-xs sm:text-sm">
           {contactLinks.map((item) => (
-            <div key={item.label} className="flex items-baseline justify-between gap-2 py-0.5 border-b border-zinc-100 dark:border-zinc-900">
-              <span className="text-zinc-500">{item.label}</span>
-              <a
-                href={item.href}
-                target={item.external ? "_blank" : undefined}
-                rel={item.external ? "noreferrer" : undefined}
-                className="font-mono text-zinc-900 dark:text-zinc-100 hover:underline"
-              >
-                {item.display}
-              </a>
+            <div key={item.label} className="contents">
+              <span className="text-zinc-500 dark:text-zinc-400 font-normal">
+                {item.label}
+              </span>
+              <div>
+                <a
+                  href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noreferrer" : undefined}
+                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-1.5 py-0.5 -ml-1.5 rounded transition-all duration-150 active:scale-[0.98] inline-block font-mono text-xs sm:text-[13px]"
+                >
+                  {item.display}
+                </a>
+              </div>
             </div>
           ))}
         </div>
@@ -165,7 +169,7 @@ export default function ContactPage() {
           <button
             type="submit"
             disabled={isSubmitting || !formData.name || !formData.email || !formData.message}
-            className="px-4 py-2 rounded text-xs font-medium bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded text-xs font-medium bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? "Sending..." : "Send Message →"}
           </button>

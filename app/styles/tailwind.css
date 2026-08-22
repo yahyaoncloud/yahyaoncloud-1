@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -73,35 +75,40 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    line-height: 1.75;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14.5px;
+    line-height: 1.8;
+    letter-spacing: -0.011em;
     margin: 0;
     padding: 0;
   }
 
-  /* Inline Link Accents */
+  /* External Link arrow styling */
   a.external-link::after,
   a[target="_blank"]:not(.no-arrow)::after {
     content: " ↗";
-    font-size: 0.8em;
-    opacity: 0.6;
+    font-size: 0.82em;
+    opacity: 0.65;
     margin-left: 0.15ch;
   }
 
+  code, kbd, samp, pre {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
   code {
-    @apply font-mono text-[0.85em] bg-zinc-100 dark:bg-zinc-800/80 px-1 py-0.5 rounded text-zinc-800 dark:text-zinc-200;
+    font-size: 0.85em;
+    @apply bg-zinc-100 dark:bg-zinc-800/80 px-1 py-0.5 rounded text-zinc-800 dark:text-zinc-200;
   }
 }
 
 @layer utilities {
-  /* Hairline separator */
-  .hairline-b {
-    border-bottom: 1px solid var(--border);
+  /* Interactive text link with clean hover */
+  .editorial-link {
+    @apply text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-1.5 py-0.5 -ml-1.5 rounded transition-all duration-150 active:scale-[0.98];
   }
-  .hairline-t {
-    border-top: 1px solid var(--border);
-  }
-  
+
   /* Scrollbar */
   html, .custom-scroll {
     scrollbar-width: thin;

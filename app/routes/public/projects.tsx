@@ -20,13 +20,13 @@ export default function ProjectsIndex() {
       : projects.filter((p: ProjectCaseStudy) => p.category === selectedCategory);
 
   return (
-    <div className="space-y-10 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-[14.5px] leading-[1.8] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Projects
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <p className="text-zinc-600 dark:text-zinc-400 text-sm">
           Engineering case studies on multi-region Kubernetes, enterprise SDN migrations, and distributed telemetry meshes.
         </p>
       </div>
@@ -37,7 +37,7 @@ export default function ProjectsIndex() {
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`text-xs px-2.5 py-1 rounded transition-colors ${
+            className={`text-xs px-2.5 py-1 rounded transition-all duration-150 active:scale-95 ${
               selectedCategory === cat
                 ? "bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 font-medium"
                 : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
@@ -73,7 +73,7 @@ export default function ProjectsIndex() {
               {project.techStack.map((tech, i) => (
                 <span
                   key={i}
-                  className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400"
+                  className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
                 >
                   {tech}
                 </span>

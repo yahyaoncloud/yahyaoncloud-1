@@ -21,12 +21,12 @@ export default function ProjectDetail() {
   const { project } = useLoaderData<{ project: ProjectCaseStudy }>();
 
   return (
-    <article className="space-y-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <article className="space-y-8 text-[14.5px] leading-[1.8] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
       {/* Breadcrumb */}
       <div>
         <Link
           to="/projects"
-          className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+          className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1"
         >
           ← Projects
         </Link>
@@ -37,7 +37,7 @@ export default function ProjectDetail() {
         <div className="space-y-2">
           <div className="flex items-center gap-2 font-mono text-xs text-zinc-400">
             <span>{project.category}</span>
-            <span>•</span>
+            <span>/</span>
             <span>{project.period}</span>
           </div>
 
@@ -45,7 +45,7 @@ export default function ProjectDetail() {
             {project.title}
           </h1>
 
-          <p className="text-zinc-600 dark:text-zinc-400 pt-1">
+          <p className="text-zinc-600 dark:text-zinc-400 pt-1 text-sm sm:text-[15px]">
             {project.summary}
           </p>
         </div>
@@ -114,7 +114,7 @@ export default function ProjectDetail() {
           href="#top"
           className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
         >
-          Top ↑
+          Top
         </a>
       </div>
     </article>

@@ -1,4 +1,6 @@
 import React from "react";
+import { useLocation } from "@remix-run/react";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "../Header";
 import Footer from "../Footer";
 
@@ -7,13 +9,24 @@ interface UserLayoutProps {
 }
 
 export default function UserLayout({ children }: UserLayoutProps) {
+  const location = useLocation();
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-zinc-200 dark:selection:bg-zinc-800">
       <div className="mx-auto my-8 w-[90%] max-w-[580px] sm:my-14 flex flex-col min-h-[calc(100vh-7rem)]">
         <Header />
-        <main className="flex-1 space-y-12">
-          {children}
-        </main>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.main
+            key={location.pathname}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="flex-1 space-y-12"
+          >
+            {children}
+          </motion.main>
+        </AnimatePresence>
         <Footer />
       </div>
     </div>

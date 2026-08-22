@@ -60,10 +60,10 @@ export default function Index() {
   ];
 
   const elsewhereLinks = [
+    { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
+    { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "https://github.com/yahyaoncloud", external: true },
+    { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "https://linkedin.com/in/ykinwork1", external: true },
     { label: "Email", href: "mailto:hello@yahyaoncloud.com", display: "hello@yahyaoncloud.com", external: false },
-    { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "github.com/yahyaoncloud", external: true },
-    { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "linkedin.com/in/ykinwork1", external: true },
-    { label: "X", href: "https://x.com/yahyaoncloud", display: "@yahyaoncloud", external: true },
   ];
 
   const toggleExperience = (idx: number) => {
@@ -71,10 +71,10 @@ export default function Index() {
   };
 
   return (
-    <div className="space-y-12 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-12 text-[14.5px] leading-[1.8] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
       {/* Introduction */}
       <section className="space-y-4">
-        <p className="text-zinc-900 dark:text-zinc-100 font-medium text-base">
+        <p className="text-zinc-900 dark:text-zinc-100 font-semibold text-[15px] sm:text-base">
           Cloud DevOps & Infrastructure Engineer.
         </p>
         <p>
@@ -97,13 +97,13 @@ export default function Index() {
             return (
               <div
                 key={idx}
-                className="grid grid-cols-[100px_1fr] sm:grid-cols-[120px_1fr] gap-x-2 sm:gap-x-4 items-start text-sm"
+                className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 sm:gap-x-4 items-start text-sm"
               >
                 {/* Year + Present badge column */}
                 <div className="py-1.5 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
-                  <span className="font-normal">{exp.year}</span>
+                  <span className="font-normal font-mono text-xs">{exp.year}</span>
                   {exp.present && (
-                    <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
+                    <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
                       Present
                     </span>
                   )}
@@ -118,7 +118,7 @@ export default function Index() {
                   <button
                     type="button"
                     onClick={() => toggleExperience(idx)}
-                    className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group"
+                    className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all"
                   >
                     <ChevronRight
                       size={14}
@@ -126,7 +126,7 @@ export default function Index() {
                         isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
                       }`}
                     />
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 shrink-0">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100 shrink-0 text-xs sm:text-sm">
                       {exp.company}
                     </span>
                     <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 mx-2" />
@@ -146,18 +146,18 @@ export default function Index() {
                               {proj.internal ? (
                                 <Link
                                   to={proj.url}
-                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4"
+                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4"
                                 >
-                                  {proj.name} ↗
+                                  {proj.name}
                                 </Link>
                               ) : (
                                 <a
                                   href={proj.url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4"
+                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4"
                                 >
-                                  {proj.name} ↗
+                                  {proj.name}
                                 </a>
                               )}
                             </div>
@@ -210,7 +210,7 @@ export default function Index() {
               <div className="flex items-baseline justify-between gap-2">
                 <Link
                   to={`/projects/${project.slug}`}
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm sm:text-base"
                 >
                   {project.title}
                 </Link>
@@ -274,7 +274,7 @@ export default function Index() {
               <div className="flex items-baseline justify-between gap-2">
                 <Link
                   to="/research"
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm sm:text-base"
                 >
                   {paper.title}
                 </Link>
@@ -282,7 +282,7 @@ export default function Index() {
                   {paper.year}
                 </span>
               </div>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">
                 {paper.abstract}
               </p>
             </div>
@@ -290,23 +290,27 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Elsewhere Section */}
+      {/* Elsewhere Section (2 columns: left Social key, right value link) */}
       <section className="space-y-3 pt-2">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Elsewhere
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-xs">
+        <div className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-y-2.5 items-baseline text-xs sm:text-sm">
           {elsewhereLinks.map((item) => (
-            <div key={item.label} className="flex items-baseline justify-between gap-2 py-0.5 border-b border-zinc-100 dark:border-zinc-900">
-              <span className="text-zinc-500">{item.label}</span>
-              <a
-                href={item.href}
-                target={item.external ? "_blank" : undefined}
-                rel={item.external ? "noreferrer" : undefined}
-                className="font-mono text-zinc-900 dark:text-zinc-100 hover:underline"
-              >
-                {item.display}
-              </a>
+            <div key={item.label} className="contents">
+              <span className="text-zinc-500 dark:text-zinc-400 font-normal">
+                {item.label}
+              </span>
+              <div>
+                <a
+                  href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noreferrer" : undefined}
+                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-1.5 py-0.5 -ml-1.5 rounded transition-all duration-150 active:scale-[0.98] inline-block font-mono text-xs sm:text-[13px]"
+                >
+                  {item.display}
+                </a>
+              </div>
             </div>
           ))}
         </div>
