@@ -15,23 +15,23 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
   return (
     <article className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0">
       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
-        <span className="font-mono text-xs text-zinc-400">
+        <span className="font-mono text-xs sm:text-[13px] text-zinc-400">
           {paper.venue}
         </span>
-        <span className="font-mono text-xs text-zinc-400">
+        <span className="font-mono text-xs sm:text-[13px] text-zinc-400">
           {paper.year}
         </span>
       </div>
 
-      <h2 className="font-medium text-base text-zinc-900 dark:text-zinc-100">
+      <h2 className="font-medium text-base sm:text-[17px] text-zinc-900 dark:text-zinc-100">
         {paper.title}
       </h2>
 
-      <p className="text-xs text-zinc-500 dark:text-zinc-500">
+      <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-500">
         {paper.authors.join(", ")}
       </p>
 
-      <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 pt-1">
+      <p className="text-sm sm:text-[15px] text-zinc-600 dark:text-zinc-400 pt-1">
         {paper.abstract}
       </p>
 
@@ -40,7 +40,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
         {paper.tags.map((tag, i) => (
           <span
             key={i}
-            className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+            className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
           >
             {tag}
           </span>
@@ -48,7 +48,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4 pt-2 text-xs">
+      <div className="flex items-center gap-4 pt-2 text-xs sm:text-sm">
         {paper.content && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -82,13 +82,13 @@ export default function ResearchIndex() {
   const { papers } = useLoaderData<typeof loader>();
 
   return (
-    <div className="space-y-10 text-[14.5px] leading-[1.8] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-sm sm:text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Research & Publications
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+        <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-[15px]">
           Technical papers, architecture benchmarks, and experimental studies on Zero-Trust network topologies and eBPF traffic engineering.
         </p>
       </div>

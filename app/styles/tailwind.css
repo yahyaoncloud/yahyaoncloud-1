@@ -72,12 +72,13 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-size: 16px;
   }
 
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 13.5px;
+    font-size: 18.5px;
     line-height: 1.75;
     letter-spacing: -0.011em;
     margin: 0;
@@ -86,7 +87,7 @@
 
   @screen sm {
     body {
-      font-size: 14px;
+      font-size: 16px;
     }
   }
 
@@ -99,32 +100,41 @@
     margin-left: 0.15ch;
   }
 
-  code, kbd, samp, pre {
+  code,
+  kbd,
+  samp,
+  pre {
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   code {
-    font-size: 0.85em;
-    @apply bg-zinc-100 dark:bg-zinc-800/80 px-1 py-0.5 rounded text-zinc-800 dark:text-zinc-200;
+    font-size: 0.88em;
+    @apply bg-zinc-100 dark:bg-zinc-800/80 px-1.5 py-0.5 rounded text-zinc-800 dark:text-zinc-200;
   }
 }
 
 @layer utilities {
+
   /* Interactive text link with clean hover */
   .editorial-link {
     @apply text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-1.5 py-0.5 -ml-1.5 rounded transition-all duration-150 active:scale-[0.98];
   }
 
   /* Scrollbar */
-  html, .custom-scroll {
+  html,
+  .custom-scroll {
     scrollbar-width: thin;
     scrollbar-color: var(--scroll-thumb) transparent;
   }
-  html::-webkit-scrollbar, .custom-scroll::-webkit-scrollbar {
+
+  html::-webkit-scrollbar,
+  .custom-scroll::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  html::-webkit-scrollbar-thumb, .custom-scroll::-webkit-scrollbar-thumb {
+
+  html::-webkit-scrollbar-thumb,
+  .custom-scroll::-webkit-scrollbar-thumb {
     background-color: var(--scroll-thumb);
     border-radius: 4px;
   }

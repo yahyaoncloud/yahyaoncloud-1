@@ -73,23 +73,23 @@ export default function Index() {
   };
 
   return (
-    <div className="space-y-10 text-[13.5px] sm:text-[14px] leading-[1.75] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-sm sm:text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Introduction */}
       <section className="space-y-3">
-        <p className="text-zinc-900 dark:text-zinc-100 font-semibold text-[15px] sm:text-base">
+        <p className="text-zinc-900 dark:text-zinc-100 font-semibold text-base sm:text-[17px]">
           Cloud DevOps & Infrastructure Engineer.
         </p>
-        <p>
+        <p className="text-sm sm:text-[15px] leading-relaxed">
           Over the past 3 years, I've engineered network backbones and scaled cloud environments—transitioning from 2 years in enterprise network infrastructure to building declarative Kubernetes, Terraform, and GitOps architectures.
         </p>
-        <p>
+        <p className="text-sm sm:text-[15px] leading-relaxed">
           I studied Engineering at Global Institute of Engineering & Technology (GIET), Moinabad. I focus on simple, observable, and resilient distributed systems.
         </p>
       </section>
 
       {/* Experience Section (Accordion inspired by Siraj Chokshi) */}
       <section className="space-y-3 pt-2">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+        <h2 className="text-xs sm:text-[13px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Experience
         </h2>
 
@@ -99,13 +99,13 @@ export default function Index() {
             return (
               <div
                 key={idx}
-                className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 sm:gap-x-4 items-start text-sm"
+                className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 sm:gap-x-4 items-start text-sm sm:text-[15px]"
               >
                 {/* Year + Present badge column */}
                 <div className="py-1 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
-                  <span className="font-normal font-mono text-xs">{exp.year}</span>
+                  <span className="font-normal font-mono text-xs sm:text-sm">{exp.year}</span>
                   {exp.present && (
-                    <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
+                    <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-[10px] sm:text-xs font-medium text-zinc-600 dark:text-zinc-400">
                       Present
                     </span>
                   )}
@@ -123,12 +123,12 @@ export default function Index() {
                     className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all"
                   >
                     <ChevronRight
-                      size={14}
+                      size={15}
                       className={`text-zinc-400 transition-transform duration-200 shrink-0 ${
                         isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
                       }`}
                     />
-                    <span className="font-medium text-zinc-900 dark:text-zinc-100 shrink-0 text-xs sm:text-sm">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100 shrink-0 text-sm sm:text-[15px]">
                       {exp.company}
                     </span>
                     <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 mx-2" />
@@ -148,7 +148,7 @@ export default function Index() {
                               {proj.internal ? (
                                 <Link
                                   to={proj.url}
-                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4"
+                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs sm:text-sm"
                                 >
                                   {proj.name}
                                 </Link>
@@ -157,7 +157,7 @@ export default function Index() {
                                   href={proj.url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4"
+                                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs sm:text-sm"
                                 >
                                   {proj.name}
                                 </a>
@@ -177,14 +177,14 @@ export default function Index() {
 
       {/* Skills Section */}
       <section className="space-y-3 pt-2">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+        <h2 className="text-xs sm:text-[13px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Skills
         </h2>
         <div className="flex flex-wrap gap-1.5">
           {skills.map((skill, idx) => (
             <span
               key={idx}
-              className="text-xs font-mono px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/80"
+              className="text-xs sm:text-[12.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/80"
             >
               {skill}
             </span>
@@ -195,12 +195,12 @@ export default function Index() {
       {/* Selected Work Section */}
       <section className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+          <h2 className="text-xs sm:text-[13px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
             Selected Work
           </h2>
           <Link
             to="/projects"
-            className="text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="text-xs sm:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
           >
             All projects →
           </Link>
@@ -212,18 +212,18 @@ export default function Index() {
               <div className="flex items-baseline justify-between gap-2">
                 <Link
                   to={`/projects/${project.slug}`}
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm sm:text-base"
                 >
                   {project.title}
                 </Link>
-                <span className="font-mono text-[11px] text-zinc-400 shrink-0">
+                <span className="font-mono text-xs text-zinc-400 shrink-0">
                   {project.category}
                 </span>
               </div>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                 {project.summary}
               </p>
-              <div className="pt-0.5 flex items-center gap-3 text-xs">
+              <div className="pt-0.5 flex items-center gap-3 text-xs sm:text-sm">
                 <Link
                   to={`/projects/${project.slug}`}
                   className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"
@@ -260,12 +260,12 @@ export default function Index() {
       {recentPosts && recentPosts.length > 0 && (
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+            <h2 className="text-xs sm:text-[13px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
               Writing
             </h2>
             <Link
               to="/blog"
-              className="text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+              className="text-xs sm:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
             >
               All articles →
             </Link>
@@ -276,13 +276,13 @@ export default function Index() {
               <div key={post.slug} className="group">
                 <Link
                   to={`/blog/${post.slug}`}
-                  className="flex items-baseline justify-between py-0.5 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
+                  className="flex items-baseline justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
                 >
-                  <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 shrink-0 text-sm">
+                  <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 shrink-0 text-sm sm:text-[15px]">
                     {post.title}
                   </span>
                   <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 mx-2 sm:mx-3" />
-                  <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500 shrink-0">
+                  <span className="font-mono text-xs sm:text-[13px] text-zinc-400 dark:text-zinc-500 shrink-0">
                     {post.displayDate}
                   </span>
                 </Link>
@@ -295,12 +295,12 @@ export default function Index() {
       {/* Research Section */}
       <section className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+          <h2 className="text-xs sm:text-[13px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
             Research
           </h2>
           <Link
             to="/research"
-            className="text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="text-xs sm:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
           >
             All papers →
           </Link>
@@ -312,15 +312,15 @@ export default function Index() {
               <div className="flex items-baseline justify-between gap-2">
                 <Link
                   to="/research"
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm sm:text-base"
                 >
                   {paper.title}
                 </Link>
-                <span className="font-mono text-[11px] text-zinc-400 shrink-0">
+                <span className="font-mono text-xs text-zinc-400 shrink-0">
                   {paper.year}
                 </span>
               </div>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">
                 {paper.abstract}
               </p>
             </div>
@@ -330,10 +330,10 @@ export default function Index() {
 
       {/* Elsewhere Section */}
       <section className="space-y-3 pt-2">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+        <h2 className="text-xs sm:text-[13px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Elsewhere
         </h2>
-        <div className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-y-2.5 items-baseline text-xs sm:text-sm">
+        <div className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-y-2.5 items-baseline text-sm sm:text-[15px]">
           {elsewhereLinks.map((item) => (
             <div key={item.label} className="contents">
               <span className="text-zinc-500 dark:text-zinc-400 font-normal">
@@ -344,7 +344,7 @@ export default function Index() {
                   href={item.href}
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
-                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-1.5 py-0.5 -ml-1.5 rounded transition-all duration-150 active:scale-[0.98] inline-block font-mono text-xs sm:text-[13px]"
+                  className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-1.5 py-0.5 -ml-1.5 rounded transition-all duration-150 active:scale-[0.98] inline-block font-mono text-xs sm:text-sm"
                 >
                   {item.display}
                 </a>
