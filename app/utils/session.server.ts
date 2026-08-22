@@ -34,3 +34,14 @@ export async function getUser(request: Request) {
   const user = session.get("user");
   return user || null;
 }
+
+// Helper to logout
+export async function logout(request: Request, redirectTo: string = "/login") {
+  const session = await getSession(request);
+  return redirect(redirectTo, {
+    headers: {
+      "Set-Cookie": await destroySession(session),
+    },
+  });
+}
+

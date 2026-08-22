@@ -61,3 +61,43 @@ export async function updateAdmin(id: string, data: {
     data: updateData
   });
 }
+
+// ==================== GUESTBOOK OPERATIONS ====================
+export async function getGuestbookEntries(limit: number = 100) {
+  try {
+    return ((prisma as any).guestbookEntry?.findMany({
+      take: limit,
+      orderBy: { createdAt: 'desc' }
+    })) || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function createGuestbookEntry(data: any) {
+  try {
+    return (prisma as any).guestbookEntry?.create({ data });
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteGuestbookEntry(id: string) {
+  try {
+    return (prisma as any).guestbookEntry?.delete({ where: { id } });
+  } catch {
+    return null;
+  }
+}
+
+export async function approveGuestbookEntry(id: string) {
+  try {
+    return (prisma as any).guestbookEntry?.update({
+      where: { id },
+      data: { isApproved: true }
+    });
+  } catch {
+    return null;
+  }
+}
+

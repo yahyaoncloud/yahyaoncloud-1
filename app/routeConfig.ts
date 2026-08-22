@@ -9,7 +9,7 @@ export const routes = (defineRoutes: any) => {
       route("projects/:slug", "routes/public/projects.$slug.tsx");
       route("research", "routes/public/research.tsx");
       route("contact", "routes/public/contact.tsx");
-      route("about", "routes/public/_index.tsx");
+      route("about", "routes/public/_index.tsx", { id: "public-about-alias" });
       
       // Policies
       route("privacy-policy", "routes/public/privacy-policy.tsx");
