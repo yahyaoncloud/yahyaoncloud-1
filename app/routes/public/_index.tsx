@@ -20,7 +20,7 @@ export async function loader() {
 
 export default function Index() {
   const { featuredProjects, featuredResearch, recentPosts } = useLoaderData<typeof loader>();
-  const [openExperienceIndex, setOpenExperienceIndex] = useState<number | null>(0);
+  const [openExperienceIndex, setOpenExperienceIndex] = useState<number | null>(null);
 
   const experiences = [
     {
