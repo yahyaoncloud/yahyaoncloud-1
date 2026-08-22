@@ -42,6 +42,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.510.0",
     "marked": "^15.0.12",
+    "mermaid": "^11.4.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.3",
     "pretty-cache-header": "^1.0.0",
