@@ -12,7 +12,10 @@ export default function ProjectsIndex() {
   const { projects } = useLoaderData<typeof loader>();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
-  const categories = ["All", "Cloud & DevOps", "Networking & SDN", "Observability & SRE"];
+  const dynamicCategories = [
+    "All",
+    ...Array.from(new Set(projects.map((p: ProjectCaseStudy) => p.category).filter(Boolean))),
+  ];
 
   const filteredProjects =
     selectedCategory === "All"
@@ -31,27 +34,32 @@ export default function ProjectsIndex() {
         </p>
       </div>
 
-      {/* Category Filter Pills */}
-      <div className="flex flex-wrap gap-1.5 pb-2">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`text-xs md:text-sm px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
-              selectedCategory === cat
-                ? "bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 font-medium"
-                : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {/* Dynamic Category Filter Pills */}
+      {dynamicCategories.length > 1 && (
+        <div className="flex flex-wrap gap-1.5 pb-2">
+          {dynamicCategories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`text-xs md:text-sm px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
+                selectedCategory === cat
+                  ? "bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 font-medium"
+                  : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Projects List */}
       <div className="space-y-8">
         {filteredProjects.map((project: ProjectCaseStudy) => (
-          <article key={project.slug} className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0">
+          <article
+            key={project.slug}
+            className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0"
+          >
             <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
               <Link
                 to={`/projects/${project.slug}`}
@@ -69,16 +77,18 @@ export default function ProjectsIndex() {
             </p>
 
             {/* Tech Tags */}
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {project.techStack.map((tech, i) => (
-                <span
-                  key={i}
-                  className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+            {project.techStack && project.techStack.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {project.techStack.map((tech, i) => (
+                  <span
+                    key={i}
+                    className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Links */}
             <div className="flex items-center gap-4 pt-1 text-xs md:text-sm">
