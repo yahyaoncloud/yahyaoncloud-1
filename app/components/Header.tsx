@@ -8,6 +8,7 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
+  { name: "Blog", href: "/blog" },
   { name: "Projects", href: "/projects" },
   { name: "Research", href: "/research" },
   { name: "Contact", href: "/contact" },
@@ -23,6 +24,8 @@ export default function Header() {
   };
 
   const getSubpageName = () => {
+    if (location.pathname.startsWith("/blog/")) return "Blog";
+    if (location.pathname.startsWith("/blog")) return "Blog";
     if (location.pathname.startsWith("/projects/")) return "Project";
     if (location.pathname.startsWith("/projects")) return "Projects";
     if (location.pathname.startsWith("/research")) return "Research";
@@ -33,7 +36,7 @@ export default function Header() {
   const subpage = getSubpageName();
 
   return (
-    <header className="flex items-center justify-between py-2 mb-10 text-sm text-zinc-600 dark:text-zinc-400">
+    <header className="flex items-center justify-between py-1 mb-8 text-[13px] text-zinc-600 dark:text-zinc-400">
       {/* Title & Breadcrumbs */}
       <div className="flex items-center gap-1.5 min-w-0">
         <Link
@@ -45,7 +48,7 @@ export default function Header() {
         {subpage && (
           <>
             <span className="text-zinc-300 dark:text-zinc-700 select-none">/</span>
-            <span className="text-zinc-500 dark:text-zinc-400 truncate text-xs sm:text-sm">
+            <span className="text-zinc-500 dark:text-zinc-400 truncate text-[12px] sm:text-[13px]">
               {subpage}
             </span>
           </>
@@ -53,14 +56,14 @@ export default function Header() {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex items-center gap-1 sm:gap-1.5">
+      <nav className="flex items-center gap-0.5 sm:gap-1">
         {NAV_LINKS.map((link) => {
           const active = isActive(link.href);
           return (
             <Link
               key={link.name}
               to={link.href}
-              className={`px-2 py-1 rounded text-xs sm:text-sm transition-all duration-150 active:scale-95 ${
+              className={`px-2 py-0.5 rounded text-[12px] sm:text-[13px] transition-all duration-150 active:scale-95 ${
                 active
                   ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium"
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/70"
@@ -74,11 +77,11 @@ export default function Header() {
         {/* Theme Switcher */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 ml-0.5 rounded text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-150 active:scale-90"
+          className="p-1 ml-0.5 rounded text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-150 active:scale-90 cursor-pointer"
           aria-label="Switch theme"
           title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+          {isDarkMode ? <Sun size={14} /> : <Moon size={14} />}
         </button>
       </nav>
     </header>

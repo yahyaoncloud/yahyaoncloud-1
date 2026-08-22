@@ -13,16 +13,16 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-zinc-200 dark:selection:bg-zinc-800">
-      <div className="mx-auto my-8 w-[90%] max-w-[580px] sm:my-14 flex flex-col min-h-[calc(100vh-7rem)]">
+      <div className="mx-auto p-12 w-[90%] max-w-[580px] flex flex-col min-h-[calc(100vh-5rem)]">
         <Header />
         <AnimatePresence mode="wait" initial={false}>
           <motion.main
             key={location.pathname}
-            initial={{ opacity: 0, y: 4 }}
+            initial={{ opacity: 0, y: 3 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="flex-1 space-y-12"
+            exit={{ opacity: 0, y: -3 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="flex-1 space-y-8 sm:space-y-10"
           >
             {children}
           </motion.main>

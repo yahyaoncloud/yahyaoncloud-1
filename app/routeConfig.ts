@@ -1,10 +1,11 @@
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const routes = (defineRoutes: any) => {
   return defineRoutes((route) => {
     // Public Routes (Layout: public/layout.tsx)
     route("/", "routes/public/layout.tsx", () => {
       route("", "routes/public/_index.tsx", { index: true });
+      route("blog", "routes/public/blog.tsx");
+      route("blog/:slug", "routes/public/blog.$slug.tsx");
       route("projects", "routes/public/projects.tsx");
       route("projects/:slug", "routes/public/projects.$slug.tsx");
       route("research", "routes/public/research.tsx");
@@ -24,10 +25,17 @@ export const routes = (defineRoutes: any) => {
       // Business Card
       route("business-card", "routes/admin/business-card.tsx");
       
-      // Content Management
+      // Content Management (Blog Posts, Projects, Research)
       route("posts", "routes/admin/posts.tsx");
       route("post/create", "routes/admin/post.create.tsx");
       route("post/edit/:slug", "routes/admin/post.edit.$slug.tsx");
+      route("projects", "routes/admin/projects.tsx");
+      route("projects/create", "routes/admin/projects.create.tsx");
+      route("projects/edit/:slug", "routes/admin/projects.edit.$slug.tsx");
+      route("research", "routes/admin/research.tsx");
+      route("research/create", "routes/admin/research.create.tsx");
+      route("research/edit/:slug", "routes/admin/research.edit.$slug.tsx");
+      
       route("categories", "routes/admin/categories.tsx");
       route("tags", "routes/admin/tags.tsx");
       route("featured-articles", "routes/admin/featured-articles.tsx");
@@ -52,11 +60,8 @@ export const routes = (defineRoutes: any) => {
       
       // Resumes
       route("resumes", "routes/admin/resumes.tsx");
-      route("assets", "routes/admin/assets.tsx"); // New PDF Assets Manager
+      route("assets", "routes/admin/assets.tsx"); // PDF Assets Manager
       route("logout", "routes/admin/logout.tsx");
-      // route("resume/editor", "routes/admin/resume.editor.tsx");
-      // route("resume/qr", "routes/admin/resume.qr.tsx");
-      // route("resume/view/:id", "routes/admin/resume.view.$id.tsx");
     });
 
     // Author Portal
@@ -74,7 +79,7 @@ export const routes = (defineRoutes: any) => {
     });
 
     // Auth & API (Root Level / Layoutless)
-    route("login", "routes/login.tsx"); // Unified login page
+    route("login", "routes/login.tsx");
     
     // API Routes are Resource Routes (no layout)
     route("api/upload-image", "routes/api/upload-image.tsx");
@@ -86,21 +91,19 @@ export const routes = (defineRoutes: any) => {
     route("api/track", "routes/api/track.ts");
     route("api/media", "routes/api/media.tsx");
     route("api/generate-business-card-pdf", "routes/api/generate-business-card-pdf.tsx");
-    // route("api/supabase-keepalive", "routes/api/supabase-keepalive.ts");
 
     // Auth Providers
     route("auth/:provider", "routes/auth/$provider.tsx");
-    route("auth/sso/:provider", "routes/auth/sso.$provider.tsx"); // SSO OAuth flow
+    route("auth/sso/:provider", "routes/auth/sso.$provider.tsx");
     route("auth/callback", "routes/auth/callback.tsx");
-    route("auth/logout", "routes/auth/logout.tsx"); // Universal logout
+    route("auth/logout", "routes/auth/logout.tsx");
     route("auth/verify-auth", "routes/auth/verify-auth.tsx");
 
     // Utilities
     route("me/:shortCode", "routes/me.$shortCode.tsx");
-    route("resources/download/resume/:id", "routes/resources.download.resume.$id.tsx"); // Proxy download
-    route("links", "routes/links.tsx"); // Permanent QR code URL for linktree
-    route("resume", "routes/resume.tsx"); // Public resume viewer
-    // route("resume/view/:id", "routes/resume.view.$id.tsx"); // Public resume view?
+    route("resources/download/resume/:id", "routes/resources.download.resume.$id.tsx");
+    route("links", "routes/links.tsx");
+    route("resume", "routes/resume.tsx");
     
     // 404
     route("*", "routes/404.tsx");

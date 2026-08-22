@@ -1,4 +1,4 @@
-﻿import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTheme } from "~/Contexts/ThemeContext";
 import { Link, useActionData, useNavigation, Form, useFetcher, useSubmit } from "@remix-run/react";
 import type { ActionFunctionArgs } from "@remix-run/node";
@@ -61,16 +61,31 @@ export async function action({ request }: ActionFunctionArgs) {
             return json({ error: "Title and Content are required to publish" }, { status: 400 });
         }
 
-        await createPost({
+        // Save to Markdown storage for editorial blog
+        const { saveBlogPost } = await import("~/Services/content.server");
+        await saveBlogPost({
             title,
-            slug,
-            content,
+            slug: slug || title.toLowerCase().replace(/[^a-z0-9_-]/g, "-"),
+            date: new Date().toISOString().split("T")[0],
+            displayDate: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
             summary,
-            coverImage,
-            status: status === "published" ? "published" : "draft",
-            authorId, 
-            // gallery: gallery // Add to createPost interface if schema supports it
+            content,
+            featured: false,
         });
+
+        try {
+          await createPost({
+              title,
+              slug,
+              content,
+              summary,
+              coverImage,
+              status: status === "published" ? "published" : "draft",
+              authorId, 
+          });
+        } catch (dbErr) {
+          console.warn("Database post creation notice:", dbErr);
+        }
         
         return redirect("/admin/posts");
     }

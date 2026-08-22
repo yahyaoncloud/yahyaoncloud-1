@@ -2,22 +2,24 @@ import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChevronRight } from "lucide-react";
-import { getFeaturedProjects, getFeaturedResearch } from "~/Services/content.server";
+import { getFeaturedProjects, getFeaturedResearch, getAllBlogPosts } from "~/Services/content.server";
 
 export async function loader() {
-  const [featuredProjects, featuredResearch] = await Promise.all([
+  const [featuredProjects, featuredResearch, allPosts] = await Promise.all([
     getFeaturedProjects(),
     getFeaturedResearch(),
+    getAllBlogPosts(),
   ]);
 
   return json({
     featuredProjects,
     featuredResearch,
+    recentPosts: allPosts.slice(0, 3),
   });
 }
 
 export default function Index() {
-  const { featuredProjects, featuredResearch } = useLoaderData<typeof loader>();
+  const { featuredProjects, featuredResearch, recentPosts } = useLoaderData<typeof loader>();
   const [openExperienceIndex, setOpenExperienceIndex] = useState<number | null>(0);
 
   const experiences = [
@@ -71,9 +73,9 @@ export default function Index() {
   };
 
   return (
-    <div className="space-y-12 text-[14.5px] leading-[1.8] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-[13.5px] sm:text-[14px] leading-[1.75] tracking-[-0.011em] text-zinc-700 dark:text-zinc-300">
       {/* Introduction */}
-      <section className="space-y-4">
+      <section className="space-y-3">
         <p className="text-zinc-900 dark:text-zinc-100 font-semibold text-[15px] sm:text-base">
           Cloud DevOps & Infrastructure Engineer.
         </p>
@@ -86,7 +88,7 @@ export default function Index() {
       </section>
 
       {/* Experience Section (Accordion inspired by Siraj Chokshi) */}
-      <section className="space-y-4 pt-2">
+      <section className="space-y-3 pt-2">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Experience
         </h2>
@@ -100,7 +102,7 @@ export default function Index() {
                 className="grid grid-cols-[90px_1fr] sm:grid-cols-[110px_1fr] gap-x-2 sm:gap-x-4 items-start text-sm"
               >
                 {/* Year + Present badge column */}
-                <div className="py-1.5 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                <div className="py-1 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
                   <span className="font-normal font-mono text-xs">{exp.year}</span>
                   {exp.present && (
                     <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-[10px] font-medium text-zinc-600 dark:text-zinc-400">
@@ -204,13 +206,13 @@ export default function Index() {
           </Link>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-5">
           {featuredProjects.map((project) => (
-            <div key={project.slug} className="space-y-1.5 group">
+            <div key={project.slug} className="space-y-1 group">
               <div className="flex items-baseline justify-between gap-2">
                 <Link
                   to={`/projects/${project.slug}`}
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm sm:text-base"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm"
                 >
                   {project.title}
                 </Link>
@@ -218,10 +220,10 @@ export default function Index() {
                   {project.category}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 {project.summary}
               </p>
-              <div className="pt-1 flex items-center gap-3 text-xs">
+              <div className="pt-0.5 flex items-center gap-3 text-xs">
                 <Link
                   to={`/projects/${project.slug}`}
                   className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"
@@ -254,8 +256,44 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Writing Section */}
+      {recentPosts && recentPosts.length > 0 && (
+        <section className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+              Writing
+            </h2>
+            <Link
+              to="/blog"
+              className="text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            >
+              All articles →
+            </Link>
+          </div>
+
+          <div className="space-y-2">
+            {recentPosts.map((post) => (
+              <div key={post.slug} className="group">
+                <Link
+                  to={`/blog/${post.slug}`}
+                  className="flex items-baseline justify-between py-0.5 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
+                >
+                  <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 shrink-0 text-sm">
+                    {post.title}
+                  </span>
+                  <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 mx-2 sm:mx-3" />
+                  <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500 shrink-0">
+                    {post.displayDate}
+                  </span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Research Section */}
-      <section className="space-y-4 pt-2">
+      <section className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
             Research
@@ -268,13 +306,13 @@ export default function Index() {
           </Link>
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-4">
           {featuredResearch.map((paper) => (
             <div key={paper.slug} className="space-y-1">
               <div className="flex items-baseline justify-between gap-2">
                 <Link
                   to="/research"
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm sm:text-base"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm"
                 >
                   {paper.title}
                 </Link>
@@ -282,7 +320,7 @@ export default function Index() {
                   {paper.year}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
                 {paper.abstract}
               </p>
             </div>
@@ -290,7 +328,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Elsewhere Section (2 columns: left Social key, right value link) */}
+      {/* Elsewhere Section */}
       <section className="space-y-3 pt-2">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Elsewhere

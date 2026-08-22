@@ -1,4 +1,4 @@
-﻿import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTheme } from "~/Contexts/ThemeContext";
 import { Link, useLoaderData, Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
@@ -45,6 +45,27 @@ export async function loader({ params }: LoaderFunctionArgs) {
     }
 
     if (!post) {
+      const { getBlogPostBySlug } = await import("~/Services/content.server");
+      const mdPost = await getBlogPostBySlug(slug);
+      if (mdPost) {
+        post = {
+          id: mdPost.slug,
+          title: mdPost.title,
+          slug: mdPost.slug,
+          summary: mdPost.summary || "",
+          content: mdPost.content,
+          coverImage: "",
+          status: "published",
+          date: new Date(mdPost.date),
+          gallery: [],
+          author: { authorName: mdPost.author || "Yahya" },
+          categories: [],
+          tags: [],
+        };
+      }
+    }
+
+    if (!post) {
       return json({ error: "Post not found" }, { status: 404 });
     }
     
@@ -68,26 +89,42 @@ export async function action({ request, params }: ActionFunctionArgs) {
   try {
     if (intent === "update") {
         const title = formData.get("title") as string;
-        const slug = formData.get("slug") as string;
+        const slug = (formData.get("slug") as string) || params.slug || postId;
         const summary = formData.get("summary") as string;
         const content = formData.get("content") as string;
         const coverImage = formData.get("coverImage") as string;
         const status = formData.get("status") as string;
         const dateRaw = formData.get("date") as string;
-        console.log(`[AdminPostEdit] Action received dateRaw: "${dateRaw}"`);
         const gallery = JSON.parse(formData.get("gallery") as string || "[]");
         
-        await updatePost({
-            id: postId,
+        // Save to Markdown
+        const { saveBlogPost } = await import("~/Services/content.server");
+        await saveBlogPost({
             title,
             slug,
+            date: dateRaw || new Date().toISOString().split("T")[0],
+            displayDate: new Date(dateRaw || Date.now()).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
             summary,
             content,
-            coverImage,
-            status,
-            gallery,
-            date: dateRaw ? new Date(dateRaw) : undefined
+            featured: false,
         });
+
+        try {
+          await updatePost({
+              id: postId,
+              title,
+              slug,
+              summary,
+              content,
+              coverImage,
+              status,
+              gallery,
+              date: dateRaw ? new Date(dateRaw) : undefined
+          });
+        } catch (dbErr) {
+          console.warn("Database post update notice:", dbErr);
+        }
+
         return json({ success: true, message: "Post updated successfully", error: undefined });
     }
 

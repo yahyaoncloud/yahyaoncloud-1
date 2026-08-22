@@ -1,4 +1,4 @@
-﻿// Admin Posts - Manage blog posts
+// Admin Posts - Manage blog posts
 import { json, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useActionData, Form, Link, useSearchParams, useNavigation } from "@remix-run/react";
 import { 
@@ -44,14 +44,45 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const search = url.searchParams.get("q") || undefined;
   const status = url.searchParams.get("status") || undefined;
   
-  const { posts, total, totalPages } = await getPosts({
-    page,
-    limit: 10,
-    search,
-    status
-  });
+  let dbResult = { posts: [] as any[], total: 0, totalPages: 1 };
+  try {
+    dbResult = await getPosts({
+      page,
+      limit: 10,
+      search,
+      status
+    });
+  } catch (err) {
+    console.warn("DB posts fetch notice:", err);
+  }
   
-  return json({ posts, total, page, totalPages });
+  // Merge with Markdown blog posts
+  const { getAllBlogPosts } = await import("~/Services/content.server");
+  const mdPosts = await getAllBlogPosts();
+  
+  const existingSlugs = new Set(dbResult.posts.map((p) => p.slug));
+  const mappedMdPosts = mdPosts
+    .filter((mp) => !existingSlugs.has(mp.slug))
+    .map((mp) => ({
+      id: mp.slug,
+      title: mp.title,
+      slug: mp.slug,
+      summary: mp.summary || "",
+      status: "published",
+      views: 0,
+      likes: 0,
+      createdAt: mp.date,
+      date: mp.date,
+      author: { authorName: mp.author || "Yahya" },
+      categories: [],
+      tags: [],
+    }));
+
+  const allPosts = [...dbResult.posts, ...mappedMdPosts];
+  const total = allPosts.length;
+  const totalPages = Math.max(1, Math.ceil(total / 10));
+
+  return json({ posts: allPosts, total, page, totalPages });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -61,7 +92,13 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     if (intent === "delete") {
-      await deletePost(id);
+      const { deleteBlogPost } = await import("~/Services/content.server");
+      await deleteBlogPost(id);
+      try {
+        await deletePost(id);
+      } catch (dbErr) {
+        console.warn("DB delete post notice:", dbErr);
+      }
       return json({ success: true, message: "Post deleted" });
     }
     

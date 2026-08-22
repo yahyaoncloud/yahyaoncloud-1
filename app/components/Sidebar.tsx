@@ -38,20 +38,18 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: "Dashboard", href: "/admin/dashboard", icon: Home },
   {
-    name: "Blog Management",
-    icon: FileText,
+    name: "Engineering Content",
+    icon: Globe,
     children: [
-      { name: "All Posts", icon: FileText, href: "/admin/posts" },
-      { name: "Create Post", icon: PlusCircle, href: "/admin/post/create" },
-      { name: "Categories", icon: Tags, href: "/admin/categories" },
-      { name: "Tags", icon: Tag, href: "/admin/tags" },
-      { name: "Featured", icon: FileText, href: "/admin/featured-articles" },
-      { name: "Media", icon: Image, href: "/admin/media" },
+      { name: "Projects", icon: Briefcase, href: "/admin/projects" },
+      { name: "Research Papers", icon: FileText, href: "/admin/research" },
+      { name: "Blog Articles", icon: FileText, href: "/admin/posts" },
+      { name: "Create Article", icon: PlusCircle, href: "/admin/post/create" },
     ],
   },
   {
     name: "Site Content",
-    icon: Globe,
+    icon: Layout,
     children: [
       { name: "Homepage Cards", icon: Layout, href: "/admin/homepage-cards" },
       { name: "About Page", icon: FileText, href: "/admin/about" },
