@@ -54,10 +54,10 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
           themeVariables: isDarkMode
             ? {
                 darkMode: true,
-                background: "#09090b",
+                background: "transparent",
                 primaryColor: "#18181b",
                 primaryTextColor: "#f4f4f5",
-                primaryBorderColor: "#27272a",
+                primaryBorderColor: "#3f3f46",
                 lineColor: "#71717a",
                 secondaryColor: "#18181b",
                 tertiaryColor: "#18181b",
@@ -65,7 +65,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
               }
             : {
                 darkMode: false,
-                background: "#ffffff",
+                background: "transparent",
                 primaryColor: "#f4f4f5",
                 primaryTextColor: "#18181b",
                 primaryBorderColor: "#e4e4e7",
@@ -122,7 +122,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
 
   // Inline Drag Handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.button !== 0) return; // Only primary mouse button
+    if (e.button !== 0) return;
     setIsDragging(true);
     dragStartRef.current = { x: e.clientX - position.x, y: e.clientY - position.y };
   }, [position]);
@@ -168,7 +168,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
 
   if (!isClient) {
     return (
-      <div className="my-6 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-center min-h-[140px]">
+      <div className="my-6 p-4 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-center min-h-[140px]">
         <span className="text-xs text-zinc-400 font-mono">Loading diagram...</span>
       </div>
     );
@@ -176,7 +176,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
 
   if (error) {
     return (
-      <div className="my-6 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs font-mono text-zinc-600 dark:text-zinc-400 overflow-x-auto">
+      <div className="my-6 p-4 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50 dark:bg-zinc-900/40 text-xs font-mono text-zinc-600 dark:text-zinc-400 overflow-x-auto">
         <p className="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">Diagram Source</p>
         <pre>{chart}</pre>
       </div>
@@ -188,7 +188,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
   return (
     <>
       <div
-        className={`relative my-6 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden group select-none ${className}`}
+        className={`relative my-6 rounded-lg border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 overflow-hidden group select-none ${className}`}
       >
         {/* Floating Zoom & Pan Controls Bar */}
         <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 bg-zinc-100/90 dark:bg-zinc-800/90 backdrop-blur-sm px-1.5 py-1 rounded-md border border-zinc-200/80 dark:border-zinc-700/80 shadow-xs opacity-80 group-hover:opacity-100 transition-opacity">
@@ -237,9 +237,9 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
           </button>
         </div>
 
-        {/* Diagram SVG Container with Drag & Pan support */}
+        {/* Diagram SVG Container - Height dynamically fits diagram naturally */}
         <div
-          className={`p-4 sm:p-6 overflow-hidden min-h-[160px] max-h-[580px] flex justify-center items-center ${
+          className={`p-4 sm:p-6 overflow-hidden w-full h-auto flex justify-center items-center ${
             isDragging ? "cursor-grabbing" : isCustomTransform ? "cursor-grab" : "cursor-default"
           }`}
           onMouseDown={handleMouseDown}
@@ -256,7 +256,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
               transformOrigin: "center center",
               transition: isDragging ? "none" : "transform 0.15s ease-out",
             }}
-            className="flex justify-center items-center [&_svg]:max-w-full [&_svg]:h-auto pointer-events-none"
+            className="w-full h-auto flex justify-center items-center [&_svg]:max-w-full [&_svg]:h-auto pointer-events-none"
             dangerouslySetInnerHTML={{ __html: svgContent }}
           />
         </div>

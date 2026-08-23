@@ -29,10 +29,13 @@ function CodeBlock({
     return <MermaidViewer chart={codeString} />;
   }
 
-  if (inline) {
+  // Accurately determine if this is an inline code snippet or a multi-line fenced code block
+  const isInline = inline ?? (!match && !codeString.includes("\n"));
+
+  if (isInline) {
     return (
       <code
-        className="px-1.5 py-0.5 rounded text-[15px] font-mono bg-zinc-100 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200"
+        className="px-1.5 py-0.5 rounded text-[14.5px] font-mono bg-zinc-100 dark:bg-zinc-800/60 text-zinc-800 dark:text-zinc-200"
         {...props}
       >
         {children}
@@ -40,7 +43,7 @@ function CodeBlock({
     );
   }
 
-  // Syntax Highlighted snippet - seamlessly replicates theme background (Light/Dark)
+  // Syntax Highlighted block snippet - seamless dark & light mode blending
   const activeTheme = isDark ? themes.vsDark : themes.vsLight;
 
   return (
@@ -51,7 +54,7 @@ function CodeBlock({
     >
       {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
         <pre
-          className={`p-3.5 rounded-md overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-3 border-0 bg-zinc-100/90 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
+          className={`p-3.5 rounded-md overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-3.5 border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-100/80 dark:bg-zinc-900/40 text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
           style={{ ...style, backgroundColor: undefined }}
         >
           <code className="block">
