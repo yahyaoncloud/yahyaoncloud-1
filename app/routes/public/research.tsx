@@ -23,15 +23,15 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
         </span>
       </div>
 
-      <h2 className="font-medium text-lg md:text-xl text-zinc-900 dark:text-zinc-100">
+      <h3 className="font-medium text-lg md:text-xl text-zinc-900 dark:text-zinc-100">
         {paper.title}
-      </h2>
+      </h3>
 
       <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-500">
         {paper.authors.join(", ")}
       </p>
 
-      <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 pt-1">
+      <p className="text-zinc-600 dark:text-zinc-400 pt-1">
         {paper.abstract}
       </p>
 
@@ -84,13 +84,11 @@ export default function ResearchIndex() {
   const { papers } = useLoaderData<typeof loader>();
 
   return (
-    <div className="space-y-10 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Research & Publications
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg">
+        <h1>Research & Publications</h1>
+        <p className="text-zinc-600 dark:text-zinc-400">
           Technical papers, architecture benchmarks, and experimental studies on Zero-Trust network topologies and eBPF traffic engineering.
         </p>
       </div>

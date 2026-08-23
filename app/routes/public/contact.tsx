@@ -37,22 +37,18 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="space-y-10 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Contact
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg">
+        <h1>Contact</h1>
+        <p className="text-zinc-600 dark:text-zinc-400">
           Interested in cloud infrastructure, reliability engineering, or discussing distributed systems? Reach out through any channel below.
         </p>
       </div>
 
       {/* Direct Reach-Out Channels (2 columns) */}
       <section className="space-y-3 pt-2">
-        <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-          Channels
-        </h2>
+        <h2>Channels</h2>
         <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-y-2.5 items-baseline text-base md:text-[17px]">
           {contactLinks.map((item) => (
             <div key={item.label} className="contents">
@@ -76,9 +72,7 @@ export default function ContactPage() {
 
       {/* Message Form */}
       <section className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-900">
-        <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-          Send a Message
-        </h2>
+        <h2>Send a Message</h2>
 
         <Form method="post" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

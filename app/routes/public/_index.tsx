@@ -2,6 +2,7 @@ import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChevronRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   getProfileInfo,
   getFeaturedProjects,
@@ -35,25 +36,21 @@ export default function Index() {
   };
 
   return (
-    <div className="space-y-10 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10">
       {/* Introduction */}
       <section className="space-y-3">
-        <p className="text-zinc-900 dark:text-zinc-100 font-semibold text-lg md:text-[19px]">
+        <p className="font-semibold text-zinc-900 dark:text-zinc-100 text-lg md:text-[19px]">
           {profileInfo.headline}
         </p>
         {profileInfo.bio.map((paragraph, idx) => (
-          <p key={idx} className="text-[17px] md:text-lg leading-relaxed">
-            {paragraph}
-          </p>
+          <p key={idx}>{paragraph}</p>
         ))}
       </section>
 
-      {/* Experience Section (Accordion inspired by Siraj Chokshi) */}
+      {/* Experience Section (with smooth subtle dropdown animation) */}
       {profileInfo.experiences && profileInfo.experiences.length > 0 && (
         <section className="space-y-3 pt-2">
-          <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-            Experience
-          </h2>
+          <h2>Experience</h2>
 
           <div className="space-y-2">
             {profileInfo.experiences.map((exp, idx) => {
@@ -64,7 +61,7 @@ export default function Index() {
                   className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-x-3 md:gap-x-4 items-start text-base md:text-[17px]"
                 >
                   {/* Year + Present badge column */}
-                  <div className="py-1 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                  <div className="py-1.5 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
                     <span className="font-normal font-mono text-sm md:text-base">{exp.year}</span>
                     {exp.present && (
                       <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-xs md:text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -73,7 +70,7 @@ export default function Index() {
                     )}
                   </div>
 
-                  {/* Accordion Row */}
+                  {/* Accordion Container */}
                   <div
                     className={`overflow-hidden rounded-lg transition-colors min-w-0 ${
                       isOpen
@@ -101,37 +98,53 @@ export default function Index() {
                       </span>
                     </button>
 
-                    {/* Collapsible Content */}
-                    {isOpen && (
-                      <div className="px-6 pb-3 pt-1 space-y-2 text-sm md:text-base text-zinc-600 dark:text-zinc-400">
-                        <p className="leading-relaxed">{exp.description}</p>
-                        {exp.projects && exp.projects.length > 0 && (
-                          <div className="space-y-1 pt-1">
-                            {exp.projects.map((proj) => (
-                              <div key={proj.name}>
-                                {proj.internal ? (
-                                  <Link
-                                    to={proj.url}
-                                    className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base"
-                                  >
-                                    {proj.name}
-                                  </Link>
-                                ) : (
-                                  <a
-                                    href={proj.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base"
-                                  >
-                                    {proj.name}
-                                  </a>
-                                )}
+                    {/* Animated Dropdown Content */}
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          key="content"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{
+                            duration: 0.22,
+                            ease: [0.04, 0.62, 0.23, 0.98],
+                          }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-6 pb-3 pt-1 space-y-2 text-sm md:text-base text-zinc-600 dark:text-zinc-400">
+                            <p className="leading-relaxed text-sm md:text-base text-zinc-600 dark:text-zinc-400">
+                              {exp.description}
+                            </p>
+                            {exp.projects && exp.projects.length > 0 && (
+                              <div className="space-y-1 pt-1">
+                                {exp.projects.map((proj) => (
+                                  <div key={proj.name}>
+                                    {proj.internal ? (
+                                      <Link
+                                        to={proj.url}
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base"
+                                      >
+                                        {proj.name}
+                                      </Link>
+                                    ) : (
+                                      <a
+                                        href={proj.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base"
+                                      >
+                                        {proj.name}
+                                      </a>
+                                    )}
+                                  </div>
+                                ))}
                               </div>
-                            ))}
+                            )}
                           </div>
-                        )}
-                      </div>
-                    )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               );
@@ -143,9 +156,7 @@ export default function Index() {
       {/* Skills Section */}
       {profileInfo.skills && profileInfo.skills.length > 0 && (
         <section className="space-y-3 pt-2">
-          <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-            Skills
-          </h2>
+          <h2>Skills</h2>
           <div className="flex flex-wrap gap-1.5">
             {profileInfo.skills.map((skill, idx) => (
               <span
@@ -162,9 +173,7 @@ export default function Index() {
       {/* Selected Work Section */}
       <section className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-            Selected Work
-          </h2>
+          <h2>Selected Work</h2>
           <Link
             to="/projects"
             className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
@@ -228,9 +237,7 @@ export default function Index() {
       {recentPosts && recentPosts.length > 0 && (
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-              Writing
-            </h2>
+            <h2>Writing</h2>
             <Link
               to="/blog"
               className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
@@ -264,9 +271,7 @@ export default function Index() {
       {/* Research Section */}
       <section className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-            Research
-          </h2>
+          <h2>Research</h2>
           <Link
             to="/research"
             className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
@@ -301,9 +306,7 @@ export default function Index() {
       {/* Elsewhere Section */}
       {profileInfo.socialLinks && profileInfo.socialLinks.length > 0 && (
         <section className="space-y-3 pt-2">
-          <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
-            Elsewhere
-          </h2>
+          <h2>Elsewhere</h2>
           <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-y-2.5 items-baseline text-base md:text-[17px]">
             {profileInfo.socialLinks.map((item) => (
               <div key={item.label} className="contents">

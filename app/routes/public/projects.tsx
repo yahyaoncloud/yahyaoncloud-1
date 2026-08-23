@@ -29,13 +29,11 @@ export default function ProjectsIndex() {
       : projects.filter((p: ProjectCaseStudy) => p.category === selectedCategory);
 
   return (
-    <div className="space-y-10 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Projects
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg">
+        <h1>Projects</h1>
+        <p className="text-zinc-600 dark:text-zinc-400">
           Engineering case studies on multi-region Kubernetes, enterprise SDN migrations, and distributed telemetry meshes.
         </p>
       </div>
@@ -78,7 +76,7 @@ export default function ProjectsIndex() {
               </span>
             </div>
 
-            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400">
+            <p className="text-zinc-600 dark:text-zinc-400">
               {project.summary}
             </p>
 

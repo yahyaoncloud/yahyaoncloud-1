@@ -2,11 +2,9 @@ import { Link } from "@remix-run/react";
 
 export default function TermsPage() {
   return (
-    <div className="space-y-8 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Terms & Conditions
-        </h1>
+        <h1>Terms & Conditions</h1>
         <p className="text-xs font-mono text-zinc-400">
           Last updated: 2026
         </p>
