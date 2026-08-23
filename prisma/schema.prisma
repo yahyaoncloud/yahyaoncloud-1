@@ -164,15 +164,16 @@ model ResearchPaper {
 }
 
 model ProfileInfo {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  key         String   @unique @default("homepage_profile")
-  headline    String
-  bio         String[]
-  experiences Json?    // Array of { year, present, company, role, description, projects }
-  skills      String[]
-  socialLinks Json?    // Array of { label, href, display, external }
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  key            String   @unique @default("homepage_profile")
+  headline       String
+  bio            String[]
+  experiences    Json?    // Array of { year, present, company, role, description, projects }
+  skills         String[]
+  certifications Json?    // Array of { name, issuer, issueDate, expiryDate, credentialId, credentialUrl }
+  socialLinks    Json?    // Array of { label, href, display, external }
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model ContactMessage {

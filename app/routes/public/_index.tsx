@@ -153,6 +153,44 @@ export default function Index() {
         </section>
       )}
 
+      {/* Certifications Section */}
+      {profileInfo.certifications && profileInfo.certifications.length > 0 && (
+        <section className="space-y-3 pt-2">
+          <h2>Certifications</h2>
+          <div className="space-y-2.5">
+            {profileInfo.certifications.map((cert, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 gap-3 min-w-0"
+              >
+                <div className="flex items-center gap-2 min-w-0 truncate">
+                  {cert.credentialUrl ? (
+                    <a
+                      href={cert.credentialUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-normal text-zinc-800 dark:text-zinc-200 hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-base md:text-lg truncate"
+                      title={cert.name}
+                    >
+                      {cert.name}
+                    </a>
+                  ) : (
+                    <span className="font-normal text-zinc-800 dark:text-zinc-200 text-base md:text-lg truncate">
+                      {cert.name}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
+                <div className="flex items-center gap-2 font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
+                  <span>{cert.issuer}</span>
+                  {cert.issueDate && <span>• {cert.issueDate}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Skills Section */}
       {profileInfo.skills && profileInfo.skills.length > 0 && (
         <section className="space-y-3 pt-2">

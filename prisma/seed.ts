@@ -7,60 +7,88 @@ async function main() {
 
   // 1. Seed Profile Info
   console.log("Seeding ProfileInfo...");
+  const profileData = {
+    key: "homepage_profile",
+    headline: "Cloud DevOps & Infrastructure Engineer.",
+    bio: [
+      "Over the past 3 years, I've engineered network backbones and scaled cloud environments—transitioning from 2 years in enterprise network infrastructure to building declarative Kubernetes, Terraform, and GitOps architectures.",
+      "I studied Engineering at Global Institute of Engineering & Technology (GIET), Moinabad. I focus on simple, observable, and resilient distributed systems.",
+    ],
+    skills: [
+      "AWS (EKS, VPC, Route53)",
+      "Kubernetes & ArgoCD",
+      "Terraform (IaC)",
+      "Docker & Containers",
+      "CI/CD (GitHub Actions)",
+      "Linux & Networking (BGP/OSPF)",
+      "Python & Bash Scripting",
+      "Cloud Architecture & SRE",
+      "Remix / TypeScript",
+    ],
+    certifications: [
+      {
+        name: "AWS Certified Solutions Architect – Professional",
+        issuer: "Amazon Web Services",
+        issueDate: "2024",
+        credentialUrl: "https://aws.amazon.com/certification/",
+      },
+      {
+        name: "Certified Kubernetes Administrator (CKA)",
+        issuer: "Cloud Native Computing Foundation",
+        issueDate: "2023",
+        credentialUrl: "https://www.cncf.io/certification/cka/",
+      },
+      {
+        name: "HashiCorp Certified: Terraform Associate",
+        issuer: "HashiCorp",
+        issueDate: "2023",
+        credentialUrl: "https://www.hashicorp.com/certification/terraform-associate",
+      },
+      {
+        name: "Red Hat Certified Specialist in Linux Networking",
+        issuer: "Red Hat",
+        issueDate: "2022",
+        credentialUrl: "https://www.redhat.com/en/services/certification",
+      },
+    ],
+    experiences: [
+      {
+        year: "2024",
+        present: true,
+        company: "Cloud & DevOps",
+        role: "Engineer",
+        description:
+          "Architecting multi-region Kubernetes clusters, GitOps pipelines with ArgoCD, Terraform IaC automation, and distributed observability meshes across AWS and hybrid clouds.",
+        projects: [
+          { name: "Multi-Region Cloud GitOps Platform", url: "/projects/multi-region-cloud-gitops", internal: true },
+          { name: "Distributed Observability & Telemetry Mesh", url: "/projects/observability-mesh-telemetry", internal: true },
+        ],
+      },
+      {
+        year: "2022",
+        present: false,
+        company: "Network Infrastructure",
+        role: "Engineer",
+        description:
+          "Managed enterprise multi-vendor routing and switching, BGP peering, OSPF network backbones, hardware firewalls, site-to-site VPN tunnels, and zero-trust SDN migrations.",
+        projects: [
+          { name: "Hybrid Cloud Enterprise Network & Zero-Trust SDN", url: "/projects/hybrid-sdn-infrastructure", internal: true },
+          { name: "eBPF-Driven Cloud Traffic Engineering", url: "/research", internal: true },
+        ],
+      },
+    ],
+    socialLinks: [
+      { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
+      { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "https://github.com/yahyaoncloud", external: true },
+      { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "https://linkedin.com/in/ykinwork1", external: true },
+      { label: "Email", href: "mailto:hello@yahyaoncloud.com", display: "hello@yahyaoncloud.com", external: false },
+    ],
+  };
+
   await prisma.profileInfo.upsert({
     where: { key: "homepage_profile" },
-    update: {},
-    create: {
-      key: "homepage_profile",
-      headline: "Cloud DevOps & Infrastructure Engineer.",
-      bio: [
-        "Over the past 3 years, I've engineered network backbones and scaled cloud environments—transitioning from 2 years in enterprise network infrastructure to building declarative Kubernetes, Terraform, and GitOps architectures.",
-        "I studied Engineering at Global Institute of Engineering & Technology (GIET), Moinabad. I focus on simple, observable, and resilient distributed systems.",
-      ],
-      skills: [
-        "AWS (EKS, VPC, Route53)",
-        "Kubernetes & ArgoCD",
-        "Terraform (IaC)",
-        "Docker & Containers",
-        "CI/CD (GitHub Actions)",
-        "Linux & Networking (BGP/OSPF)",
-        "Python & Bash Scripting",
-        "Cloud Architecture & SRE",
-        "Remix / TypeScript",
-      ],
-      experiences: [
-        {
-          year: "2024",
-          present: true,
-          company: "Cloud & DevOps",
-          role: "Engineer",
-          description:
-            "Architecting multi-region Kubernetes clusters, GitOps pipelines with ArgoCD, Terraform IaC automation, and distributed observability meshes across AWS and hybrid clouds.",
-          projects: [
-            { name: "Multi-Region Cloud GitOps Platform", url: "/projects/multi-region-cloud-gitops", internal: true },
-            { name: "Distributed Observability & Telemetry Mesh", url: "/projects/observability-mesh-telemetry", internal: true },
-          ],
-        },
-        {
-          year: "2022",
-          present: false,
-          company: "Network Infrastructure",
-          role: "Engineer",
-          description:
-            "Managed enterprise multi-vendor routing and switching, BGP peering, OSPF network backbones, hardware firewalls, site-to-site VPN tunnels, and zero-trust SDN migrations.",
-          projects: [
-            { name: "Hybrid Cloud Enterprise Network & Zero-Trust SDN", url: "/projects/hybrid-sdn-infrastructure", internal: true },
-            { name: "eBPF-Driven Cloud Traffic Engineering", url: "/research", internal: true },
-          ],
-        },
-      ],
-      socialLinks: [
-        { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
-        { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "https://github.com/yahyaoncloud", external: true },
-        { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "https://linkedin.com/in/ykinwork1", external: true },
-        { label: "Email", href: "mailto:hello@yahyaoncloud.com", display: "hello@yahyaoncloud.com", external: false },
-      ],
-    },
+    update: profileData,
+    create: profileData,
   });
 
   // 2. Seed Project Case Studies

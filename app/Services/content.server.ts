@@ -47,6 +47,15 @@ export interface ResearchPaper {
   content?: string;
 }
 
+export interface CertificationItem {
+  name: string;
+  issuer: string;
+  issueDate?: string;
+  expiryDate?: string;
+  credentialId?: string;
+  credentialUrl?: string;
+}
+
 export interface ProfileInfoData {
   headline: string;
   bio: string[];
@@ -59,6 +68,7 @@ export interface ProfileInfoData {
     projects?: Array<{ name: string; url: string; internal?: boolean }>;
   }>;
   skills: string[];
+  certifications?: CertificationItem[];
   socialLinks: Array<{
     label: string;
     href: string;
@@ -660,6 +670,32 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
     "Cloud Architecture & SRE",
     "Remix / TypeScript",
   ],
+  certifications: [
+    {
+      name: "AWS Certified Solutions Architect – Professional",
+      issuer: "Amazon Web Services",
+      issueDate: "2024",
+      credentialUrl: "https://aws.amazon.com/certification/",
+    },
+    {
+      name: "Certified Kubernetes Administrator (CKA)",
+      issuer: "Cloud Native Computing Foundation",
+      issueDate: "2023",
+      credentialUrl: "https://www.cncf.io/certification/cka/",
+    },
+    {
+      name: "HashiCorp Certified: Terraform Associate",
+      issuer: "HashiCorp",
+      issueDate: "2023",
+      credentialUrl: "https://www.hashicorp.com/certification/terraform-associate",
+    },
+    {
+      name: "Red Hat Certified Specialist in Linux Networking",
+      issuer: "Red Hat",
+      issueDate: "2022",
+      credentialUrl: "https://www.redhat.com/en/services/certification",
+    },
+  ],
   socialLinks: [
     { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
     { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "https://github.com/yahyaoncloud", external: true },
@@ -680,6 +716,7 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
         bio: profile.bio && profile.bio.length > 0 ? profile.bio : DEFAULT_PROFILE_INFO.bio,
         skills: profile.skills && profile.skills.length > 0 ? profile.skills : DEFAULT_PROFILE_INFO.skills,
         experiences: (profile.experiences as unknown as ProfileInfoData["experiences"]) || DEFAULT_PROFILE_INFO.experiences,
+        certifications: (profile.certifications as unknown as ProfileInfoData["certifications"]) || DEFAULT_PROFILE_INFO.certifications,
         socialLinks: (profile.socialLinks as unknown as ProfileInfoData["socialLinks"]) || DEFAULT_PROFILE_INFO.socialLinks,
       };
     }
@@ -692,6 +729,7 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
         bio: DEFAULT_PROFILE_INFO.bio,
         skills: DEFAULT_PROFILE_INFO.skills,
         experiences: DEFAULT_PROFILE_INFO.experiences as unknown as object,
+        certifications: DEFAULT_PROFILE_INFO.certifications as unknown as object,
         socialLinks: DEFAULT_PROFILE_INFO.socialLinks as unknown as object,
       },
     }).catch((err) => console.warn("DB seed profile info notice:", err));
@@ -711,6 +749,7 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         bio: data.bio,
         skills: data.skills,
         experiences: data.experiences as unknown as object,
+        certifications: data.certifications as unknown as object,
         socialLinks: data.socialLinks as unknown as object,
       },
       create: {
@@ -719,6 +758,7 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         bio: data.bio,
         skills: data.skills,
         experiences: data.experiences as unknown as object,
+        certifications: data.certifications as unknown as object,
         socialLinks: data.socialLinks as unknown as object,
       },
     });
