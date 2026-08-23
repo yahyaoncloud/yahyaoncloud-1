@@ -143,8 +143,8 @@ export default function UnifiedLogin() {
       
       <div className="w-full max-w-md relative z-10">
         {/* Animated gradient border */}
-        <div className="relative p-[2px] rounded-lg bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 animate-gradient-x">
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-8 h-[650px] flex flex-col">
+        <div className="relative p-[2px] rounded-lg bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 animate-gradient-x shadow-xl">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg p-8 flex flex-col">
             {/* Logo and Branding */}
             <div className="text-center mb-6">
               <img 
@@ -161,7 +161,7 @@ export default function UnifiedLogin() {
             <button
               type="button"
               onClick={() => setActiveTab('admin')}
-              className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors text-sm ${
+              className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors text-sm cursor-pointer ${
                 activeTab === 'admin'
                   ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
@@ -172,7 +172,7 @@ export default function UnifiedLogin() {
             <button
               type="button"
               onClick={() => setActiveTab('author')}
-              className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors text-sm ${
+              className={`flex-1 py-2.5 px-4 rounded-md font-medium transition-colors text-sm cursor-pointer ${
                 activeTab === 'author'
                   ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
@@ -182,8 +182,8 @@ export default function UnifiedLogin() {
             </button>
           </div>
           
-          {/* Content Area - Fixed height */}
-          <div className="flex-1 overflow-y-auto">
+          {/* Content Area */}
+          <div className="w-full">
           
           {/* Admin Login */}
           {activeTab === 'admin' && (

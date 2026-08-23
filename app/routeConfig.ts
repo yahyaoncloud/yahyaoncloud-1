@@ -75,14 +75,10 @@ export const routes = (defineRoutes: any) => {
       route("logout", "routes/authors/logout.tsx");
     });
 
-    // Auth Portal (Layout: auth/layout.tsx)
-    route("login", "routes/auth/layout.tsx", () => {
-      route("", "routes/login.tsx", { index: true });
-    });
-    route("auth", "routes/auth/layout.tsx", { id: "auth-portal-group" }, () => {
-      route("login", "routes/login.tsx", { id: "auth-login-alias" });
-      route("portal", "routes/login.tsx", { id: "auth-portal-alias" });
-    });
+    // Auth & Login (Root Level / Layoutless)
+    route("login", "routes/login.tsx");
+    route("auth/login", "routes/login.tsx", { id: "auth-login-alias" });
+    route("auth/portal", "routes/login.tsx", { id: "auth-portal-alias" });
     
     // API Routes are Resource Routes (no layout)
     route("api/upload-image", "routes/api/upload-image.tsx");
