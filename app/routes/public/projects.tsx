@@ -48,7 +48,7 @@ export default function ProjectsIndex() {
               className={`text-sm md:text-base px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
                 selectedCategory === cat
                   ? "bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 font-medium"
-                  : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  : "bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200/80 dark:border-zinc-800/80"
               }`}
             >
               {cat}
@@ -58,37 +58,37 @@ export default function ProjectsIndex() {
       )}
 
       {/* Projects List */}
-      <div className="space-y-8">
+      <div className="space-y-7">
         {filteredProjects.map((project: ProjectCaseStudy) => (
-          <article
-            key={project.slug}
-            className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0"
-          >
-            <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
+          <article key={project.slug} className="space-y-2 group">
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
               <Link
                 to={`/projects/${project.slug}`}
-                className="font-medium text-lg md:text-xl text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4"
+                className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline underline-offset-4 text-lg md:text-xl"
               >
                 {project.title}
               </Link>
-              <span className="font-mono text-xs md:text-sm text-zinc-400 shrink-0">
-                {project.period}
-              </span>
+              {project.category && (
+                <span className="text-xs md:text-sm font-mono text-zinc-400 shrink-0">
+                  {project.category}
+                </span>
+              )}
             </div>
 
-            <p className="text-zinc-600 dark:text-zinc-400">
-              {project.summary}
-            </p>
+            {project.description && (
+              <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-[17px] line-clamp-2">
+                {project.description}
+              </p>
+            )}
 
-            {/* Tech Tags */}
-            {project.techStack && project.techStack.length > 0 && (
+            {project.tags && project.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {project.techStack.map((tech, i) => (
+                {project.tags.map((tag: string, idx: number) => (
                   <span
-                    key={i}
-                    className="text-xs md:text-sm font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+                    key={idx}
+                    className="text-xs md:text-sm font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800/80"
                   >
-                    {tech}
+                    {tag}
                   </span>
                 ))}
               </div>

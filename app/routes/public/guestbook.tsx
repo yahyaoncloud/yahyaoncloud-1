@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Send, Clock, User, LogOut } from "lucide-react";
 import { FaGithub, FaTwitter } from "react-icons/fa";
 import { FaSquareXTwitter, FaGoogle } from "react-icons/fa6";
@@ -280,10 +280,10 @@ export default function MinimalistGuestbook() {
           animate="visible"
         >
           {!user ? (
-            <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 p-6 w-full">
+            <div className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/40 p-6 w-full">
               <div className="text-center mb-6">
                 <User className="mx-auto w-6 h-6 text-zinc-400 mb-3" />
-                <h2 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">
+                <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">
                   Sign in to leave a message
                 </h2>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -302,19 +302,19 @@ export default function MinimalistGuestbook() {
                     name: "GitHub",
                     provider: githubProvider,
                     icon: FaGithub,
-                    color: "text-zinc-900 dark:text-white",
+                    color: "text-zinc-900 dark:text-zinc-100",
                   },
                   {
                     name: "Twitter",
                     provider: twitterProvider,
                     icon: FaSquareXTwitter,
-                    color: "text-zinc-900 dark:text-white",
+                    color: "text-zinc-900 dark:text-zinc-100",
                   },
                 ].map(({ name, provider, icon: Icon, color }) => (
                   <button
                     key={name}
                     onClick={() => handleSignIn(provider)}
-                    className="group flex items-center justify-center gap-3 py-2.5 px-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors duration-200 w-full"
+                    className="group flex items-center justify-center gap-3 py-2.5 px-2 border border-zinc-200/80 dark:border-zinc-800 rounded-md bg-zinc-100/80 dark:bg-zinc-900/70 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 transition-colors duration-200 w-full cursor-pointer"
                   >
                     <Icon className={`w-6 h-6 ${color}`} />
                     {/* <span className="text-sm font-medium">Sign in with {name}</span> */}

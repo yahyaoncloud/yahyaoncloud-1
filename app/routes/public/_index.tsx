@@ -74,8 +74,8 @@ export default function Index() {
                   <div
                     className={`overflow-hidden rounded-lg transition-colors min-w-0 ${
                       isOpen
-                        ? "bg-zinc-50/80 dark:bg-zinc-900/60"
-                        : "hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30"
+                        ? "bg-zinc-100/80 dark:bg-zinc-900/60"
+                        : "hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30"
                     }`}
                   >
                     <button
@@ -199,7 +199,7 @@ export default function Index() {
             {profileInfo.skills.map((skill, idx) => (
               <span
                 key={idx}
-                className="text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/80"
+                className="text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80"
               >
                 {skill}
               </span>

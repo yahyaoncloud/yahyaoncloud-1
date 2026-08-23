@@ -96,7 +96,7 @@ function RootLayout() {
       </head>
 
       <body
-        className={`dark:bg-zinc-900 dark:text-zinc-100 bg-zinc-50 text-zinc-800 min-h-screen transition-colors duration-300`}
+        className="bg-background text-foreground min-h-screen transition-colors duration-200"
       >
         <Outlet />
         <Toaster position="top-right" richColors theme={theme as "light" | "dark" | "system"} />
@@ -147,7 +147,7 @@ export function ErrorBoundary() {
           <Meta />
           <Links />
         </head>
-        <body className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+        <body className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground">
           <div className="text-center">
             <h1 className="text-6xl font-bold text-zinc-800 dark:text-indigo-100">
               {status}
