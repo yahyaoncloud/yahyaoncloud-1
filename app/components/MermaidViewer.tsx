@@ -20,9 +20,10 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
 
-  // Fullscreen modal state
+  // Fullscreen modal state - starts enlarged (1.5x) for spacious inspection
+  const DEFAULT_MODAL_SCALE = 1.5;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalScale, setModalScale] = useState<number>(1);
+  const [modalScale, setModalScale] = useState<number>(DEFAULT_MODAL_SCALE);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   const [isModalDragging, setIsModalDragging] = useState(false);
   const modalDragStartRef = useRef({ x: 0, y: 0 });
@@ -140,10 +141,10 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
   }, []);
 
   // Modal Controls
-  const handleModalZoomIn = () => setModalScale((prev) => Math.min(Number((prev + 0.25).toFixed(2)), 4));
-  const handleModalZoomOut = () => setModalScale((prev) => Math.max(Number((prev - 0.25).toFixed(2)), 0.5));
+  const handleModalZoomIn = () => setModalScale((prev) => Math.min(Number((prev + 0.25).toFixed(2)), 4.5));
+  const handleModalZoomOut = () => setModalScale((prev) => Math.max(Number((prev - 0.25).toFixed(2)), 0.6));
   const handleModalReset = () => {
-    setModalScale(1);
+    setModalScale(DEFAULT_MODAL_SCALE);
     setModalPosition({ x: 0, y: 0 });
   };
 
@@ -226,7 +227,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
             type="button"
             onClick={() => {
               setModalPosition({ x: 0, y: 0 });
-              setModalScale(1);
+              setModalScale(DEFAULT_MODAL_SCALE);
               setIsModalOpen(true);
             }}
             className="p-1 rounded text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer"
@@ -262,7 +263,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
         </div>
       </div>
 
-      {/* Fullscreen Interactive Drag & Zoom Modal */}
+      {/* Fullscreen Interactive Drag & Zoom Modal - Enlarge View */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -270,7 +271,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 select-none"
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 select-none"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setIsModalOpen(false);
@@ -303,7 +304,7 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
                 type="button"
                 onClick={handleModalReset}
                 className="p-1.5 rounded text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
-                title="Reset to Default (100%)"
+                title="Reset to Enlarged View (150%)"
               >
                 <RotateCcw size={17} />
               </button>
@@ -321,9 +322,9 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
               </button>
             </div>
 
-            {/* Draggable & Zoomable SVG Surface */}
+            {/* Draggable & Zoomable SVG Surface with Enlarge Expansion */}
             <div
-              className={`w-full h-full flex items-center justify-center overflow-hidden ${
+              className={`w-full h-full flex items-center justify-center overflow-hidden p-6 sm:p-12 ${
                 isModalDragging ? "cursor-grabbing" : "cursor-grab"
               }`}
               onMouseDown={handleModalMouseDown}
@@ -338,14 +339,14 @@ export default function MermaidViewer({ chart, className = "" }: MermaidViewerPr
                   transformOrigin: "center center",
                   transition: isModalDragging ? "none" : "transform 0.15s ease-out",
                 }}
-                className="[&_svg]:max-w-none flex justify-center items-center pointer-events-none"
+                className="[&_svg]:min-w-[65vw] sm:[&_svg]:min-w-[75vw] [&_svg]:max-w-none [&_svg]:h-auto flex justify-center items-center pointer-events-none"
                 dangerouslySetInnerHTML={{ __html: svgContent }}
               />
             </div>
 
             {/* Bottom Hint */}
             <div className="absolute bottom-4 z-40 text-xs font-mono text-zinc-400 bg-zinc-900/80 px-3 py-1 rounded-full border border-zinc-800">
-              Drag to pan • Double-click to reset (100%) • Press Esc to exit
+              Drag to pan • Double-click to reset • Press Esc to exit
             </div>
           </motion.div>
         )}

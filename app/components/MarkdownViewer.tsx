@@ -35,7 +35,7 @@ function CodeBlock({
   if (isInline) {
     return (
       <code
-        className="px-1.5 py-0.5 rounded text-[14.5px] font-mono bg-zinc-100 dark:bg-zinc-800/60 text-zinc-800 dark:text-zinc-200"
+        className="px-1.5 py-0.5 rounded text-[14.5px] font-mono bg-zinc-100 dark:bg-blue-200 text-zinc-800 dark:text-zinc-200"
         {...props}
       >
         {children}
