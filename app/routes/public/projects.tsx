@@ -12,9 +12,15 @@ export default function ProjectsIndex() {
   const { projects } = useLoaderData<typeof loader>();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
-  const dynamicCategories = [
+  const dynamicCategories: string[] = [
     "All",
-    ...Array.from(new Set(projects.map((p: ProjectCaseStudy) => p.category).filter(Boolean))),
+    ...Array.from(
+      new Set(
+        projects
+          .map((p: ProjectCaseStudy) => p.category)
+          .filter((c): c is string => Boolean(c))
+      )
+    ),
   ];
 
   const filteredProjects =

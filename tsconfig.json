@@ -1,14 +1,16 @@
 {
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/.server/**/*.ts",
-    "**/.server/**/*.tsx",
-    "**/.client/**/*.ts",
-    "**/.client/**/*.tsx",
-    "app/routes/admin_.create",
-    "app"
-, "app/hooks"  ],
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "prisma/**/*.ts",
+    "vite.config.ts",
+    "env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts"
+  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["@remix-run/node", "vite/client"],
@@ -27,8 +29,6 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-
-    // Vite takes care of building everything, not tsc.
     "noEmit": true
   }
 }
