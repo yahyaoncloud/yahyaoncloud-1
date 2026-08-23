@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Highlight, themes } from "prism-react-renderer";
+import { FileCode, Terminal, Copy, Check } from "lucide-react";
 import { useTheme } from "~/Contexts/ThemeContext";
 import MermaidViewer from "./MermaidViewer";
 
@@ -19,23 +20,59 @@ function CodeBlock({
   inline?: boolean;
   className?: string;
   children?: React.ReactNode;
+  [key: string]: unknown;
 }) {
   const { isDark } = useTheme();
-  const match = /language-(\w+)/.exec(className || "");
-  const lang = match ? match[1] : "";
-  const codeString = String(children).replace(/\n$/, "");
+  const [copied, setCopied] = useState(false);
+
+  // 1. Extract language and filename from className (e.g. language-ts:app/routes.ts)
+  let lang = "";
+  let detectedFileName = "";
+
+  const colonMatch = /language-([a-zA-Z0-9_-]+):([a-zA-Z0-9_./-]+)/.exec(className || "");
+  if (colonMatch) {
+    lang = colonMatch[1];
+    detectedFileName = colonMatch[2];
+  } else {
+    const standardMatch = /language-([a-zA-Z0-9_-]+)/.exec(className || "");
+    lang = standardMatch ? standardMatch[1] : "";
+  }
+
+  // 2. Check meta string (e.g. ```terraform filename="main.tf" or ```yaml docker-compose.yml)
+  const meta = ((props as Record<string, unknown>).node as { data?: { meta?: string } })?.data?.meta || "";
+  if (!detectedFileName && meta) {
+    const metaTitleMatch = /(?:title|filename|file)=["']?([^"'\s]+)["']?/i.exec(meta);
+    if (metaTitleMatch) {
+      detectedFileName = metaTitleMatch[1];
+    } else if (!meta.includes("=") && /^[a-zA-Z0-9_./-]+\.[a-zA-Z0-9]+$/.test(meta.trim())) {
+      detectedFileName = meta.trim();
+    }
+  }
+
+  let codeString = String(children).replace(/\n$/, "");
 
   if (lang === "mermaid") {
     return <MermaidViewer chart={codeString} />;
   }
 
+  // 3. Extract filename from first-line comments if present (e.g. // main.tf or # terraform.tf)
+  const lines = codeString.split("\n");
+  if (!detectedFileName && lines.length > 1) {
+    const firstLine = lines[0].trim();
+    const commentFileMatch = /^(?:\/\/|#|\/\*|--)\s*(?:filename:\s*|file:\s*)?([a-zA-Z0-9_./-]+\.[a-zA-Z0-9]+)\s*(?:\*\/)?$/i.exec(firstLine);
+    if (commentFileMatch) {
+      detectedFileName = commentFileMatch[1];
+      codeString = lines.slice(1).join("\n");
+    }
+  }
+
   // Accurately determine if this is an inline code snippet or a multi-line fenced code block
-  const isInline = inline ?? (!match && !codeString.includes("\n"));
+  const isInline = inline ?? (!className && !codeString.includes("\n"));
 
   if (isInline) {
     return (
       <code
-        className="px-1.5 py-0.5 rounded text-[14.5px] font-mono bg-zinc-100 dark:bg-blue-200 text-zinc-800 dark:text-zinc-200"
+        className="px-1.5 py-0.5 rounded text-[14.5px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
         {...props}
       >
         {children}
@@ -43,32 +80,80 @@ function CodeBlock({
     );
   }
 
-  // Syntax Highlighted block snippet - seamless dark & light mode blending
+  // Display title: either the explicit file name or the language name
+  const displayTitle = detectedFileName || (lang ? lang.toUpperCase() : "CODE");
+  const isShell = ["bash", "sh", "zsh", "shell", "terminal", "powershell", "cmd"].includes(lang.toLowerCase());
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(codeString);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy code:", err);
+    }
+  };
+
   const activeTheme = isDark ? themes.vsDark : themes.vsLight;
 
   return (
-    <Highlight
-      theme={activeTheme}
-      code={codeString}
-      language={lang || "bash"}
-    >
-      {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
-        <pre
-          className={`p-3.5 rounded-md overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-3.5 border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-100/80 dark:bg-zinc-900/40 text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
-          style={{ ...style, backgroundColor: undefined }}
+    <div className="my-5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 overflow-hidden shadow-xs">
+      {/* Code Snippet Header with Filename & Copy Button */}
+      <div className="flex items-center justify-between px-3.5 py-2 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/90 dark:bg-zinc-800/60 text-xs font-mono select-none">
+        <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 font-medium truncate">
+          {isShell ? (
+            <Terminal size={14} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
+          ) : (
+            <FileCode size={14} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
+          )}
+          <span className="truncate">{displayTitle}</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 px-2 py-1 rounded text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer"
+          title="Copy code"
+          aria-label="Copy code to clipboard"
         >
-          <code className="block">
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line })}>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token })} />
-                ))}
-              </div>
-            ))}
-          </code>
-        </pre>
-      )}
-    </Highlight>
+          {copied ? (
+            <>
+              <Check size={13} className="text-emerald-500" />
+              <span className="text-[11px] text-emerald-500 font-sans font-medium">Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy size={13} />
+              <span className="text-[11px] font-sans">Copy</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Syntax Highlighted Code Content */}
+      <Highlight
+        theme={activeTheme}
+        code={codeString}
+        language={lang || "bash"}
+      >
+        {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
+          <pre
+            className={`p-3.5 sm:p-4 overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
+            style={{ ...style, backgroundColor: "transparent" }}
+          >
+            <code className="block">
+              {tokens.map((line, i) => (
+                <div key={i} {...getLineProps({ line })}>
+                  {line.map((token, key) => (
+                    <span key={key} {...getTokenProps({ token })} />
+                  ))}
+                </div>
+              ))}
+            </code>
+          </pre>
+        )}
+      </Highlight>
+    </div>
   );
 }
 
