@@ -29,13 +29,13 @@ export default function ProjectsIndex() {
       : projects.filter((p: ProjectCaseStudy) => p.category === selectedCategory);
 
   return (
-    <div className="space-y-10 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Projects
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
+        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg">
           Engineering case studies on multi-region Kubernetes, enterprise SDN migrations, and distributed telemetry meshes.
         </p>
       </div>
@@ -47,7 +47,7 @@ export default function ProjectsIndex() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs md:text-sm px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
+              className={`text-sm md:text-base px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
                 selectedCategory === cat
                   ? "bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 font-medium"
                   : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
@@ -69,7 +69,7 @@ export default function ProjectsIndex() {
             <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
               <Link
                 to={`/projects/${project.slug}`}
-                className="font-medium text-base md:text-[17px] text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4"
+                className="font-medium text-lg md:text-xl text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4"
               >
                 {project.title}
               </Link>
@@ -78,7 +78,7 @@ export default function ProjectsIndex() {
               </span>
             </div>
 
-            <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400">
+            <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400">
               {project.summary}
             </p>
 
@@ -88,7 +88,7 @@ export default function ProjectsIndex() {
                 {project.techStack.map((tech, i) => (
                   <span
                     key={i}
-                    className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+                    className="text-xs md:text-sm font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
                   >
                     {tech}
                   </span>
@@ -97,7 +97,7 @@ export default function ProjectsIndex() {
             )}
 
             {/* Links */}
-            <div className="flex items-center gap-4 pt-1 text-xs md:text-sm">
+            <div className="flex items-center gap-4 pt-1 text-sm md:text-base">
               <Link
                 to={`/projects/${project.slug}`}
                 className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"

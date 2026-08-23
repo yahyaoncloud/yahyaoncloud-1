@@ -23,32 +23,34 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
         </span>
       </div>
 
-      <h2 className="font-medium text-base md:text-[17px] text-zinc-900 dark:text-zinc-100">
+      <h2 className="font-medium text-lg md:text-xl text-zinc-900 dark:text-zinc-100">
         {paper.title}
       </h2>
 
-      <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-500">
+      <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-500">
         {paper.authors.join(", ")}
       </p>
 
-      <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400 pt-1">
+      <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 pt-1">
         {paper.abstract}
       </p>
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-1.5 pt-1">
-        {paper.tags.map((tag, i) => (
-          <span
-            key={i}
-            className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+      {paper.tags && paper.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {paper.tags.map((tag, i) => (
+            <span
+              key={i}
+              className="text-xs md:text-sm font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Actions */}
-      <div className="flex items-center gap-4 pt-2 text-xs md:text-sm">
+      <div className="flex items-center gap-4 pt-2 text-sm md:text-base">
         {paper.content && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -82,13 +84,13 @@ export default function ResearchIndex() {
   const { papers } = useLoaderData<typeof loader>();
 
   return (
-    <div className="space-y-10 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Research & Publications
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
+        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg">
           Technical papers, architecture benchmarks, and experimental studies on Zero-Trust network topologies and eBPF traffic engineering.
         </p>
       </div>

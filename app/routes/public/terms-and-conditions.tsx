@@ -2,9 +2,9 @@ import { Link } from "@remix-run/react";
 
 export default function TermsPage() {
   return (
-    <div className="space-y-8 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-8 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
       <div className="space-y-2">
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Terms & Conditions
         </h1>
         <p className="text-xs font-mono text-zinc-400">
@@ -26,7 +26,7 @@ export default function TermsPage() {
       <div className="pt-4">
         <Link
           to="/"
-          className="text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
         >
           ← Back to home
         </Link>

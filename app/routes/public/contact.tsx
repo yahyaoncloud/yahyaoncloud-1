@@ -4,27 +4,28 @@ import { createContactMessage } from "~/Services/content.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const name = String(formData.get("name") || "").trim();
-  const email = String(formData.get("email") || "").trim();
-  const message = String(formData.get("message") || "").trim();
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const message = formData.get("message");
 
-  if (name.length < 2) {
-    return json({ error: "Please enter your name." }, { status: 400 });
+  if (typeof name !== "string" || typeof email !== "string" || typeof message !== "string") {
+    return json({ error: "All fields are required." }, { status: 400 });
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+
+  if (!email.includes("@")) {
     return json({ error: "Please enter a valid email address." }, { status: 400 });
   }
-  if (message.length < 8) {
-    return json({ error: "Message must be at least 8 characters long." }, { status: 400 });
+
+  const saved = await createContactMessage({ name, email, message });
+  if (!saved) {
+    return json({ error: "Failed to send message. Please try again later." }, { status: 500 });
   }
 
-  await createContactMessage({ name, email, message });
-
-  return json({ success: true, message: "Thank you. Your message has been received." });
+  return json({ success: true });
 }
 
 export default function ContactPage() {
-  const actionData = useActionData<{ success?: boolean; message?: string; error?: string }>();
+  const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
@@ -36,23 +37,23 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="space-y-10 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-10 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Contact
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
+        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg">
           Interested in cloud infrastructure, reliability engineering, or discussing distributed systems? Reach out through any channel below.
         </p>
       </div>
 
       {/* Direct Reach-Out Channels (2 columns) */}
       <section className="space-y-3 pt-2">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Channels
         </h2>
-        <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-y-2.5 items-baseline text-sm md:text-[15px]">
+        <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-y-2.5 items-baseline text-base md:text-[17px]">
           {contactLinks.map((item) => (
             <div key={item.label} className="contents">
               <span className="text-zinc-500 dark:text-zinc-400 font-normal">
@@ -75,14 +76,14 @@ export default function ContactPage() {
 
       {/* Message Form */}
       <section className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-900">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
           Send a Message
         </h2>
 
         <Form method="post" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label htmlFor="name" className="block text-xs md:text-sm font-mono text-zinc-500">
+              <label htmlFor="name" className="block text-sm md:text-base font-mono text-zinc-500">
                 Name
               </label>
               <input
@@ -91,12 +92,12 @@ export default function ContactPage() {
                 type="text"
                 required
                 placeholder="Alex Morgan"
-                className="w-full px-3 py-2 rounded-lg text-sm md:text-base bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-lg text-base md:text-lg bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors"
               />
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="email" className="block text-xs md:text-sm font-mono text-zinc-500">
+              <label htmlFor="email" className="block text-sm md:text-base font-mono text-zinc-500">
                 Email
               </label>
               <input
@@ -104,50 +105,42 @@ export default function ContactPage() {
                 name="email"
                 type="email"
                 required
-                placeholder="alex@company.com"
-                className="w-full px-3 py-2 rounded-lg text-sm md:text-base bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors"
+                placeholder="alex@domain.com"
+                className="w-full px-3.5 py-2.5 rounded-lg text-base md:text-lg bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="message" className="block text-xs md:text-sm font-mono text-zinc-500">
+            <label htmlFor="message" className="block text-sm md:text-base font-mono text-zinc-500">
               Message
             </label>
             <textarea
               id="message"
               name="message"
-              rows={4}
               required
-              placeholder="Your note..."
-              className="w-full px-3 py-2 rounded-lg text-sm md:text-base bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors resize-none"
+              rows={4}
+              placeholder="Hi Yahya, I'd like to talk about..."
+              className="w-full px-3.5 py-2.5 rounded-lg text-base md:text-lg bg-transparent border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-500 transition-colors resize-none"
             />
           </div>
 
-          {actionData?.message && (
-            <div
-              className={`p-2.5 rounded text-xs md:text-sm ${
-                actionData.success
-                  ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800"
-                  : "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900"
-              }`}
-            >
-              <span>{actionData.message}</span>
-            </div>
+          {actionData?.error && (
+            <p className="text-sm text-red-500 font-mono">{actionData.error}</p>
           )}
 
-          {actionData?.error && (
-            <div className="p-2.5 rounded text-xs md:text-sm bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900">
-              <span>{actionData.error}</span>
-            </div>
+          {actionData?.success && (
+            <p className="text-sm text-zinc-700 dark:text-zinc-300 font-mono">
+              ✓ Message sent. Thank you!
+            </p>
           )}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-lg text-xs md:text-sm font-medium bg-zinc-900 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="px-4 py-2 rounded-lg text-sm md:text-base font-medium bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all duration-150 active:scale-95 disabled:opacity-50 cursor-pointer"
           >
-            {isSubmitting ? "Sending..." : "Send Message →"}
+            {isSubmitting ? "Sending..." : "Send Message"}
           </button>
         </Form>
       </section>

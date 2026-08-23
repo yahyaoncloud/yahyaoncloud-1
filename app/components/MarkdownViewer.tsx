@@ -30,7 +30,7 @@ function CodeBlock({
   if (inline) {
     return (
       <code
-        className="px-1.5 py-0.5 rounded text-[13px] font-mono bg-zinc-100 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200 border border-zinc-200/50 dark:border-zinc-700/50"
+        className="px-1.5 py-0.5 rounded text-[15px] font-mono bg-zinc-100 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200 border border-zinc-200/50 dark:border-zinc-700/50"
         {...props}
       >
         {children}
@@ -47,7 +47,7 @@ function CodeBlock({
     >
       {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
         <pre
-          className={`p-4 rounded-lg overflow-x-auto font-mono text-[13px] md:text-[13.5px] leading-relaxed my-5 border border-zinc-200/60 dark:border-zinc-800 bg-zinc-950 text-zinc-100 custom-scroll ${highlightClass}`}
+          className={`p-4 rounded-lg overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-5 border border-zinc-200/60 dark:border-zinc-800 bg-zinc-950 text-zinc-100 custom-scroll ${highlightClass}`}
           style={{ ...style, backgroundColor: undefined }}
         >
           <code className="block">
@@ -67,28 +67,28 @@ function CodeBlock({
 
 export default function MarkdownViewer({ content, className = "" }: MarkdownViewerProps) {
   return (
-    <div className={`space-y-4 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300 ${className}`}>
+    <div className={`space-y-4 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300 ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
           code: CodeBlock,
           h1: ({ children }) => (
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-8 mb-3">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-8 mb-3.5">
               {children}
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-lg md:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mt-7 mb-2.5">
+            <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mt-7 mb-3">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-base md:text-[17px] font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-6 mb-2">
+            <h3 className="text-lg md:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-6 mb-2.5">
               {children}
             </h3>
           ),
           h4: ({ children }) => (
-            <h4 className="text-[15px] font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-5 mb-1.5">
+            <h4 className="text-[17px] md:text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-5 mb-2">
               {children}
             </h4>
           ),
@@ -98,17 +98,17 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
             </p>
           ),
           ul: ({ children }) => (
-            <ul className="list-disc pl-6 my-4 space-y-1.5 text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
+            <ul className="list-disc pl-6 my-4 space-y-2 text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal pl-6 my-4 space-y-1.5 text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
+            <ol className="list-decimal pl-6 my-4 space-y-2 text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
               {children}
             </ol>
           ),
           li: ({ children }) => (
-            <li className="leading-relaxed text-[15px] md:text-base">{children}</li>
+            <li className="leading-relaxed text-[17px] md:text-lg">{children}</li>
           ),
           blockquote: ({ children }) => (
             <blockquote className="my-5 pl-4 border-l-2 border-zinc-300 dark:border-zinc-700 italic text-zinc-600 dark:text-zinc-400 py-1">
@@ -131,7 +131,7 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
           hr: () => <hr className="my-8 border-zinc-200 dark:border-zinc-800" />,
           table: ({ children }) => (
             <div className="my-6 overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
-              <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs md:text-sm">
+              <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm md:text-base">
                 {children}
               </table>
             </div>
