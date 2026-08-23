@@ -1,7 +1,8 @@
-﻿import { Outlet } from "@remix-run/react";
+import { Outlet } from "@remix-run/react";
 import Sidebar from "~/components/Sidebar";
 import Navbar from "~/components/Navbar";
 import { useUIStore } from "~/store/uiStore";
+import { useEffect } from "react";
 
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { requireAdmin } from "~/utils/admin-auth.server";
@@ -12,10 +13,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function AdminLayout() {
-  const { isSidebarOpen, closeSidebar } = useUIStore();
+  const { isSidebarOpen, sidebarBehavior, closeSidebar, openSidebar } = useUIStore();
+
+  // Initialize sidebar on page visit based on user settings preference
+  useEffect(() => {
+    if (sidebarBehavior === "always-closed") {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  }, [sidebarBehavior, closeSidebar, openSidebar]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
+    <div className="min-h-screen bg-background text-foreground">
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={closeSidebar} 

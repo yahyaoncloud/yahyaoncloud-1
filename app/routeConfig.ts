@@ -22,9 +22,6 @@ export const routes = (defineRoutes: any) => {
       route("", "routes/admin/dashboard.tsx", { index: true });
       route("dashboard", "routes/admin/dashboard.tsx", { id: "admin-dashboard-alias" });
       
-      // Business Card
-      route("business-card", "routes/admin/business-card.tsx");
-      
       // Content Management (Blog Posts, Projects, Research)
       route("posts", "routes/admin/posts.tsx");
       route("post/create", "routes/admin/post.create.tsx");

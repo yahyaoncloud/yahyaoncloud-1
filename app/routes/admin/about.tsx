@@ -2,6 +2,7 @@
 import { json, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useActionData, Form, useNavigation } from "@remix-run/react";
 import { getAllPortfolios, createPortfolio, updatePortfolio } from "~/Services/post.server";
+import { getProfileInfo, saveProfileInfo, type ProfileInfoData } from "~/Services/content.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -14,9 +15,12 @@ import toast from "react-hot-toast";
 import ImageUpload from "~/components/ImageUpload";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const portfolios = await getAllPortfolios();
+  const [portfolios, profileInfo] = await Promise.all([
+    getAllPortfolios(),
+    getProfileInfo(),
+  ]);
   const portfolio = portfolios.length > 0 ? portfolios[0] : null;
-  return json({ portfolio });
+  return json({ portfolio, profileInfo });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -26,25 +30,69 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     if (intent === "save") {
+      const bio = JSON.parse((formData.get("bio") as string) || "[]");
+      const skills = JSON.parse((formData.get("skills") as string) || "[]");
+      const rawExperiences = JSON.parse((formData.get("experiences") as string) || "[]");
+      const rawCertifications = JSON.parse((formData.get("certifications") as string) || "[]");
+      const rawSocialLinks = JSON.parse((formData.get("socialLinks") as string) || "{}");
+
+      // Format for live Minimalist ProfileInfo in MongoDB
+      const experiences = rawExperiences.map((exp: any) => ({
+        year: String(exp.year || ""),
+        present: Boolean(exp.present || exp.isWorking),
+        company: String(exp.company || ""),
+        role: String(exp.role || ""),
+        description: String(exp.description || exp.summary || ""),
+        projects: Array.isArray(exp.projects) ? exp.projects : [],
+      }));
+
+      const certifications = rawCertifications.map((c: any) => ({
+        name: String(c.name || c.title || ""),
+        issuer: String(c.issuer || ""),
+        issueDate: String(c.issueDate || c.year || ""),
+        credentialUrl: c.credentialUrl || undefined,
+        credentialId: c.credentialId || undefined,
+      }));
+
+      const socialLinksList = Array.isArray(rawSocialLinks)
+        ? rawSocialLinks
+        : Object.entries(rawSocialLinks).map(([k, v]) => ({
+            label: k.charAt(0).toUpperCase() + k.slice(1),
+            href: String(v),
+            display: String(v),
+            external: !String(v).startsWith("mailto:"),
+          }));
+
+      // Save to ProfileInfo in Prisma MongoDB
+      await saveProfileInfo({
+        headline: (formData.get("location") as string) || "Cloud DevOps & Infrastructure Engineer.",
+        bio,
+        skills,
+        experiences,
+        certifications,
+        socialLinks: socialLinksList,
+      });
+
+      // Also save to Portfolio for legacy compatibility
       const data: any = {
         name: formData.get("name") as string,
         portraitUrl: formData.get("portraitUrl") as string,
         location: formData.get("location") as string,
-        bio: JSON.parse(formData.get("bio") as string || "[]"),
-        skills: JSON.parse(formData.get("skills") as string || "[]"),
-        experiences: JSON.parse(formData.get("experiences") as string || "[]"),
-        projects: JSON.parse(formData.get("projects") as string || "[]"),
-        certifications: JSON.parse(formData.get("certifications") as string || "[]"),
-        socialLinks: JSON.parse(formData.get("socialLinks") as string || "{}"),
+        bio,
+        skills,
+        experiences: rawExperiences,
+        projects: JSON.parse((formData.get("projects") as string) || "[]"),
+        certifications: rawCertifications,
+        socialLinks: rawSocialLinks,
       };
 
       if (id) {
         await updatePortfolio(id, data);
-        return json({ success: true, message: "Profile updated successfully", error: undefined });
       } else {
         await createPortfolio(data);
-        return json({ success: true, message: "Profile created successfully", error: undefined });
       }
+
+      return json({ success: true, message: "Website profile & homepage updated successfully", error: undefined });
     }
     return json({ success: false, error: "Invalid intent", message: undefined }, { status: 400 });
   } catch (error) {
@@ -52,9 +100,6 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ success: false, error: "Failed to save profile", message: undefined }, { status: 500 });
   }
 }
-
-
-
 
 interface ActionResponse {
   success: boolean;
@@ -65,17 +110,28 @@ interface ActionResponse {
 import { IPortfolioDoc } from "~/models";
 
 export default function AdminAbout() {
-  const { portfolio } = useLoaderData<typeof loader>() as { portfolio: IPortfolioDoc | null };
+  const { portfolio, profileInfo } = useLoaderData<typeof loader>() as {
+    portfolio: IPortfolioDoc | null;
+    profileInfo: ProfileInfoData | null;
+  };
   const actionData = useActionData<typeof action>() as ActionResponse | undefined;
   const navigation = useNavigation();
 
-  // Initial State Setup
+  // Initial State Setup - Prefer live ProfileInfo data
   const [portraitUrl, setPortraitUrl] = useState<string>(portfolio?.portraitUrl || "");
-  const [bio, setBio] = useState<string[]>(portfolio?.bio || [""]);
-  const [skills, setSkills] = useState<string[]>(portfolio?.skills || []);
-  const [experiences, setExperiences] = useState<any[]>(portfolio?.experiences || []);
+  const [bio, setBio] = useState<string[]>(
+    profileInfo?.bio && profileInfo.bio.length > 0 ? profileInfo.bio : portfolio?.bio || [""]
+  );
+  const [skills, setSkills] = useState<string[]>(
+    profileInfo?.skills && profileInfo.skills.length > 0 ? profileInfo.skills : portfolio?.skills || []
+  );
+  const [experiences, setExperiences] = useState<any[]>(
+    profileInfo?.experiences && profileInfo.experiences.length > 0 ? profileInfo.experiences : portfolio?.experiences || []
+  );
   const [projects, setProjects] = useState<any[]>(portfolio?.projects || []);
-  const [certifications, setCertifications] = useState<any[]>(portfolio?.certifications || []);
+  const [certifications, setCertifications] = useState<any[]>(
+    profileInfo?.certifications && profileInfo.certifications.length > 0 ? profileInfo.certifications : portfolio?.certifications || []
+  );
   const [socialLinks, setSocialLinks] = useState<any>(portfolio?.socialLinks || {});
 
   useEffect(() => {

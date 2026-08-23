@@ -54,7 +54,6 @@ const navItems: NavItem[] = [
       { name: "Homepage Cards", icon: Layout, href: "/admin/homepage-cards" },
       { name: "About Page", icon: FileText, href: "/admin/about" },
       { name: "Linktree", icon: Share2, href: "/admin/linktree" },
-      { name: "Business Card", icon: Briefcase, href: "/admin/business-card" },
       { name: "PDF Assets", icon: FileText, href: "/admin/assets" },
     ],
   },
