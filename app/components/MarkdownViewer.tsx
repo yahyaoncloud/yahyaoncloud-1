@@ -72,7 +72,7 @@ function CodeBlock({
   if (isInline) {
     return (
       <code
-        className="px-1.5 py-0.5 rounded text-[14.5px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
+        className="px-1.5 py-0.5 rounded text-[13.5px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
         {...props}
       >
         {children}
@@ -97,33 +97,33 @@ function CodeBlock({
   const activeTheme = isDark ? themes.vsDark : themes.vsLight;
 
   return (
-    <div className="my-5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 overflow-hidden shadow-xs">
+    <div className="my-5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/70 overflow-hidden shadow-xs">
       {/* Code Snippet Header with Filename & Copy Button */}
-      <div className="flex items-center justify-between px-3.5 py-2 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/90 dark:bg-zinc-800/60 text-xs font-mono select-none">
+      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/90 dark:bg-zinc-800/70 text-xs font-mono select-none">
         <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 font-medium truncate">
           {isShell ? (
-            <Terminal size={14} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
+            <Terminal size={13} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
           ) : (
-            <FileCode size={14} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
+            <FileCode size={13} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
           )}
-          <span className="truncate">{displayTitle}</span>
+          <span className="truncate text-xs">{displayTitle}</span>
         </div>
 
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-2 py-1 rounded text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer"
           title="Copy code"
           aria-label="Copy code to clipboard"
         >
           {copied ? (
             <>
-              <Check size={13} className="text-emerald-500" />
+              <Check size={12} className="text-emerald-500" />
               <span className="text-[11px] text-emerald-500 font-sans font-medium">Copied</span>
             </>
           ) : (
             <>
-              <Copy size={13} />
+              <Copy size={12} />
               <span className="text-[11px] font-sans">Copy</span>
             </>
           )}
@@ -138,7 +138,7 @@ function CodeBlock({
       >
         {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
           <pre
-            className={`p-3.5 sm:p-4 overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
+            className={`p-3.5 sm:p-4 overflow-x-auto font-mono text-[13.5px] md:text-[14px] leading-relaxed text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
             style={{ ...style, backgroundColor: "transparent" }}
           >
             <code className="block">
@@ -158,8 +158,11 @@ function CodeBlock({
 }
 
 export default function MarkdownViewer({ content, className = "" }: MarkdownViewerProps) {
+  // Strip duplicate leading title if markdown starts with '# Title'
+  const sanitizedContent = content.replace(/^#\s+[^\n]+\n*/, "");
+
   return (
-    <div className={`space-y-4 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300 ${className}`}>
+    <div className={`space-y-4 text-base md:text-[17px] leading-relaxed text-zinc-700 dark:text-zinc-300 [&>*:first-child]:mt-0 ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -187,25 +190,25 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
             </h4>
           ),
           p: ({ children }) => (
-            <p className="text-[15px] md:text-base leading-relaxed my-3 text-zinc-700 dark:text-zinc-300">
+            <p className="text-base md:text-[17px] leading-relaxed my-3.5 text-zinc-700 dark:text-zinc-300">
               {children}
             </p>
           ),
           ul: ({ children }) => (
-            <ul className="list-disc pl-5 my-3 space-y-1 text-[15px] md:text-base text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
+            <ul className="list-disc pl-5 my-3.5 space-y-1.5 text-base md:text-[17px] text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal pl-5 my-3 space-y-1 text-[15px] md:text-base text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
+            <ol className="list-decimal pl-5 my-3.5 space-y-1.5 text-base md:text-[17px] text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
               {children}
             </ol>
           ),
           li: ({ children }) => (
-            <li className="leading-relaxed text-[15px] md:text-base my-0.5 text-zinc-700 dark:text-zinc-300">{children}</li>
+            <li className="leading-relaxed text-base md:text-[17px] my-0.5 text-zinc-700 dark:text-zinc-300">{children}</li>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="my-4 pl-3.5 border-l-2 border-zinc-300 dark:border-zinc-700 italic text-zinc-600 dark:text-zinc-400 py-0.5 text-[15px] md:text-base">
+            <blockquote className="my-4 pl-3.5 border-l-2 border-zinc-300 dark:border-zinc-700 italic text-zinc-600 dark:text-zinc-400 py-0.5 text-base md:text-[17px]">
               {children}
             </blockquote>
           ),
@@ -249,7 +252,7 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
           ),
         }}
       >
-        {content}
+        {sanitizedContent}
       </ReactMarkdown>
     </div>
   );

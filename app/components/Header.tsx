@@ -44,13 +44,13 @@ export default function Header() {
   const subpage = getSubpageName();
 
   return (
-    <header className="relative py-2 mb-8 md:mb-10 text-[15px] text-zinc-600 dark:text-zinc-400">
+    <header className="relative py-1.5 mb-5 md:mb-6 text-[15px] text-zinc-600 dark:text-zinc-400">
       <div className="flex items-center justify-between">
         {/* Title & Breadcrumbs */}
         <div className="flex items-center gap-2 min-w-0">
           <Link
             to="/"
-            className="font-semibold text-zinc-900 dark:text-zinc-100 text-2xl px-1.5 py-0.5 -ml-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-150 active:scale-95"
+            className="font-normal text-zinc-900 dark:text-zinc-100 text-base px-1.5 py-0.5 -ml-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-all duration-150 active:scale-95"
           >
             Yahya
           </Link>

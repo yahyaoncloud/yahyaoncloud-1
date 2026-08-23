@@ -91,7 +91,7 @@
   }
 
   h2 {
-    @apply text-xs md:text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold;
+    @apply text-lg md:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100;
   }
 
   h3 {
@@ -104,6 +104,11 @@
 
   p {
     @apply text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300;
+  }
+
+  /* Section heading for homepage categories (Experience, Skills, Certifications, etc.) */
+  .section-heading {
+    @apply text-xs md:text-sm font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold;
   }
 
   /* External Link arrow styling */

@@ -50,7 +50,7 @@ export default function Index() {
       {/* Experience Section (with smooth subtle dropdown animation) */}
       {profileInfo.experiences && profileInfo.experiences.length > 0 && (
         <section className="space-y-3 pt-2">
-          <h2>Experience</h2>
+          <h2 className="section-heading">Experience</h2>
 
           <div className="space-y-2">
             {profileInfo.experiences.map((exp, idx) => {
@@ -156,7 +156,7 @@ export default function Index() {
       {/* Certifications Section */}
       {profileInfo.certifications && profileInfo.certifications.length > 0 && (
         <section className="space-y-3 pt-2">
-          <h2>Certifications</h2>
+          <h2 className="section-heading">Certifications</h2>
           <div className="space-y-2.5">
             {profileInfo.certifications.map((cert, idx) => (
               <div
@@ -194,7 +194,7 @@ export default function Index() {
       {/* Skills Section */}
       {profileInfo.skills && profileInfo.skills.length > 0 && (
         <section className="space-y-3 pt-2">
-          <h2>Skills</h2>
+          <h2 className="section-heading">Skills</h2>
           <div className="flex flex-wrap gap-1.5">
             {profileInfo.skills.map((skill, idx) => (
               <span
@@ -211,7 +211,7 @@ export default function Index() {
       {/* Selected Work Section */}
       <section className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
-          <h2>Selected Work</h2>
+          <h2 className="section-heading">Selected Work</h2>
           <Link
             to="/projects"
             className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
@@ -275,7 +275,7 @@ export default function Index() {
       {recentPosts && recentPosts.length > 0 && (
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2>Writing</h2>
+            <h2 className="section-heading">Writing</h2>
             <Link
               to="/blog"
               className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
@@ -309,7 +309,7 @@ export default function Index() {
       {/* Research Section */}
       <section className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
-          <h2>Research</h2>
+          <h2 className="section-heading">Research</h2>
           <Link
             to="/research"
             className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
@@ -344,7 +344,7 @@ export default function Index() {
       {/* Elsewhere Section */}
       {profileInfo.socialLinks && profileInfo.socialLinks.length > 0 && (
         <section className="space-y-3 pt-2">
-          <h2>Elsewhere</h2>
+          <h2 className="section-heading">Elsewhere</h2>
           <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-y-2.5 items-baseline text-base md:text-[17px]">
             {profileInfo.socialLinks.map((item) => (
               <div key={item.label} className="contents">

@@ -21,23 +21,21 @@ export default function BlogPostDetail() {
   const { post } = useLoaderData<{ post: BlogPost }>();
 
   return (
-    <article className="space-y-6 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <article className="space-y-4 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Title & Trailing Meta Line */}
-      <header className="space-y-3">
+      <header className="space-y-2">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight">
           {post.title}
         </h1>
 
-        <div className="flex items-center gap-2 text-xs md:text-sm font-mono text-zinc-400 dark:text-zinc-500">
-          <span className="text-zinc-500 dark:text-zinc-400">{post.author || "@yahyaoncloud"}</span>
-          <span>|</span>
+        <div className="flex items-center gap-3 text-xs md:text-sm font-mono text-zinc-400 dark:text-zinc-500 pt-0.5">
           <span>{post.displayDate}</span>
-          <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 ml-1" />
+          <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800" />
         </div>
       </header>
 
       {/* Article Content */}
-      <main className="pt-2">
+      <main className="pt-0">
         <MarkdownViewer content={post.content} />
       </main>
 
