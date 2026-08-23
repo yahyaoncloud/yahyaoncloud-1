@@ -109,7 +109,10 @@ export const routes = (defineRoutes: any) => {
     route("me/:shortCode", "routes/me.$shortCode.tsx");
     route("resources/download/resume/:id", "routes/resources.download.resume.$id.tsx");
     route("links", "routes/links.tsx");
-    route("resume", "routes/resume.tsx");
+    // Feeds & SEO XML
+    route("rss.xml", "routes/rss[.]xml.ts");
+    route("atom.xml", "routes/atom[.]xml.ts");
+    route("sitemap.xml", "routes/sitemap[.]xml.ts");
     
     // 404
     route("*", "routes/404.tsx");
