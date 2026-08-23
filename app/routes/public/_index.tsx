@@ -3,6 +3,7 @@ import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import yocLogo from "~/assets/yoc-logo.png";
 import {
   getProfileInfo,
   getFeaturedProjects,
@@ -37,14 +38,28 @@ export default function Index() {
 
   return (
     <div className="space-y-10">
-      {/* Introduction */}
-      <section className="space-y-3">
-        <p className="font-semibold text-zinc-900 dark:text-zinc-100 text-base md:text-lg">
-          {profileInfo.headline}
-        </p>
-        {profileInfo.bio.map((paragraph, idx) => (
-          <p key={idx}>{paragraph}</p>
-        ))}
+      {/* Profile & Introduction */}
+      <section className="space-y-4">
+        <div className="flex items-center gap-3.5 sm:gap-4">
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 shadow-xs shrink-0 flex items-center justify-center">
+            <img
+              src={yocLogo}
+              alt="Yahya Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <h1 className="font-semibold text-zinc-900 dark:text-zinc-100 text-base md:text-lg">
+              {profileInfo.headline}
+            </h1>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {profileInfo.bio.map((paragraph, idx) => (
+            <p key={idx}>{paragraph}</p>
+          ))}
+        </div>
       </section>
 
       {/* Experience Section (with smooth subtle dropdown animation) */}
