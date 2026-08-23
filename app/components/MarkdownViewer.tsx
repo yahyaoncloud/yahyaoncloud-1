@@ -2,6 +2,7 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Highlight, themes } from "prism-react-renderer";
+import { useTheme } from "~/Contexts/ThemeContext";
 import MermaidViewer from "./MermaidViewer";
 
 interface MarkdownViewerProps {
@@ -19,6 +20,7 @@ function CodeBlock({
   className?: string;
   children?: React.ReactNode;
 }) {
+  const { isDark } = useTheme();
   const match = /language-(\w+)/.exec(className || "");
   const lang = match ? match[1] : "";
   const codeString = String(children).replace(/\n$/, "");
@@ -38,16 +40,18 @@ function CodeBlock({
     );
   }
 
-  // Syntax Highlighted snippet - ONLY single clean block with NO border, NO outer margins, subtle inner padding
+  // Syntax Highlighted snippet - seamlessly replicates theme background (Light/Dark)
+  const activeTheme = isDark ? themes.vsDark : themes.vsLight;
+
   return (
     <Highlight
-      theme={themes.vsDark}
+      theme={activeTheme}
       code={codeString}
       language={lang || "bash"}
     >
       {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
         <pre
-          className={`p-3.5 rounded-md overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-3 border-0 bg-zinc-950 dark:bg-zinc-900/90 text-zinc-100 custom-scroll ${highlightClass}`}
+          className={`p-3.5 rounded-md overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-3 border-0 bg-zinc-100/90 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
           style={{ ...style, backgroundColor: undefined }}
         >
           <code className="block">
