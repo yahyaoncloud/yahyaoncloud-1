@@ -39,7 +39,7 @@ export default function Index() {
     <div className="space-y-10">
       {/* Introduction */}
       <section className="space-y-3">
-        <p className="font-semibold text-zinc-900 dark:text-zinc-100 text-lg md:text-[19px]">
+        <p className="font-semibold text-zinc-900 dark:text-zinc-100 text-base md:text-lg">
           {profileInfo.headline}
         </p>
         {profileInfo.bio.map((paragraph, idx) => (
@@ -58,13 +58,13 @@ export default function Index() {
               return (
                 <div
                   key={idx}
-                  className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-x-3 md:gap-x-4 items-start text-base md:text-[17px]"
+                  className="grid grid-cols-[90px_1fr] md:grid-cols-[110px_1fr] gap-x-3 md:gap-x-4 items-start text-[15px] md:text-base"
                 >
                   {/* Year + Present badge column */}
                   <div className="py-1.5 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
-                    <span className="font-normal font-mono text-sm md:text-base">{exp.year}</span>
+                    <span className="font-normal font-mono text-xs md:text-sm">{exp.year}</span>
                     {exp.present && (
-                      <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-xs md:text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                      <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-[11px] md:text-xs font-medium text-zinc-600 dark:text-zinc-400">
                         Present
                       </span>
                     )}
@@ -84,16 +84,16 @@ export default function Index() {
                       className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all min-w-0"
                     >
                       <ChevronRight
-                        size={16}
+                        size={15}
                         className={`text-zinc-400 transition-transform duration-200 shrink-0 ${
                           isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
                         }`}
                       />
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-base md:text-[17px]">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-[15px] md:text-base">
                         {exp.company}
                       </span>
                       <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[16px] shrink-0" />
-                      <span className="text-zinc-500 dark:text-zinc-400 text-sm md:text-base shrink-0">
+                      <span className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm shrink-0">
                         {exp.role}
                       </span>
                     </button>
@@ -112,8 +112,8 @@ export default function Index() {
                           }}
                           className="overflow-hidden"
                         >
-                          <div className="px-6 pb-3 pt-1 space-y-2 text-sm md:text-base text-zinc-600 dark:text-zinc-400">
-                            <p className="leading-relaxed text-sm md:text-base text-zinc-600 dark:text-zinc-400">
+                          <div className="px-6 pb-3 pt-1 space-y-2 text-xs md:text-sm text-zinc-600 dark:text-zinc-400">
+                            <p className="leading-relaxed text-xs md:text-sm text-zinc-600 dark:text-zinc-400">
                               {exp.description}
                             </p>
                             {exp.projects && exp.projects.length > 0 && (
@@ -123,7 +123,7 @@ export default function Index() {
                                     {proj.internal ? (
                                       <Link
                                         to={proj.url}
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base"
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
                                       >
                                         {proj.name}
                                       </Link>
@@ -132,7 +132,7 @@ export default function Index() {
                                         href={proj.url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base"
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
                                       >
                                         {proj.name}
                                       </a>

@@ -3,13 +3,13 @@ export const proseClasses = [
   
   // Headings
   "prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-zinc-900 dark:prose-headings:text-zinc-100",
-  "prose-h1:text-2xl md:prose-h1:text-3xl prose-h1:font-bold prose-h1:mt-8 prose-h1:mb-3.5",
-  "prose-h2:text-xl md:prose-h2:text-2xl prose-h2:font-semibold prose-h2:mt-7 prose-h2:mb-3",
-  "prose-h3:text-lg md:prose-h3:text-xl prose-h3:font-medium prose-h3:mt-6 prose-h3:mb-2.5",
-  "prose-h4:text-[17px] md:prose-h4:text-lg prose-h4:font-medium prose-h4:mt-5 prose-h4:mb-2",
+  "prose-h1:text-xl md:prose-h1:text-2xl prose-h1:font-bold prose-h1:mt-7 prose-h1:mb-3",
+  "prose-h2:text-lg md:prose-h2:text-xl prose-h2:font-semibold prose-h2:mt-6 prose-h2:mb-2.5",
+  "prose-h3:text-base md:prose-h3:text-lg prose-h3:font-medium prose-h3:mt-5 prose-h3:mb-2",
+  "prose-h4:text-[15px] md:prose-h4:text-base prose-h4:font-medium prose-h4:mt-4 prose-h4:mb-1.5",
 
   // Paragraphs
-  "prose-p:text-[17px] md:prose-p:text-lg prose-p:leading-[1.8] prose-p:my-4",
+  "prose-p:text-[15px] md:prose-p:text-base prose-p:leading-[1.75] prose-p:my-3.5",
   "prose-p:text-zinc-700 dark:prose-p:text-zinc-300",
 
   // Emphasis & strong
@@ -17,14 +17,14 @@ export const proseClasses = [
   "prose-em:italic prose-em:text-zinc-800 dark:prose-em:text-zinc-200",
 
   // Blockquotes
-  "prose-blockquote:my-5 prose-blockquote:pl-4 prose-blockquote:py-1",
+  "prose-blockquote:my-4 prose-blockquote:pl-3.5 prose-blockquote:py-0.5",
   "prose-blockquote:border-l-2 prose-blockquote:border-zinc-300 dark:prose-blockquote:border-zinc-700",
   "prose-blockquote:italic prose-blockquote:text-zinc-600 dark:prose-blockquote:text-zinc-400",
 
   // Lists & Bulletins
-  "prose-ul:list-disc prose-ul:pl-6 prose-ul:my-4 prose-ul:space-y-2",
-  "prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-4 prose-ol:space-y-2",
-  "prose-li:text-[17px] md:prose-li:text-lg prose-li:leading-relaxed",
+  "prose-ul:list-disc prose-ul:pl-5 prose-ul:my-3.5 prose-ul:space-y-1.5",
+  "prose-ol:list-decimal prose-ol:pl-5 prose-ol:my-3.5 prose-ol:space-y-1.5",
+  "prose-li:text-[15px] md:prose-li:text-base prose-li:leading-relaxed",
   "prose-li:text-zinc-700 dark:prose-li:text-zinc-300",
   "prose-ul:marker:text-zinc-400 dark:prose-ul:marker:text-zinc-600",
   "prose-ol:marker:text-zinc-400 dark:prose-ol:marker:text-zinc-600",
@@ -36,17 +36,17 @@ export const proseClasses = [
   "transition-colors duration-150",
 
   // Inline code
-  "prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-[15px]",
+  "prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-[13.5px]",
   "prose-code:bg-zinc-100 dark:prose-code:bg-zinc-800/80 prose-code:text-zinc-800 dark:prose-code:text-zinc-200",
 
   // Code blocks (pre) - reset outer pre wrapper styles
   "prose-pre:p-0 prose-pre:m-0 prose-pre:border-0 prose-pre:bg-transparent",
 
   // Tables
-  "prose-table:w-full prose-table:border prose-table:border-collapse prose-table:rounded-lg my-6",
-  "prose-table:border-zinc-200 dark:prose-table:border-zinc-800 text-sm md:text-base",
-  "prose-th:px-3.5 prose-th:py-2.5 prose-th:font-semibold prose-th:text-left prose-th:bg-zinc-50 dark:prose-th:bg-zinc-900 prose-th:text-zinc-900 dark:prose-th:text-zinc-100",
-  "prose-td:px-3.5 prose-td:py-2.5 prose-td:text-zinc-700 dark:prose-td:text-zinc-300",
+  "prose-table:w-full prose-table:border prose-table:border-collapse prose-table:rounded-lg my-5",
+  "prose-table:border-zinc-200 dark:prose-table:border-zinc-800 text-xs md:text-sm",
+  "prose-th:px-3 prose-th:py-2 prose-th:font-semibold prose-th:text-left prose-th:bg-zinc-50 dark:prose-th:bg-zinc-900 prose-th:text-zinc-900 dark:prose-th:text-zinc-100",
+  "prose-td:px-3 prose-td:py-2 prose-td:text-zinc-700 dark:prose-td:text-zinc-300",
   "prose-tbody tr:border-t prose-tbody tr:border-zinc-200 dark:prose-tbody tr:border-zinc-800",
 
   // Images

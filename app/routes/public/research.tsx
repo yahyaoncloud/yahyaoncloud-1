@@ -15,23 +15,23 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
   return (
     <article className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0">
       <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-        <span className="font-mono text-xs md:text-sm text-zinc-400">
+        <span className="font-mono text-[11px] md:text-xs text-zinc-400">
           {paper.venue}
         </span>
-        <span className="font-mono text-xs md:text-sm text-zinc-400">
+        <span className="font-mono text-[11px] md:text-xs text-zinc-400">
           {paper.year}
         </span>
       </div>
 
-      <h3 className="font-medium text-lg md:text-xl text-zinc-900 dark:text-zinc-100">
+      <h3 className="font-medium text-base md:text-lg text-zinc-900 dark:text-zinc-100">
         {paper.title}
       </h3>
 
-      <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-500">
+      <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-500">
         {paper.authors.join(", ")}
       </p>
 
-      <p className="text-zinc-600 dark:text-zinc-400 pt-1">
+      <p className="text-zinc-600 dark:text-zinc-400 text-[15px] md:text-base pt-1">
         {paper.abstract}
       </p>
 
@@ -41,7 +41,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
           {paper.tags.map((tag, i) => (
             <span
               key={i}
-              className="text-xs md:text-sm font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+              className="text-[11px] md:text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
             >
               {tag}
             </span>
@@ -50,7 +50,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-4 pt-2 text-sm md:text-base">
+      <div className="flex items-center gap-4 pt-2 text-xs md:text-sm">
         {paper.content && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}

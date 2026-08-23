@@ -45,7 +45,7 @@ export default function ProjectsIndex() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`text-sm md:text-base px-3 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
+              className={`text-xs md:text-sm px-2.5 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
                 selectedCategory === cat
                   ? "bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-900 font-medium"
                   : "bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200/80 dark:border-zinc-800/80"
@@ -64,19 +64,19 @@ export default function ProjectsIndex() {
             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
               <Link
                 to={`/projects/${project.slug}`}
-                className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline underline-offset-4 text-lg md:text-xl"
+                className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline underline-offset-4 text-base md:text-lg"
               >
                 {project.title}
               </Link>
               {project.category && (
-                <span className="text-xs md:text-sm font-mono text-zinc-400 shrink-0">
+                <span className="text-[11px] md:text-xs font-mono text-zinc-400 shrink-0">
                   {project.category}
                 </span>
               )}
             </div>
 
             {project.description && (
-              <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-[17px] line-clamp-2">
+              <p className="text-zinc-600 dark:text-zinc-400 text-[15px] md:text-base line-clamp-2">
                 {project.description}
               </p>
             )}
@@ -86,7 +86,7 @@ export default function ProjectsIndex() {
                 {project.tags.map((tag: string, idx: number) => (
                   <span
                     key={idx}
-                    className="text-xs md:text-sm font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800/80"
+                    className="text-[11px] md:text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800/80"
                   >
                     {tag}
                   </span>
@@ -95,7 +95,7 @@ export default function ProjectsIndex() {
             )}
 
             {/* Links */}
-            <div className="flex items-center gap-4 pt-1 text-sm md:text-base">
+            <div className="flex items-center gap-4 pt-1 text-xs md:text-sm">
               <Link
                 to={`/projects/${project.slug}`}
                 className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"

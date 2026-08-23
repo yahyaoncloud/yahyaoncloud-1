@@ -11,7 +11,7 @@ export default function BlogIndex() {
   const { posts } = useLoaderData<typeof loader>();
 
   return (
-    <div className="space-y-8 text-[17px] md:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-8 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Blog Posts List with Hairline Connectors */}
       <div className="space-y-3.5">
         {posts.map((post: BlogPost) => (
@@ -21,11 +21,11 @@ export default function BlogIndex() {
               className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-3 min-w-0"
               title={post.title}
             >
-              <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-[17px] md:text-lg truncate min-w-0">
+              <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-[15px] md:text-base truncate min-w-0">
                 {post.title}
               </span>
               <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
-              <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
+              <span className="font-mono text-[11px] md:text-xs text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
                 {post.displayDate}
               </span>
             </Link>
@@ -34,7 +34,7 @@ export default function BlogIndex() {
       </div>
 
       {/* Subscription Note */}
-      <div className="pt-6 text-sm md:text-base text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
+      <div className="pt-6 text-xs md:text-sm text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
         <span>Subscribe with</span>
         <a
           href="/rss.xml"
