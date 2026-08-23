@@ -25,7 +25,7 @@ export default function AdminLayout() {
   }, [sidebarBehavior, closeSidebar, openSidebar]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={closeSidebar} 
