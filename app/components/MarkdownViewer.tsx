@@ -30,7 +30,7 @@ function CodeBlock({
   if (inline) {
     return (
       <code
-        className="px-1.5 py-0.5 rounded text-[15px] font-mono bg-zinc-100 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200 border border-zinc-200/50 dark:border-zinc-700/50"
+        className="px-1.5 py-0.5 rounded text-[15px] font-mono bg-zinc-100 dark:bg-zinc-800/80 text-zinc-800 dark:text-zinc-200"
         {...props}
       >
         {children}
@@ -38,7 +38,7 @@ function CodeBlock({
     );
   }
 
-  // Syntax Highlighted snippet with NO header bar / copy header
+  // Syntax Highlighted snippet - ONLY single clean block with NO border, NO outer margins, subtle inner padding
   return (
     <Highlight
       theme={themes.vsDark}
@@ -47,7 +47,7 @@ function CodeBlock({
     >
       {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
         <pre
-          className={`p-4 rounded-lg overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-5 border border-zinc-200/60 dark:border-zinc-800 bg-zinc-950 text-zinc-100 custom-scroll ${highlightClass}`}
+          className={`p-3.5 rounded-md overflow-x-auto font-mono text-[14px] md:text-[15px] leading-relaxed my-3 border-0 bg-zinc-950 dark:bg-zinc-900/90 text-zinc-100 custom-scroll ${highlightClass}`}
           style={{ ...style, backgroundColor: undefined }}
         >
           <code className="block">
@@ -71,6 +71,8 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          // Prevent ReactMarkdown from creating an outer redundant pre tag
+          pre: ({ children }) => <>{children}</>,
           code: CodeBlock,
           h1: ({ children }) => (
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-8 mb-3.5">

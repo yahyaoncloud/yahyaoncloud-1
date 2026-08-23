@@ -39,12 +39,8 @@ export const proseClasses = [
   "prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-[15px]",
   "prose-code:bg-zinc-100 dark:prose-code:bg-zinc-800/80 prose-code:text-zinc-800 dark:prose-code:text-zinc-200",
 
-  // Code blocks (pre)
-  "prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:font-mono",
-  "prose-pre:text-[14px] md:prose-pre:text-[15px] prose-pre:leading-relaxed",
-  "prose-pre:bg-zinc-900 dark:prose-pre:bg-zinc-900/90",
-  "prose-pre:border prose-pre:border-zinc-200/40 dark:prose-pre:border-zinc-800/80",
-  "prose-pre:text-zinc-100 prose-pre:my-5",
+  // Code blocks (pre) - reset outer pre wrapper styles
+  "prose-pre:p-0 prose-pre:m-0 prose-pre:border-0 prose-pre:bg-transparent",
 
   // Tables
   "prose-table:w-full prose-table:border prose-table:border-collapse prose-table:rounded-lg my-6",
