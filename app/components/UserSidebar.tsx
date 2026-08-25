@@ -16,7 +16,7 @@ interface SocialLink {
   id?: string;
   label?: string;
   href: string;
-  icon: React.ComponentType<{ size?: number }>;
+  icon: any;
 }
 
 interface SidebarProps {
@@ -168,7 +168,7 @@ export default function Sidebar({
         : propRecentPosts.slice(0, 4);
 
     const finalSocialLinks = loaderAuthor
-      ? convertContactDetailsToSocialLinks(loaderAuthor)
+      ? convertContactDetailsToSocialLinks(loaderAuthor as any)
       : propSocialLinks;
 
     return {

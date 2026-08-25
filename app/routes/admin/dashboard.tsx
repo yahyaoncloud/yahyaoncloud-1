@@ -1,10 +1,12 @@
-﻿import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { Briefcase, FileText, Globe, Settings, Users, Activity, Eye } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { getAnalyticsSummary } from "~/Services/analytics.server";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  await requireAdmin(request);
   const summary = await getAnalyticsSummary();
   return json({ summary });
 };

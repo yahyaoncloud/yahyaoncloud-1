@@ -45,8 +45,8 @@ export async function canUserAccessPost(
 
   // Check subscription tier against content access level
   const tierHierarchy = { free: 0, premium: 1, exclusive: 2 };
-  const userTier = tierHierarchy[subscription.tier] || 0;
-  const requiredTier = tierHierarchy[post.accessLevel] || 0;
+  const userTier = tierHierarchy[subscription.tier as keyof typeof tierHierarchy] || 0;
+  const requiredTier = tierHierarchy[(post as any).accessLevel as keyof typeof tierHierarchy] || 0;
 
   if (userTier >= requiredTier) {
     return { canAccess: true };

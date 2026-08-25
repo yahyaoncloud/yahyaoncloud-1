@@ -56,6 +56,17 @@ export interface CertificationItem {
   credentialUrl?: string;
 }
 
+export interface SectionVisibility {
+  summary?: boolean;        // Mandatory: Always true
+  experience?: boolean;     // Mandatory: Always true
+  elsewhere?: boolean;      // Mandatory: Always true
+  certifications?: boolean; // Toggleable
+  skills?: boolean;         // Toggleable
+  selectedWork?: boolean;   // Toggleable
+  writing?: boolean;        // Toggleable
+  research?: boolean;       // Toggleable
+}
+
 export interface ProfileInfoData {
   headline: string;
   bio: string[];
@@ -75,6 +86,7 @@ export interface ProfileInfoData {
     display: string;
     external: boolean;
   }>;
+  sectionsVisibility?: SectionVisibility;
 }
 
 const BLOG_DIR = path.join(process.cwd(), "content", "blog");
@@ -637,25 +649,25 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
     {
       year: "2024",
       present: true,
-      company: "Cloud & DevOps",
-      role: "Engineer",
+      company: "Gulf Intelligence & Media",
+      role: "Architect / Full-stack Developer",
       description:
-        "Architecting multi-region Kubernetes clusters, GitOps pipelines with ArgoCD, Terraform IaC automation, and distributed observability meshes across AWS and hybrid clouds.",
+        "Architecting real-time geospatial intelligence, ML threat scoring pipelines, and cross-platform document synthesis engines using Go, Python, and React.",
       projects: [
-        { name: "Multi-Region Cloud GitOps Platform", url: "/projects/multi-region-cloud-gitops", internal: true },
-        { name: "Distributed Observability & Telemetry Mesh", url: "/projects/observability-mesh-telemetry", internal: true },
+        { name: "HormuzWatch", url: "/projects/hormuzwatch", internal: true },
+        { name: "RaweeGo", url: "/projects/raweego", internal: true },
       ],
     },
     {
-      year: "2022",
+      year: "2023",
       present: false,
-      company: "Network Infrastructure",
-      role: "Engineer",
+      company: "Enterprise Systems",
+      role: "Full-stack & Infrastructure Engineer",
       description:
-        "Managed enterprise multi-vendor routing and switching, BGP peering, OSPF network backbones, hardware firewalls, site-to-site VPN tunnels, and zero-trust SDN migrations.",
+        "Engineered distributed point-of-sale tenant platforms, Kafka event-driven architectures, and encrypted certification authoring studios.",
       projects: [
-        { name: "Hybrid Cloud Enterprise Network & Zero-Trust SDN", url: "/projects/hybrid-sdn-infrastructure", internal: true },
-        { name: "eBPF-Driven Cloud Traffic Engineering", url: "/research", internal: true },
+        { name: "NoteTruck", url: "/projects/notetruck", internal: true },
+        { name: "AburPOS Central", url: "/projects/aburpos-central", internal: true },
       ],
     },
   ],
@@ -672,28 +684,34 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
   ],
   certifications: [
     {
-      name: "AWS Certified Solutions Architect – Professional",
+      name: "Cisco Certified Network Professional (CCNP)",
+      issuer: "Cisco",
+      credentialUrl: "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/professional.html",
+    },
+    {
+      name: "Cisco Certified Network Associate (CCNA)",
+      issuer: "Cisco",
+      credentialUrl: "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html",
+    },
+    {
+      name: "Microsoft Certified: Azure Administrator Associate",
+      issuer: "Microsoft",
+      credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/",
+    },
+    {
+      name: "Microsoft Certified: Azure Solutions Architect Expert",
+      issuer: "Microsoft",
+      credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-solutions-architect/",
+    },
+    {
+      name: "Microsoft Certified: Azure Fundamentals",
+      issuer: "Microsoft",
+      credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-fundamentals/",
+    },
+    {
+      name: "AWS Certified Solutions Architect – Associate",
       issuer: "Amazon Web Services",
-      issueDate: "2024",
-      credentialUrl: "https://aws.amazon.com/certification/",
-    },
-    {
-      name: "Certified Kubernetes Administrator (CKA)",
-      issuer: "Cloud Native Computing Foundation",
-      issueDate: "2023",
-      credentialUrl: "https://www.cncf.io/certification/cka/",
-    },
-    {
-      name: "HashiCorp Certified: Terraform Associate",
-      issuer: "HashiCorp",
-      issueDate: "2023",
-      credentialUrl: "https://www.hashicorp.com/certification/terraform-associate",
-    },
-    {
-      name: "Red Hat Certified Specialist in Linux Networking",
-      issuer: "Red Hat",
-      issueDate: "2022",
-      credentialUrl: "https://www.redhat.com/en/services/certification",
+      credentialUrl: "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
     },
   ],
   socialLinks: [
@@ -702,6 +720,16 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
     { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "https://linkedin.com/in/ykinwork1", external: true },
     { label: "Email", href: "mailto:hello@yahyaoncloud.com", display: "hello@yahyaoncloud.com", external: false },
   ],
+  sectionsVisibility: {
+    summary: true,
+    experience: true,
+    elsewhere: true,
+    certifications: true,
+    skills: true,
+    selectedWork: true,
+    writing: true,
+    research: true,
+  },
 };
 
 export async function getProfileInfo(): Promise<ProfileInfoData> {
@@ -711,6 +739,7 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
     }).catch(() => null);
 
     if (profile) {
+      const dbVisibility = profile.sectionsVisibility as unknown as SectionVisibility | undefined;
       return {
         headline: profile.headline || DEFAULT_PROFILE_INFO.headline,
         bio: profile.bio && profile.bio.length > 0 ? profile.bio : DEFAULT_PROFILE_INFO.bio,
@@ -718,6 +747,16 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
         experiences: (profile.experiences as unknown as ProfileInfoData["experiences"]) || DEFAULT_PROFILE_INFO.experiences,
         certifications: (profile.certifications as unknown as ProfileInfoData["certifications"]) || DEFAULT_PROFILE_INFO.certifications,
         socialLinks: (profile.socialLinks as unknown as ProfileInfoData["socialLinks"]) || DEFAULT_PROFILE_INFO.socialLinks,
+        sectionsVisibility: {
+          summary: true,
+          experience: true,
+          elsewhere: true,
+          certifications: dbVisibility?.certifications !== undefined ? Boolean(dbVisibility.certifications) : true,
+          skills: dbVisibility?.skills !== undefined ? Boolean(dbVisibility.skills) : true,
+          selectedWork: dbVisibility?.selectedWork !== undefined ? Boolean(dbVisibility.selectedWork) : true,
+          writing: dbVisibility?.writing !== undefined ? Boolean(dbVisibility.writing) : true,
+          research: dbVisibility?.research !== undefined ? Boolean(dbVisibility.research) : true,
+        },
       };
     }
 
@@ -731,6 +770,7 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
         experiences: DEFAULT_PROFILE_INFO.experiences as unknown as object,
         certifications: DEFAULT_PROFILE_INFO.certifications as unknown as object,
         socialLinks: DEFAULT_PROFILE_INFO.socialLinks as unknown as object,
+        sectionsVisibility: DEFAULT_PROFILE_INFO.sectionsVisibility as unknown as object,
       },
     }).catch((err) => console.warn("DB seed profile info notice:", err));
   } catch (err) {
@@ -742,6 +782,17 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
 
 export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
   try {
+    const visibilityToSave = {
+      summary: true,
+      experience: true,
+      elsewhere: true,
+      certifications: data.sectionsVisibility?.certifications !== undefined ? Boolean(data.sectionsVisibility.certifications) : true,
+      skills: data.sectionsVisibility?.skills !== undefined ? Boolean(data.sectionsVisibility.skills) : true,
+      selectedWork: data.sectionsVisibility?.selectedWork !== undefined ? Boolean(data.sectionsVisibility.selectedWork) : true,
+      writing: data.sectionsVisibility?.writing !== undefined ? Boolean(data.sectionsVisibility.writing) : true,
+      research: data.sectionsVisibility?.research !== undefined ? Boolean(data.sectionsVisibility.research) : true,
+    };
+
     await prisma.profileInfo.upsert({
       where: { key: "homepage_profile" },
       update: {
@@ -751,6 +802,7 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         experiences: data.experiences as unknown as object,
         certifications: data.certifications as unknown as object,
         socialLinks: data.socialLinks as unknown as object,
+        sectionsVisibility: visibilityToSave as unknown as object,
       },
       create: {
         key: "homepage_profile",
@@ -760,6 +812,7 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         experiences: data.experiences as unknown as object,
         certifications: data.certifications as unknown as object,
         socialLinks: data.socialLinks as unknown as object,
+        sectionsVisibility: visibilityToSave as unknown as object,
       },
     });
     return true;

@@ -1,4 +1,4 @@
-import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { createCookieSessionStorage, redirect, type Session } from "@remix-run/node";
 export { destroyAdminSession } from "./admin-auth.server";
 
 // Export the session storage object
@@ -19,12 +19,12 @@ export function getSession(request: Request) {
 }
 
 // Helper to commit session
-export function commitSession(session: any) {
+export function commitSession(session: Session) {
   return sessionStorage.commitSession(session);
 }
 
 // Helper to destroy session
-export function destroySession(session: any) {
+export function destroySession(session: Session) {
   return sessionStorage.destroySession(session);
 }
 

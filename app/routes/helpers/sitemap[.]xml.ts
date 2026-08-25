@@ -42,7 +42,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       (post) => `
   <url>
     <loc>${baseUrl}/blog/${post.slug}</loc>
-    <lastmod>${new Date(post.createdAt || post.date || Date.now()).toISOString().split("T")[0]}</lastmod>
+    <lastmod>${new Date((post as any).createdAt || post.date || Date.now()).toISOString().split("T")[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`

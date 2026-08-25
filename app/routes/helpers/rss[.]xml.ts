@@ -42,14 +42,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     ${posts
       .map((post) => {
         const postUrl = `${baseUrl}/blog/${post.slug}`;
-        const pubDate = new Date(post.createdAt || post.date || Date.now()).toUTCString();
+        const pubDate = new Date((post as any).createdAt || post.date || Date.now()).toUTCString();
         return `
     <item>
       <title>${escapeXml(post.title)}</title>
       <link>${postUrl}</link>
       <guid isPermaLink="true">${postUrl}</guid>
       <pubDate>${pubDate}</pubDate>
-      <description><![CDATA[${post.excerpt || post.content || ""}]]></description>
+      <description><![CDATA[${(post as any).excerpt || post.summary || (post as any).content || ""}]]></description>
     </item>`;
       })
       .join("")}

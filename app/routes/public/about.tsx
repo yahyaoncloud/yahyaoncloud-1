@@ -1,4 +1,4 @@
-﻿import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { json, useLoaderData } from "@remix-run/react";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useState } from "react";
@@ -346,9 +346,9 @@ function Certifications({ certifications }: CertificationsProps) {
         Certifications
       </h2>
       <div className="space-y-3">
-        {certifications.map((cert, i) => (
+        {certifications.map((cert: any, i: number) => (
           <div
-            key={cert._id || i}
+            key={cert._id || cert.id || i}
             className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b dark:border-b-zinc-700 border-b-zinc-300 pb-2"
           >
             <div className="flex flex-col">
@@ -370,13 +370,13 @@ function Certifications({ certifications }: CertificationsProps) {
 }
 
 type SocialLinksProps = {
-  socials: SocialLinks[];
+  socials: any;
 };
 
 function Socials({ socials }: SocialLinksProps) {
   if (!socials) return null;
 
-  const entries = Object.entries(socials).filter(([_, v]) => v);
+  const entries = Object.entries(socials).filter(([_, v]) => Boolean(v));
 
   return (
     <div className="space-y-4 md:space-y-6 mb-8">
@@ -384,27 +384,30 @@ function Socials({ socials }: SocialLinksProps) {
         Connect
       </h2>
       <div className="space-y-4">
-        {entries.map(([key, value], i) => (
-          <div
-            key={i}
-            className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pb-1 border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 last:pb-0"
-          >
-            <span className="capitalize text-sm text-zinc-600 dark:text-zinc-400">
-              {key}
-            </span>
-            <a
-              href={key === "email" ? `mailto:${value}` : value}
-              target="_blank"
-              rel="noreferrer"
-              className="group text-sm font-medium text-indigo-600 dark:text-indigo-400 break-all sm:break-normal transition-colors duration-200"
+        {entries.map(([key, value], i) => {
+          const valStr = String(value);
+          return (
+            <div
+              key={i}
+              className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pb-1 border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 last:pb-0"
             >
-              <span className="relative">
-                {value}
-                <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+              <span className="capitalize text-sm text-zinc-600 dark:text-zinc-400">
+                {key}
               </span>
-            </a>
-          </div>
-        ))}
+              <a
+                href={key === "email" ? `mailto:${valStr}` : valStr}
+                target="_blank"
+                rel="noreferrer"
+                className="group text-sm font-medium text-indigo-600 dark:text-indigo-400 break-all sm:break-normal transition-colors duration-200"
+              >
+                <span className="relative">
+                  {valStr}
+                  <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
+                </span>
+              </a>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

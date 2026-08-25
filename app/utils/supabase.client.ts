@@ -16,8 +16,8 @@ export function getSupabaseClient(): SupabaseClient | null {
   }
 
   // Get environment variables from window.ENV (set in root.tsx)
-  const supabaseId = (window as any).ENV?.SUPABASE_ID;
-  const supabaseAnonKey = (window as any).ENV?.SUPABASE_ANON;
+  const supabaseId = window.ENV?.SUPABASE_ID;
+  const supabaseAnonKey = window.ENV?.SUPABASE_ANON;
 
   if (!supabaseId || !supabaseAnonKey) {
     console.warn('Supabase client environment variables not set');

@@ -46,6 +46,6 @@ export async function firebaseLogout() {
 }
 
 // Get user avatar
-export function getUserAvatar(user: any) {
+export function getUserAvatar(user: { photoURL?: string | null } | null | undefined) {
   return user?.photoURL || null;
 }

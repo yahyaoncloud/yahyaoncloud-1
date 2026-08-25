@@ -50,9 +50,9 @@ export async function createPost(
 
     // Merge parsed Markdown frontmatter with postData
     postData.title = postData.title || parsedMarkdown.frontmatter.title || "Untitled Post";
-    postData.categories = postData.categories || parsedMarkdown.frontmatter.categories || [];
-    postData.tags = postData.tags || parsedMarkdown.frontmatter.tags || [];
-    postData.status = postData.status || parsedMarkdown.frontmatter.status || "draft";
+    postData.categories = postData.categories || (parsedMarkdown.frontmatter.categories as any) || [];
+    postData.tags = postData.tags || (parsedMarkdown.frontmatter.tags as any) || [];
+    postData.status = postData.status || (parsedMarkdown.frontmatter.status as any) || "draft";
   } else {
     // Manual post creation: Upload cover and gallery images
     if (files?.coverImage) {
@@ -292,18 +292,10 @@ export async function convertDraftToPost(
     title: draft.title,
     summary: draft.summary,
     content: draft.content,
-    categories: draft.categories?.map((id) => ({ _id: id })),
-    tags: draft.tags,
-    types: draft.types,
+    categories: (draft.categories?.map((id) => ({ _id: id })) as any),
+    tags: (draft.tags as any),
+    types: (draft.types as any),
     authorId: draft.authorId,
-    seo: {
-      title: draft.seoTitle || draft.title,
-      description: draft.seoDescription || draft.summary || "",
-      keywords: draft.seoKeywords || [],
-      canonicalUrl: "",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
     status: "draft",
     date: new Date(),
     createdAt: new Date(),

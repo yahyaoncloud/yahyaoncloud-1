@@ -164,10 +164,15 @@ export async function getActiveResume(userId?: string) {
  * Get all resumes (for admin selection)
  */
 export async function getAllResumes(userId?: string) {
-  if (userId) {
-    return await Resume.find({ userId }).sort({ title: 1 });
+  try {
+    if (userId) {
+      return await Resume.find({ userId }).sort({ title: 1 });
+    }
+    return await Resume.find({}).sort({ title: 1 });
+  } catch (error) {
+    console.warn("getAllResumes warning:", error);
+    return [];
   }
-  return await Resume.find({}).sort({ title: 1 });
 }
 
 export async function getResumeById(resumeId: string) {

@@ -1,17 +1,17 @@
-﻿import { json, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Form, useNavigation, useActionData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { Card, CardContent } from "~/components/ui/Card";
+import { Card, CardContent } from "~/components/ui/card";
 import { 
   getCategoriesWithCount, 
   createCategory, 
   updateCategory, 
   deleteCategory 
 } from "~/Services/category.prisma.server";
-import { useToast } from "~/hooks/use-toast";
+import { toast } from "sonner";
 import { AdminDataTable, type Column } from "~/components/AdminDataTable";
 import { Plus, Pencil, Trash2, Tag } from "lucide-react";
 
@@ -57,19 +57,18 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Categories() {
     const { categories } = useLoaderData<typeof loader>();
-    const actionData = useActionData<typeof action>();
-    const { toast } = useToast();
+    const actionData = useActionData<typeof action>() as { success?: boolean; message?: string; error?: string } | undefined;
     const navigation = useNavigation();
     const [editingId, setEditingId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (actionData?.success) {
-            toast({ title: "Success", description: actionData.message });
+        if (actionData?.success && actionData.message) {
+            toast.success(actionData.message);
             setEditingId(null);
         } else if (actionData?.error) {
-            toast({ title: "Error", description: actionData.error, variant: "destructive" });
+            toast.error(actionData.error);
         }
-    }, [actionData, toast]);
+    }, [actionData]);
 
     const isSubmitting = navigation.state === "submitting";
 

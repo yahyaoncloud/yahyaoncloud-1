@@ -2,7 +2,6 @@ import { Authenticator } from "remix-auth";
 import { GitHubStrategy } from "remix-auth-github";
 import { sessionStorage } from "~/utils/session.server";
 import { createAdmin, getAdminByUsername } from "~/Services/admin.prisma.server";
-import { createAuthor, getAuthorByUsername } from "~/Services/author-management.server";
 
 // We'll define a User type that can represent either an Admin or Author locally
 // or just the profile returned from the provider
@@ -31,19 +30,20 @@ if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET) {
         clientSecret: GITHUB_CLIENT_SECRET,
         redirectURI: `${BASE_URL}/auth/sso/github`,
       },
-      async ({ profile }: any) => {
-        // Here you would find or create the user in your database
-        // For now we just return the profile info adapted to our User interface
-        // In a real app, you'd integrate with admin.prisma.server or author services
-        
-        // Example check:
-        // let user = await getAdminByUsername(profile.displayName);
-        
+      async ({ tokens }: { request: Request; tokens: { accessToken: () => string } }) => {
+        const response = await fetch("https://api.github.com/user", {
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken()}`,
+            "User-Agent": "YahyaOnCloud-App",
+          },
+        });
+        const profile = (await response.json()) as { id: number; login: string; name?: string; email?: string; avatar_url?: string };
+
         return {
-          id: profile.id, // This is the GitHub ID
-          email: profile.emails?.[0]?.value || "",
-          name: profile.displayName,
-          photoUrl: profile.photos?.[0]?.value || "",
+          id: String(profile.id),
+          email: profile.email || "",
+          name: profile.name || profile.login,
+          photoUrl: profile.avatar_url || "",
           provider: "github",
         };
       }

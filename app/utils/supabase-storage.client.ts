@@ -1,7 +1,7 @@
 // Supabase storage utility for file uploads
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = `https://${process.env.SUPABASE_ID}.supabase.co` || '';
+const supabaseUrl = process.env.SUPABASE_ID ? `https://${process.env.SUPABASE_ID}.supabase.co` : '';
 const supabaseKey = process.env.SUPABASE_ANON || '';
 
 export const supabase = supabaseUrl && supabaseKey
@@ -20,6 +20,10 @@ export async function uploadFile(
   bucket: string,
   path: string
 ): Promise<string> {
+  if (!supabase) {
+    throw new Error('Supabase client is not initialized');
+  }
+
   const { data, error } = await supabase.storage
     .from(bucket)
     .upload(path, file, {
@@ -44,6 +48,10 @@ export async function uploadFile(
  * @param path - File path in bucket
  */
 export async function deleteFile(bucket: string, path: string): Promise<void> {
+  if (!supabase) {
+    throw new Error('Supabase client is not initialized');
+  }
+
   const { error } = await supabase.storage.from(bucket).remove([path]);
 
   if (error) {

@@ -1,268 +1,283 @@
-﻿import { json, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useActionData, useFetcher } from "@remix-run/react";
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData, useActionData, useFetcher, Link } from "@remix-run/react";
 import { useState, useEffect } from "react";
-import { Send, Heart, Clock, Trash2, Check } from "lucide-react";
-import { FaGithub, FaGoogle, FaTwitter } from "react-icons/fa";
-import { getGuestbookEntries, createGuestbookEntry, deleteGuestbookEntry, approveGuestbookEntry } from "~/Services/admin.prisma.server";
-import { useToast } from "~/hooks/use-toast";
+import { Send, Clock, Trash2, Check, Shield, RefreshCw, AlertCircle, ExternalLink } from "lucide-react";
+import { requireAdmin } from "~/utils/admin-auth.server";
+import { 
+  getGuestbookFromRTDB, 
+  deleteGuestbookFromRTDB, 
+  approveGuestbookInRTDB,
+  addGuestbookToRTDB,
+  type GuestbookEntry 
+} from "~/utils/firebase-rtdb.server";
+import { getGuestbookEntries } from "~/Services/admin.prisma.server";
+import { Button } from "~/components/ui/button";
+import { toast } from "sonner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  try {
-    const entries = await getGuestbookEntries(100);
-    return json({ entries, isAdmin: true }); // In real app, check admin session
-  } catch (error) {
-    console.error("Guestbook loader error:", error);
-    return json({ entries: [], isAdmin: false, error: "Failed to load entries" }, { status: 500 });
+  await requireAdmin(request);
+  
+  // Try fetching from Firebase Realtime Database first with 30-day auto retention
+  let entries: GuestbookEntry[] = await getGuestbookFromRTDB();
+
+  // If RTDB has no entries yet, fallback to Prisma DB entries
+  if (entries.length === 0) {
+    try {
+      const dbEntries = await getGuestbookEntries(50);
+      entries = dbEntries.map((e: any) => ({
+        id: e.id,
+        author: e.author,
+        content: e.content,
+        approved: e.approved,
+        createdAt: e.createdAt,
+        provider: "website",
+      }));
+    } catch {
+      // ignore fallback error
+    }
   }
+
+  return json({ entries });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await request.formData();
-  const intent = formData.get("intent");
+  const intent = formData.get("intent") as string;
+  const id = formData.get("id") as string;
 
   try {
-    if (intent === "create") {
-      const author = formData.get("author") as string;
-      const content = formData.get("content") as string;
-      
-      if (!author?.trim() || author.trim().length < 2) {
-        return json({ success: false, error: "Name must have at least 2 characters" }, { status: 400 });
+    if (intent === "delete" && id) {
+      await deleteGuestbookFromRTDB(id);
+      return json({ success: true, message: "Guestbook message deleted from Realtime Database" });
+    }
+
+    if (intent === "approve" && id) {
+      await approveGuestbookInRTDB(id, true);
+      return json({ success: true, message: "Guestbook entry approved" });
+    }
+
+    if (intent === "reply") {
+      const author = "Yahya (Site Owner)";
+      const message = formData.get("replyMessage") as string;
+      if (!message?.trim()) {
+        return json({ success: false, error: "Reply message cannot be empty" }, { status: 400 });
       }
-      if (!content?.trim() || content.trim().length < 5) {
-        return json({ success: false, error: "Message must have at least 5 characters" }, { status: 400 });
-      }
-      
-      await createGuestbookEntry({ author: author.trim(), content: content.trim() });
-      return json({ success: true, message: "Message added successfully! It will appear after approval." });
+      await addGuestbookToRTDB({
+        author,
+        content: message.trim(),
+        approved: true,
+        provider: "admin",
+        createdAt: Date.now(),
+      });
+      return json({ success: true, message: "Admin reply posted to Guestbook!" });
     }
-    
-    if (intent === "delete") {
-      const id = formData.get("id") as string;
-      await deleteGuestbookEntry(id);
-      return json({ success: true, message: "Entry deleted" });
-    }
-    
-    if (intent === "approve") {
-      const id = formData.get("id") as string;
-      await approveGuestbookEntry(id);
-      return json({ success: true, message: "Entry approved" });
-    }
-    
+
     return json({ success: false, error: "Invalid action" }, { status: 400 });
   } catch (error) {
     return json({ 
       success: false, 
       error: error instanceof Error ? error.message : "Action failed" 
-    }, { status: 400 });
+    }, { status: 500 });
   }
 }
 
 export default function AdminGuestbook() {
-  const { entries, isAdmin } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>() as { success?: boolean; message?: string; error?: string } | undefined;
-  const { toast } = useToast();
+  const { entries } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const fetcher = useFetcher();
-  
-  const [formData, setFormData] = useState({ name: "", message: "" });
   const [filter, setFilter] = useState<"all" | "pending" | "approved">("all");
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
-    if (actionData?.success && actionData?.message) {
-      toast({ title: "Success", description: actionData.message });
-      setFormData({ name: "", message: "" });
-    } else if (actionData?.error) {
-      toast({ title: "Error", description: actionData.error, variant: "destructive" });
+    if ((actionData as any)?.success && (actionData as any).message) {
+      toast.success((actionData as any).message);
+      setReplyText("");
+      setReplyOpen(false);
+    } else if ((actionData as any)?.error) {
+      toast.error((actionData as any).error);
     }
-  }, [actionData, toast]);
+  }, [actionData]);
 
-  const formatTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    if (diffMs < 60000) return "now";
-    if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m`;
-    if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h`;
-    return `${Math.floor(diffMs / 86400000)}d`;
-  };
-
-  const filteredEntries = entries.filter((entry: { approved: boolean }) => {
-    if (filter === "pending") return !entry.approved;
-    if (filter === "approved") return entry.approved;
+  const filteredEntries = entries.filter((e) => {
+    if (filter === "pending") return !e.approved;
+    if (filter === "approved") return e.approved;
     return true;
   });
 
-  const pendingCount = entries.filter((e: { approved: boolean }) => !e.approved).length;
+  const pendingCount = entries.filter((e) => !e.approved).length;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="px-6 py-8">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl mt-8 lg:text-6xl font-bold bg-gradient-to-r from-zinc-900 via-indigo-800 to-indigo-800 dark:from-white dark:via-indigo-200 dark:to-indigo-200 bg-clip-text text-transparent mb-6">
-            Guestbook
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+            <Shield className="text-indigo-600 dark:text-indigo-400" size={22} /> Guestbook Moderation
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-            {entries.length} messages â€¢ {pendingCount} pending approval
+          <p className="text-xs text-zinc-500 mt-1">
+            Realtime Database (RTDB) sync with 30-day retention auto-pruning.
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setReplyOpen(!replyOpen)}
+            className="text-xs gap-1.5"
+          >
+            <Send size={13} /> Post Owner Note
+          </Button>
+          <Link to="/guestbook" target="_blank">
+            <Button variant="secondary" size="sm" className="text-xs gap-1">
+              <span>View Public</span>
+              <ExternalLink size={12} />
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-          {/* Left Side - Message Form */}
-          <div className="space-y-6 border border-zinc-500 dark:border-zinc-700 rounded-md p-10 bg-zinc-50 dark:bg-zinc-900/70">
-            <h2 className="text-xl font-medium text-zinc-900 dark:text-white">
-              Leave a message
-            </h2>
+      {/* 30-Day Retention Notice Card */}
+      <div className="flex items-center justify-between p-3.5 rounded-xl border border-indigo-200/60 dark:border-indigo-900/40 bg-indigo-50/40 dark:bg-indigo-950/20 text-xs text-indigo-900 dark:text-indigo-300">
+        <div className="flex items-center gap-2">
+          <AlertCircle size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+          <span>
+            <strong>30-Day Policy Active:</strong> All messages older than 30 days are automatically pruned from the Realtime Database to keep storage lightweight.
+          </span>
+        </div>
+        <span className="font-mono text-[11px] bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded text-indigo-700 dark:text-indigo-300">
+          {entries.length} active
+        </span>
+      </div>
 
-            <fetcher.Form method="post" className="space-y-4">
-              <input type="hidden" name="intent" value="create" />
-              <div>
-                <input
-                  name="author"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Your name"
-                  className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-700 rounded-md bg-zinc-100 dark:bg-zinc-950/70 text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:border-zinc-400 dark:focus:border-zinc-500 focus:outline-none transition-colors"
-                />
-              </div>
-
-              <div>
-                <textarea
-                  name="content"
-                  rows={6}
-                  value={formData.message}
-                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                  placeholder="Write your message here..."
-                  className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-700 rounded-md bg-zinc-100 dark:bg-zinc-950/70 text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:border-zinc-400 dark:focus:border-zinc-500 focus:outline-none resize-none transition-colors"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={!formData.name || !formData.message || fetcher.state === "submitting"}
-                className={`w-full py-3 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
-                  !formData.name || !formData.message || fetcher.state === "submitting"
-                    ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-                    : "bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100"
-                }`}
-              >
-                {fetcher.state === "submitting" ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin"></div>
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send size={16} />
-                    Submit Message
-                  </>
-                )}
-              </button>
-            </fetcher.Form>
+      {/* Admin Post Reply Box */}
+      {replyOpen && (
+        <fetcher.Form method="post" className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-3">
+          <input type="hidden" name="intent" value="reply" />
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">Post as Site Owner</h2>
+          <textarea
+            name="replyMessage"
+            rows={3}
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Write a public announcement or welcome note to the guestbook..."
+            className="w-full p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={() => setReplyOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" size="sm" disabled={!replyText.trim() || fetcher.state === "submitting"}>
+              {fetcher.state === "submitting" ? "Posting..." : "Post to Guestbook"}
+            </Button>
           </div>
+        </fetcher.Form>
+      )}
 
-          {/* Right Side - Messages List */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-medium text-zinc-900 dark:text-white">
-                Messages
-              </h2>
-              {isAdmin && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setFilter("all")}
-                    className={`text-xs px-3 py-1 rounded-full ${filter === "all" ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900" : "bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"}`}
-                  >
-                    All ({entries.length})
-                  </button>
-                  <button
-                    onClick={() => setFilter("pending")}
-                    className={`text-xs px-3 py-1 rounded-full ${filter === "pending" ? "bg-yellow-500 text-white" : "bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"}`}
-                  >
-                    Pending ({pendingCount})
-                  </button>
-                  <button
-                    onClick={() => setFilter("approved")}
-                    className={`text-xs px-3 py-1 rounded-full ${filter === "approved" ? "bg-green-500 text-white" : "bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300"}`}
-                  >
-                    Approved
-                  </button>
-                </div>
-              )}
+      {/* Moderation List */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setFilter("all")}
+              className={`text-xs px-3 py-1 rounded-full font-medium transition-colors ${
+                filter === "all"
+                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+              }`}
+            >
+              All ({entries.length})
+            </button>
+            <button
+              onClick={() => setFilter("approved")}
+              className={`text-xs px-3 py-1 rounded-full font-medium transition-colors ${
+                filter === "approved"
+                  ? "bg-green-600 text-white"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+              }`}
+            >
+              Approved ({entries.filter((e) => e.approved).length})
+            </button>
+            <button
+              onClick={() => setFilter("pending")}
+              className={`text-xs px-3 py-1 rounded-full font-medium transition-colors ${
+                filter === "pending"
+                  ? "bg-amber-500 text-white"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+              }`}
+            >
+              Pending ({pendingCount})
+            </button>
+          </div>
+        </div>
+
+        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          {filteredEntries.length === 0 ? (
+            <div className="py-12 text-center text-xs text-zinc-400">
+              No guestbook messages in this view.
             </div>
-
-            <div className="space-y-6 max-h-[600px] overflow-y-auto">
-              {filteredEntries.length === 0 ? (
-                <div className="text-center py-12 text-zinc-500">
-                  No messages yet. Be the first to leave one!
-                </div>
-              ) : (
-                filteredEntries.map((entry: { id: string; author: string; content: string; approved: boolean; createdAt: string }) => (
-                  <div
-                    key={entry.id}
-                    className={`border-b border-zinc-100 dark:border-zinc-800 pb-6 last:border-0 ${!entry.approved ? "opacity-70" : ""}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 text-xs font-medium flex-shrink-0">
-                        {entry.author.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+          ) : (
+            filteredEntries.map((entry) => (
+              <div key={entry.id} className="py-4 first:pt-0 last:pb-0 flex items-start justify-between gap-4">
+                <div className="space-y-1.5 flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    {entry.avatar ? (
+                      <img src={entry.avatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold flex items-center justify-center shrink-0">
+                        {entry.author.slice(0, 2).toUpperCase()}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium text-zinc-900 dark:text-white text-sm">
-                            {entry.author}
-                          </span>
-                          <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                            <Clock size={10} />
-                            {formatTime(entry.createdAt)}
-                          </div>
-                          {!entry.approved && (
-                            <span className="text-xs px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full">
-                              Pending
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed mb-3">
-                          {entry.content}
-                        </p>
-                        {isAdmin && (
-                          <div className="flex items-center gap-2">
-                            {!entry.approved && (
-                              <fetcher.Form method="post" className="inline">
-                                <input type="hidden" name="intent" value="approve" />
-                                <input type="hidden" name="id" value={entry.id} />
-                                <button
-                                  type="submit"
-                                  className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 transition-colors"
-                                >
-                                  <Check size={12} /> Approve
-                                </button>
-                              </fetcher.Form>
-                            )}
-                            <fetcher.Form method="post" className="inline">
-                              <input type="hidden" name="intent" value="delete" />
-                              <input type="hidden" name="id" value={entry.id} />
-                              <button
-                                type="submit"
-                                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 transition-colors"
-                              >
-                                <Trash2 size={12} /> Delete
-                              </button>
-                            </fetcher.Form>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    )}
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                      {entry.author}
+                    </span>
+                    {entry.provider && (
+                      <span className="text-[10px] font-mono uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-500 px-1.5 py-0.2 rounded">
+                        {entry.provider}
+                      </span>
+                    )}
+                    <span className="text-[11px] text-zinc-400 font-mono">
+                      {new Date(entry.createdAt).toLocaleDateString()}
+                    </span>
+                    {!entry.approved && (
+                      <span className="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                        Pending
+                      </span>
+                    )}
                   </div>
-                ))
-              )}
-            </div>
-          </div>
+                  <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                    {entry.content}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {!entry.approved && (
+                    <fetcher.Form method="post" className="inline">
+                      <input type="hidden" name="intent" value="approve" />
+                      <input type="hidden" name="id" value={entry.id} />
+                      <Button variant="outline" size="sm" className="h-7 text-xs text-green-600 gap-1 hover:bg-green-50 dark:hover:bg-green-950/20">
+                        <Check size={12} /> Approve
+                      </Button>
+                    </fetcher.Form>
+                  )}
+                  <fetcher.Form 
+                    method="post" 
+                    className="inline"
+                    onSubmit={(e) => !confirm("Delete this message permanently?") && e.preventDefault()}
+                  >
+                    <input type="hidden" name="intent" value="delete" />
+                    <input type="hidden" name="id" value={entry.id} />
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-400 hover:text-red-600">
+                      <Trash2 size={13} />
+                    </Button>
+                  </fetcher.Form>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
   );
 }
-

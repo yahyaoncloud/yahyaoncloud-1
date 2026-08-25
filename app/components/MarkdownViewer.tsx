@@ -168,7 +168,7 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
         components={{
           // Prevent ReactMarkdown from creating an outer redundant pre tag
           pre: ({ children }) => <>{children}</>,
-          code: CodeBlock,
+          code: CodeBlock as any,
           h1: ({ children }) => (
             <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-7 mb-3">
               {children}

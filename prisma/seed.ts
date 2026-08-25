@@ -27,53 +27,59 @@ async function main() {
     ],
     certifications: [
       {
-        name: "AWS Certified Solutions Architect – Professional",
+        name: "Cisco Certified Network Professional (CCNP)",
+        issuer: "Cisco",
+        credentialUrl: "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/professional.html",
+      },
+      {
+        name: "Cisco Certified Network Associate (CCNA)",
+        issuer: "Cisco",
+        credentialUrl: "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html",
+      },
+      {
+        name: "Microsoft Certified: Azure Administrator Associate",
+        issuer: "Microsoft",
+        credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/",
+      },
+      {
+        name: "Microsoft Certified: Azure Solutions Architect Expert",
+        issuer: "Microsoft",
+        credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-solutions-architect/",
+      },
+      {
+        name: "Microsoft Certified: Azure Fundamentals",
+        issuer: "Microsoft",
+        credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-fundamentals/",
+      },
+      {
+        name: "AWS Certified Solutions Architect – Associate",
         issuer: "Amazon Web Services",
-        issueDate: "2024",
-        credentialUrl: "https://aws.amazon.com/certification/",
-      },
-      {
-        name: "Certified Kubernetes Administrator (CKA)",
-        issuer: "Cloud Native Computing Foundation",
-        issueDate: "2023",
-        credentialUrl: "https://www.cncf.io/certification/cka/",
-      },
-      {
-        name: "HashiCorp Certified: Terraform Associate",
-        issuer: "HashiCorp",
-        issueDate: "2023",
-        credentialUrl: "https://www.hashicorp.com/certification/terraform-associate",
-      },
-      {
-        name: "Red Hat Certified Specialist in Linux Networking",
-        issuer: "Red Hat",
-        issueDate: "2022",
-        credentialUrl: "https://www.redhat.com/en/services/certification",
+        credentialUrl: "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
       },
     ],
     experiences: [
       {
         year: "2024",
         present: true,
-        company: "Cloud & DevOps",
-        role: "Engineer",
+        company: "Gulf Intelligence & Media",
+        role: "Architect / Full-stack Developer",
         description:
-          "Architecting multi-region Kubernetes clusters, GitOps pipelines with ArgoCD, Terraform IaC automation, and distributed observability meshes across AWS and hybrid clouds.",
+          "Architecting real-time geospatial intelligence, ML threat scoring pipelines, and cross-platform document synthesis engines using Go, Python, and React.",
         projects: [
-          { name: "Multi-Region Cloud GitOps Platform", url: "/projects/multi-region-cloud-gitops", internal: true },
-          { name: "Distributed Observability & Telemetry Mesh", url: "/projects/observability-mesh-telemetry", internal: true },
+          { name: "HormuzWatch", url: "/projects/hormuzwatch", internal: true },
+          { name: "RaweeGo", url: "/projects/raweego", internal: true },
         ],
       },
       {
-        year: "2022",
+        year: "2023",
         present: false,
-        company: "Network Infrastructure",
-        role: "Engineer",
+        company: "Enterprise Systems",
+        role: "Full-stack & Infrastructure Engineer",
         description:
-          "Managed enterprise multi-vendor routing and switching, BGP peering, OSPF network backbones, hardware firewalls, site-to-site VPN tunnels, and zero-trust SDN migrations.",
+          "Engineered distributed point-of-sale tenant platforms, Kafka event-driven architectures, and encrypted certification authoring studios.",
         projects: [
-          { name: "Hybrid Cloud Enterprise Network & Zero-Trust SDN", url: "/projects/hybrid-sdn-infrastructure", internal: true },
-          { name: "eBPF-Driven Cloud Traffic Engineering", url: "/research", internal: true },
+          { name: "NoteTruck", url: "/projects/notetruck", internal: true },
+          { name: "AburPOS Central", url: "/projects/aburpos-central", internal: true },
         ],
       },
     ],
@@ -95,71 +101,102 @@ async function main() {
   console.log("Seeding Project Case Studies...");
   const projects = [
     {
-      slug: "multi-region-cloud-gitops",
-      title: "Multi-Region Cloud GitOps Platform",
-      category: "Infrastructure",
-      period: "2024",
-      role: "Lead Infrastructure Architect",
-      summary: "Multi-region Kubernetes and GitOps delivery pipeline orchestrating mission-critical microservices with automated failover and zero-downtime rollouts.",
-      techStack: ["AWS EKS", "Terraform", "ArgoCD", "Kubernetes", "Helm", "GitHub Actions"],
-      githubUrl: "https://github.com/yahyaoncloud/cloud-gitops-infra",
-      demoUrl: "https://gitops.yahyaoncloud.com",
+      slug: "hormuzwatch",
+      title: "HormuzWatch — Gulf Intelligence Platform",
+      category: "SaaS, Security, AI/ML, Observability, Infrastructure",
+      period: "2024 - 2026",
+      role: "Architect / Full-stack Developer",
+      summary: "Real-time geospatial surveillance, multi-source news intelligence, and ensemble anomaly detection for strategic maritime regions in the Gulf. Combines AIS vessel tracking, aviation telemetry, and 16-news-source RSS pipeline with ML-powered threat scoring.",
+      techStack: [
+        "Go 1.23",
+        "Python 3.11",
+        "PyTorch ROCm",
+        "XGBoost",
+        "React 19",
+        "TypeScript",
+        "PostgreSQL",
+        "Terraform",
+      ],
       featured: true,
       order: 1,
-      content: `## Architecture Overview
+      content: `## Executive Summary
 
-This platform implements a multi-region active-active architecture spanning \`us-east-1\` and \`eu-west-1\` on AWS. Utilizing Terraform for modular infrastructure as code and ArgoCD ApplicationSets for declarative GitOps synchronization.
-
-### Key Highlights
-
-- **Declarative Infrastructure**: 100% Terraform coverage across VPC peering, Route53 latency routing, and IAM roles.
-- **Continuous Delivery**: Automated pull-request preview environments and progressive canary rollouts via Argo Rollouts.
-- **Disaster Recovery**: Automated RTO < 60 seconds with cross-region Amazon Aurora and DynamoDB global tables.`,
+HormuzWatch is a unified real-time maritime and aviation surveillance platform paired with a multi-source news intelligence engine for strategic Gulf waterways. It replaces fragmented manual monitoring by combining live AIS vessel feeds, OpenSky aviation telemetry, and an automated 16-source OSINT RSS ingestion pipeline with machine learning anomaly detection and threat scoring.`,
     },
     {
-      slug: "observability-mesh-telemetry",
-      title: "Distributed Observability & Telemetry Mesh",
-      category: "Observability",
-      period: "2023 - 2024",
-      role: "DevOps / SRE Engineer",
-      summary: "Unified eBPF and OpenTelemetry distributed tracing mesh processing 40k+ events/sec with Prometheus and Grafana dashboards.",
-      techStack: ["OpenTelemetry", "Prometheus", "Grafana", "eBPF", "Grafana Loki", "Tempo"],
-      githubUrl: "https://github.com/yahyaoncloud/observability-mesh",
-      demoUrl: "https://telemetry.yahyaoncloud.com",
+      slug: "raweego",
+      title: "RaweeGo — Pocket Narrator / Document-to-Audio Platform",
+      category: "SaaS, Developer Tool, AI/ML, Mobile, Automation",
+      period: "2024 - 2025",
+      role: "Architect / Full-stack Developer",
+      summary: "Cross-platform document-to-audio platform with a Flutter mobile app, Rust native core engine, Go backend REST API, Python Piper TTS microservice, and React marketing website. End-to-end flow: mobile app inspects documents via Rust FFI → uploads to Go server → Go orchestrates Python TTS → audio streamed back to mobile for playback.",
+      techStack: [
+        "Flutter",
+        "Rust FFI",
+        "Go 1.22",
+        "Python Piper TTS",
+        "React 19",
+        "Three.js",
+      ],
       featured: true,
       order: 2,
-      content: `## Distributed Tracing & Metric Pipelines
+      content: `## Executive Summary
 
-Engineered a high-throughput telemetry pipeline collecting traces, logs, and kernel metrics with sub-millisecond overhead.
-
-### Implementation Details
-
-- **OpenTelemetry Collector Gateway**: Clustered OTel collectors with adaptive sampling to curtail ingestion costs by 65%.
-- **eBPF Kernel Probing**: Non-invasive network latency and TCP retransmission tracking using Cilium Hubble.
-- **Alerting & SLO Tracking**: Automated alerting rules with Slack and PagerDuty escalations.`,
+RaweeGo is an end-to-end, privacy-respecting document-to-audio platform engineered as a clean monorepo across five isolated domains. It enables mobile users to convert documents into natural, neural-synthesized audio streams locally and efficiently without proprietary cloud speech lock-in.`,
     },
     {
-      slug: "hybrid-sdn-infrastructure",
-      title: "Hybrid Cloud Enterprise Network & Zero-Trust SDN",
-      category: "Networking",
-      period: "2022 - 2023",
-      role: "Network Engineer",
-      summary: "Enterprise SDN migration interconnecting on-premises data centers to AWS VPCs via IPSec tunnels, BGP routing, and Zero-Trust access.",
-      techStack: ["BGP", "OSPF", "Cisco Nexus", "WireGuard", "AWS DirectConnect", "Zero Trust"],
-      githubUrl: "https://github.com/yahyaoncloud/hybrid-network-sdn",
-      demoUrl: "https://sdn.yahyaoncloud.com",
+      slug: "notetruck",
+      title: "NoteTruck — Personal Certification Notes & Authoring Studio",
+      category: "Developer Tool, SaaS, Observability",
+      period: "2024 - 2025",
+      role: "Architect / Full-stack Developer",
+      summary: "High-performance single-port personal authoring studio and knowledge repository for cloud, networking, and security certification notes (AWS, Kubernetes, Azure, Cisco). Features Go backend with SQLite FTS5 search, live SSE sync, JWT auth, and embedded React Router v7/Vite frontend with Shadcn UI.",
+      techStack: [
+        "Go 1.22+",
+        "React Router v7",
+        "SQLite FTS5",
+        "LUKS2 Encryption",
+        "Docker",
+        "Shadcn UI",
+      ],
       featured: true,
       order: 3,
-      content: `## Network Backbone Architecture
+      content: `## Executive Summary
 
-Designed high-reliability interconnects between legacy bare-metal infrastructure and modern public cloud regions.
+NoteTruck is a high-performance single-binary authoring studio and structured knowledge repository engineered for cloud, network, and security certification preparation. It provides an encrypted, zero-latency local-first workspace with real-time multi-tab synchronization and lightning-fast full-text search.`,
+    },
+    {
+      slug: "aburpos-central",
+      title: "AburPOS Central System — Tenant & License Management Platform",
+      category: "SaaS, Infrastructure, Automation",
+      period: "2025",
+      role: "Architect / Backend Developer",
+      summary: "Cloud-based central management platform for distributed AburPOS tenants. Handles tenant onboarding/provisioning, license generation/validation/renewal with tier-based limits (Small/Medium/Enterprise), and server health monitoring via Kafka event-driven architecture.",
+      techStack: [
+        "Go 1.24+",
+        "Apache Kafka",
+        "MongoDB",
+        "Gin Framework",
+        "Swagger/OpenAPI",
+        "AWS EC2",
+      ],
+      featured: true,
+      order: 4,
+      content: `## Executive Summary
 
-### Highlights
-
-- **Dynamic Routing**: Dual-homed BGP peering with AS prepending and route filtering to avoid asymmetric routing.
-- **Microsegmentation**: Layer-4/Layer-7 access policies enforcing least-privilege security per service tier.`,
+AburPOS Central System is a high-availability cloud control plane designed to manage distributed point-of-sale (POS) deployments across multi-branch enterprise networks. Built with Go 1.24, Apache Kafka, and MongoDB, it centralizes tenant lifecycle orchestration, cryptographic license validation, remote server health monitoring, and asynchronous state synchronization.`,
     },
   ];
+
+  // Remove obsolete projects
+  const activeSlugs = projects.map((p) => p.slug);
+  await prisma.projectCaseStudy.deleteMany({
+    where: {
+      slug: {
+        notIn: activeSlugs,
+      },
+    },
+  });
 
   for (const proj of projects) {
     await prisma.projectCaseStudy.upsert({

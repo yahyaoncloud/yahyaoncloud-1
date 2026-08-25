@@ -110,9 +110,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       customLinks: (linktree.customLinks as unknown as CustomLink[]) || [],
       shortCode: linktree.shortCode,
     },
-    resumes: resumes.map((r) => ({
-      _id: r._id.toString(),
-      title: r.title || "Untitled Resume",
+    resumes: (resumes || []).map((r: any) => ({
+      _id: r?._id ? r._id.toString() : (r?.id || ""),
+      title: r?.title || "Untitled Resume",
     })),
     activeQR: activeQR ? {
       id: activeQR.id,

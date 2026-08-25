@@ -46,7 +46,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   ${posts
     .map((post) => {
       const postUrl = `${baseUrl}/blog/${post.slug}`;
-      const published = new Date(post.createdAt || post.date || Date.now()).toISOString();
+      const published = new Date((post as any).createdAt || post.date || Date.now()).toISOString();
       return `
   <entry>
     <title>${escapeXml(post.title)}</title>
@@ -54,8 +54,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     <id>${postUrl}</id>
     <published>${published}</published>
     <updated>${published}</updated>
-    <summary type="html"><![CDATA[${post.excerpt || ""}]]></summary>
-    <content type="html"><![CDATA[${post.content || ""}]]></content>
+    <summary type="html"><![CDATA[${(post as any).excerpt || post.summary || ""}]]></summary>
+    <content type="html"><![CDATA[${(post as any).content || ""}]]></content>
   </entry>`;
     })
     .join("")}

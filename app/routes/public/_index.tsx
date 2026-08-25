@@ -169,213 +169,251 @@ export default function Index() {
       )}
 
       {/* Certifications Section */}
-      {profileInfo.certifications && profileInfo.certifications.length > 0 && (
-        <section className="space-y-3 pt-2">
-          <h2 className="section-heading">Certifications</h2>
-          <div className="space-y-2.5">
-            {profileInfo.certifications.map((cert, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 gap-3 min-w-0"
-              >
-                <div className="flex items-center gap-2 min-w-0 truncate">
-                  {cert.credentialUrl ? (
-                    <a
-                      href={cert.credentialUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-normal text-zinc-800 dark:text-zinc-200 hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-base md:text-lg truncate"
-                      title={cert.name}
-                    >
-                      {cert.name}
-                    </a>
-                  ) : (
-                    <span className="font-normal text-zinc-800 dark:text-zinc-200 text-base md:text-lg truncate">
-                      {cert.name}
-                    </span>
-                  )}
+      {profileInfo.sectionsVisibility?.certifications !== false &&
+        profileInfo.certifications &&
+        profileInfo.certifications.length > 0 && (
+          <section className="space-y-3 pt-2">
+            <h2 className="section-heading">Certifications</h2>
+            <div className="space-y-2">
+              {profileInfo.certifications.map((cert, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between py-0.5 text-zinc-800 dark:text-zinc-200 gap-3 min-w-0 group"
+                >
+                  <div className="flex items-center min-w-0 max-w-[70%] sm:max-w-[75%]">
+                    {cert.credentialUrl ? (
+                      <a
+                        href={cert.credentialUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-normal text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline text-sm md:text-[15px] flex items-center gap-1 min-w-0"
+                        title={cert.name}
+                      >
+                        <span className="truncate group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4">
+                          {cert.name}
+                        </span>
+                        <span className="inline-block shrink-0 text-xs opacity-50 group-hover:opacity-100 transition-transform duration-200 group-hover:-rotate-45 origin-center select-none no-underline">
+                          →
+                        </span>
+                      </a>
+                    ) : (
+                      <span className="font-normal text-zinc-800 dark:text-zinc-200 text-sm md:text-[15px] truncate">
+                        {cert.name}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 h-px bg-zinc-200/60 dark:bg-zinc-800/60 min-w-[16px] shrink-0" />
+                  <div className="flex items-center gap-2 font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
+                    <span>{cert.issuer}</span>
+                    {cert.issueDate && <span>• {cert.issueDate}</span>}
+                  </div>
                 </div>
-                <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
-                <div className="flex items-center gap-2 font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
-                  <span>{cert.issuer}</span>
-                  {cert.issueDate && <span>• {cert.issueDate}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              ))}
+            </div>
+          </section>
+        )}
 
       {/* Skills Section */}
-      {profileInfo.skills && profileInfo.skills.length > 0 && (
-        <section className="space-y-3 pt-2">
-          <h2 className="section-heading">Skills</h2>
-          <div className="flex flex-wrap gap-1.5">
-            {profileInfo.skills.map((skill, idx) => (
-              <span
-                key={idx}
-                className="text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
+      {profileInfo.sectionsVisibility?.skills !== false &&
+        profileInfo.skills &&
+        profileInfo.skills.length > 0 && (
+          <section className="space-y-3 pt-2">
+            <h2 className="section-heading">Skills</h2>
+            <div className="flex flex-wrap gap-1.5">
+              {profileInfo.skills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
 
       {/* Selected Work Section */}
-      <section className="space-y-4 pt-2">
-        <div className="flex items-center justify-between">
-          <h2 className="section-heading">Selected Work</h2>
-          <Link
-            to="/projects"
-            className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-          >
-            All projects →
-          </Link>
-        </div>
-
-        <div className="space-y-5">
-          {featuredProjects.map((project) => (
-            <div key={project.slug} className="space-y-1 group">
-              <div className="flex items-baseline justify-between gap-2 min-w-0">
-                <Link
-                  to={`/projects/${project.slug}`}
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
-                  title={project.title}
-                >
-                  {project.title}
-                </Link>
-                <span className="font-mono text-xs md:text-sm text-zinc-400 shrink-0">
-                  {project.category}
+      {profileInfo.sectionsVisibility?.selectedWork !== false &&
+        featuredProjects &&
+        featuredProjects.length > 0 && (
+          <section className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <h2 className="section-heading">Selected Work</h2>
+              <Link
+                to="/projects"
+                className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+              >
+                <span>All projects</span>
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-sm">
+                  →
                 </span>
-              </div>
-              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400">
-                {project.summary}
-              </p>
-              <div className="pt-0.5 flex items-center gap-3 text-sm md:text-base">
-                <Link
-                  to={`/projects/${project.slug}`}
-                  className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"
-                >
-                  Case Study →
-                </Link>
-                {project.githubUrl && (
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-                  >
-                    GitHub
-                  </a>
-                )}
-                {project.demoUrl && (
-                  <a
-                    href={project.demoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-                  >
-                    Demo
-                  </a>
-                )}
-              </div>
+              </Link>
             </div>
-          ))}
-        </div>
-      </section>
+
+            <div className="space-y-5">
+              {featuredProjects.map((project) => (
+                <div key={project.slug} className="space-y-1 group">
+                  <div className="flex items-baseline justify-between gap-2 min-w-0">
+                    <Link
+                      to={`/projects/${project.slug}`}
+                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
+                      title={project.title}
+                    >
+                      {project.title}
+                    </Link>
+                    <span className="font-mono text-xs md:text-sm text-zinc-400 shrink-0">
+                      {project.category}
+                    </span>
+                  </div>
+                  <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400">
+                    {project.summary}
+                  </p>
+                  <div className="pt-0.5 flex items-center gap-3 text-sm md:text-base">
+                    <Link
+                      to={`/projects/${project.slug}`}
+                      className="group/btn text-zinc-900 dark:text-zinc-100 font-medium hover:underline inline-flex items-center gap-1.5"
+                    >
+                      <span>Case Study</span>
+                      <span className="inline-block transition-transform duration-200 group-hover/btn:-rotate-45 origin-center text-sm">
+                        →
+                      </span>
+                    </Link>
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                      >
+                        GitHub
+                      </a>
+                    )}
+                    {project.demoUrl && (
+                      <a
+                        href={project.demoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                      >
+                        Demo
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
       {/* Writing Section */}
-      {recentPosts && recentPosts.length > 0 && (
-        <section className="space-y-3 pt-2">
-          <div className="flex items-center justify-between">
-            <h2 className="section-heading">Writing</h2>
-            <Link
-              to="/blog"
-              className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-            >
-              All articles →
-            </Link>
-          </div>
+      {profileInfo.sectionsVisibility?.writing !== false &&
+        recentPosts &&
+        recentPosts.length > 0 && (
+          <section className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <h2 className="section-heading">Writing</h2>
+              <Link
+                to="/blog"
+                className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+              >
+                <span>All articles</span>
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-sm">
+                  →
+                </span>
+              </Link>
+            </div>
 
-          <div className="space-y-2">
-            {recentPosts.map((post) => (
-              <div key={post.slug} className="group">
-                <Link
-                  to={`/blog/${post.slug}`}
-                  className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-3 min-w-0"
-                  title={post.title}
-                >
-                  <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-base md:text-lg truncate min-w-0">
-                    {post.title}
-                  </span>
-                  <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
-                  <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
-                    {post.displayDate}
-                  </span>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+            <div className="space-y-2">
+              {recentPosts.map((post) => (
+                <div key={post.slug} className="group">
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-3 min-w-0"
+                    title={post.title}
+                  >
+                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-base md:text-lg truncate min-w-0">
+                      {post.title}
+                    </span>
+                    <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
+                    <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
+                      {post.displayDate}
+                    </span>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
       {/* Research Section */}
-      <section className="space-y-3 pt-2">
-        <div className="flex items-center justify-between">
-          <h2 className="section-heading">Research</h2>
-          <Link
-            to="/research"
-            className="text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-          >
-            All papers →
-          </Link>
-        </div>
-
-        <div className="space-y-4">
-          {featuredResearch.map((paper) => (
-            <div key={paper.slug} className="space-y-1">
-              <div className="flex items-baseline justify-between gap-2 min-w-0">
-                <Link
-                  to="/research"
-                  className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
-                  title={paper.title}
-                >
-                  {paper.title}
-                </Link>
-                <span className="font-mono text-xs md:text-sm text-zinc-400 shrink-0">
-                  {paper.year}
+      {profileInfo.sectionsVisibility?.research !== false &&
+        featuredResearch &&
+        featuredResearch.length > 0 && (
+          <section className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <h2 className="section-heading">Research</h2>
+              <Link
+                to="/research"
+                className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+              >
+                <span>All papers</span>
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-sm">
+                  →
                 </span>
-              </div>
-              <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400 line-clamp-2">
-                {paper.abstract}
-              </p>
+              </Link>
             </div>
-          ))}
-        </div>
-      </section>
+
+            <div className="space-y-4">
+              {featuredResearch.map((paper) => (
+                <div key={paper.slug} className="space-y-1">
+                  <div className="flex items-baseline justify-between gap-2 min-w-0">
+                    <Link
+                      to="/research"
+                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
+                      title={paper.title}
+                    >
+                      {paper.title}
+                    </Link>
+                    <span className="font-mono text-xs md:text-sm text-zinc-400 shrink-0">
+                      {paper.year}
+                    </span>
+                  </div>
+                  <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                    {paper.abstract}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
       {/* Elsewhere Section */}
       {profileInfo.socialLinks && profileInfo.socialLinks.length > 0 && (
         <section className="space-y-3 pt-2">
           <h2 className="section-heading">Elsewhere</h2>
-          <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-y-2.5 items-baseline text-base md:text-[17px]">
+          <div className="space-y-2">
             {profileInfo.socialLinks.map((item) => (
-              <div key={item.label} className="contents">
-                <span className="text-zinc-500 dark:text-zinc-400 font-normal">
+              <div
+                key={item.label}
+                className="flex items-center justify-between py-1 text-sm md:text-base gap-3"
+              >
+                <span className="text-zinc-500 dark:text-zinc-400 font-mono text-xs md:text-sm shrink-0">
                   {item.label}
                 </span>
-                <div>
-                  <a
-                    href={item.href}
-                    target={item.external ? "_blank" : undefined}
-                    rel={item.external ? "noreferrer" : undefined}
-                    className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-1.5 py-0.5 -ml-1.5 rounded transition-all duration-150 active:scale-[0.98] inline-block font-mono text-xs md:text-sm"
-                  >
-                    {item.display}
-                  </a>
-                </div>
+                <div className="flex-1 h-px bg-zinc-200/60 dark:bg-zinc-800/60 min-w-[16px]" />
+                <a
+                  href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noreferrer" : undefined}
+                  className="group text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-2 py-0.5 rounded-md transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-1.5 font-mono text-xs md:text-sm shrink-0"
+                >
+                  <span>{item.display}</span>
+                  {item.external && (
+                    <span className="inline-block opacity-60 group-hover:opacity-100 transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
+                      →
+                    </span>
+                  )}
+                </a>
               </div>
             ))}
           </div>

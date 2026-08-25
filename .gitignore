@@ -7,3 +7,6 @@ node_modules
 # /go/.env
 yahyaoncloud.json
 go-backend.zip
+
+.env
+.env.*

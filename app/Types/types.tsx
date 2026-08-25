@@ -96,7 +96,14 @@ export type ContactDetails = {
   website: string;
   createdAt: string;
   updatedAt?: string;
-  buyCoffee: string;
+  buyCoffee?: string;
+};
+
+export type ActionResponse<T = Record<string, unknown>> = {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  data?: T;
 };
 
 export type Author = {

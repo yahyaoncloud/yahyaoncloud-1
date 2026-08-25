@@ -16,16 +16,65 @@ export interface CustomLink {
 
 // Get the active linktree profile
 export async function getLinktree() {
-  const linktree = await prisma.linktree.findFirst({
-    where: { isActive: true },
-  });
-  
-  if (!linktree) {
-    // Create default linktree if none exists
-    return createDefaultLinktree();
+  try {
+    const linktree = await prisma.linktree.findFirst({
+      where: { isActive: true },
+    }).catch(() => null);
+    
+    if (!linktree) {
+      // Create default linktree if none exists
+      return await createDefaultLinktree().catch(() => ({
+        id: "default-id",
+        displayName: "Yahya",
+        tagline: "Cloud & Web Developer",
+        theme: "dark",
+        shortCode: "yahya",
+        showcaseTitle: "My Current Work",
+        showcaseItems: [],
+        customLinks: [],
+        isActive: true,
+        resumeUrl: null,
+        selectedResumeId: null,
+        linkedinUrl: null,
+        instagramUrl: null,
+        twitterUrl: null,
+        githubUrl: null,
+        emailUrl: null,
+        avatarUrl: null,
+        backgroundUrl: null,
+        qrCodeUrl: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }));
+    }
+    
+    return linktree;
+  } catch (error) {
+    console.warn("getLinktree warning:", error);
+    return {
+      id: "default-id",
+      displayName: "Yahya",
+      tagline: "Cloud & Web Developer",
+      theme: "dark",
+      shortCode: "yahya",
+      showcaseTitle: "My Current Work",
+      showcaseItems: [],
+      customLinks: [],
+      isActive: true,
+      resumeUrl: null,
+      selectedResumeId: null,
+      linkedinUrl: null,
+      instagramUrl: null,
+      twitterUrl: null,
+      githubUrl: null,
+      emailUrl: null,
+      avatarUrl: null,
+      backgroundUrl: null,
+      qrCodeUrl: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   }
-  
-  return linktree;
 }
 
 // Get linktree by short code (for QR redirect)
@@ -53,8 +102,8 @@ export async function createDefaultLinktree() {
           description: "My startup - Cloud Solutions",
           icon: "cloud",
         },
-      ] as ShowcaseItem[],
-      customLinks: [] as CustomLink[],
+      ] as any,
+      customLinks: [] as any,
       isActive: true,
     },
   });
@@ -80,7 +129,7 @@ export async function updateLinktree(id: string, data: {
 }) {
   return prisma.linktree.update({
     where: { id },
-    data,
+    data: data as any,
   });
 }
 

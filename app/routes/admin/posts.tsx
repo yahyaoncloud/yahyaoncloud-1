@@ -37,8 +37,10 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAdmin(request);
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page") || "1");
   const search = url.searchParams.get("q") || undefined;
@@ -86,6 +88,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent") as string;
   const id = formData.get("id") as string;
@@ -130,11 +133,11 @@ export default function AdminPosts() {
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
 
   useEffect(() => {
-    if (actionData?.success) {
-      toast.success(actionData.message);
+    if ((actionData as any)?.success) {
+      toast.success((actionData as any).message);
     }
-    if (actionData?.error) {
-      toast.error(actionData.error);
+    if ((actionData as any)?.error) {
+      toast.error((actionData as any).error);
     }
   }, [actionData]);
 

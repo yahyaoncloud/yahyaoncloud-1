@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Clock, User, LogOut } from "lucide-react";
-import { FaGithub, FaTwitter } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import { FaSquareXTwitter, FaGoogle } from "react-icons/fa6";
 import {
   json,
@@ -16,6 +16,7 @@ import {
   db,
 } from "~/utils/firebase.client";
 import { getSession } from "~/utils/session.server";
+import { addGuestbookToRTDB } from "~/utils/firebase-rtdb.server";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { onValue, push, ref } from "firebase/database";
 import { motion } from "framer-motion";
@@ -56,19 +57,16 @@ export const action: ActionFunction = async ({ request }) => {
   const user = session.get("user");
   const timestamp = new Date().toISOString();
 
-  const entry = {
-    message,
-    timestamp,
-    user: {
-      name: user.displayName,
-      photo: user.photoURL,
-      uid: user.uid,
-    },
-  };
-
   try {
-    await push(ref(db, "guestbook"), entry);
-    return json({ entry });
+    const res = await addGuestbookToRTDB({
+      content: message,
+      author: user.displayName || "Anonymous",
+      avatar: user.photoURL || "",
+      approved: true,
+      provider: "sso",
+      createdAt: Date.now(),
+    });
+    return json({ success: res.success, entry: { message, timestamp, user } });
   } catch (error) {
     return json({ error: "Failed to send message" }, { status: 500 });
   }
@@ -104,6 +102,7 @@ export default function MinimalistGuestbook() {
 
   // Firebase Messages Listener
   useEffect(() => {
+    if (!db) return;
     const messagesRef = ref(db, "guestbook");
     const unsubscribe = onValue(messagesRef, (snapshot) => {
       const data = snapshot.val();
@@ -111,11 +110,11 @@ export default function MinimalistGuestbook() {
         const entries = Object.entries(data).map(
           ([id, value]: [string, any]) => ({
             id,
-            message: value.message || "",
-            timestamp: value.timestamp || new Date().toISOString(),
+            message: value.message || value.content || "",
+            timestamp: value.timestamp || (typeof value.createdAt === "number" ? new Date(value.createdAt).toISOString() : value.createdAt) || new Date().toISOString(),
             user: {
-              name: value.user?.name || value.user?.displayName || "Anonymous",
-              photo: value.user?.photo || value.user?.photoURL || "",
+              name: value.user?.name || value.author || value.user?.displayName || "Anonymous",
+              photo: value.user?.photo || value.avatar || value.user?.photoURL || "",
               uid: value.user?.uid || "",
             },
           })
@@ -164,6 +163,7 @@ export default function MinimalistGuestbook() {
 
   // Authentication Handlers
   const handleSignIn = async (provider: any) => {
+    if (!auth || !provider) return;
     try {
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken();
@@ -184,6 +184,7 @@ export default function MinimalistGuestbook() {
   };
 
   const handleSignOut = async () => {
+    if (!auth) return;
     try {
       await signOut(auth);
       await fetch("/api/logout", { method: "POST" });
@@ -196,7 +197,7 @@ export default function MinimalistGuestbook() {
   // Form Handlers
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim() || !user || !db) return;
 
     setIsSubmitting(true);
     const entry = {
@@ -243,275 +244,245 @@ export default function MinimalistGuestbook() {
       .toUpperCase()
       .slice(0, 2);
   };
-  const [pinnedMessage, setPinnedMessage] = useState<Message | null>({
+
+  const pinnedMessage: Message = {
     id: "pinned-1",
-    message: "Welcome to the guestbook! Be kind and respectful.",
+    message: "Welcome to my digital guestbook! Leave a note or connect.",
     timestamp: new Date().toISOString(),
     user: {
-      name: "Admin",
-      photo: "", // optional admin avatar URL
+      name: "Yahya",
+      photo: "",
       uid: "admin",
     },
-  });
+  };
 
   return (
-    <div className="min-h-screen md:w-[700px] ">
-      <div className="py-12 px-4 sm:px-6 md:px-8 w-full max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          className="mb-8 w-full"
-          variants={fadeIn}
-          initial="hidden"
-          animate="visible"
-        >
-          <h1 className="text-3xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-2">
-            Guestbook
-          </h1>
-          <p className="text-base text-zinc-600 dark:text-zinc-400 w-full">
-            Share reflections or drop a message.
-          </p>
-        </motion.div>
+    <div className="space-y-8 max-w-2xl">
+      {/* Header */}
+      <motion.div
+        className="space-y-2"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+      >
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
+          Guestbook
+        </h1>
+        <p className="text-zinc-600 dark:text-zinc-400">
+          Share reflections, drop a note, or connect.
+        </p>
+      </motion.div>
 
-        {/* Authentication & Form */}
-        <motion.div
-          className="mb-8 w-full flex items-center justify-center"
-          variants={fadeIn}
-          initial="hidden"
-          animate="visible"
-        >
-          {!user ? (
-            <div className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/40 p-6 w-full">
-              <div className="text-center mb-6">
-                <User className="mx-auto w-6 h-6 text-zinc-400 mb-3" />
-                <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">
-                  Sign in to leave a message
-                </h2>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Choose your preferred method
+      {/* Authentication & Form */}
+      <motion.div
+        className="w-full"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+      >
+        {!user ? (
+          <div className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 p-6 w-full">
+            <div className="text-center mb-5">
+              <User className="mx-auto w-6 h-6 text-zinc-400 mb-2" />
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Sign in with SSO to leave a message
+              </h2>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Quick 1-click authentication
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
+              {[
+                {
+                  name: "Google",
+                  provider: googleProvider,
+                  icon: FaGoogle,
+                  color: "text-red-500",
+                },
+                {
+                  name: "GitHub",
+                  provider: githubProvider,
+                  icon: FaGithub,
+                  color: "text-zinc-900 dark:text-zinc-100",
+                },
+                {
+                  name: "Twitter",
+                  provider: twitterProvider,
+                  icon: FaSquareXTwitter,
+                  color: "text-zinc-900 dark:text-zinc-100",
+                },
+              ].map(({ name, provider, icon: Icon, color }) => (
+                <button
+                  key={name}
+                  onClick={() => handleSignIn(provider)}
+                  className="group flex items-center justify-center gap-2 py-2 px-3 border border-zinc-200 dark:border-zinc-700/80 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/60 text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer shadow-xs"
+                >
+                  <Icon className={`w-4 h-4 ${color}`} />
+                  <span className="text-xs font-medium">{name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 w-full flex flex-col p-5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            {/* User Info */}
+            <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName}
+                  className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-700 object-cover"
+                />
+              ) : (
+                <div className="w-7 h-7 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                  {getInitials(user.displayName || "User")}
+                </div>
+              )}
+              <div className="flex-1 flex items-center justify-between">
+                <p className="text-xs font-semibold text-zinc-900 dark:text-white">
+                  {user.displayName}
+                </p>
+                <button
+                  onClick={handleSignOut}
+                  className="text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center gap-1 transition-colors"
+                >
+                  <LogOut className="w-3 h-3" />
+                  <span>Sign out</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Message Form */}
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <textarea
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Share your thoughts..."
+                rows={3}
+                className="w-full p-3 border border-zinc-200 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder-zinc-400"
+                maxLength={500}
+              />
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-zinc-400 font-mono">
+                  {newMessage.length}/500
+                </span>
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim() || isSubmitting}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    !newMessage.trim() || isSubmitting
+                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer shadow-xs"
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3 h-3" />
+                      Post Message
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Messages Feed */}
+      <motion.div
+        variants={fadeIn}
+        className="space-y-3 pt-2"
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+          <h2 className="text-sm font-mono font-medium text-zinc-900 dark:text-zinc-100">
+            Messages Feed
+          </h2>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
+            {messages.length} {messages.length === 1 ? "entry" : "entries"}
+          </span>
+        </div>
+
+        {/* Scrollable Container */}
+        <div className="max-h-[420px] overflow-y-auto pr-1.5 space-y-2 divide-y divide-zinc-100/60 dark:divide-zinc-800/60 scrollbar-thin">
+          {pinnedMessage && (
+            <div className="pt-2 pb-2.5 flex items-start gap-2.5">
+              <div className="w-6 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 mt-0.5">
+                Y
+              </div>
+              <div className="flex-1 min-w-0 space-y-0.5">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-xs font-mono font-semibold text-indigo-600 dark:text-indigo-400 truncate">
+                    {pinnedMessage.user.name} <span className="text-[10px] opacity-75 font-normal">(Pinned)</span>
+                  </span>
+                  <span className="text-[10px] text-zinc-400 font-mono shrink-0">
+                    {formatTime(pinnedMessage.timestamp)}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-700 dark:text-zinc-300 break-words leading-snug">
+                  {pinnedMessage.message}
                 </p>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  {
-                    name: "Google",
-                    provider: googleProvider,
-                    icon: FaGoogle,
-                    color: "text-red-500",
-                  },
-                  {
-                    name: "GitHub",
-                    provider: githubProvider,
-                    icon: FaGithub,
-                    color: "text-zinc-900 dark:text-zinc-100",
-                  },
-                  {
-                    name: "Twitter",
-                    provider: twitterProvider,
-                    icon: FaSquareXTwitter,
-                    color: "text-zinc-900 dark:text-zinc-100",
-                  },
-                ].map(({ name, provider, icon: Icon, color }) => (
-                  <button
-                    key={name}
-                    onClick={() => handleSignIn(provider)}
-                    className="group flex items-center justify-center gap-3 py-2.5 px-2 border border-zinc-200/80 dark:border-zinc-800 rounded-md bg-zinc-100/80 dark:bg-zinc-900/70 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 transition-colors duration-200 w-full cursor-pointer"
-                  >
-                    <Icon className={`w-6 h-6 ${color}`} />
-                    {/* <span className="text-sm font-medium">Sign in with {name}</span> */}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4 w-full flex flex-col">
-              {/* User Info */}
-              <div className="flex items-center gap-3 pb-4 border-b w-full border-zinc-200 dark:border-zinc-700">
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName}
-                    className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                    {getInitials(user.displayName || "User")}
-                  </div>
-                )}
-                <div className="flex-1 gap-2">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                    {user.displayName}
-                  </p>
-                  <button
-                    onClick={handleSignOut}
-                    className="group text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 flex items-center gap-1 transition-colors duration-200"
-                  >
-                    <LogOut className="w-3 h-3" />
-                    <span className="relative">
-                      Sign out
-                      <span className="absolute bottom-0 left-0 w-0 h-px bg-current transition-all duration-200 group-hover:w-full" />
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Message Form */}
-              <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl">
-                <textarea
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Share your thoughts..."
-                  rows={3}
-                  className="w-full p-3 border border-zinc-300 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder-zinc-400 dark:placeholder-zinc-500"
-                  maxLength={500}
-                />
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {newMessage.length}/500
-                  </span>
-                  <button
-                    type="submit"
-                    disabled={!newMessage.trim() || isSubmitting}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                      !newMessage.trim() || isSubmitting
-                        ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
-                        : "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        Send
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
             </div>
           )}
-        </motion.div>
 
-        {/* Messages */}
-        <motion.div
-          variants={fadeIn}
-          className="max-w-2xl"
-          initial="hidden"
-          animate="visible"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-medium text-zinc-900 dark:text-white">
-              Messages
-            </h2>
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">
-              {messages.length} {messages.length === 1 ? "message" : "messages"}
-            </span>
-          </div>
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="space-y-6 max-h-96 overflow-y-auto"
-          >
-            {pinnedMessage && (
-              <motion.div
-                variants={itemVariants}
-                className="pb-6 border-b border-indigo-300 dark:border-indigo-500  bg-gradient-to-t from-indigo-900/5 to-transparent flex gap-3"
+          {visibleMessages.length === 0 ? (
+            <div className="text-center py-8 text-xs text-zinc-400 font-mono">
+              <p>No messages yet. Be the first to say hello!</p>
+            </div>
+          ) : (
+            visibleMessages.map((message) => (
+              <div
+                key={message.id}
+                className="pt-2.5 pb-2.5 flex items-start gap-2.5 group"
               >
-                {pinnedMessage.user.photo ? (
+                {message.user.photo ? (
                   <img
-                    src={pinnedMessage.user.photo}
-                    alt={pinnedMessage.user.name}
-                    className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700 flex-shrink-0"
+                    src={message.user.photo}
+                    alt={message.user.name}
+                    className="w-6 h-6 rounded-full border border-zinc-200 dark:border-zinc-700 object-cover shrink-0 mt-0.5"
                   />
                 ) : (
-                  <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
-                    {getInitials(pinnedMessage.user.name)}
+                  <div className="w-6 h-6 bg-zinc-800 dark:bg-zinc-700 rounded-full flex items-center justify-center text-zinc-200 text-[10px] font-mono shrink-0 mt-0.5">
+                    {getInitials(message.user.name)}
                   </div>
                 )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
-                      {pinnedMessage.user.name} (Pinned)
+                <div className="flex-1 min-w-0 space-y-0.5">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-xs font-mono font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                      {message.user.name}
                     </span>
-                    <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                      <Clock className="w-3 h-3" />
-                      {formatTime(pinnedMessage.timestamp)}
-                    </div>
+                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0">
+                      {formatTime(message.timestamp)}
+                    </span>
                   </div>
-                  <p className="text-sm text-zinc-700 dark:text-zinc-300 break-words leading-relaxed">
-                    {pinnedMessage.message}
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 break-words leading-snug">
+                    {message.message}
                   </p>
                 </div>
-              </motion.div>
-            )}
+              </div>
+            ))
+          )}
 
-            {visibleMessages.length === 0 ? (
-              <motion.div
-                variants={itemVariants}
-                className="text-center py-12 text-zinc-500 dark:text-zinc-400"
-              >
-                <p>No messages yet. Be the first to share!</p>
-              </motion.div>
-            ) : (
-              <>
-                {visibleMessages.map((message, index) => (
-                  <motion.div
-                    key={message.id}
-                    variants={itemVariants}
-                    className="pb-6 border-b border-zinc-200 dark:border-zinc-700 last:border-0"
-                  >
-                    <div className="flex gap-3">
-                      {message.user.photo ? (
-                        <img
-                          src={message.user.photo}
-                          alt={message.user.name}
-                          className="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700 flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
-                          {getInitials(message.user.name)}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                            {message.user.name}
-                          </span>
-                          <div className="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                            <Clock className="w-3 h-3" />
-                            {formatTime(message.timestamp)}
-                          </div>
-                        </div>
-                        <p className="text-sm text-zinc-700 dark:text-zinc-300 break-words leading-relaxed">
-                          {message.message}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-
-                {hasMore && (
-                  <div ref={observerRef} className="text-center py-4">
-                    {isLoadingMore && (
-                      <div className="flex items-center justify-center gap-2 text-zinc-500 dark:text-zinc-400 text-sm">
-                        <div className="w-4 h-4 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-500 dark:border-t-zinc-400 rounded-full animate-spin"></div>
-                        Loading more messages...
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-          </motion.div>
-        </motion.div>
-      </div>
+          {hasMore && (
+            <div ref={observerRef} className="text-center py-2">
+              {isLoadingMore && (
+                <div className="flex items-center justify-center gap-1.5 text-zinc-400 text-[11px] font-mono">
+                  <div className="w-3 h-3 border-2 border-zinc-300 dark:border-zinc-600 border-t-indigo-500 rounded-full animate-spin"></div>
+                  <span>Loading...</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 }
-

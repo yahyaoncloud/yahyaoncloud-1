@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const routes = (defineRoutes: any) => {
-  return defineRoutes((route) => {
+  return defineRoutes((route: any) => {
     // Public Routes (Layout: public/layout.tsx)
     route("/", "routes/public/layout.tsx", () => {
       route("", "routes/public/_index.tsx", { index: true });
@@ -8,8 +8,10 @@ export const routes = (defineRoutes: any) => {
       route("blog/:slug", "routes/public/blog.$slug.tsx");
       route("projects", "routes/public/projects.tsx");
       route("projects/:slug", "routes/public/projects.$slug.tsx");
+      route("work", "routes/public/projects.tsx", { id: "public-work-alias" });
+      route("work/:slug", "routes/public/projects.$slug.tsx", { id: "public-work-slug-alias" });
       route("research", "routes/public/research.tsx");
-      route("contact", "routes/public/contact.tsx");
+      route("guestbook", "routes/public/guestbook.tsx");
       route("about", "routes/public/_index.tsx", { id: "public-about-alias" });
       
       // Policies
@@ -22,7 +24,7 @@ export const routes = (defineRoutes: any) => {
       route("", "routes/admin/dashboard.tsx", { index: true });
       route("dashboard", "routes/admin/dashboard.tsx", { id: "admin-dashboard-alias" });
       
-      // Content Management (Blog Posts, Projects, Research)
+      // Content Management (Blog Posts, Projects, Research, Featured, Taxonomies)
       route("posts", "routes/admin/posts.tsx");
       route("post/create", "routes/admin/post.create.tsx");
       route("post/edit/:slug", "routes/admin/post.edit.$slug.tsx");
@@ -32,10 +34,9 @@ export const routes = (defineRoutes: any) => {
       route("research", "routes/admin/research.tsx");
       route("research/create", "routes/admin/research.create.tsx");
       route("research/edit/:slug", "routes/admin/research.edit.$slug.tsx");
-      
+      route("featured-articles", "routes/admin/featured-articles.tsx");
       route("categories", "routes/admin/categories.tsx");
       route("tags", "routes/admin/tags.tsx");
-      route("featured-articles", "routes/admin/featured-articles.tsx");
       
       // Pages / Sections
       route("about", "routes/admin/about.tsx");
@@ -44,41 +45,21 @@ export const routes = (defineRoutes: any) => {
       route("messages", "routes/admin/messages.tsx");
       route("linktree", "routes/admin/linktree.tsx");
       route("homepage-cards", "routes/admin/homepage-cards.tsx");
+      route("announcements", "routes/admin/announcements.tsx");
+      route("media", "routes/admin/media.tsx");
+      route("assets", "routes/admin/assets.tsx");
       
-      // Users & Settings
-      route("users", "routes/admin/users.tsx");
-      route("authors", "routes/admin/authors.tsx");
-      route("authors/:id", "routes/admin/authors.$id.tsx");
+      // Settings
       route("settings", "routes/admin/settings.tsx");
       route("site-settings", "routes/admin/site-settings.tsx");
       route("blog-settings", "routes/admin/blog-settings.tsx");
-      route("announcements", "routes/admin/announcements.tsx");
-      route("media", "routes/admin/media.tsx");
-      
-      // Resumes
-      route("resumes", "routes/admin/resumes.tsx");
-      route("assets", "routes/admin/assets.tsx");
       route("logout", "routes/admin/logout.tsx");
     });
 
-    // Author Portal (Layout: authors/layout.tsx)
-    route("authors", "routes/authors/layout.tsx", () => {
-      route("", "routes/authors/dashboard.tsx", { index: true });
-      route("dashboard", "routes/authors/dashboard.tsx", { id: "authors-dashboard-alias" });
-      route("posts", "routes/authors/posts.tsx");
-      route("post/create", "routes/authors/post.create.tsx");
-      route("post/edit/:slug", "routes/authors/post.edit.$slug.tsx");
-      route("assets", "routes/authors/assets.tsx");
-      route("profile", "routes/authors/profile.tsx");
-      route("api/upload", "routes/authors/api.upload.tsx");
-      route("change-password", "routes/authors/change-password.tsx");
-      route("logout", "routes/authors/logout.tsx");
-    });
-
     // Auth & Login (Root Level / Layoutless)
-    route("login", "routes/login.tsx");
-    route("auth/login", "routes/login.tsx", { id: "auth-login-alias" });
-    route("auth/portal", "routes/login.tsx", { id: "auth-portal-alias" });
+    route("login", "routes/auth/login.tsx");
+    route("auth/login", "routes/auth/login.tsx", { id: "auth-login-alias" });
+    route("auth/portal", "routes/auth/login.tsx", { id: "auth-portal-alias" });
     
     // API Routes are Resource Routes (no layout)
     route("api/upload-image", "routes/api/upload-image.tsx");
@@ -89,7 +70,6 @@ export const routes = (defineRoutes: any) => {
     route("api/logout", "routes/api/logout.ts"); 
     route("api/track", "routes/api/track.ts");
     route("api/media", "routes/api/media.tsx");
-    route("api/generate-business-card-pdf", "routes/api/generate-business-card-pdf.tsx");
 
     // Auth Providers
     route("auth/:provider", "routes/auth/$provider.tsx");
@@ -98,16 +78,19 @@ export const routes = (defineRoutes: any) => {
     route("auth/logout", "routes/auth/logout.tsx");
     route("auth/verify-auth", "routes/auth/verify-auth.tsx");
 
-    // Utilities
-    route("me/:shortCode", "routes/me.$shortCode.tsx");
-    route("resources/download/resume/:id", "routes/resources.download.resume.$id.tsx");
-    route("links", "routes/links.tsx");
-    // Feeds & SEO XML
-    route("rss.xml", "routes/rss[.]xml.ts");
-    route("atom.xml", "routes/atom[.]xml.ts");
-    route("sitemap.xml", "routes/sitemap[.]xml.ts");
+    // Utilities & Helper Routes
+    route("me/:shortCode", "routes/helpers/me.$shortCode.tsx");
+    route("resources/download/resume/:id", "routes/helpers/resources.download.resume.$id.tsx");
+    route("resume", "routes/helpers/resume.tsx");
+    route("links", "routes/helpers/links.tsx");
+    route("qr/:qrId", "routes/helpers/qr.$qrId.tsx");
     
-    // 404
-    route("*", "routes/404.tsx");
+    // Feeds & SEO XML
+    route("rss.xml", "routes/helpers/rss[.]xml.ts");
+    route("atom.xml", "routes/helpers/atom[.]xml.ts");
+    route("sitemap.xml", "routes/helpers/sitemap[.]xml.ts");
+    
+    // 404 Not Found
+    route("*", "routes/helpers/404.tsx");
   });
 };

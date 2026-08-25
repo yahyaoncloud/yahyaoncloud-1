@@ -30,7 +30,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export default function LinktreePage() {
-  const { linktree, activeResume } = useLoaderData<typeof loader>();
+  const { linktree, activeResume } = useLoaderData<typeof loader>() as { linktree: any; activeResume: any };
   
   const showcaseItems = (linktree.showcaseItems as { name: string; url: string; description?: string; icon?: string }[]) || [];
   const customLinks = (linktree.customLinks as { title: string; url: string; icon?: string; color?: string }[]) || [];

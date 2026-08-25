@@ -26,9 +26,10 @@ export default function ProjectDetail() {
       <div>
         <Link
           to="/projects"
-          className="text-xs md:text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1"
+          className="group text-xs md:text-sm text-zinc-500 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1 font-mono"
         >
-          ← Projects
+          <span className="inline-block transition-transform duration-200 group-hover:-translate-x-0.5">←</span>
+          <span>Projects</span>
         </Link>
       </div>
 
@@ -41,7 +42,7 @@ export default function ProjectDetail() {
             <span>{project.period}</span>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight font-mono">
             {project.title}
           </h1>
 
@@ -53,7 +54,7 @@ export default function ProjectDetail() {
         {/* Metadata Details */}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs md:text-sm pt-1">
           <div>
-            <span className="text-zinc-400">Role: </span>
+            <span className="text-zinc-400 font-mono">Role: </span>
             <span className="font-medium text-zinc-900 dark:text-zinc-100">{project.role}</span>
           </div>
         </div>
@@ -63,7 +64,7 @@ export default function ProjectDetail() {
           {project.techStack.map((tech, i) => (
             <span
               key={i}
-              className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+              className="text-xs font-mono px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
             >
               {tech}
             </span>
@@ -72,15 +73,18 @@ export default function ProjectDetail() {
 
         {/* Action Links */}
         {(project.demoUrl || project.githubUrl) && (
-          <div className="flex items-center gap-4 pt-2 text-xs md:text-sm">
+          <div className="flex items-center gap-4 pt-2 text-xs md:text-sm font-mono">
             {project.demoUrl && (
               <a
                 href={project.demoUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline"
+                className="group font-medium text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1"
               >
-                Live Demonstration
+                <span>Live Demonstration</span>
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
+                  →
+                </span>
               </a>
             )}
             {project.githubUrl && (
@@ -88,9 +92,12 @@ export default function ProjectDetail() {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                className="group text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1"
               >
-                GitHub Repository
+                <span>Source Code</span>
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
+                  →
+                </span>
               </a>
             )}
           </div>

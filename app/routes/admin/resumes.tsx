@@ -112,12 +112,12 @@ export default function AdminResumes() {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    if (actionData?.success) {
-      toast.success(actionData.message);
+    if ((actionData as any)?.success) {
+      toast.success((actionData as any).message);
       setIsUploading(false);
     }
-    if (actionData?.error) {
-      toast.error(actionData.error);
+    if ((actionData as any)?.error) {
+      toast.error((actionData as any).error);
     }
   }, [actionData]);
 

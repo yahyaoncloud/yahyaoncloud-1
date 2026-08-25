@@ -1,10 +1,10 @@
-﻿import { json, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Form, useNavigation, useActionData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { AdminDataTable, type Column } from "~/components/AdminDataTable";
 import { Tag, Pencil, Trash2 } from "lucide-react";
 import { 

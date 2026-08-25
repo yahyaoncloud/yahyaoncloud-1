@@ -21,7 +21,7 @@ export default function ContactPage() {
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -59,7 +59,7 @@ export default function ContactPage() {
     }, 3000);
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,

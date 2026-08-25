@@ -1,14 +1,13 @@
-// apiResponse.ts
 type ApiStatus = "success" | "error";
 
-interface ApiResponse<T> {
+export interface ApiResponse<T = unknown> {
     status: ApiStatus;
     message: string;
-    data?: T;
-    meta: string;
+    data?: T | null;
+    meta?: Record<string, unknown>;
 }
 
-export function successResponse(data: any, message: string, meta?: any): ApiResponse<any> {
+export function successResponse<T = unknown>(data: T, message: string, meta?: Record<string, unknown>): ApiResponse<T> {
     return {
         status: "success",
         data,
@@ -17,11 +16,11 @@ export function successResponse(data: any, message: string, meta?: any): ApiResp
     };
 }
 
-export function errorResponse(message: string, data: any, meta?: any): ApiResponse<any> {
+export function errorResponse<T = unknown>(message: string, data?: T | null, meta?: Record<string, unknown>): ApiResponse<T> {
     return {
         status: "error",
         message,
-        data,
+        data: data ?? null,
         meta: meta || {}
     };
 }

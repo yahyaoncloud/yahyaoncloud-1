@@ -66,7 +66,7 @@ export default function MarkdownEditor({
   }, [value, onChange]);
 
   // Toolbar actions
-  const toolbarActions = [
+  const toolbarActions: Array<{ type?: string; icon?: any; label?: string; action?: () => void }> = [
     { icon: Bold, label: 'Bold', action: () => insertAtCursor('**', '**', 'bold text') },
     { icon: Italic, label: 'Italic', action: () => insertAtCursor('*', '*', 'italic text') },
     { icon: Code, label: 'Code', action: () => insertAtCursor('`', '`', 'code') },
@@ -146,7 +146,7 @@ export default function MarkdownEditor({
               title={item.label}
               className="p-2 h-8 w-8"
             >
-              <item.icon className="w-4 h-4" />
+              {item.icon && <item.icon className="w-4 h-4" />}
             </Button>
           )
         )}

@@ -15,10 +15,10 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
   return (
     <article className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0">
       <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-        <span className="font-mono text-[11px] md:text-xs text-zinc-400">
+        <span className="font-mono text-[11px] md:text-xs text-indigo-600 dark:text-indigo-400 font-medium">
           {paper.venue}
         </span>
-        <span className="font-mono text-[11px] md:text-xs text-zinc-400">
+        <span className="font-mono text-[11px] md:text-xs text-zinc-400 dark:text-zinc-500">
           {paper.year}
         </span>
       </div>
@@ -27,11 +27,11 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
         {paper.title}
       </h3>
 
-      <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-500">
+      <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-400">
         {paper.authors.join(", ")}
       </p>
 
-      <p className="text-zinc-600 dark:text-zinc-400 text-[15px] md:text-base pt-1">
+      <p className="text-zinc-600 dark:text-zinc-300 text-[15px] md:text-base pt-1">
         {paper.abstract}
       </p>
 
@@ -41,7 +41,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
           {paper.tags.map((tag, i) => (
             <span
               key={i}
-              className="text-[11px] md:text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+              className="text-[11px] md:text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800/80"
             >
               {tag}
             </span>
@@ -50,11 +50,11 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-4 pt-2 text-xs md:text-sm">
+      <div className="flex items-center gap-4 pt-2 text-xs md:text-sm font-mono">
         {paper.content && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer transition-colors"
+            className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:underline cursor-pointer transition-colors"
           >
             {isExpanded ? "Hide Findings" : "Read Full Findings"}
           </button>
@@ -64,9 +64,12 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
             href={paper.pdfUrl}
             target="_blank"
             rel="noreferrer"
-            className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="group text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1"
           >
-            PDF Document
+            <span>PDF Document</span>
+            <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
+              →
+            </span>
           </a>
         )}
       </div>

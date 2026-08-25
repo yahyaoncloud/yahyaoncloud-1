@@ -82,12 +82,12 @@ export default function AdminHomepageCards() {
   const [editingCard, setEditingCard] = useState<any>(null);
 
   useEffect(() => {
-    if (actionData?.success) {
-        toast.success(actionData.message);
+    if ((actionData as any)?.success) {
+        toast.success((actionData as any).message);
         setIsModalOpen(false);
         setEditingCard(null);
     }
-    if (actionData?.error) toast.error(actionData.error);
+    if ((actionData as any)?.error) toast.error((actionData as any).error);
   }, [actionData]);
 
   const handleEdit = (card: any) => {

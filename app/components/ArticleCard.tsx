@@ -12,7 +12,7 @@ interface ArticleCardProps {
     author: string;
     excerpt?: string;
     coverImage?: string;
-    createdAt: Date;
+    createdAt?: Date | string;
     categories: string[];
     types?: string;
     tags?: string[];
@@ -27,9 +27,10 @@ export default function ArticleCard({
   const { theme } = useTheme();
   if (!post || !post._id) return null;
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+  const formatDate = (dateVal?: string | Date) => {
+    if (!dateVal) return "";
+    const date = new Date(dateVal);
+    return isNaN(date.getTime()) ? "" : date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",

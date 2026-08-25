@@ -9,7 +9,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/Card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   Save,
   Plus,
@@ -70,7 +70,7 @@ interface PortfolioData {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const portfolios = await getAllPortfolios();
-  const portfolio = portfolios[0] || null;
+  const portfolio = (portfolios[0] as unknown as PortfolioData) || null;
   return json({ portfolio });
 }
 
@@ -123,7 +123,7 @@ export async function action({ request }: ActionFunctionArgs) {
     if (intent === "updateProjects") {
       const id = formData.get("id") as string;
       const projects = JSON.parse(formData.get("projects") as string);
-      await updatePortfolio(id, { projects });
+      await updatePortfolio(id, { projects } as any);
       return json({ success: true, message: "Projects updated" });
     }
 
@@ -152,7 +152,7 @@ function Section({
   defaultOpen = false 
 }: { 
   title: string; 
-  icon: React.ComponentType<{ size?: number }>; 
+  icon: any; 
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) {
@@ -200,11 +200,11 @@ export default function AdminPortfolio() {
   }, [portfolio]);
 
   useEffect(() => {
-    if (actionData?.success) {
-      toast.success(actionData.message);
+    if ((actionData as any)?.success) {
+      toast.success((actionData as any).message);
     }
-    if (actionData?.error) {
-      toast.error(actionData.error);
+    if ((actionData as any)?.error) {
+      toast.error((actionData as any).error);
     }
   }, [actionData]);
 

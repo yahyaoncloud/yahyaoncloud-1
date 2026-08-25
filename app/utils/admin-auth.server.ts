@@ -65,9 +65,29 @@ export async function getAdminFromRequest(request: Request): Promise<AdminPayloa
   if (!cookie) return null;
   
   const match = cookie.match(/admin_token=([^;]+)/);
-  if (!match) return null;
+  if (match) {
+    const verified = verifyAdminToken(match[1]);
+    if (verified) return verified;
+  }
+
+  // Fallback: check session storage (__session) for logged-in user
+  try {
+    const { getSession } = await import("./session.server");
+    const session = await getSession(request);
+    const user = session.get("user");
+    if (user && (user.role === "admin" || user.email || user.username)) {
+      return {
+        id: user.id || user.uid || "admin",
+        username: user.username || user.name || user.email || "admin",
+        email: user.email || null,
+        role: user.role || "admin",
+      };
+    }
+  } catch (err) {
+    // Ignore session read errors
+  }
   
-  return verifyAdminToken(match[1]);
+  return null;
 }
 
 /**
@@ -88,21 +108,20 @@ export async function requireAdmin(request: Request): Promise<AdminPayload> {
  */
 export function createAdminSession(token: string, rememberMe: boolean = false): string {
   const maxAge = rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60;
-  return `admin_token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${maxAge}`;
+  const isProd = process.env.NODE_ENV === "production";
+  const secureFlag = isProd ? "Secure; " : "";
+  return `admin_token=${token}; HttpOnly; ${secureFlag}SameSite=Lax; Path=/; Max-Age=${maxAge}`;
 }
 
 /**
  * Destroy admin session cookie
  */
 export function destroyAdminSession(request: Request): Response {
-    // Note: This logic seems to conflict with how some routes usually return redirects with headers.
-    // But since logout.tsx imports it, it likely expects a redirect response OR just the cookie string?
-    // Looking at routes/admin/logout.tsx: return destroyAdminSession(request) from an action/loader.
-    // So it MUST return a Response object (likely a redirect).
-    
-    return redirect('/login?type=admin', {
-        headers: {
-            'Set-Cookie': 'admin_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'
-        }
-    });
+  const isProd = process.env.NODE_ENV === "production";
+  const secureFlag = isProd ? "Secure; " : "";
+  return redirect('/login?type=admin', {
+    headers: {
+      'Set-Cookie': `admin_token=; HttpOnly; ${secureFlag}SameSite=Lax; Path=/; Max-Age=0`
+    }
+  });
 }

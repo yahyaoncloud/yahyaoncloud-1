@@ -1,29 +1,39 @@
 // Admin About - Manage Portfolio/Profile
 import { json, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useActionData, Form, useNavigation } from "@remix-run/react";
-import { getAllPortfolios, createPortfolio, updatePortfolio } from "~/Services/post.server";
-import { getProfileInfo, saveProfileInfo, type ProfileInfoData } from "~/Services/content.server";
+import { useLoaderData, useActionData, Form, useNavigation, useSearchParams } from "@remix-run/react";
+import { getAllPortfolios } from "~/Services/post.prisma.server";
+import { getProfileInfo, saveProfileInfo, type ProfileInfoData, type SectionVisibility } from "~/Services/content.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { Switch } from "~/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Plus, Trash2, Save, User, Briefcase, Code, Award, Share2, Layers } from "lucide-react";
+import { Plus, Trash2, Save, User, Briefcase, Code, Award, Share2, Layers, LayoutGrid, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ImageUpload from "~/components/ImageUpload";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const [portfolios, profileInfo] = await Promise.all([
-    getAllPortfolios(),
-    getProfileInfo(),
-  ]);
-  const portfolio = portfolios.length > 0 ? portfolios[0] : null;
-  return json({ portfolio, profileInfo });
+  await requireAdmin(request);
+  try {
+    const [portfolios, profileInfo] = await Promise.all([
+      getAllPortfolios().catch(() => []),
+      getProfileInfo(),
+    ]);
+    const portfolio = portfolios && portfolios.length > 0 ? portfolios[0] : null;
+    return json({ portfolio, profileInfo });
+  } catch (error) {
+    console.error("Error in admin/about loader:", error);
+    const profileInfo = await getProfileInfo();
+    return json({ portfolio: null, profileInfo });
+  }
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
   const id = formData.get("id") as string;
@@ -35,6 +45,7 @@ export async function action({ request }: ActionFunctionArgs) {
       const rawExperiences = JSON.parse((formData.get("experiences") as string) || "[]");
       const rawCertifications = JSON.parse((formData.get("certifications") as string) || "[]");
       const rawSocialLinks = JSON.parse((formData.get("socialLinks") as string) || "{}");
+      const rawSectionsVisibility = JSON.parse((formData.get("sectionsVisibility") as string) || "{}");
 
       // Format for live Minimalist ProfileInfo in MongoDB
       const experiences = rawExperiences.map((exp: any) => ({
@@ -63,6 +74,17 @@ export async function action({ request }: ActionFunctionArgs) {
             external: !String(v).startsWith("mailto:"),
           }));
 
+      const sectionsVisibility: SectionVisibility = {
+        summary: true,
+        experience: true,
+        elsewhere: true,
+        certifications: rawSectionsVisibility.certifications !== undefined ? Boolean(rawSectionsVisibility.certifications) : true,
+        skills: rawSectionsVisibility.skills !== undefined ? Boolean(rawSectionsVisibility.skills) : true,
+        selectedWork: rawSectionsVisibility.selectedWork !== undefined ? Boolean(rawSectionsVisibility.selectedWork) : true,
+        writing: rawSectionsVisibility.writing !== undefined ? Boolean(rawSectionsVisibility.writing) : true,
+        research: rawSectionsVisibility.research !== undefined ? Boolean(rawSectionsVisibility.research) : true,
+      };
+
       // Save to ProfileInfo in Prisma MongoDB
       await saveProfileInfo({
         headline: (formData.get("location") as string) || "Cloud DevOps & Infrastructure Engineer.",
@@ -71,26 +93,8 @@ export async function action({ request }: ActionFunctionArgs) {
         experiences,
         certifications,
         socialLinks: socialLinksList,
+        sectionsVisibility,
       });
-
-      // Also save to Portfolio for legacy compatibility
-      const data: any = {
-        name: formData.get("name") as string,
-        portraitUrl: formData.get("portraitUrl") as string,
-        location: formData.get("location") as string,
-        bio,
-        skills,
-        experiences: rawExperiences,
-        projects: JSON.parse((formData.get("projects") as string) || "[]"),
-        certifications: rawCertifications,
-        socialLinks: rawSocialLinks,
-      };
-
-      if (id) {
-        await updatePortfolio(id, data);
-      } else {
-        await createPortfolio(data);
-      }
 
       return json({ success: true, message: "Website profile & homepage updated successfully", error: undefined });
     }
@@ -107,14 +111,12 @@ interface ActionResponse {
   error?: string;
 }
 
-import { IPortfolioDoc } from "~/models";
-
 export default function AdminAbout() {
   const { portfolio, profileInfo } = useLoaderData<typeof loader>() as {
-    portfolio: IPortfolioDoc | null;
+    portfolio: any;
     profileInfo: ProfileInfoData | null;
   };
-  const actionData = useActionData<typeof action>() as ActionResponse | undefined;
+  const actionData = useActionData<typeof action>() as any;
   const navigation = useNavigation();
 
   // Initial State Setup - Prefer live ProfileInfo data
@@ -133,9 +135,29 @@ export default function AdminAbout() {
     profileInfo?.certifications && profileInfo.certifications.length > 0 ? profileInfo.certifications : portfolio?.certifications || []
   );
   const [socialLinks, setSocialLinks] = useState<any>(portfolio?.socialLinks || {});
+  const [sectionsVisibility, setSectionsVisibility] = useState<SectionVisibility>({
+    summary: true,
+    experience: true,
+    elsewhere: true,
+    certifications: profileInfo?.sectionsVisibility?.certifications !== false,
+    skills: profileInfo?.sectionsVisibility?.skills !== false,
+    selectedWork: profileInfo?.sectionsVisibility?.selectedWork !== false,
+    writing: profileInfo?.sectionsVisibility?.writing !== false,
+    research: profileInfo?.sectionsVisibility?.research !== false,
+  });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<string>(searchParams.get("tab") || "basic");
 
   useEffect(() => {
-    if (actionData?.success) toast.success(actionData.message);
+    const tabParam = searchParams.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (actionData?.success && actionData.message) toast.success(actionData.message);
     if (actionData?.error) toast.error(actionData.error);
   }, [actionData]);
 
@@ -198,18 +220,18 @@ export default function AdminAbout() {
             <div>
                 <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">About & Portfolio</h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                    Manage your public profile information, skills, and experience.
+                    Manage your public profile information, homepage sections, and skills.
                 </p>
             </div>
             <div className="flex items-center gap-3">
                 <a 
-                    href="/about" 
+                    href="/" 
                     target="_blank" 
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors bg-white dark:bg-zinc-900"
                 >
                     <Share2 size={16} className="text-zinc-500" />
-                    View Page
+                    View Homepage
                 </a>
                 <Button 
                     type="submit" 
@@ -217,7 +239,7 @@ export default function AdminAbout() {
                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                     <Save size={16} className="mr-2" />
-                    {navigation.state === "submitting" ? "Saving..." : "Save Profile"}
+                    {navigation.state === "submitting" ? "Saving..." : "Save Settings"}
                 </Button>
             </div>
         </div>
@@ -233,10 +255,12 @@ export default function AdminAbout() {
         <input type="hidden" name="projects" value={JSON.stringify(projects)} />
         <input type="hidden" name="certifications" value={JSON.stringify(certifications)} />
         <input type="hidden" name="socialLinks" value={JSON.stringify(socialLinks)} />
+        <input type="hidden" name="sectionsVisibility" value={JSON.stringify(sectionsVisibility)} />
 
-        <Tabs defaultValue="basic" className="w-full space-y-6">
-          <TabsList className="bg-zinc-100 dark:bg-zinc-900 p-1 border border-zinc-200 dark:border-zinc-800 h-auto grid w-full grid-cols-3 md:grid-cols-6 mb-8 rounded-lg">
+        <Tabs value={activeTab} onValueChange={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }} className="w-full space-y-6">
+          <TabsList className="bg-zinc-100 dark:bg-zinc-900 p-1 border border-zinc-200 dark:border-zinc-800 h-auto grid w-full grid-cols-2 sm:grid-cols-4 md:grid-cols-7 mb-8 rounded-lg">
             <TabsTrigger value="basic" className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-white py-2">Basic</TabsTrigger>
+            <TabsTrigger value="sections" className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-white py-2 font-medium">Sections</TabsTrigger>
             <TabsTrigger value="experience" className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-white py-2">Experience</TabsTrigger>
             <TabsTrigger value="projects" className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-white py-2">Projects</TabsTrigger>
             <TabsTrigger value="skills" className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-white py-2">Skills</TabsTrigger>
@@ -299,6 +323,166 @@ export default function AdminAbout() {
                   <Button type="button" variant="outline" size="sm" onClick={addBioLine} className="gap-2 border-dashed border-zinc-300 dark:border-zinc-700">
                     <Plus size={14} /> Add Paragraph
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* HOMEPAGE SECTIONS VISIBILITY */}
+          <TabsContent value="sections">
+            <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-900">
+              <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid size={20} className="text-indigo-600 dark:text-indigo-400" />
+                  <div>
+                    <CardTitle className="text-lg">Homepage Sections Visibility</CardTitle>
+                    <CardDescription>
+                      Customize which sections appear on your public minimalist homepage.
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                {/* Mandatory Sections */}
+                <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <Lock size={13} className="text-amber-500" />
+                    Mandatory Core Sections (Always Visible)
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="p-3 bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
+                      <div>
+                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Summary / Bio</p>
+                        <p className="text-xs text-zinc-400">Headline & intro paragraphs</p>
+                      </div>
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium">
+                        Active
+                      </span>
+                    </div>
+                    <div className="p-3 bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
+                      <div>
+                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Experience</p>
+                        <p className="text-xs text-zinc-400">Career history accordions</p>
+                      </div>
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium">
+                        Active
+                      </span>
+                    </div>
+                    <div className="p-3 bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
+                      <div>
+                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Elsewhere</p>
+                        <p className="text-xs text-zinc-400">Social handles & contact</p>
+                      </div>
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium">
+                        Active
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Optional / Toggleable Sections */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <Layers size={13} className="text-indigo-500" />
+                    Toggleable Homepage Sections
+                  </div>
+
+                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-900">
+                    {/* Certifications */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
+                      <div className="space-y-0.5 pr-4">
+                        <Label htmlFor="toggle-certs" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                          Certifications Section
+                        </Label>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays professional certifications (CCNP, CCNA, Azure, AWS) with credential verification links.
+                        </p>
+                      </div>
+                      <Switch
+                        id="toggle-certs"
+                        checked={sectionsVisibility.certifications}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, certifications: val })
+                        }
+                      />
+                    </div>
+
+                    {/* Skills */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
+                      <div className="space-y-0.5 pr-4">
+                        <Label htmlFor="toggle-skills" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                          Skills Section
+                        </Label>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays skill badges and technical competencies on the homepage.
+                        </p>
+                      </div>
+                      <Switch
+                        id="toggle-skills"
+                        checked={sectionsVisibility.skills}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, skills: val })
+                        }
+                      />
+                    </div>
+
+                    {/* Selected Work */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
+                      <div className="space-y-0.5 pr-4">
+                        <Label htmlFor="toggle-work" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                          Selected Work Section
+                        </Label>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays highlighted featured project cards, summaries, and case study links.
+                        </p>
+                      </div>
+                      <Switch
+                        id="toggle-work"
+                        checked={sectionsVisibility.selectedWork}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, selectedWork: val })
+                        }
+                      />
+                    </div>
+
+                    {/* Writing / Blog */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
+                      <div className="space-y-0.5 pr-4">
+                        <Label htmlFor="toggle-writing" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                          Writing (Articles) Section
+                        </Label>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays recent published engineering articles and technical posts.
+                        </p>
+                      </div>
+                      <Switch
+                        id="toggle-writing"
+                        checked={sectionsVisibility.writing}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, writing: val })
+                        }
+                      />
+                    </div>
+
+                    {/* Research */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
+                      <div className="space-y-0.5 pr-4">
+                        <Label htmlFor="toggle-research" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                          Research Section
+                        </Label>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays technical research papers, abstracts, and publications.
+                        </p>
+                      </div>
+                      <Switch
+                        id="toggle-research"
+                        checked={sectionsVisibility.research}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, research: val })
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
