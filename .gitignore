@@ -2,9 +2,9 @@ node_modules
 
 /.cache
 /build
-# .env
+.env
 
-# /go/.env
+/go/.env
 yahyaoncloud.json
 go-backend.zip
 
