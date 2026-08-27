@@ -11,8 +11,10 @@ techStack:
   - SQLite with FTS5 Full-Text Search
   - Encrypted LUKS2 Storage Partition (AES-XTS 512-bit)
   - Docker Multi-stage Builds + Systemd
+demoUrl: "https://notetruck.aburcloud.com"
+githubUrl: "https://github.com/yahyaoncloud/notetruck"
 featured: true
-order: 3
+order: 4
 ---
 
 ## Executive Summary

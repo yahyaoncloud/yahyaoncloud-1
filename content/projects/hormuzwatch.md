@@ -11,8 +11,10 @@ techStack:
   - React 19 + TypeScript + React Router v8 + Tailwind CSS v4 + Leaflet
   - PostgreSQL (Supabase) + Event Hubs
   - Terraform (Azure) + Cloudflare Tunnel + GitHub Actions + systemd
+demoUrl: "https://hormuzwatch.aburcloud.com"
+githubUrl: "https://github.com/yahyaoncloud/hormuzwatch"
 featured: true
-order: 1
+order: 2
 ---
 
 ## Executive Summary

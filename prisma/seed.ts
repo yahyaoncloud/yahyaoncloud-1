@@ -93,6 +93,31 @@ async function main() {
   console.log("Seeding Project Case Studies...");
   const projects = [
     {
+      slug: "ytpmd",
+      title: "ytpMD — PDF-to-Markdown Engine for Technical Documentation & AI Workflows",
+      category: "Developer Tools, AI/ML, Documentation",
+      period: "2025 - 2026",
+      role: "Creator / Developer",
+      summary: "High-performance, local-first PDF-to-chapter-based Markdown engine built for technical documentation, RAG pipelines, and AI-agent workflows. Slices PDFs by TOC, generates YAML frontmatter, breadcrumbs, and AGENTS.md manifests.",
+      techStack: [
+        "Go 1.22+",
+        "PDF Processing",
+        "MCP Server",
+        "JSON-RPC 2.0",
+        "Debian / Snap",
+        "React",
+        "Vite",
+        "Firebase",
+      ],
+      demoUrl: "https://ytpmd.aburcloud.com",
+      githubUrl: "https://github.com/ytp24/ytpmd",
+      featured: true,
+      order: 1,
+      content: `## Executive Summary
+
+ytpMD is a high-performance, local-first document processing engine that converts technical PDF manuals and books into clean, structured, chapter-segmented Markdown documentation. Rather than producing one large unmanageable file, ytpMD analyzes document structure and generates an organized documentation library with individual chapter notes, YAML frontmatter, token metrics, and AI agent manifests.`,
+    },
+    {
       slug: "hormuzwatch",
       title: "HormuzWatch — Gulf Intelligence Platform",
       category: "SaaS, Security, AI/ML, Observability, Infrastructure",
@@ -107,34 +132,39 @@ async function main() {
         "React 19",
         "TypeScript",
         "PostgreSQL",
-        "Terraform",
+        "Terraform (Azure)",
       ],
+      demoUrl: "https://hormuzwatch.aburcloud.com",
+      githubUrl: "https://github.com/yahyaoncloud/hormuzwatch",
       featured: true,
-      order: 1,
+      order: 2,
       content: `## Executive Summary
 
 HormuzWatch is a unified real-time maritime and aviation surveillance platform paired with a multi-source news intelligence engine for strategic Gulf waterways. It replaces fragmented manual monitoring by combining live AIS vessel feeds, OpenSky aviation telemetry, and an automated 16-source OSINT RSS ingestion pipeline with machine learning anomaly detection and threat scoring.`,
     },
     {
-      slug: "raweego",
-      title: "RaweeGo — Pocket Narrator / Document-to-Audio Platform",
-      category: "SaaS, Developer Tool, AI/ML, Mobile, Automation",
+      slug: "firewood",
+      title: "Firewood — Zero-Knowledge Offline Password & Secret Vault",
+      category: "Mobile, Security, Cryptography",
       period: "2024 - 2025",
-      role: "Architect / Full-stack Developer",
-      summary: "Cross-platform document-to-audio platform with a Flutter mobile app, Rust native core engine, Go backend REST API, Python Piper TTS microservice, and React marketing website. End-to-end flow: mobile app inspects documents via Rust FFI → uploads to Go server → Go orchestrates Python TTS → audio streamed back to mobile for playback.",
+      role: "Creator / Mobile & Security Engineer",
+      summary: "Local-first offline password and credentials manager built with Flutter, Riverpod, and Isar. Implements zero-knowledge manual field-level encryption using Argon2id key derivation and XChaCha20-Poly1305 AEAD authenticated encryption.",
       techStack: [
-        "Flutter",
-        "Rust FFI",
-        "Go 1.22",
-        "Python Piper TTS",
-        "React 19",
-        "Three.js",
+        "Flutter 3.22+",
+        "Dart",
+        "Argon2id KDF",
+        "XChaCha20-Poly1305 AEAD",
+        "Isar Database",
+        "Riverpod 2.5",
+        "Linux Desktop / Android",
       ],
+      demoUrl: "",
+      githubUrl: "https://github.com/yahyaoncloud/firewood",
       featured: true,
-      order: 2,
+      order: 3,
       content: `## Executive Summary
 
-RaweeGo is an end-to-end, privacy-respecting document-to-audio platform engineered as a clean monorepo across five isolated domains. It enables mobile users to convert documents into natural, neural-synthesized audio streams locally and efficiently without proprietary cloud speech lock-in.`,
+Firewood is a high-security, local-first, and completely offline password and credentials manager built with Flutter and Dart. Designed around a strict zero-knowledge security architecture, Firewood ensures that sensitive user secrets never touch remote servers or unencrypted persistent storage.`,
     },
     {
       slug: "notetruck",
@@ -151,32 +181,13 @@ RaweeGo is an end-to-end, privacy-respecting document-to-audio platform engineer
         "Docker",
         "Shadcn UI",
       ],
-      featured: true,
-      order: 3,
-      content: `## Executive Summary
-
-NoteTruck is a high-performance single-binary authoring studio and structured knowledge repository engineered for cloud, network, and security certification preparation. It provides an encrypted, zero-latency local-first workspace with real-time multi-tab synchronization and lightning-fast full-text search.`,
-    },
-    {
-      slug: "aburpos-central",
-      title: "AburPOS Central System — Tenant & License Management Platform",
-      category: "SaaS, Infrastructure, Automation",
-      period: "2025",
-      role: "Architect / Backend Developer",
-      summary: "Cloud-based central management platform for distributed AburPOS tenants. Handles tenant onboarding/provisioning, license generation/validation/renewal with tier-based limits (Small/Medium/Enterprise), and server health monitoring via Kafka event-driven architecture.",
-      techStack: [
-        "Go 1.24+",
-        "Apache Kafka",
-        "MongoDB",
-        "Gin Framework",
-        "Swagger/OpenAPI",
-        "AWS EC2",
-      ],
+      demoUrl: "https://notetruck.aburcloud.com",
+      githubUrl: "https://github.com/yahyaoncloud/notetruck",
       featured: true,
       order: 4,
       content: `## Executive Summary
 
-AburPOS Central System is a high-availability cloud control plane designed to manage distributed point-of-sale (POS) deployments across multi-branch enterprise networks. Built with Go 1.24, Apache Kafka, and MongoDB, it centralizes tenant lifecycle orchestration, cryptographic license validation, remote server health monitoring, and asynchronous state synchronization.`,
+NoteTruck is a high-performance single-binary authoring studio and structured knowledge repository engineered for cloud, network, and security certification preparation. It provides an encrypted, zero-latency local-first workspace with real-time multi-tab synchronization and lightning-fast full-text search.`,
     },
   ];
 
