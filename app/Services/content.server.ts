@@ -647,28 +647,20 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
   ],
   experiences: [
     {
-      year: "2024",
-      present: true,
-      company: "Gulf Intelligence & Media",
-      role: "Architect / Full-stack Developer",
+      year: "2024–2025",
+      present: false,
+      company: "Minute KSA",
+      role: "Cloud DevOps Engineer",
       description:
-        "Architecting real-time geospatial intelligence, ML threat scoring pipelines, and cross-platform document synthesis engines using Go, Python, and React.",
-      projects: [
-        { name: "HormuzWatch", url: "/projects/hormuzwatch", internal: true },
-        { name: "RaweeGo", url: "/projects/raweego", internal: true },
-      ],
+        "Supported production AWS infrastructure for a ride-hailing platform, focusing on cloud infrastructure, containerized workloads, CI/CD, infrastructure automation, cloud networking, production troubleshooting, reliability, and cost optimization.",
     },
     {
-      year: "2023",
+      year: "2022–2024",
       present: false,
-      company: "Enterprise Systems",
-      role: "Full-stack & Infrastructure Engineer",
+      company: "Faabee Technologies",
+      role: "Network Infrastructure Engineer",
       description:
-        "Engineered distributed point-of-sale tenant platforms, Kafka event-driven architectures, and encrypted certification authoring studios.",
-      projects: [
-        { name: "NoteTruck", url: "/projects/notetruck", internal: true },
-        { name: "AburPOS Central", url: "/projects/aburpos-central", internal: true },
-      ],
+        "Supported enterprise network infrastructure and production operations, focusing on routing and switching, SD-WAN, network security, hybrid cloud connectivity, incident troubleshooting, network automation, and operational reliability.",
     },
   ],
   skills: [

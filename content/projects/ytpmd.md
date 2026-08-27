@@ -17,7 +17,7 @@ techStack:
   - React
   - Vite
   - Firebase Hosting
-demoUrl: "https://ytpmd.web.app"
+demoUrl: "https://ytpmd-1222d.web.app"
 githubUrl: "https://github.com/ytp24/ytpMD"
 coverImage: "/images/projects/ytpmd.webp"
 featured: true
