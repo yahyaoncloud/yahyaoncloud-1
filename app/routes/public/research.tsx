@@ -4,9 +4,20 @@ import { useLoaderData } from "@remix-run/react";
 import { getAllResearchPapers, type ResearchPaper } from "~/Services/content.server";
 import MarkdownViewer from "~/components/MarkdownViewer";
 
+export const headers = () => ({
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+});
+
 export async function loader() {
   const papers = await getAllResearchPapers();
-  return json({ papers });
+  return json(
+    { papers },
+    {
+      headers: {
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+      },
+    }
+  );
 }
 
 function PaperItem({ paper }: { paper: ResearchPaper }) {

@@ -2,9 +2,20 @@ import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAllBlogPosts, type BlogPost } from "~/Services/content.server";
 
+export const headers = () => ({
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+});
+
 export async function loader() {
   const posts = await getAllBlogPosts();
-  return json({ posts });
+  return json(
+    { posts },
+    {
+      headers: {
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+      },
+    }
+  );
 }
 
 export default function BlogIndex() {
@@ -18,6 +29,7 @@ export default function BlogIndex() {
           <div key={post.slug} className="group">
             <Link
               to={`/blog/${post.slug}`}
+              prefetch="intent"
               className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 sm:py-1 text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors gap-1 sm:gap-3 min-w-0"
               title={post.title}
             >

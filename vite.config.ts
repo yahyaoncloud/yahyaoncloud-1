@@ -68,6 +68,27 @@ export default defineConfig({
       "@remix-run/node",
     ],
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("node_modules/mermaid") || id.includes("node_modules/cytoscape")) {
+            return "mermaid-vendor";
+          }
+          if (id.includes("node_modules/katex")) {
+            return "katex-vendor";
+          }
+          if (id.includes("node_modules/firebase")) {
+            return "firebase-vendor";
+          }
+          if (id.includes("node_modules/framer-motion")) {
+            return "motion-vendor";
+          }
+        },
+      },
+    },
+  },
   plugins: [
     remix({
       future: {

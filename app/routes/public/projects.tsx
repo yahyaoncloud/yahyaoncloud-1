@@ -3,9 +3,20 @@ import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAllProjects, type ProjectCaseStudy } from "~/Services/content.server";
 
+export const headers = () => ({
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+});
+
 export async function loader() {
   const projects = await getAllProjects();
-  return json({ projects });
+  return json(
+    { projects },
+    {
+      headers: {
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+      },
+    }
+  );
 }
 
 export default function ProjectsIndex() {
@@ -68,6 +79,7 @@ export default function ProjectsIndex() {
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
                 <Link
                   to={`/projects/${project.slug}`}
+                  prefetch="intent"
                   className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline underline-offset-4 text-base md:text-lg transition-colors"
                 >
                   {project.title}
@@ -102,6 +114,7 @@ export default function ProjectsIndex() {
               <div className="flex flex-wrap items-center gap-4 pt-1 text-xs md:text-sm font-mono">
                 <Link
                   to={`/projects/${project.slug}`}
+                  prefetch="intent"
                   className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"
                 >
                   Read Case Study →

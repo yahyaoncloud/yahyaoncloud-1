@@ -102,6 +102,7 @@ export default function Header() {
           {/* Blog Link */}
           <Link
             to="/blog"
+            prefetch="intent"
             className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 ${
               isBlogActive
                 ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
@@ -142,6 +143,7 @@ export default function Header() {
                 >
                   <Link
                     to="/projects"
+                    prefetch="intent"
                     onClick={() => setWorkDropdownOpen(false)}
                     className={`flex items-center px-3 py-1.5 transition-colors ${
                       isProjectsActive
@@ -153,6 +155,7 @@ export default function Header() {
                   </Link>
                   <Link
                     to="/research"
+                    prefetch="intent"
                     onClick={() => setWorkDropdownOpen(false)}
                     className={`flex items-center px-3 py-1.5 transition-colors ${
                       isResearchActive
@@ -198,6 +201,7 @@ export default function Header() {
                 >
                   <Link
                     to="/guestbook"
+                    prefetch="intent"
                     onClick={() => setMiscDropdownOpen(false)}
                     className={`flex items-center px-3 py-1.5 transition-colors ${
                       isGuestbookActive
@@ -256,6 +260,7 @@ export default function Header() {
             <nav className="flex flex-col gap-1 py-1 text-sm">
               <Link
                 to="/blog"
+                prefetch="intent"
                 onClick={() => setMobileMenuOpen(false)}
                 className={`px-3 py-1.5 rounded-md transition-colors ${
                   isBlogActive
@@ -274,6 +279,7 @@ export default function Header() {
                 <div className="flex flex-col gap-0.5 pl-2">
                   <Link
                     to="/projects"
+                    prefetch="intent"
                     onClick={() => setMobileMenuOpen(false)}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
                       isProjectsActive
@@ -285,6 +291,7 @@ export default function Header() {
                   </Link>
                   <Link
                     to="/research"
+                    prefetch="intent"
                     onClick={() => setMobileMenuOpen(false)}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
                       isResearchActive
@@ -305,6 +312,7 @@ export default function Header() {
                 <div className="flex flex-col gap-0.5 pl-2">
                   <Link
                     to="/guestbook"
+                    prefetch="intent"
                     onClick={() => setMobileMenuOpen(false)}
                     className={`px-3 py-1.5 rounded-md transition-colors ${
                       isGuestbookActive

@@ -11,6 +11,10 @@ import {
   getAllBlogPosts,
 } from "~/Services/content.server";
 
+export const headers = () => ({
+  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+});
+
 export async function loader() {
   const [profileInfo, featuredProjects, featuredResearch, allPosts] = await Promise.all([
     getProfileInfo(),
@@ -19,12 +23,19 @@ export async function loader() {
     getAllBlogPosts(),
   ]);
 
-  return json({
-    profileInfo,
-    featuredProjects,
-    featuredResearch,
-    recentPosts: allPosts.slice(0, 3),
-  });
+  return json(
+    {
+      profileInfo,
+      featuredProjects,
+      featuredResearch,
+      recentPosts: allPosts.slice(0, 3),
+    },
+    {
+      headers: {
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+      },
+    }
+  );
 }
 
 export default function Index() {
@@ -331,6 +342,7 @@ export default function Index() {
               <h2 className="section-heading">Selected Work</h2>
               <Link
                 to="/projects"
+                prefetch="intent"
                 className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All projects</span>
@@ -346,6 +358,7 @@ export default function Index() {
                   <div className="flex items-baseline justify-between gap-2 min-w-0">
                     <Link
                       to={`/projects/${project.slug}`}
+                      prefetch="intent"
                       className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
                       title={project.title}
                     >
@@ -361,6 +374,7 @@ export default function Index() {
                   <div className="pt-0.5 flex items-center gap-3 text-sm md:text-base">
                     <Link
                       to={`/projects/${project.slug}`}
+                      prefetch="intent"
                       className="group/btn text-zinc-900 dark:text-zinc-100 font-medium hover:underline inline-flex items-center gap-1.5"
                     >
                       <span>Case Study</span>
@@ -404,6 +418,7 @@ export default function Index() {
               <h2 className="section-heading">Writing</h2>
               <Link
                 to="/blog"
+                prefetch="intent"
                 className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All articles</span>
@@ -418,6 +433,7 @@ export default function Index() {
                 <div key={post.slug} className="group">
                   <Link
                     to={`/blog/${post.slug}`}
+                    prefetch="intent"
                     className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 sm:py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-1 sm:gap-3 min-w-0"
                     title={post.title}
                   >
@@ -444,6 +460,7 @@ export default function Index() {
               <h2 className="section-heading">Research</h2>
               <Link
                 to="/research"
+                prefetch="intent"
                 className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All papers</span>
@@ -459,6 +476,7 @@ export default function Index() {
                   <div className="flex items-baseline justify-between gap-2 min-w-0">
                     <Link
                       to="/research"
+                      prefetch="intent"
                       className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
                       title={paper.title}
                     >
