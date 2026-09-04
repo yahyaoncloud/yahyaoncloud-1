@@ -79,3 +79,13 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
     recentVisits
   };
 }
+
+export async function resetAnalyticsSummary(): Promise<{ deletedCount: number }> {
+  // @ts-ignore
+  if (!prisma.analytics) {
+    return { deletedCount: 0 };
+  }
+
+  const result = await prisma.analytics.deleteMany({});
+  return { deletedCount: result.count };
+}

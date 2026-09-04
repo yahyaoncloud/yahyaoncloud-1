@@ -894,6 +894,8 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         sectionsVisibility: visibilityToSave as unknown as object,
       },
     });
+
+    invalidateContentCache();
     return true;
   } catch (err) {
     console.error("Error saving profile info:", err);

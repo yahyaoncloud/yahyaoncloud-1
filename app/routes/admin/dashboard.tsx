@@ -3,7 +3,7 @@ import { Link, useLoaderData, useFetcher, useRouteError, isRouteErrorResponse } 
 import { LuBriefcase as Briefcase, LuFileText as FileText, LuSettings as Settings, LuUsers as Users, LuEye as Eye, LuLayoutGrid as LayoutGrid, LuSparkles as Sparkles, LuLayers as Layers, LuGlobe as Globe, LuExternalLink as ExternalLink, LuCode as Code, LuAward as Award, LuBookOpen as BookOpen, LuShare2 as Share2, LuTrendingUp as TrendingUp } from "react-icons/lu";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { getAnalyticsSummary } from "~/Services/analytics.server";
+import { getAnalyticsSummary, resetAnalyticsSummary } from "~/Services/analytics.server";
 import {
   getProfileInfo,
   saveProfileInfo,
@@ -53,6 +53,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
+
+  if (intent === "reset-analytics") {
+    try {
+      const { deletedCount } = await resetAnalyticsSummary();
+      return json({
+        success: true,
+        message: `Homepage dashboard metrics successfully reset (cleared ${deletedCount} tracking entries).`,
+      });
+    } catch (err) {
+      console.error("Error resetting analytics on dashboard:", err);
+      return json(
+        {
+          success: false,
+          error: "Failed to reset dashboard metrics.",
+        },
+        { status: 500 }
+      );
+    }
+  }
 
   if (intent === "toggle-section") {
     const sectionKey = formData.get("sectionKey") as keyof SectionVisibility;

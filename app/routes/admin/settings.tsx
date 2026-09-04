@@ -1,49 +1,81 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useNavigation, Form, useActionData } from "@remix-run/react";
+import { useLoaderData, useNavigation, Form, useActionData, useFetcher } from "@remix-run/react";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { getAdminByUsername, updateAdmin } from "~/Services/admin.prisma.server";
+import { getAnalyticsSummary, resetAnalyticsSummary, type AnalyticsSummary } from "~/Services/analytics.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { LuUser as User, LuShield as Shield, LuSave as Save, LuLoaderCircle as Loader2, LuLayoutDashboard as Layout, LuPanelLeft as SidebarIcon } from "react-icons/lu";
+import {
+  LuUser as User,
+  LuShield as Shield,
+  LuSave as Save,
+  LuLoaderCircle as Loader2,
+  LuLayoutDashboard as Layout,
+  LuPanelLeft as SidebarIcon,
+  LuTrendingUp as TrendingUp,
+  LuEye as Eye,
+  LuUsers as Users,
+  LuRotateCcw as RotateCcw,
+  LuTriangleAlert as AlertTriangle,
+} from "react-icons/lu";
 import { useUIStore } from "~/store/uiStore";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const adminPayload = await requireAdmin(request);
-  
-  // Try to find admin in database by username or email
-  let admin = await getAdminByUsername(adminPayload.username);
-  
-  // If not found by username, the admin is Firebase-only (no MongoDB record)
-  // Use JWT payload data for display
+  const [admin, summary] = await Promise.all([
+    getAdminByUsername(adminPayload.username),
+    getAnalyticsSummary(),
+  ]);
+
   if (!admin) {
-    return json({ 
+    return json({
       admin: {
         id: adminPayload.id,
         username: adminPayload.username,
         email: adminPayload.email,
         role: adminPayload.role,
         isFirebaseOnly: true,
-      }
+      },
+      summary,
     });
   }
 
-  return json({ admin: { ...admin, isFirebaseOnly: false } });
+  return json({ admin: { ...admin, isFirebaseOnly: false }, summary });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const adminPayload = await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
-  
-  // Look up admin by username to get MongoDB ID
+
+  if (intent === "reset-analytics") {
+    try {
+      const { deletedCount } = await resetAnalyticsSummary();
+      return json({
+        success: true,
+        message: `Homepage dashboard metrics successfully reset (cleared ${deletedCount} tracking entries).`,
+        intent: "reset-analytics",
+      });
+    } catch (err) {
+      console.error("Error resetting analytics:", err);
+      return json({
+        success: false,
+        error: "Failed to reset dashboard metrics.",
+        intent: "reset-analytics",
+      }, { status: 500 });
+    }
+  }
+
+  // Look up admin by username to get MongoDB ID for profile/security changes
   const admin = await getAdminByUsername(adminPayload.username);
   if (!admin) {
-    return json({ 
-      success: false, 
+    return json({
+      success: false,
       error: "Your account is managed by Firebase. Profile changes cannot be saved to the database.",
-      intent: intent as string
+      intent: intent as string,
     });
   }
 
@@ -96,7 +128,7 @@ interface ActionResponse {
 }
 
 export default function AdminSettings() {
-  const { admin } = useLoaderData<typeof loader>();
+  const { admin, summary } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>() as ActionResponse | undefined;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -259,6 +291,84 @@ export default function AdminSettings() {
             </Button>
           </div>
         </Form>
+      </div>
+
+      {/* Analytics & Telemetry Metrics Management */}
+      <div id="analytics" className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="text-blue-600 dark:text-blue-400" size={20} />
+            <div>
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Analytics & Dashboard Metrics</h2>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Overview of collected homepage metrics, telemetry, and visitor traffic counters.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Current Metric Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Tracked Views</span>
+              <div className="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                {summary.totalViews.toLocaleString()}
+              </div>
+            </div>
+            <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <Eye size={20} />
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Unique Visitors</span>
+              <div className="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
+                {summary.uniqueVisitors.toLocaleString()}
+              </div>
+            </div>
+            <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <Users size={20} />
+            </div>
+          </div>
+        </div>
+
+        {/* Reset Metrics Section */}
+        <div className="p-4 rounded-lg border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 text-red-600 dark:text-red-400 shrink-0" size={20} />
+            <div>
+              <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Reset Dashboard Analytics</div>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+                Permanently deletes all recorded page visit logs, country breakdown, and resets lifetime view counters back to 0.
+              </p>
+            </div>
+          </div>
+
+          <Form method="post" onSubmit={(e) => {
+            if (!confirm("Are you sure you want to reset all dashboard analytics and page view counters to 0? This cannot be undone.")) {
+              e.preventDefault();
+            }
+          }}>
+            <input type="hidden" name="intent" value="reset-analytics" />
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={isSubmitting}
+              className="gap-2 shrink-0 border-red-300 dark:border-red-800 bg-white dark:bg-zinc-900 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white transition-colors cursor-pointer"
+            >
+              {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : <RotateCcw size={16} />}
+              Reset Analytics
+            </Button>
+          </Form>
+        </div>
+
+        {actionData?.intent === "reset-analytics" && (
+          <div className={`text-sm ${actionData.success ? "text-green-600 dark:text-green-400" : "text-red-600"}`}>
+            {actionData.success ? actionData.message : actionData.error}
+          </div>
+        )}
       </div>
     </div>
   );

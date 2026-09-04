@@ -1,6 +1,6 @@
 // Admin About - Manage Portfolio/Profile
 import { json, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useActionData, Form, useNavigation, useSearchParams, useRouteError, isRouteErrorResponse } from "@remix-run/react";
+import { useLoaderData, useActionData, Form, useNavigation, useSearchParams, useFetcher, useRouteError, isRouteErrorResponse } from "@remix-run/react";
 import { getProfileInfo, saveProfileInfo, type ProfileInfoData, type SectionVisibility } from "~/Services/content.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -9,7 +9,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuUser as User, LuBriefcase as Briefcase, LuCode as Code, LuAward as Award, LuShare2 as Share2, LuLayers as Layers, LuLayoutGrid as LayoutGrid, LuCircleCheck as CheckCircle2, LuSparkles as Sparkles, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw } from "react-icons/lu";
+import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuUser as User, LuBriefcase as Briefcase, LuCode as Code, LuAward as Award, LuShare2 as Share2, LuLayers as Layers, LuLayoutGrid as LayoutGrid, LuCircleCheck as CheckCircle2, LuSparkles as Sparkles, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw, LuLoaderCircle as Loader2 } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ImageUpload from "~/components/ImageUpload";
@@ -33,6 +33,26 @@ export async function action({ request }: ActionFunctionArgs) {
   const intent = formData.get("intent");
 
   try {
+    if (intent === "update-skills-mode") {
+      const mode = ((formData.get("skillsDisplayMode") as string) || "both") as "both" | "icons" | "text";
+      const profile = await getProfileInfo();
+      await saveProfileInfo({
+        ...profile,
+        skillsDisplayMode: mode,
+      });
+      const modeLabels = {
+        both: "Icons + Text Badges",
+        icons: "Icons Grid Only",
+        text: "Text Badges Only",
+      };
+      return json({
+        success: true,
+        skillsDisplayMode: mode,
+        message: `Homepage skills display mode changed to ${modeLabels[mode] || mode}.`,
+        error: undefined,
+      });
+    }
+
     if (intent === "save") {
       const bio = JSON.parse((formData.get("bio") as string) || "[]");
       const skills = JSON.parse((formData.get("skills") as string) || "[]");
@@ -108,6 +128,12 @@ export default function AdminAbout() {
   };
   const actionData = useActionData<typeof action>() as any;
   const navigation = useNavigation();
+  const skillsModeFetcher = useFetcher<{
+    success?: boolean;
+    skillsDisplayMode?: "both" | "icons" | "text";
+    message?: string;
+    error?: string;
+  }>();
 
   // Initial State Setup - Prefer live ProfileInfo data
   const [headline, setHeadline] = useState<string>(profileInfo?.headline || "Cloud DevOps & Infrastructure Engineer.");
@@ -165,6 +191,12 @@ export default function AdminAbout() {
     setActiveTab(tabParam);
   }, [searchParams]);
 
+  useEffect(() => {
+    if (profileInfo?.skillsDisplayMode) {
+      setSkillsDisplayMode(profileInfo.skillsDisplayMode);
+    }
+  }, [profileInfo?.skillsDisplayMode]);
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     if (tab === "basic") {
@@ -182,6 +214,25 @@ export default function AdminAbout() {
     if (actionData?.success && actionData.message) toast.success(actionData.message);
     if (actionData?.error) toast.error(actionData.error);
   }, [actionData]);
+
+  useEffect(() => {
+    if (skillsModeFetcher.data?.success && skillsModeFetcher.data.message) {
+      toast.success(skillsModeFetcher.data.message);
+    } else if (skillsModeFetcher.data?.error) {
+      toast.error(skillsModeFetcher.data.error);
+    }
+  }, [skillsModeFetcher.data]);
+
+  const handleSelectSkillsMode = (mode: "both" | "icons" | "text") => {
+    setSkillsDisplayMode(mode);
+    skillsModeFetcher.submit(
+      {
+        intent: "update-skills-mode",
+        skillsDisplayMode: mode,
+      },
+      { method: "post" }
+    );
+  };
 
   // --- Handlers ---
 
@@ -785,24 +836,32 @@ export default function AdminAbout() {
             {/* Display Mode Selection: Both | Icons | Text */}
             <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-900">
               <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles size={20} className="text-amber-500" />
-                  <div>
-                    <CardTitle className="text-lg">Homepage Skills Display Style</CardTitle>
-                    <CardDescription>
-                      Choose how your skills appear to public visitors on the homepage.
-                    </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={20} className="text-amber-500" />
+                    <div>
+                      <CardTitle className="text-lg">Homepage Skills Display Style</CardTitle>
+                      <CardDescription>
+                        Choose how your skills appear to public visitors on the homepage. Changes auto-save instantly.
+                      </CardDescription>
+                    </div>
                   </div>
+                  {skillsModeFetcher.state === "submitting" && (
+                    <div className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Saving...</span>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className="pt-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     type="button"
-                    onClick={() => setSkillsDisplayMode("both")}
-                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all ${
+                    onClick={() => handleSelectSkillsMode("both")}
+                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all cursor-pointer ${
                       skillsDisplayMode === "both"
-                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100"
+                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100 shadow-xs"
                         : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950"
                     }`}
                   >
@@ -817,10 +876,10 @@ export default function AdminAbout() {
 
                   <button
                     type="button"
-                    onClick={() => setSkillsDisplayMode("icons")}
-                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all ${
+                    onClick={() => handleSelectSkillsMode("icons")}
+                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all cursor-pointer ${
                       skillsDisplayMode === "icons"
-                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100"
+                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100 shadow-xs"
                         : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950"
                     }`}
                   >
@@ -835,10 +894,10 @@ export default function AdminAbout() {
 
                   <button
                     type="button"
-                    onClick={() => setSkillsDisplayMode("text")}
-                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all ${
+                    onClick={() => handleSelectSkillsMode("text")}
+                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all cursor-pointer ${
                       skillsDisplayMode === "text"
-                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100"
+                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100 shadow-xs"
                         : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950"
                     }`}
                   >
@@ -856,12 +915,17 @@ export default function AdminAbout() {
 
             <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-900">
               <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                <div className="flex items-center gap-2">
-                  <Code size={20} className="text-pink-500" />
-                  <div>
-                    <CardTitle className="text-lg">Skills List</CardTitle>
-                    <CardDescription>Add, edit, and arrange technologies and competencies</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Code size={20} className="text-pink-500" />
+                    <div>
+                      <CardTitle className="text-lg">Skills List</CardTitle>
+                      <CardDescription>Add, edit, and arrange technologies and competencies</CardDescription>
+                    </div>
                   </div>
+                  <Button type="button" size="sm" onClick={addSkill} className="gap-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900">
+                    <Plus size={14} /> Add Skill
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
@@ -882,6 +946,17 @@ export default function AdminAbout() {
                   </Button>
                 </div>
               </CardContent>
+              <CardFooter className="border-t border-zinc-100 dark:border-zinc-800 pt-4 flex justify-end">
+                <Button
+                  type="submit"
+                  form="about-portfolio-form"
+                  disabled={navigation.state === "submitting"}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                >
+                  <Save size={16} />
+                  {navigation.state === "submitting" ? "Saving..." : "Save Skills"}
+                </Button>
+              </CardFooter>
             </Card>
           </TabsContent>
 
