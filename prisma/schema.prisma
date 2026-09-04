@@ -170,6 +170,7 @@ model ProfileInfo {
   bio                String[]
   experiences        Json?    // Array of { year, present, company, role, description, projects }
   skills             String[]
+  skillsDisplayMode  String?  @default("both") // "both", "icons", "text"
   certifications     Json?    // Array of { name, issuer, issueDate, expiryDate, credentialId, credentialUrl }
   socialLinks        Json?    // Array of { label, href, display, external }
   sectionsVisibility Json?    // { summary, experience, elsewhere, certifications, skills, selectedWork, writing, research }

@@ -97,11 +97,11 @@
   }
 
   h4 {
-    @apply text-[15px] md:text-base font-medium text-zinc-900 dark:text-zinc-100;
+    @apply text-base font-medium text-zinc-900 dark:text-zinc-100;
   }
 
   p {
-    @apply text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300;
+    @apply text-sm md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300;
   }
 
   /* Section heading for homepage categories (Experience, Skills, Certifications, etc.) */

@@ -79,11 +79,14 @@ export async function action({ request }: ActionFunctionArgs) {
         research: rawSectionsVisibility.research !== undefined ? Boolean(rawSectionsVisibility.research) : true,
       };
 
+      const skillsDisplayMode = ((formData.get("skillsDisplayMode") as string) || "both") as "both" | "icons" | "text";
+
       // Save to ProfileInfo in Prisma MongoDB
       await saveProfileInfo({
         headline: (formData.get("headline") as string) || "Cloud DevOps & Infrastructure Engineer.",
         bio,
         skills,
+        skillsDisplayMode,
         experiences,
         certifications,
         socialLinks: socialLinksList,
@@ -114,6 +117,9 @@ export default function AdminAbout() {
   );
   const [skills, setSkills] = useState<string[]>(
     profileInfo?.skills && profileInfo.skills.length > 0 ? profileInfo.skills : []
+  );
+  const [skillsDisplayMode, setSkillsDisplayMode] = useState<"both" | "icons" | "text">(
+    profileInfo?.skillsDisplayMode || "both"
   );
   const [experiences, setExperiences] = useState<any[]>(
     profileInfo?.experiences && profileInfo.experiences.length > 0 ? profileInfo.experiences : []
@@ -267,6 +273,7 @@ export default function AdminAbout() {
         {/* Serialized JSON inputs */}
         <input type="hidden" name="bio" value={JSON.stringify(bio)} />
         <input type="hidden" name="skills" value={JSON.stringify(skills)} />
+        <input type="hidden" name="skillsDisplayMode" value={skillsDisplayMode} />
         <input type="hidden" name="experiences" value={JSON.stringify(experiences)} />
         <input type="hidden" name="projects" value={JSON.stringify(projects)} />
         <input type="hidden" name="certifications" value={JSON.stringify(certifications)} />
@@ -774,33 +781,105 @@ export default function AdminAbout() {
           </TabsContent>
 
           {/* SKILLS */}
-          <TabsContent value="skills">
+          <TabsContent value="skills" className="space-y-6">
+            {/* Display Mode Selection: Both | Icons | Text */}
             <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-900">
-               <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
+              <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
                 <div className="flex items-center gap-2">
-                    <Code size={20} className="text-pink-500" />
-                    <div>
-                        <CardTitle className="text-lg">Skills</CardTitle>
-                        <CardDescription>Technologies and competencies</CardDescription>
+                  <Sparkles size={20} className="text-amber-500" />
+                  <div>
+                    <CardTitle className="text-lg">Homepage Skills Display Style</CardTitle>
+                    <CardDescription>
+                      Choose how your skills appear to public visitors on the homepage.
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSkillsDisplayMode("both")}
+                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all ${
+                      skillsDisplayMode === "both"
+                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100"
+                        : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-medium text-sm text-zinc-900 dark:text-zinc-100">
+                      <Layers size={16} className="text-blue-500" />
+                      <span>Icons + Text Badges</span>
                     </div>
+                    <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                      Pill badges showing brand devicon + technology name.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSkillsDisplayMode("icons")}
+                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all ${
+                      skillsDisplayMode === "icons"
+                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100"
+                        : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-medium text-sm text-zinc-900 dark:text-zinc-100">
+                      <Sparkles size={16} className="text-amber-500" />
+                      <span>Icons Grid Only</span>
+                    </div>
+                    <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                      Responsive brand devicon cards with brand colors.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSkillsDisplayMode("text")}
+                    className={`flex flex-col items-start p-3.5 rounded-lg border text-left transition-all ${
+                      skillsDisplayMode === "text"
+                        ? "border-zinc-900 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-800/80 ring-2 ring-zinc-900 dark:ring-zinc-100"
+                        : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-white dark:bg-zinc-950"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 font-medium text-sm text-zinc-900 dark:text-zinc-100">
+                      <Code size={16} className="text-emerald-500" />
+                      <span>Text Badges Only</span>
+                    </div>
+                    <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                      Clean monospace text badges without icons.
+                    </p>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-900">
+              <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                <div className="flex items-center gap-2">
+                  <Code size={20} className="text-pink-500" />
+                  <div>
+                    <CardTitle className="text-lg">Skills List</CardTitle>
+                    <CardDescription>Add, edit, and arrange technologies and competencies</CardDescription>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {skills.map((skill, i) => (
-                        <div key={i} className="flex gap-2 items-center">
-                            <div className="flex items-center gap-2 flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1 focus-within:ring-2 focus-within:ring-zinc-950 dark:focus-within:ring-zinc-300">
-                                <TechIcon name={skill} size={16} useBrandColor />
-                                <Input className="border-0 shadow-none p-0 h-8 focus-visible:ring-0 bg-transparent text-sm" value={skill} onChange={(e) => updateSkill(i, e.target.value)} placeholder="Skill name" />
-                            </div>
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removeSkill(i)} className="text-red-500 shrink-0">
-                                <Trash2 size={14} />
-                            </Button>
-                        </div>
-                    ))}
-                    <Button type="button" variant="outline" onClick={addSkill} className="w-full border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50">
-                        <Plus size={14} className="mr-2" /> Add Skill
-                    </Button>
+                  {skills.map((skill, i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2 flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1 focus-within:ring-2 focus-within:ring-zinc-950 dark:focus-within:ring-zinc-300">
+                        <TechIcon name={skill} size={16} useBrandColor />
+                        <Input className="border-0 shadow-none p-0 h-8 focus-visible:ring-0 bg-transparent text-sm" value={skill} onChange={(e) => updateSkill(i, e.target.value)} placeholder="Skill name" />
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeSkill(i)} className="text-red-500 shrink-0">
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" onClick={addSkill} className="w-full border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/50">
+                    <Plus size={14} className="mr-2" /> Add Skill
+                  </Button>
                 </div>
               </CardContent>
             </Card>

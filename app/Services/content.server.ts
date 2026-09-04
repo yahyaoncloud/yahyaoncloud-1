@@ -79,6 +79,7 @@ export interface ProfileInfoData {
     projects?: Array<{ name: string; url: string; internal?: boolean }>;
   }>;
   skills: string[];
+  skillsDisplayMode?: "both" | "icons" | "text";
   certifications?: CertificationItem[];
   socialLinks: Array<{
     label: string;
@@ -787,6 +788,7 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
     "Ansible & Helm",
     "Cloudflare",
   ],
+  skillsDisplayMode: "both",
   certifications: [],
   socialLinks: [],
   sectionsVisibility: {
@@ -819,6 +821,7 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
         headline: profile.headline || "",
         bio: profile.bio || [],
         skills: profile.skills || [],
+        skillsDisplayMode: (profile.skillsDisplayMode as "both" | "icons" | "text") || "both",
         experiences: Array.isArray(profile.experiences) ? (profile.experiences as unknown as ProfileInfoData["experiences"]) : [],
         certifications: Array.isArray(profile.certifications) ? (profile.certifications as unknown as ProfileInfoData["certifications"]) : [],
         socialLinks: Array.isArray(profile.socialLinks)
@@ -873,6 +876,7 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         headline: data.headline,
         bio: data.bio,
         skills: data.skills,
+        skillsDisplayMode: data.skillsDisplayMode || "both",
         experiences: data.experiences as unknown as object,
         certifications: data.certifications as unknown as object,
         socialLinks: cleanSocialLinks as unknown as object,
@@ -883,6 +887,7 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         headline: data.headline,
         bio: data.bio,
         skills: data.skills,
+        skillsDisplayMode: data.skillsDisplayMode || "both",
         experiences: data.experiences as unknown as object,
         certifications: data.certifications as unknown as object,
         socialLinks: data.socialLinks as unknown as object,

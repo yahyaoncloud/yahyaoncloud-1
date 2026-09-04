@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import {
-  LuChevronRight as ChevronRight,
-  LuSparkles as Sparkles,
-  LuLayers as Layers,
-  LuCode as Code,
-} from "react-icons/lu";
+import { LuChevronRight as ChevronRight } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import profilePhoto from "~/assets/profile.jpg";
 import { TechIcon } from "~/components/TechIcon";
@@ -48,7 +43,6 @@ export default function Index() {
   const { profileInfo, featuredProjects, featuredResearch, recentPosts } =
     useLoaderData<typeof loader>();
   const [openExperienceIndex, setOpenExperienceIndex] = useState<number | null>(null);
-  const [skillsView, setSkillsView] = useState<"badges" | "icons" | "text">("badges");
 
   const toggleExperience = (idx: number) => {
     setOpenExperienceIndex(openExperienceIndex === idx ? null : idx);
@@ -97,12 +91,12 @@ export default function Index() {
               return (
                 <div key={idx} className="space-y-1">
                   {/* Desktop Layout (sm and up) */}
-                  <div className="hidden sm:grid sm:grid-cols-[100px_1fr] md:grid-cols-[110px_1fr] gap-x-3 md:gap-x-4 items-start text-[15px] md:text-base">
+                  <div className="hidden sm:grid sm:grid-cols-[100px_1fr] md:grid-cols-[110px_1fr] gap-x-3 md:gap-x-4 items-start text-sm md:text-base">
                     {/* Year + Present badge column */}
                     <div className="py-1.5 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
                       <span className="font-normal font-mono text-xs md:text-sm">{exp.year}</span>
                       {exp.present && (
-                        <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-[11px] md:text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                        <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-xs font-medium text-zinc-600 dark:text-zinc-400">
                           Present
                         </span>
                       )}
@@ -127,7 +121,7 @@ export default function Index() {
                             isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
                           }`}
                         />
-                        <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-[15px] md:text-base">
+                        <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-sm md:text-base">
                           {exp.company}
                         </span>
                         <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[16px] shrink-0" />
@@ -296,7 +290,7 @@ export default function Index() {
                         href={cert.credentialUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-normal text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline text-sm md:text-[15px] flex items-center gap-1 min-w-0"
+                        className="font-normal text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline text-sm md:text-base flex items-center gap-1 min-w-0"
                         title={cert.name}
                       >
                         <span className="truncate group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4">
@@ -307,7 +301,7 @@ export default function Index() {
                         </span>
                       </a>
                     ) : (
-                      <span className="font-normal text-zinc-800 dark:text-zinc-200 text-sm md:text-[15px] truncate">
+                      <span className="font-normal text-zinc-800 dark:text-zinc-200 text-sm md:text-base truncate">
                         {cert.name}
                       </span>
                     )}
@@ -328,54 +322,10 @@ export default function Index() {
         profileInfo.skills &&
         profileInfo.skills.length > 0 && (
           <section className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <h2 className="section-heading">Skills</h2>
-              {/* View Switcher: Both | Icons | Text */}
-              <div className="inline-flex items-center gap-0.5 p-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 text-[11px] sm:text-xs">
-                <button
-                  type="button"
-                  onClick={() => setSkillsView("badges")}
-                  className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
-                    skillsView === "badges"
-                      ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium"
-                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
-                  }`}
-                  title="Show both icons and text badges"
-                >
-                  <Layers size={11} className={skillsView === "badges" ? "text-blue-500" : ""} />
-                  <span>Both</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSkillsView("icons")}
-                  className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
-                    skillsView === "icons"
-                      ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium"
-                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
-                  }`}
-                  title="Show brand icons grid"
-                >
-                  <Sparkles size={11} className={skillsView === "icons" ? "text-amber-500" : ""} />
-                  <span>Icons</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSkillsView("text")}
-                  className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
-                    skillsView === "text"
-                      ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium"
-                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
-                  }`}
-                  title="Show text only"
-                >
-                  <Code size={11} className={skillsView === "text" ? "text-emerald-500" : ""} />
-                  <span>Text</span>
-                </button>
-              </div>
-            </div>
+            <h2 className="section-heading">Skills</h2>
 
             {/* Icons-Only Mode */}
-            {skillsView === "icons" && (
+            {profileInfo.skillsDisplayMode === "icons" && (
               <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 pt-1">
                 {profileInfo.skills.map((skill, idx) => (
                   <div
@@ -384,7 +334,7 @@ export default function Index() {
                     title={skill}
                   >
                     <TechIcon name={skill} size={24} useBrandColor />
-                    <span className="mt-1.5 text-[10.5px] font-mono text-zinc-600 dark:text-zinc-400 text-center truncate max-w-full">
+                    <span className="mt-1.5 text-xs font-mono text-zinc-600 dark:text-zinc-400 text-center truncate max-w-full">
                       {skill.replace(/\s*\([^)]*\)/g, "").split("&")[0].trim()}
                     </span>
                   </div>
@@ -392,30 +342,30 @@ export default function Index() {
               </div>
             )}
 
-            {/* Badges Mode (Icons + Text) */}
-            {skillsView === "badges" && (
+            {/* Text-Only Mode */}
+            {profileInfo.skillsDisplayMode === "text" && (
               <div className="flex flex-wrap gap-1.5">
                 {profileInfo.skills.map((skill, idx) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-1.5 text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                    className="text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
                   >
-                    <TechIcon name={skill} size={15} useBrandColor />
-                    <span>{skill}</span>
+                    {skill}
                   </span>
                 ))}
               </div>
             )}
 
-            {/* Text-Only Mode */}
-            {skillsView === "text" && (
+            {/* Default / Badges Mode (Both Icons & Text) */}
+            {(!profileInfo.skillsDisplayMode || profileInfo.skillsDisplayMode === "both") && (
               <div className="flex flex-wrap gap-1.5">
                 {profileInfo.skills.map((skill, idx) => (
                   <span
                     key={idx}
-                    className="text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
                   >
-                    {skill}
+                    <TechIcon name={skill} size={15} useBrandColor />
+                    <span>{skill}</span>
                   </span>
                 ))}
               </div>
@@ -433,10 +383,10 @@ export default function Index() {
               <Link
                 to="/projects"
                 prefetch="intent"
-                className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+                className="group text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All projects</span>
-                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-sm">
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
                   →
                 </span>
               </Link>
@@ -509,10 +459,10 @@ export default function Index() {
               <Link
                 to="/blog"
                 prefetch="intent"
-                className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+                className="group text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All articles</span>
-                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-sm">
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
                   →
                 </span>
               </Link>
@@ -527,7 +477,7 @@ export default function Index() {
                     className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 sm:py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-1 sm:gap-3 min-w-0"
                     title={post.title}
                   >
-                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-[15px] sm:text-base md:text-lg min-w-0 sm:truncate">
+                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base min-w-0 sm:truncate">
                       {post.title}
                     </span>
                     <div className="hidden sm:block flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
@@ -551,10 +501,10 @@ export default function Index() {
               <Link
                 to="/research"
                 prefetch="intent"
-                className="group text-sm md:text-base text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+                className="group text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All papers</span>
-                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-sm">
+                <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
                   →
                 </span>
               </Link>
@@ -567,7 +517,7 @@ export default function Index() {
                     <Link
                       to="/research"
                       prefetch="intent"
-                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
+                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm md:text-base truncate"
                       title={paper.title}
                     >
                       {paper.title}

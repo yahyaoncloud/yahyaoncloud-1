@@ -32,6 +32,7 @@ async function main() {
       "Ansible & Helm",
       "Cloudflare",
     ],
+    skillsDisplayMode: "both",
     certifications: [
       {
         name: "Cisco Certified Network Professional (CCNP)",
