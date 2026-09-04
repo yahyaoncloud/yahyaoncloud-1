@@ -128,7 +128,14 @@ interface ActionResponse {
 }
 
 export default function AdminSettings() {
-  const { admin, summary } = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
+  const admin = loaderData?.admin || { id: "", username: "admin", email: "", role: "admin", isFirebaseOnly: false };
+  const summary = loaderData?.summary || {
+    totalViews: 0,
+    uniqueVisitors: 0,
+    topPages: [],
+    recentVisits: [],
+  };
   const actionData = useActionData<typeof action>() as ActionResponse | undefined;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -313,7 +320,7 @@ export default function AdminSettings() {
             <div className="space-y-1">
               <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Tracked Views</span>
               <div className="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
-                {summary.totalViews.toLocaleString()}
+                {(summary?.totalViews ?? 0).toLocaleString()}
               </div>
             </div>
             <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
@@ -325,7 +332,7 @@ export default function AdminSettings() {
             <div className="space-y-1">
               <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Unique Visitors</span>
               <div className="text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100">
-                {summary.uniqueVisitors.toLocaleString()}
+                {(summary?.uniqueVisitors ?? 0).toLocaleString()}
               </div>
             </div>
             <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
