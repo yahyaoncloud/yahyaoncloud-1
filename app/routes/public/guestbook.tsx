@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Clock, User, LogOut } from "lucide-react";
+import { Send, LogOut, Sparkles, MessageSquare, CornerDownLeft } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { FaSquareXTwitter, FaGoogle } from "react-icons/fa6";
 import {
@@ -20,6 +20,8 @@ import { addGuestbookToRTDB } from "~/utils/firebase-rtdb.server";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { onValue, push, ref } from "firebase/database";
 import { motion } from "framer-motion";
+import yocLogo from "~/assets/yoc-logo.png";
+import profilePhoto from "~/assets/profile.jpg";
 
 // Interface
 interface Message {
@@ -33,7 +35,6 @@ interface Message {
   };
 }
 
-// Loader and Action Functions
 export const loader: LoaderFunction = async ({ request }) => {
   try {
     const session = await getSession(request);
@@ -73,19 +74,9 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 // Animation variants
-const fadeIn = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+const fadeIn: any = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
 };
 
 export default function MinimalistGuestbook() {
@@ -98,20 +89,25 @@ export default function MinimalistGuestbook() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  const messagesPerPage = 20;
+  const messagesPerPage = 25;
 
-  // Firebase Messages Listener
+  // Firebase Realtime Database Messages Listener
   useEffect(() => {
     if (!db) return;
     const messagesRef = ref(db, "guestbook");
     const unsubscribe = onValue(messagesRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const entries = Object.entries(data).map(
+        const entries: Message[] = Object.entries(data).map(
           ([id, value]: [string, any]) => ({
             id,
             message: value.message || value.content || "",
-            timestamp: value.timestamp || (typeof value.createdAt === "number" ? new Date(value.createdAt).toISOString() : value.createdAt) || new Date().toISOString(),
+            timestamp:
+              value.timestamp ||
+              (typeof value.createdAt === "number"
+                ? new Date(value.createdAt).toISOString()
+                : value.createdAt) ||
+              new Date().toISOString(),
             user: {
               name: value.user?.name || value.author || value.user?.displayName || "Anonymous",
               photo: value.user?.photo || value.avatar || value.user?.photoURL || "",
@@ -120,8 +116,7 @@ export default function MinimalistGuestbook() {
           })
         );
         entries.sort(
-          (a, b) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         );
         setMessages(entries);
         setVisibleMessages(entries.slice(0, messagesPerPage));
@@ -144,14 +139,11 @@ export default function MinimalistGuestbook() {
         if (entries[0].isIntersecting && !isLoadingMore) {
           setIsLoadingMore(true);
           setTimeout(() => {
-            const nextMessages = messages.slice(
-              0,
-              visibleMessages.length + messagesPerPage
-            );
+            const nextMessages = messages.slice(0, visibleMessages.length + messagesPerPage);
             setVisibleMessages(nextMessages);
             setHasMore(nextMessages.length < messages.length);
             setIsLoadingMore(false);
-          }, 500);
+          }, 300);
         }
       },
       { threshold: 0.1 }
@@ -195,15 +187,19 @@ export default function MinimalistGuestbook() {
   };
 
   // Form Handlers
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!newMessage.trim() || !user || !db) return;
 
     setIsSubmitting(true);
     const entry = {
       message: newMessage.trim(),
       timestamp: new Date().toISOString(),
-      user,
+      user: {
+        name: user.displayName || user.name || "Anonymous",
+        photo: user.photoURL || user.photo || "",
+        uid: user.uid || "",
+      },
     };
 
     try {
@@ -219,20 +215,24 @@ export default function MinimalistGuestbook() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmit();
     }
   };
 
-  // Utility Functions
   const formatTime = (timestamp: string) => {
-    const now = new Date();
-    const messageTime = new Date(timestamp);
-    const diffMs = now.getTime() - messageTime.getTime();
+    try {
+      const now = new Date();
+      const messageTime = new Date(timestamp);
+      const diffMs = now.getTime() - messageTime.getTime();
 
-    if (diffMs < 60000) return "just now";
-    if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
-    if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
-    return `${Math.floor(diffMs / 86400000)}d ago`;
+      if (diffMs < 60000) return "just now";
+      if (diffMs < 3600000) return `${Math.floor(diffMs / 60000)}m ago`;
+      if (diffMs < 86400000) return `${Math.floor(diffMs / 3600000)}h ago`;
+      if (diffMs < 604800000) return `${Math.floor(diffMs / 86400000)}d ago`;
+      return messageTime.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    } catch {
+      return "recently";
+    }
   };
 
   const getInitials = (name: string) => {
@@ -246,52 +246,43 @@ export default function MinimalistGuestbook() {
   };
 
   const pinnedMessage: Message = {
-    id: "pinned-1",
-    message: "Welcome to my digital guestbook! Leave a note or connect.",
-    timestamp: new Date().toISOString(),
+    id: "pinned-author-1",
+    message: "Welcome to my digital guestbook! Leave a thought, ask a question, or say hello.",
+    timestamp: "2026-01-01T00:00:00.000Z",
     user: {
       name: "Yahya",
-      photo: "",
-      uid: "admin",
+      photo: profilePhoto,
+      uid: "author",
     },
   };
 
   return (
     <div className="space-y-8 max-w-2xl">
-      {/* Header */}
+      {/* 1. Header Section with SSO Card placed on the right */}
       <motion.div
-        className="space-y-2"
+        className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-2"
         variants={fadeIn}
         initial="hidden"
         animate="visible"
       >
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
-          Guestbook
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Share reflections, drop a note, or connect.
-        </p>
-      </motion.div>
+        <div className="space-y-1.5 flex-1 pr-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+            Guestbook
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            {!user
+              ? "Share reflections, drop a note, or say hello. Sign in with GitHub, Google, or X to post a message."
+              : `Signed in as ${user.displayName || user.email || "Guest"}. Write your message below to join the guestbook.`}
+          </p>
+        </div>
 
-      {/* Authentication & Form */}
-      <motion.div
-        className="w-full"
-        variants={fadeIn}
-        initial="hidden"
-        animate="visible"
-      >
-        {!user ? (
-          <div className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 p-6 w-full">
-            <div className="text-center mb-5">
-              <User className="mx-auto w-6 h-6 text-zinc-400 mb-2" />
-              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                Sign in with SSO to leave a message
-              </h2>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                Quick 1-click authentication
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
+        {/* Header Right: SSO Auth Pill or User Session Badge */}
+        <div className="shrink-0 self-start sm:self-center">
+          {!user ? (
+            <div className="flex items-center gap-1.5 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 shadow-2xs">
+              <span className="text-[11px] font-medium text-zinc-500 px-2 select-none hidden xs:inline">
+                Sign in:
+              </span>
               {[
                 {
                   name: "Google",
@@ -303,10 +294,10 @@ export default function MinimalistGuestbook() {
                   name: "GitHub",
                   provider: githubProvider,
                   icon: FaGithub,
-                  color: "text-zinc-900 dark:text-zinc-100",
+                  color: "text-zinc-800 dark:text-zinc-200",
                 },
                 {
-                  name: "Twitter",
+                  name: "X",
                   provider: twitterProvider,
                   icon: FaSquareXTwitter,
                   color: "text-zinc-900 dark:text-zinc-100",
@@ -314,157 +305,210 @@ export default function MinimalistGuestbook() {
               ].map(({ name, provider, icon: Icon, color }) => (
                 <button
                   key={name}
+                  type="button"
                   onClick={() => handleSignIn(provider)}
-                  className="group flex items-center justify-center gap-2 py-2 px-3 border border-zinc-200 dark:border-zinc-700/80 rounded-md bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/60 text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer shadow-xs"
+                  className="p-1.5 px-2.5 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 transition-all cursor-pointer shadow-xs flex items-center gap-1.5 text-xs font-medium"
+                  title={`Sign in with ${name}`}
                 >
-                  <Icon className={`w-4 h-4 ${color}`} />
-                  <span className="text-xs font-medium">{name}</span>
+                  <Icon className={`w-3.5 h-3.5 ${color}`} />
+                  <span className="text-[11px] font-medium">{name}</span>
                 </button>
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="space-y-4 w-full flex flex-col p-5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            {/* User Info */}
-            <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+          ) : (
+            <div className="flex items-center gap-2 p-1.5 pl-2.5 pr-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/90 shadow-2xs">
               {user.photoURL ? (
                 <img
                   src={user.photoURL}
-                  alt={user.displayName}
-                  className="w-7 h-7 rounded-full border border-zinc-200 dark:border-zinc-700 object-cover"
+                  alt={user.displayName || "User"}
+                  className="w-5 h-5 rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
                 />
               ) : (
-                <div className="w-7 h-7 bg-indigo-600 dark:bg-indigo-400 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                  {getInitials(user.displayName || "User")}
+                <div className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">
+                  {getInitials(user.displayName || "U")}
                 </div>
               )}
-              <div className="flex-1 flex items-center justify-between">
-                <p className="text-xs font-semibold text-zinc-900 dark:text-white">
-                  {user.displayName}
-                </p>
-                <button
-                  onClick={handleSignOut}
-                  className="text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center gap-1 transition-colors"
-                >
-                  <LogOut className="w-3 h-3" />
-                  <span>Sign out</span>
-                </button>
-              </div>
+              <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 max-w-[120px] truncate">
+                {user.displayName || "Guest"}
+              </span>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="p-1 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+                title="Sign out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* 2. Compact, Polished Chatbox */}
+      <motion.div
+        className="w-full"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+      >
+        {user ? (
+          <form
+            onSubmit={handleSubmit}
+            className="flex gap-3 p-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 shadow-xs focus-within:border-zinc-300 dark:focus-within:border-zinc-700 focus-within:ring-2 focus-within:ring-zinc-900/5 dark:focus-within:ring-zinc-100/5 transition-all"
+          >
+            {/* Logo / Avatar on the left */}
+            <div className="shrink-0 pt-0.5">
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || "User"}
+                  className="w-8 h-8 rounded-xl object-cover border border-zinc-200 dark:border-zinc-800 shadow-2xs"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                  {getInitials(user.displayName || "U")}
+                </div>
+              )}
             </div>
 
-            {/* Message Form */}
-            <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Input & Controls */}
+            <div className="flex-1 min-w-0 space-y-2">
               <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Share your thoughts..."
-                rows={3}
-                className="w-full p-3 border border-zinc-200 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none placeholder-zinc-400"
+                placeholder="Write your note, feedback, or say hello..."
+                rows={2}
+                className="w-full bg-transparent text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 resize-none focus:outline-hidden leading-relaxed"
                 maxLength={500}
               />
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-zinc-400 font-mono">
-                  {newMessage.length}/500
-                </span>
-                <button
-                  type="submit"
-                  disabled={!newMessage.trim() || isSubmitting}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    !newMessage.trim() || isSubmitting
-                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
-                      : "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer shadow-xs"
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3 h-3" />
-                      Post Message
-                    </>
-                  )}
-                </button>
+
+              <div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800/80 text-[11px] text-zinc-400 font-mono">
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline">Press Enter</span>
+                  <CornerDownLeft className="h-3 w-3 hidden sm:inline" />
+                  <span className="hidden sm:inline">to send</span>
+                  <span className="sm:hidden">{newMessage.length}/500</span>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <span className="hidden sm:inline">{newMessage.length}/500</span>
+                  <button
+                    type="submit"
+                    disabled={!newMessage.trim() || isSubmitting}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      !newMessage.trim() || isSubmitting
+                        ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
+                        : "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 cursor-pointer shadow-2xs"
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        <span>Sending</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3 h-3" />
+                        <span>Post</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-            </form>
+            </div>
+          </form>
+        ) : (
+          <div className="flex items-center gap-3.5 p-3.5 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40">
+            <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-center shrink-0">
+              <img src={yocLogo} alt="Logo" className="w-5 h-5 object-contain" />
+            </div>
+            <div className="flex-1 min-w-0 text-xs text-zinc-500 dark:text-zinc-400">
+              Sign in via the SSO options in the top right to leave a note.
+            </div>
           </div>
         )}
       </motion.div>
 
-      {/* Messages Feed */}
+      {/* 3. Messages Feed */}
       <motion.div
         variants={fadeIn}
-        className="space-y-3 pt-2"
+        className="space-y-3"
         initial="hidden"
         animate="visible"
       >
         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
-          <h2 className="text-sm font-mono font-medium text-zinc-900 dark:text-zinc-100">
-            Messages Feed
-          </h2>
+          <div className="flex items-center gap-2 text-xs font-mono font-medium text-zinc-500 uppercase tracking-wider">
+            <MessageSquare className="h-3.5 w-3.5" />
+            <span>Community Messages</span>
+          </div>
           <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
             {messages.length} {messages.length === 1 ? "entry" : "entries"}
           </span>
         </div>
 
-        {/* Scrollable Container */}
-        <div className="max-h-[420px] overflow-y-auto pr-1.5 space-y-2 divide-y divide-zinc-100/60 dark:divide-zinc-800/60 scrollbar-thin">
-          {pinnedMessage && (
-            <div className="pt-2 pb-2.5 flex items-start gap-2.5">
-              <div className="w-6 h-6 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 mt-0.5">
-                Y
-              </div>
-              <div className="flex-1 min-w-0 space-y-0.5">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-xs font-mono font-semibold text-indigo-600 dark:text-indigo-400 truncate">
-                    {pinnedMessage.user.name} <span className="text-[10px] opacity-75 font-normal">(Pinned)</span>
+        <div className="space-y-2.5">
+          {/* Pinned Author Message */}
+          <div className="p-3.5 rounded-xl border border-indigo-100 dark:border-indigo-950/60 bg-indigo-50/30 dark:bg-indigo-950/20 flex items-start gap-3">
+            <img
+              src={pinnedMessage.user.photo}
+              alt="Yahya"
+              className="w-7 h-7 rounded-lg object-cover border border-indigo-200 dark:border-indigo-800 shrink-0 mt-0.5"
+            />
+            <div className="flex-1 min-w-0 space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                    {pinnedMessage.user.name}
                   </span>
-                  <span className="text-[10px] text-zinc-400 font-mono shrink-0">
-                    {formatTime(pinnedMessage.timestamp)}
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-medium">
+                    Host
                   </span>
                 </div>
-                <p className="text-xs text-zinc-700 dark:text-zinc-300 break-words leading-snug">
-                  {pinnedMessage.message}
-                </p>
+                <span className="text-[10px] text-zinc-400 font-mono shrink-0">
+                  Pinned
+                </span>
               </div>
+              <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                {pinnedMessage.message}
+              </p>
             </div>
-          )}
+          </div>
 
+          {/* User Messages Stream */}
           {visibleMessages.length === 0 ? (
-            <div className="text-center py-8 text-xs text-zinc-400 font-mono">
-              <p>No messages yet. Be the first to say hello!</p>
+            <div className="text-center py-10 text-xs text-zinc-400 font-mono border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
+              No entries recorded yet. Be the first to leave a message!
             </div>
           ) : (
-            visibleMessages.map((message) => (
+            visibleMessages.map((msg) => (
               <div
-                key={message.id}
-                className="pt-2.5 pb-2.5 flex items-start gap-2.5 group"
+                key={msg.id}
+                className="p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex items-start gap-3"
               >
-                {message.user.photo ? (
+                {msg.user.photo ? (
                   <img
-                    src={message.user.photo}
-                    alt={message.user.name}
-                    className="w-6 h-6 rounded-full border border-zinc-200 dark:border-zinc-700 object-cover shrink-0 mt-0.5"
+                    src={msg.user.photo}
+                    alt={msg.user.name}
+                    className="w-7 h-7 rounded-lg object-cover border border-zinc-200 dark:border-zinc-800 shrink-0 mt-0.5"
                   />
                 ) : (
-                  <div className="w-6 h-6 bg-zinc-800 dark:bg-zinc-700 rounded-full flex items-center justify-center text-zinc-200 text-[10px] font-mono shrink-0 mt-0.5">
-                    {getInitials(message.user.name)}
+                  <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 text-[10px] font-mono font-medium shrink-0 mt-0.5">
+                    {getInitials(msg.user.name)}
                   </div>
                 )}
-                <div className="flex-1 min-w-0 space-y-0.5">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-xs font-mono font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                      {message.user.name}
+
+                <div className="flex-1 min-w-0 space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                      {msg.user.name}
                     </span>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono shrink-0">
-                      {formatTime(message.timestamp)}
+                    <span className="text-[10px] text-zinc-400 font-mono shrink-0">
+                      {formatTime(msg.timestamp)}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-300 break-words leading-snug">
-                    {message.message}
+                  <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed break-words whitespace-pre-wrap">
+                    {msg.message}
                   </p>
                 </div>
               </div>
@@ -472,11 +516,11 @@ export default function MinimalistGuestbook() {
           )}
 
           {hasMore && (
-            <div ref={observerRef} className="text-center py-2">
+            <div ref={observerRef} className="text-center py-3">
               {isLoadingMore && (
-                <div className="flex items-center justify-center gap-1.5 text-zinc-400 text-[11px] font-mono">
-                  <div className="w-3 h-3 border-2 border-zinc-300 dark:border-zinc-600 border-t-indigo-500 rounded-full animate-spin"></div>
-                  <span>Loading...</span>
+                <div className="flex items-center justify-center gap-1.5 text-zinc-400 text-xs font-mono">
+                  <div className="w-3 h-3 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-900 dark:border-t-zinc-100 rounded-full animate-spin" />
+                  <span>Loading more messages...</span>
                 </div>
               )}
             </div>

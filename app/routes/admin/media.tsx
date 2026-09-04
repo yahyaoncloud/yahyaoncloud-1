@@ -23,13 +23,20 @@ export default function AdminMedia() {
     const itemsPerPage = 12;
 
     async function loadAssets(prefix = "") {
-        const res = await fetch(`/api/media?prefix=${prefix}`);
-        const data = await res.json();
-        setAssets(data.assets || []);
-        setFolders(data.folders || []);
-        setCurrentPrefix(prefix);
-        setPage(1);
-        setSelectedAssets([]);
+        try {
+            const res = await fetch(`/api/media?prefix=${prefix}`);
+            if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+            const data = await res.json();
+            setAssets(data.assets || []);
+            setFolders(data.folders || []);
+            setCurrentPrefix(prefix);
+            setPage(1);
+            setSelectedAssets([]);
+        } catch (err) {
+            console.warn("Could not load media assets:", err);
+            setAssets([]);
+            setFolders([]);
+        }
     }
 
     useEffect(() => {

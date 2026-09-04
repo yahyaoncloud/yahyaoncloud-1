@@ -1,39 +1,12 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { getSupabase } from './supabase-storage.client';
 
-let supabaseClient: SupabaseClient | null = null;
-
-/**
- * Get Supabase client for client-side usage
- * Uses window.ENV for environment variables
- */
-export function getSupabaseClient(): SupabaseClient | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  if (supabaseClient) {
-    return supabaseClient;
-  }
-
-  // Get environment variables from window.ENV (set in root.tsx)
-  const supabaseId = window.ENV?.SUPABASE_ID;
-  const supabaseAnonKey = window.ENV?.SUPABASE_ANON;
-
-  if (!supabaseId || !supabaseAnonKey) {
-    console.warn('Supabase client environment variables not set');
-    return null;
-  }
-
-  const supabaseUrl = `https://${supabaseId}.supabase.co`;
-  supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-  return supabaseClient;
-}
+export { getSupabase, uploadFile, deleteFile, validateFileType, validateFileSize } from './supabase-storage.client';
 
 /**
- * Get public URL for a file in storage
+ * Get public URL for a file in Supabase storage
  */
 export function getPublicUrl(bucket: string, path: string): string | null {
-  const client = getSupabaseClient();
+  const client = getSupabase();
   if (!client) return null;
 
   const { data: { publicUrl } } = client.storage
@@ -42,3 +15,4 @@ export function getPublicUrl(bucket: string, path: string): string | null {
 
   return publicUrl;
 }
+

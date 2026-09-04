@@ -3,7 +3,11 @@ import { redirect } from '@remix-run/node';
 import { getAdminByUsername } from '~/Services/admin.prisma.server';
 import { verifyPassword } from './password.server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || (
+  process.env.NODE_ENV === 'production'
+    ? (() => { throw new Error('Security Error: JWT_SECRET or SESSION_SECRET must be defined in production!'); })()
+    : 'dev-fallback-secret-key-change-in-production'
+);
 const JWT_EXPIRES_IN = '1d';
 const JWT_EXPIRES_IN_REMEMBER = '7d';
 

@@ -1,6 +1,5 @@
-// Admin Homepage Cards - Manage dashboard announcements/cards
 import { json, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useActionData, Form, useNavigation, useSubmit } from "@remix-run/react";
+import { useLoaderData, useActionData, Form, useNavigation, useSubmit, useRouteError, isRouteErrorResponse } from "@remix-run/react";
 import { getHomepageCards, updateHomepageCard, createHomepageCard, deleteHomepageCard } from "~/Services/post.prisma.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -8,19 +7,22 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
-import { Layers, Save, Plus, ExternalLink, Trash2, Edit, MoreVertical, LayoutGrid } from "lucide-react";
+import { Layers, Save, Plus, ExternalLink, Trash2, Edit, MoreVertical, LayoutGrid, AlertTriangle, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAdmin(request);
   const cards = await getHomepageCards();
   return json({ cards });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
   
@@ -250,3 +252,36 @@ export default function AdminHomepageCards() {
     </div>
   );
 }
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  let message = "An unexpected error occurred while loading Homepage Cards.";
+  if (isRouteErrorResponse(error)) {
+    message = typeof error.data === "string" ? error.data : error.data?.message || `${error.status} ${error.statusText}`;
+  } else if (error instanceof Error) {
+    message = error.message;
+  }
+
+  return (
+    <div className="p-6 md:p-8 max-w-4xl mx-auto">
+      <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 rounded-2xl p-8 text-center space-y-4 shadow-sm">
+        <div className="w-14 h-14 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto">
+          <AlertTriangle className="w-7 h-7" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Homepage Cards Error</h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 max-w-md mx-auto">{message}</p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-2 border-zinc-300 dark:border-zinc-700"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Reload Page
+        </Button>
+      </div>
+    </div>
+  );
+}
+

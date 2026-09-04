@@ -227,7 +227,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     // 1050x1268 is the SVG native size. 
     await page.setViewport({ width: 1050, height: 1268, deviceScaleFactor: 2 });
     
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' as any });
     await page.evaluateHandle('document.fonts.ready');
     
     // Screenshot the specific container

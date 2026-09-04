@@ -13,7 +13,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-zinc-200 dark:selection:bg-zinc-800">
-      <div className="mx-auto px-5 sm:px-6 md:px-0 py-8 sm:py-12 md:py-16 w-full max-w-[640px] flex flex-col min-h-screen">
+      <div className="mx-auto px-5 sm:px-6 md:px-0 pt-2 sm:pt-4 pb-12 sm:pb-16 w-full max-w-[640px] flex flex-col min-h-screen">
         <Header />
         <AnimatePresence mode="wait" initial={false}>
           <motion.main
@@ -22,7 +22,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -3 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="flex-1 space-y-8 md:space-y-10"
+            className="flex-1 space-y-8 md:space-y-10 pt-2 sm:pt-4"
           >
             {children}
           </motion.main>

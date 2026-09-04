@@ -1,12 +1,31 @@
 // Supabase storage utility for file uploads
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_ID ? `https://${process.env.SUPABASE_ID}.supabase.co` : '';
-const supabaseKey = process.env.SUPABASE_ANON || '';
+function getSupabaseConfig(): { url: string; key: string } {
+  if (typeof window !== "undefined") {
+    const env = (window as unknown as { ENV?: Record<string, string> })?.ENV;
+    const url = env?.SUPABASE_URL || (env?.SUPABASE_ID ? `https://${env.SUPABASE_ID}.supabase.co` : "");
+    const key = env?.SUPABASE_ANON || "";
+    return { url, key };
+  }
+  const id = typeof process !== "undefined" && process?.env ? process.env.SUPABASE_ID || "" : "";
+  const key = typeof process !== "undefined" && process?.env ? process.env.SUPABASE_ANON || "" : "";
+  const url = id ? `https://${id}.supabase.co` : "";
+  return { url, key };
+}
 
-export const supabase = supabaseUrl && supabaseKey
-  ? createClient(supabaseUrl, supabaseKey)
-  : null;
+let _supabaseInstance: SupabaseClient | null = null;
+
+export function getSupabase(): SupabaseClient | null {
+  if (_supabaseInstance) return _supabaseInstance;
+  const { url, key } = getSupabaseConfig();
+  if (url && key) {
+    _supabaseInstance = createClient(url, key);
+  }
+  return _supabaseInstance;
+}
+
+export const supabase: SupabaseClient | null = typeof window !== "undefined" ? getSupabase() : null;
 
 /**
  * Upload file to Supabase storage
@@ -20,11 +39,12 @@ export async function uploadFile(
   bucket: string,
   path: string
 ): Promise<string> {
-  if (!supabase) {
-    throw new Error('Supabase client is not initialized');
+  const client = getSupabase();
+  if (!client) {
+    throw new Error('Supabase client is not initialized. Please ensure SUPABASE_ID and SUPABASE_ANON are configured.');
   }
 
-  const { data, error } = await supabase.storage
+  const { data, error } = await client.storage
     .from(bucket)
     .upload(path, file, {
       cacheControl: '3600',
@@ -35,7 +55,7 @@ export async function uploadFile(
     throw new Error(`Upload failed: ${error.message}`);
   }
 
-  const { data: { publicUrl } } = supabase.storage
+  const { data: { publicUrl } } = client.storage
     .from(bucket)
     .getPublicUrl(path);
 
@@ -48,11 +68,12 @@ export async function uploadFile(
  * @param path - File path in bucket
  */
 export async function deleteFile(bucket: string, path: string): Promise<void> {
-  if (!supabase) {
-    throw new Error('Supabase client is not initialized');
+  const client = getSupabase();
+  if (!client) {
+    throw new Error('Supabase client is not initialized. Please ensure SUPABASE_ID and SUPABASE_ANON are configured.');
   }
 
-  const { error } = await supabase.storage.from(bucket).remove([path]);
+  const { error } = await client.storage.from(bucket).remove([path]);
 
   if (error) {
     throw new Error(`Delete failed: ${error.message}`);

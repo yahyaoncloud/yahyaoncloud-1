@@ -34,7 +34,7 @@ type LoaderData = {
 };
 
 // Animation variants for consistent motion
-const containerVariants = {
+const containerVariants: any = {
   hidden: { opacity: 0, x: -20 },
   visible: {
     opacity: 1,
@@ -46,7 +46,7 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: any = {
   hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
@@ -58,7 +58,7 @@ const cardVariants = {
   },
 };
 
-const buttonVariants = {
+const buttonVariants: any = {
   hover: { scale: 1.03, boxShadow: "0 6px 20px rgba(0, 0, 0, 0.12)" },
   tap: { scale: 0.97 },
 };

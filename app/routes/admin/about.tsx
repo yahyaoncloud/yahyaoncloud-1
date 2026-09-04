@@ -1,16 +1,15 @@
 // Admin About - Manage Portfolio/Profile
 import { json, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useActionData, Form, useNavigation, useSearchParams } from "@remix-run/react";
-import { getAllPortfolios } from "~/Services/post.prisma.server";
+import { useLoaderData, useActionData, Form, useNavigation, useSearchParams, useRouteError, isRouteErrorResponse } from "@remix-run/react";
 import { getProfileInfo, saveProfileInfo, type ProfileInfoData, type SectionVisibility } from "~/Services/content.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Plus, Trash2, Save, User, Briefcase, Code, Award, Share2, Layers, LayoutGrid, Lock } from "lucide-react";
+import { Plus, Trash2, Save, User, Briefcase, Code, Award, Share2, Layers, LayoutGrid, CheckCircle2, Sparkles, AlertTriangle, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ImageUpload from "~/components/ImageUpload";
@@ -19,16 +18,11 @@ import { requireAdmin } from "~/utils/admin-auth.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAdmin(request);
   try {
-    const [portfolios, profileInfo] = await Promise.all([
-      getAllPortfolios().catch(() => []),
-      getProfileInfo(),
-    ]);
-    const portfolio = portfolios && portfolios.length > 0 ? portfolios[0] : null;
-    return json({ portfolio, profileInfo });
+    const profileInfo = await getProfileInfo();
+    return json({ profileInfo });
   } catch (error) {
     console.error("Error in admin/about loader:", error);
-    const profileInfo = await getProfileInfo();
-    return json({ portfolio: null, profileInfo });
+    return json({ profileInfo: null });
   }
 }
 
@@ -36,7 +30,6 @@ export async function action({ request }: ActionFunctionArgs) {
   await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
-  const id = formData.get("id") as string;
 
   try {
     if (intent === "save") {
@@ -75,9 +68,9 @@ export async function action({ request }: ActionFunctionArgs) {
           }));
 
       const sectionsVisibility: SectionVisibility = {
-        summary: true,
-        experience: true,
-        elsewhere: true,
+        summary: rawSectionsVisibility.summary !== undefined ? Boolean(rawSectionsVisibility.summary) : true,
+        experience: rawSectionsVisibility.experience !== undefined ? Boolean(rawSectionsVisibility.experience) : true,
+        elsewhere: rawSectionsVisibility.elsewhere !== undefined ? Boolean(rawSectionsVisibility.elsewhere) : true,
         certifications: rawSectionsVisibility.certifications !== undefined ? Boolean(rawSectionsVisibility.certifications) : true,
         skills: rawSectionsVisibility.skills !== undefined ? Boolean(rawSectionsVisibility.skills) : true,
         selectedWork: rawSectionsVisibility.selectedWork !== undefined ? Boolean(rawSectionsVisibility.selectedWork) : true,
@@ -87,7 +80,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
       // Save to ProfileInfo in Prisma MongoDB
       await saveProfileInfo({
-        headline: (formData.get("location") as string) || "Cloud DevOps & Infrastructure Engineer.",
+        headline: (formData.get("headline") as string) || "Cloud DevOps & Infrastructure Engineer.",
         bio,
         skills,
         experiences,
@@ -105,40 +98,51 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-interface ActionResponse {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
-
 export default function AdminAbout() {
-  const { portfolio, profileInfo } = useLoaderData<typeof loader>() as {
-    portfolio: any;
+  const { profileInfo } = useLoaderData<typeof loader>() as {
     profileInfo: ProfileInfoData | null;
   };
   const actionData = useActionData<typeof action>() as any;
   const navigation = useNavigation();
 
   // Initial State Setup - Prefer live ProfileInfo data
-  const [portraitUrl, setPortraitUrl] = useState<string>(portfolio?.portraitUrl || "");
+  const [headline, setHeadline] = useState<string>(profileInfo?.headline || "Cloud DevOps & Infrastructure Engineer.");
+  const [portraitUrl, setPortraitUrl] = useState<string>("/me.png");
   const [bio, setBio] = useState<string[]>(
-    profileInfo?.bio && profileInfo.bio.length > 0 ? profileInfo.bio : portfolio?.bio || [""]
+    profileInfo?.bio && profileInfo.bio.length > 0 ? profileInfo.bio : [""]
   );
   const [skills, setSkills] = useState<string[]>(
-    profileInfo?.skills && profileInfo.skills.length > 0 ? profileInfo.skills : portfolio?.skills || []
+    profileInfo?.skills && profileInfo.skills.length > 0 ? profileInfo.skills : []
   );
   const [experiences, setExperiences] = useState<any[]>(
-    profileInfo?.experiences && profileInfo.experiences.length > 0 ? profileInfo.experiences : portfolio?.experiences || []
+    profileInfo?.experiences && profileInfo.experiences.length > 0 ? profileInfo.experiences : []
   );
-  const [projects, setProjects] = useState<any[]>(portfolio?.projects || []);
+  const [projects, setProjects] = useState<any[]>([]);
   const [certifications, setCertifications] = useState<any[]>(
-    profileInfo?.certifications && profileInfo.certifications.length > 0 ? profileInfo.certifications : portfolio?.certifications || []
+    profileInfo?.certifications && profileInfo.certifications.length > 0 ? profileInfo.certifications : []
   );
-  const [socialLinks, setSocialLinks] = useState<any>(portfolio?.socialLinks || {});
+  const [socialLinks, setSocialLinks] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {
+      email: "",
+      github: "",
+      linkedin: "",
+      twitter: "",
+      instagram: "",
+      youtube: "",
+    };
+    if (Array.isArray(profileInfo?.socialLinks)) {
+      for (const item of profileInfo.socialLinks) {
+        if (item?.label && item?.href) {
+          initial[item.label.toLowerCase()] = item.href;
+        }
+      }
+    }
+    return initial;
+  });
   const [sectionsVisibility, setSectionsVisibility] = useState<SectionVisibility>({
-    summary: true,
-    experience: true,
-    elsewhere: true,
+    summary: profileInfo?.sectionsVisibility?.summary !== false,
+    experience: profileInfo?.sectionsVisibility?.experience !== false,
+    elsewhere: profileInfo?.sectionsVisibility?.elsewhere !== false,
     certifications: profileInfo?.sectionsVisibility?.certifications !== false,
     skills: profileInfo?.sectionsVisibility?.skills !== false,
     selectedWork: profileInfo?.sectionsVisibility?.selectedWork !== false,
@@ -150,11 +154,22 @@ export default function AdminAbout() {
   const [activeTab, setActiveTab] = useState<string>(searchParams.get("tab") || "basic");
 
   useEffect(() => {
-    const tabParam = searchParams.get("tab");
-    if (tabParam) {
-      setActiveTab(tabParam);
-    }
+    const tabParam = searchParams.get("tab") || "basic";
+    setActiveTab(tabParam);
   }, [searchParams]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === "basic") {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("tab");
+      setSearchParams(newParams, { replace: true });
+    } else {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set("tab", tab);
+      setSearchParams(newParams, { replace: true });
+    }
+  };
 
   useEffect(() => {
     if (actionData?.success && actionData.message) toast.success(actionData.message);
@@ -235,6 +250,7 @@ export default function AdminAbout() {
                 </a>
                 <Button 
                     type="submit" 
+                    form="about-portfolio-form"
                     disabled={navigation.state === "submitting"}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
@@ -244,9 +260,8 @@ export default function AdminAbout() {
             </div>
         </div>
 
-      <Form method="post" className="space-y-8">
+      <Form id="about-portfolio-form" method="post" className="space-y-8">
         <input type="hidden" name="intent" value="save" />
-        {portfolio?._id && <input type="hidden" name="id" value={portfolio._id} />}
         
         {/* Serialized JSON inputs */}
         <input type="hidden" name="bio" value={JSON.stringify(bio)} />
@@ -257,7 +272,7 @@ export default function AdminAbout() {
         <input type="hidden" name="socialLinks" value={JSON.stringify(socialLinks)} />
         <input type="hidden" name="sectionsVisibility" value={JSON.stringify(sectionsVisibility)} />
 
-        <Tabs value={activeTab} onValueChange={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }} className="w-full space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full space-y-6">
           <TabsList className="bg-zinc-100 dark:bg-zinc-900 p-1 border border-zinc-200 dark:border-zinc-800 h-auto grid w-full grid-cols-2 sm:grid-cols-4 md:grid-cols-7 mb-8 rounded-lg">
             <TabsTrigger value="basic" className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-white py-2">Basic</TabsTrigger>
             <TabsTrigger value="sections" className="data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-white py-2 font-medium">Sections</TabsTrigger>
@@ -276,20 +291,22 @@ export default function AdminAbout() {
                     <User size={20} className="text-indigo-600 dark:text-indigo-400" />
                     <div>
                         <CardTitle className="text-lg">Basic Info</CardTitle>
-                        <CardDescription>Your primary profile details</CardDescription>
+                        <CardDescription>Your primary profile details and headline</CardDescription>
                     </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-zinc-700 dark:text-zinc-300">Full Name</Label>
-                    <Input id="name" name="name" defaultValue={portfolio?.name} placeholder="e.g. Yahya" className="bg-zinc-50 dark:bg-zinc-950" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="location" className="text-zinc-700 dark:text-zinc-300">Location</Label>
-                    <Input id="location" name="location" defaultValue={portfolio?.location} placeholder="e.g. Dubai, UAE" className="bg-zinc-50 dark:bg-zinc-950" />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="headline" className="text-zinc-700 dark:text-zinc-300">Professional Headline / Subtitle</Label>
+                  <Input 
+                    id="headline" 
+                    name="headline" 
+                    value={headline} 
+                    onChange={(e) => setHeadline(e.target.value)} 
+                    placeholder="e.g. Cloud DevOps & Infrastructure Engineer." 
+                    className="bg-zinc-50 dark:bg-zinc-950" 
+                  />
+                  <p className="text-xs text-zinc-500">This appears prominently below your name on the homepage header.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="portraitUrl" className="text-zinc-700 dark:text-zinc-300">Portrait Image</Label>
@@ -332,113 +349,188 @@ export default function AdminAbout() {
           <TabsContent value="sections">
             <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-900">
               <CardHeader className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
-                <div className="flex items-center gap-2">
-                  <LayoutGrid size={20} className="text-indigo-600 dark:text-indigo-400" />
-                  <div>
-                    <CardTitle className="text-lg">Homepage Sections Visibility</CardTitle>
-                    <CardDescription>
-                      Customize which sections appear on your public minimalist homepage.
-                    </CardDescription>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-2.5">
+                    <LayoutGrid size={22} className="text-indigo-600 dark:text-indigo-400" />
+                    <div>
+                      <CardTitle className="text-lg">Homepage Sections Visibility</CardTitle>
+                      <CardDescription>
+                        Control which sections appear on your public homepage. Toggle individual sections or use quick presets.
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setSectionsVisibility({
+                          summary: true,
+                          experience: true,
+                          elsewhere: true,
+                          certifications: true,
+                          skills: true,
+                          selectedWork: true,
+                          writing: true,
+                          research: true,
+                        })
+                      }
+                      className="text-xs h-8 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    >
+                      <CheckCircle2 size={13} className="mr-1.5 text-emerald-600 dark:text-emerald-400" />
+                      Enable All
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setSectionsVisibility({
+                          summary: true,
+                          experience: false,
+                          elsewhere: true,
+                          certifications: false,
+                          skills: false,
+                          selectedWork: true,
+                          writing: true,
+                          research: false,
+                        })
+                      }
+                      className="text-xs h-8 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    >
+                      <Sparkles size={13} className="mr-1.5 text-indigo-600 dark:text-indigo-400" />
+                      Minimalist
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
+
               <CardContent className="space-y-6 pt-6">
-                {/* Mandatory Sections */}
-                <div className="p-4 rounded-lg bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                {/* Core Profile Sections */}
+                <div className="space-y-3">
                   <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                    <Lock size={13} className="text-amber-500" />
-                    Mandatory Core Sections (Always Visible)
+                    <User size={13} className="text-indigo-500" />
+                    Core Identity & Bio
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="p-3 bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
-                      <div>
-                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Summary / Bio</p>
-                        <p className="text-xs text-zinc-400">Headline & intro paragraphs</p>
+
+                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-950/40">
+                    {/* Summary / Bio */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-summary" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Profile & Introduction
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.summary !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.summary !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays the avatar, professional headline, and introductory bio paragraphs at the top of the homepage.
+                        </p>
                       </div>
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium">
-                        Active
-                      </span>
+                      <Switch
+                        id="toggle-summary"
+                        checked={sectionsVisibility.summary !== false}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, summary: val })
+                        }
+                      />
                     </div>
-                    <div className="p-3 bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
-                      <div>
-                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Experience</p>
-                        <p className="text-xs text-zinc-400">Career history accordions</p>
+
+                    {/* Career Experience */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-experience" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Career Experience
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.experience !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.experience !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays your career timeline, company roles, years, and accordion project details.
+                        </p>
                       </div>
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium">
-                        Active
-                      </span>
+                      <Switch
+                        id="toggle-experience"
+                        checked={sectionsVisibility.experience !== false}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, experience: val })
+                        }
+                      />
                     </div>
-                    <div className="p-3 bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 flex items-center justify-between shadow-xs">
-                      <div>
-                        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Elsewhere</p>
-                        <p className="text-xs text-zinc-400">Social handles & contact</p>
+
+                    {/* Elsewhere / Socials */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-elsewhere" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Elsewhere & Contact
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.elsewhere !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.elsewhere !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays social profiles, GitHub, Twitter/X, LinkedIn, and direct contact email links.
+                        </p>
                       </div>
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium">
-                        Active
-                      </span>
+                      <Switch
+                        id="toggle-elsewhere"
+                        checked={sectionsVisibility.elsewhere !== false}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, elsewhere: val })
+                        }
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* Optional / Toggleable Sections */}
-                <div className="space-y-4">
+                {/* Content & Engineering Sections */}
+                <div className="space-y-3">
                   <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     <Layers size={13} className="text-indigo-500" />
-                    Toggleable Homepage Sections
+                    Engineering Showcases & Content
                   </div>
 
-                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-900">
-                    {/* Certifications */}
-                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
-                      <div className="space-y-0.5 pr-4">
-                        <Label htmlFor="toggle-certs" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
-                          Certifications Section
-                        </Label>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Displays professional certifications (CCNP, CCNA, Azure, AWS) with credential verification links.
-                        </p>
-                      </div>
-                      <Switch
-                        id="toggle-certs"
-                        checked={sectionsVisibility.certifications}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, certifications: val })
-                        }
-                      />
-                    </div>
-
-                    {/* Skills */}
-                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
-                      <div className="space-y-0.5 pr-4">
-                        <Label htmlFor="toggle-skills" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
-                          Skills Section
-                        </Label>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Displays skill badges and technical competencies on the homepage.
-                        </p>
-                      </div>
-                      <Switch
-                        id="toggle-skills"
-                        checked={sectionsVisibility.skills}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, skills: val })
-                        }
-                      />
-                    </div>
-
+                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-950/40">
                     {/* Selected Work */}
-                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
-                      <div className="space-y-0.5 pr-4">
-                        <Label htmlFor="toggle-work" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
-                          Selected Work Section
-                        </Label>
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-work" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Selected Work (Featured Projects)
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.selectedWork !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.selectedWork !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Displays highlighted featured project cards, summaries, and case study links.
+                          Displays featured engineering projects, architectural summaries, GitHub, and live demo links.
                         </p>
                       </div>
                       <Switch
                         id="toggle-work"
-                        checked={sectionsVisibility.selectedWork}
+                        checked={sectionsVisibility.selectedWork !== false}
                         onCheckedChange={(val) =>
                           setSectionsVisibility({ ...sectionsVisibility, selectedWork: val })
                         }
@@ -446,45 +538,148 @@ export default function AdminAbout() {
                     </div>
 
                     {/* Writing / Blog */}
-                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
-                      <div className="space-y-0.5 pr-4">
-                        <Label htmlFor="toggle-writing" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
-                          Writing (Articles) Section
-                        </Label>
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-writing" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Writing (Recent Articles)
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.writing !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.writing !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Displays recent published engineering articles and technical posts.
+                          Displays the most recent published technical blog posts with publish dates and reading times.
                         </p>
                       </div>
                       <Switch
                         id="toggle-writing"
-                        checked={sectionsVisibility.writing}
+                        checked={sectionsVisibility.writing !== false}
                         onCheckedChange={(val) =>
                           setSectionsVisibility({ ...sectionsVisibility, writing: val })
                         }
                       />
                     </div>
 
-                    {/* Research */}
-                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors">
-                      <div className="space-y-0.5 pr-4">
-                        <Label htmlFor="toggle-research" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
-                          Research Section
-                        </Label>
+                    {/* Research Papers */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-research" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Technical Research Papers
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.research !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.research !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          Displays technical research papers, abstracts, and publications.
+                          Displays featured academic and technical research papers, venues, and publication abstracts.
                         </p>
                       </div>
                       <Switch
                         id="toggle-research"
-                        checked={sectionsVisibility.research}
+                        checked={sectionsVisibility.research !== false}
                         onCheckedChange={(val) =>
                           setSectionsVisibility({ ...sectionsVisibility, research: val })
+                        }
+                      />
+                    </div>
+
+                    {/* Skills */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-skills" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Skills & Competencies
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.skills !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.skills !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays technical skill tags and core competencies as pills on the homepage.
+                        </p>
+                      </div>
+                      <Switch
+                        id="toggle-skills"
+                        checked={sectionsVisibility.skills !== false}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, skills: val })
+                        }
+                      />
+                    </div>
+
+                    {/* Certifications */}
+                    <div className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors">
+                      <div className="space-y-0.5 pr-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label htmlFor="toggle-certs" className="text-sm font-medium text-zinc-900 dark:text-zinc-100 cursor-pointer">
+                            Professional Certifications
+                          </Label>
+                          <span className={`text-[11px] font-mono px-2 py-0.2 rounded-full font-medium ${
+                            sectionsVisibility.certifications !== false
+                              ? "bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300"
+                              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                          }`}>
+                            {sectionsVisibility.certifications !== false ? "Visible" : "Hidden"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Displays certifications (CCNP, CCNA, Azure, AWS) with issuing organization and verification links.
+                        </p>
+                      </div>
+                      <Switch
+                        id="toggle-certs"
+                        checked={sectionsVisibility.certifications !== false}
+                        onCheckedChange={(val) =>
+                          setSectionsVisibility({ ...sectionsVisibility, certifications: val })
                         }
                       />
                     </div>
                   </div>
                 </div>
               </CardContent>
+
+              <CardFooter className="border-t border-zinc-100 dark:border-zinc-800 py-4 px-6 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-50/50 dark:bg-zinc-950/20">
+                <div className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>
+                    {[
+                      sectionsVisibility.summary !== false,
+                      sectionsVisibility.experience !== false,
+                      sectionsVisibility.elsewhere !== false,
+                      sectionsVisibility.selectedWork !== false,
+                      sectionsVisibility.writing !== false,
+                      sectionsVisibility.research !== false,
+                      sectionsVisibility.skills !== false,
+                      sectionsVisibility.certifications !== false,
+                    ].filter(Boolean).length}{" "}
+                    of 8 sections visible on homepage
+                  </span>
+                </div>
+
+                <Button
+                  type="submit"
+                  form="about-portfolio-form"
+                  disabled={navigation.state === "submitting"}
+                  className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
+                >
+                  <Save size={15} className="mr-2" />
+                  {navigation.state === "submitting" ? "Saving Changes..." : "Save Homepage Sections"}
+                </Button>
+              </CardFooter>
             </Card>
           </TabsContent>
 
@@ -685,3 +880,36 @@ export default function AdminAbout() {
     </div>
   );
 }
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  let message = "An unexpected error occurred while loading About & Homepage Sections.";
+  if (isRouteErrorResponse(error)) {
+    message = typeof error.data === "string" ? error.data : error.data?.message || `${error.status} ${error.statusText}`;
+  } else if (error instanceof Error) {
+    message = error.message;
+  }
+
+  return (
+    <div className="p-6 md:p-8 max-w-4xl mx-auto">
+      <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 rounded-2xl p-8 text-center space-y-4 shadow-sm">
+        <div className="w-14 h-14 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto">
+          <AlertTriangle className="w-7 h-7" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">About & Sections Error</h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 max-w-md mx-auto">{message}</p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-2 border-zinc-300 dark:border-zinc-700"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Reload Page
+        </Button>
+      </div>
+    </div>
+  );
+}
+

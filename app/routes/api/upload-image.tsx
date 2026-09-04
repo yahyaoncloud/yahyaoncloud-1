@@ -1,5 +1,6 @@
 import { json, type ActionFunctionArgs } from '@remix-run/node';
 import { uploadImage } from '~/utils/cloudinary.server';
+import { requireAdmin } from '~/utils/admin-auth.server';
 
 // Max file size: 5MB
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -8,11 +9,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
 export async function action({ request }: ActionFunctionArgs) {
-  // TODO: Add authentication check
-  // const user = await requireAuth(request);
-  // if (!user || user.role !== 'admin') {
-  //   return json({ error: 'Unauthorized' }, { status: 401 });
-  // }
+  await requireAdmin(request);
 
   const formData = await request.formData();
   const file = formData.get('file') as File;

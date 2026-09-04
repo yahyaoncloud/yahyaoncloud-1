@@ -40,7 +40,7 @@ export const routes = (defineRoutes: any) => {
       
       // Pages / Sections
       route("about", "routes/admin/about.tsx");
-      route("portfolio", "routes/admin/portfolio.tsx");
+      route("portfolio", "routes/admin/about.tsx", { id: "admin-portfolio-alias" });
       route("guestbook", "routes/admin/guestbook.tsx");
       route("messages", "routes/admin/messages.tsx");
       route("linktree", "routes/admin/linktree.tsx");
@@ -49,7 +49,8 @@ export const routes = (defineRoutes: any) => {
       route("media", "routes/admin/media.tsx");
       route("assets", "routes/admin/assets.tsx");
       
-      // Settings
+      // Profile & Settings
+      route("profile", "routes/admin/profile.tsx");
       route("settings", "routes/admin/settings.tsx");
       route("site-settings", "routes/admin/site-settings.tsx");
       route("blog-settings", "routes/admin/blog-settings.tsx");
@@ -70,6 +71,8 @@ export const routes = (defineRoutes: any) => {
     route("api/logout", "routes/api/logout.ts"); 
     route("api/track", "routes/api/track.ts");
     route("api/media", "routes/api/media.tsx");
+    route("api/generate-business-card-pdf", "routes/api/generate-business-card-pdf.tsx");
+    route("api/supabase-keepalive", "routes/api/supabase-keepalive.ts");
 
     // Auth Providers
     route("auth/:provider", "routes/auth/$provider.tsx");

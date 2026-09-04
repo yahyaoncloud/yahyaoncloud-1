@@ -57,14 +57,14 @@ export interface CertificationItem {
 }
 
 export interface SectionVisibility {
-  summary?: boolean;        // Mandatory: Always true
-  experience?: boolean;     // Mandatory: Always true
-  elsewhere?: boolean;      // Mandatory: Always true
-  certifications?: boolean; // Toggleable
-  skills?: boolean;         // Toggleable
-  selectedWork?: boolean;   // Toggleable
-  writing?: boolean;        // Toggleable
-  research?: boolean;       // Toggleable
+  summary?: boolean;        // Headline & intro bio
+  experience?: boolean;     // Experience / career history
+  elsewhere?: boolean;      // Social links & contact
+  certifications?: boolean; // Certifications section
+  skills?: boolean;         // Skills badges
+  selectedWork?: boolean;   // Selected work / featured projects
+  writing?: boolean;        // Writing / blog posts
+  research?: boolean;       // Research papers
 }
 
 export interface ProfileInfoData {
@@ -640,78 +640,12 @@ export async function deleteResearchPaper(slug: string): Promise<boolean> {
 // ----------------------------------------------------
 
 export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
-  headline: "Cloud DevOps & Infrastructure Engineer.",
-  bio: [
-    "Over the past 3 years, I've engineered network backbones and scaled cloud environments—transitioning from 2 years in enterprise network infrastructure to building declarative Kubernetes, Terraform, and GitOps architectures.",
-    "I studied Engineering at Global Institute of Engineering & Technology (GIET), Moinabad. I focus on simple, observable, and resilient distributed systems.",
-  ],
-  experiences: [
-    {
-      year: "2024–2025",
-      present: false,
-      company: "Minute KSA",
-      role: "Cloud DevOps Engineer",
-      description:
-        "Supported production AWS infrastructure for a ride-hailing platform, focusing on cloud infrastructure, containerized workloads, CI/CD, infrastructure automation, cloud networking, production troubleshooting, reliability, and cost optimization.",
-    },
-    {
-      year: "2022–2024",
-      present: false,
-      company: "Faabee Technologies",
-      role: "Network Infrastructure Engineer",
-      description:
-        "Supported enterprise network infrastructure and production operations, focusing on routing and switching, SD-WAN, network security, hybrid cloud connectivity, incident troubleshooting, network automation, and operational reliability.",
-    },
-  ],
-  skills: [
-    "AWS (EKS, VPC, Route53)",
-    "Kubernetes & ArgoCD",
-    "Terraform (IaC)",
-    "Docker & Containers",
-    "CI/CD (GitHub Actions)",
-    "Linux & Networking (BGP/OSPF)",
-    "Python & Bash Scripting",
-    "Cloud Architecture & SRE",
-    "Remix / TypeScript",
-  ],
-  certifications: [
-    {
-      name: "Cisco Certified Network Professional (CCNP)",
-      issuer: "Cisco",
-      credentialUrl: "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/professional.html",
-    },
-    {
-      name: "Cisco Certified Network Associate (CCNA)",
-      issuer: "Cisco",
-      credentialUrl: "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html",
-    },
-    {
-      name: "Microsoft Certified: Azure Administrator Associate",
-      issuer: "Microsoft",
-      credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/",
-    },
-    {
-      name: "Microsoft Certified: Azure Solutions Architect Expert",
-      issuer: "Microsoft",
-      credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-solutions-architect/",
-    },
-    {
-      name: "Microsoft Certified: Azure Fundamentals",
-      issuer: "Microsoft",
-      credentialUrl: "https://learn.microsoft.com/en-us/credentials/certifications/azure-fundamentals/",
-    },
-    {
-      name: "AWS Certified Solutions Architect – Associate",
-      issuer: "Amazon Web Services",
-      credentialUrl: "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
-    },
-  ],
-  socialLinks: [
-    { label: "Twitter", href: "https://x.com/yahyaoncloud", display: "https://twitter.com/yahyaoncloud", external: true },
-    { label: "GitHub", href: "https://github.com/yahyaoncloud", display: "https://github.com/yahyaoncloud", external: true },
-    { label: "LinkedIn", href: "https://linkedin.com/in/ykinwork1", display: "https://linkedin.com/in/ykinwork1", external: true },
-    { label: "Email", href: "mailto:hello@yahyaoncloud.com", display: "hello@yahyaoncloud.com", external: false },
-  ],
+  headline: "Cloud DevOps Engineer.",
+  bio: [],
+  experiences: [],
+  skills: [],
+  certifications: [],
+  socialLinks: [],
   sectionsVisibility: {
     summary: true,
     experience: true,
@@ -733,16 +667,20 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
     if (profile) {
       const dbVisibility = profile.sectionsVisibility as unknown as SectionVisibility | undefined;
       return {
-        headline: profile.headline || DEFAULT_PROFILE_INFO.headline,
-        bio: profile.bio && profile.bio.length > 0 ? profile.bio : DEFAULT_PROFILE_INFO.bio,
-        skills: profile.skills && profile.skills.length > 0 ? profile.skills : DEFAULT_PROFILE_INFO.skills,
-        experiences: (profile.experiences as unknown as ProfileInfoData["experiences"]) || DEFAULT_PROFILE_INFO.experiences,
-        certifications: (profile.certifications as unknown as ProfileInfoData["certifications"]) || DEFAULT_PROFILE_INFO.certifications,
-        socialLinks: (profile.socialLinks as unknown as ProfileInfoData["socialLinks"]) || DEFAULT_PROFILE_INFO.socialLinks,
+        headline: profile.headline || "",
+        bio: profile.bio || [],
+        skills: profile.skills || [],
+        experiences: Array.isArray(profile.experiences) ? (profile.experiences as unknown as ProfileInfoData["experiences"]) : [],
+        certifications: Array.isArray(profile.certifications) ? (profile.certifications as unknown as ProfileInfoData["certifications"]) : [],
+        socialLinks: Array.isArray(profile.socialLinks)
+          ? (profile.socialLinks as unknown as ProfileInfoData["socialLinks"]).filter(
+              (item) => item && typeof item.href === "string" && item.href.trim().length > 0
+            )
+          : [],
         sectionsVisibility: {
-          summary: true,
-          experience: true,
-          elsewhere: true,
+          summary: dbVisibility?.summary !== undefined ? Boolean(dbVisibility.summary) : true,
+          experience: dbVisibility?.experience !== undefined ? Boolean(dbVisibility.experience) : true,
+          elsewhere: dbVisibility?.elsewhere !== undefined ? Boolean(dbVisibility.elsewhere) : true,
           certifications: dbVisibility?.certifications !== undefined ? Boolean(dbVisibility.certifications) : true,
           skills: dbVisibility?.skills !== undefined ? Boolean(dbVisibility.skills) : true,
           selectedWork: dbVisibility?.selectedWork !== undefined ? Boolean(dbVisibility.selectedWork) : true,
@@ -751,20 +689,6 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
         },
       };
     }
-
-    // Auto-seed into MongoDB if not present
-    await prisma.profileInfo.create({
-      data: {
-        key: "homepage_profile",
-        headline: DEFAULT_PROFILE_INFO.headline,
-        bio: DEFAULT_PROFILE_INFO.bio,
-        skills: DEFAULT_PROFILE_INFO.skills,
-        experiences: DEFAULT_PROFILE_INFO.experiences as unknown as object,
-        certifications: DEFAULT_PROFILE_INFO.certifications as unknown as object,
-        socialLinks: DEFAULT_PROFILE_INFO.socialLinks as unknown as object,
-        sectionsVisibility: DEFAULT_PROFILE_INFO.sectionsVisibility as unknown as object,
-      },
-    }).catch((err) => console.warn("DB seed profile info notice:", err));
   } catch (err) {
     console.warn("DB profile info query notice:", err);
   }
@@ -775,15 +699,21 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
 export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
   try {
     const visibilityToSave = {
-      summary: true,
-      experience: true,
-      elsewhere: true,
+      summary: data.sectionsVisibility?.summary !== undefined ? Boolean(data.sectionsVisibility.summary) : true,
+      experience: data.sectionsVisibility?.experience !== undefined ? Boolean(data.sectionsVisibility.experience) : true,
+      elsewhere: data.sectionsVisibility?.elsewhere !== undefined ? Boolean(data.sectionsVisibility.elsewhere) : true,
       certifications: data.sectionsVisibility?.certifications !== undefined ? Boolean(data.sectionsVisibility.certifications) : true,
       skills: data.sectionsVisibility?.skills !== undefined ? Boolean(data.sectionsVisibility.skills) : true,
       selectedWork: data.sectionsVisibility?.selectedWork !== undefined ? Boolean(data.sectionsVisibility.selectedWork) : true,
       writing: data.sectionsVisibility?.writing !== undefined ? Boolean(data.sectionsVisibility.writing) : true,
       research: data.sectionsVisibility?.research !== undefined ? Boolean(data.sectionsVisibility.research) : true,
     };
+
+    const cleanSocialLinks = Array.isArray(data.socialLinks)
+      ? data.socialLinks.filter(
+          (item) => item && typeof item.href === "string" && item.href.trim().length > 0
+        )
+      : [];
 
     await prisma.profileInfo.upsert({
       where: { key: "homepage_profile" },
@@ -793,7 +723,7 @@ export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
         skills: data.skills,
         experiences: data.experiences as unknown as object,
         certifications: data.certifications as unknown as object,
-        socialLinks: data.socialLinks as unknown as object,
+        socialLinks: cleanSocialLinks as unknown as object,
         sectionsVisibility: visibilityToSave as unknown as object,
       },
       create: {

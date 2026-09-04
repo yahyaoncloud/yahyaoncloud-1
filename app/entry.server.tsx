@@ -19,6 +19,15 @@ initMongoDB().catch((error) => {
   console.error("Failed to initialize MongoDB:", error);
   process.exit(1);
 });
+
+function applySecurityHeaders(headers: Headers) {
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("X-Frame-Options", "SAMEORIGIN");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  headers.set("X-XSS-Protection", "1; mode=block");
+}
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -29,6 +38,7 @@ export default function handleRequest(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadContext: AppLoadContext
 ) {
+  applySecurityHeaders(responseHeaders);
   return isbot(request.headers.get("user-agent") || "")
     ? handleBotRequest(
       request,

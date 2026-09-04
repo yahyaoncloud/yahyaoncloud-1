@@ -1,6 +1,12 @@
 import { createCookieSessionStorage, redirect, type Session } from "@remix-run/node";
 export { destroyAdminSession } from "./admin-auth.server";
 
+const SESSION_SECRET = process.env.SESSION_SECRET || (
+  process.env.NODE_ENV === "production"
+    ? (() => { throw new Error("Security Error: SESSION_SECRET must be defined in production!"); })()
+    : "s3cr3t-dev-fallback"
+);
+
 // Export the session storage object
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -8,7 +14,7 @@ export const sessionStorage = createCookieSessionStorage({
     httpOnly: true,
     path: "/",
     sameSite: "lax",
-    secrets: [process.env.SESSION_SECRET || "s3cr3t"],
+    secrets: [SESSION_SECRET],
     secure: process.env.NODE_ENV === "production",
   },
 });

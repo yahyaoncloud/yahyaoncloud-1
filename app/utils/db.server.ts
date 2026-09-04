@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getEnv } from "../environments/environment"; // adjust path if needed
+import { getEnv } from "../environments/environment.server";
 
 let isConnected = false;
 

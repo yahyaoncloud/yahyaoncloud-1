@@ -1,8 +1,10 @@
-﻿import { json } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { cloudinary } from "~/utils/cloudinary.server";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
+  await requireAdmin(request);
   const url = new URL(request.url);
   const prefix = url.searchParams.get("prefix") || "";
 
@@ -18,6 +20,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const action: ActionFunction = async ({ request }) => {
+  await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("_action");
 

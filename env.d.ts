@@ -5,8 +5,6 @@ interface WindowEnv {
   SUPABASE_ID?: string;
   SUPABASE_ANON?: string;
   SUPABASE_URL?: string;
-  CLOUDINARY_CLOUD_NAME?: string;
-  CLOUDINARY_API_KEY?: string;
   NODE_ENV?: string;
   FIREBASE_CONFIG?: {
     apiKey?: string;

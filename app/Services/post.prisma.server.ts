@@ -330,6 +330,36 @@ export async function getPopularPosts(limit: number = 10) {
   });
 }
 
+// TRACK POST VIEW
+export async function trackPostView(postId: string) {
+  try {
+    return await prisma.post.update({
+      where: { id: postId },
+      data: {
+        views: { increment: 1 }
+      }
+    });
+  } catch (error) {
+    console.error("Error tracking post view:", error);
+    return null;
+  }
+}
+
+// TRACK POST LIKE
+export async function trackPostLike(postId: string) {
+  try {
+    return await prisma.post.update({
+      where: { id: postId },
+      data: {
+        likes: { increment: 1 }
+      }
+    });
+  } catch (error) {
+    console.error("Error tracking post like:", error);
+    return null;
+  }
+}
+
 // ==================== CATEGORY OPERATIONS ====================
 export async function getAllCategories() {
   return prisma.category.findMany({

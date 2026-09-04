@@ -4,7 +4,7 @@ import {
   getFeaturedPosts, 
   trackPostView, 
   trackPostLike 
-} from '~/Services/content-access.server';
+} from '~/Services/post.prisma.server';
 
 /**
  * GET /api/analytics - Get popular and featured posts

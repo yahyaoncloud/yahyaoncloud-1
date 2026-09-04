@@ -72,11 +72,12 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    name: "Settings",
+    name: "Settings & Profile",
     icon: Settings,
     children: [
-      { name: "My Account", icon: User, href: "/admin/settings" },
-      { name: "Site & SEO Settings", icon: Settings, href: "/admin/site-settings" },
+      { name: "Admin Profile", icon: User, href: "/admin/profile" },
+      { name: "Interface Preferences", icon: Layout, href: "/admin/settings" },
+      { name: "Site & SEO Settings", icon: Globe, href: "/admin/site-settings" },
       { name: "Blog Config", icon: Settings, href: "/admin/blog-settings" },
     ],
   },
@@ -85,9 +86,20 @@ const navItems: NavItem[] = [
 function SidebarItem({ item, onClose }: { item: NavItem; onClose?: () => void }) {
   const location = useLocation();
   
+  // Helper to determine if a child link is active (considering search params like ?tab=sections)
+  const isChildActive = (childHref: string) => {
+    const [childPath, childQuery] = childHref.split("?");
+    if (location.pathname !== childPath) return false;
+    if (childQuery) {
+      return location.search.includes(childQuery);
+    }
+    // For base route without query param (e.g. /admin/about)
+    return !location.search.includes("tab=") || location.search.includes("tab=basic");
+  };
+
   // Check if any child is active
   const hasActiveChild = item.children?.some(
-    (child) => child.href && location.pathname.startsWith(child.href)
+    (child) => child.href && (isChildActive(child.href) || location.pathname.startsWith(child.href.split("?")[0]))
   );
 
   // Initialize state based on active child status
@@ -131,23 +143,26 @@ function SidebarItem({ item, onClose }: { item: NavItem; onClose?: () => void })
               className="overflow-hidden"
             >
               <div className="ml-3 pl-3 border-l border-zinc-200 dark:border-zinc-800 mt-1 space-y-0.5">
-                {item.children.map((child) => (
-                  <NavLink
-                    key={child.name}
-                    to={child.href!}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      `flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                        isActive
-                          ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs"
-                          : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
-                      }`
-                    }
-                  >
-                    <child.icon className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span>{child.name}</span>
-                  </NavLink>
-                ))}
+                {item.children.map((child) => {
+                  const active = isChildActive(child.href!);
+                  return (
+                    <NavLink
+                      key={child.name}
+                      to={child.href!}
+                      onClick={onClose}
+                      className={() =>
+                        `flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                          active
+                            ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs"
+                            : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        }`
+                      }
+                    >
+                      <child.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span>{child.name}</span>
+                    </NavLink>
+                  );
+                })}
               </div>
             </motion.div>
           )}

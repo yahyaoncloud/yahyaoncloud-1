@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import yocLogo from "~/assets/yoc-logo.png";
+import profilePhoto from "~/assets/profile.jpg";
 import {
   getProfileInfo,
   getFeaturedProjects,
@@ -37,33 +37,39 @@ export default function Index() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       {/* Profile & Introduction */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-3.5 sm:gap-4">
-          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 shadow-xs shrink-0 flex items-center justify-center">
-            <img
-              src={yocLogo}
-              alt="Yahya Logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div>
-            <h1 className="font-semibold text-zinc-900 dark:text-zinc-100 text-base md:text-lg">
-              {profileInfo.headline}
-            </h1>
-          </div>
-        </div>
+      {profileInfo.sectionsVisibility?.summary !== false && (
+        <section className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800 shadow-md bg-zinc-100 dark:bg-zinc-900 shrink-0 group">
+              <img
+                src={profilePhoto}
+                alt="Yahya"
+                className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 ring-1 ring-inset ring-black/5 dark:ring-white/10 rounded-2xl sm:rounded-3xl pointer-events-none" />
+            </div>
 
-        <div className="space-y-3">
-          {profileInfo.bio.map((paragraph, idx) => (
-            <p key={idx}>{paragraph}</p>
-          ))}
-        </div>
-      </section>
+            <div className="space-y-1">
+              <h1 className="font-bold text-zinc-900 dark:text-zinc-100 text-xl sm:text-2xl md:text-3xl tracking-tight leading-snug">
+                {profileInfo.headline}
+              </h1>
+            </div>
+          </div>
+
+          <div className="space-y-3.5 text-zinc-600 dark:text-zinc-300 text-sm md:text-base leading-relaxed">
+            {profileInfo.bio.map((paragraph, idx) => (
+              <p key={idx}>{paragraph}</p>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Experience Section (with smooth subtle dropdown animation) */}
-      {profileInfo.experiences && profileInfo.experiences.length > 0 && (
+      {profileInfo.sectionsVisibility?.experience !== false &&
+        profileInfo.experiences &&
+        profileInfo.experiences.length > 0 && (
         <section className="space-y-3 pt-2">
           <h2 className="section-heading">Experience</h2>
 
@@ -71,95 +77,179 @@ export default function Index() {
             {profileInfo.experiences.map((exp, idx) => {
               const isOpen = openExperienceIndex === idx;
               return (
-                <div
-                  key={idx}
-                  className="grid grid-cols-[90px_1fr] md:grid-cols-[110px_1fr] gap-x-3 md:gap-x-4 items-start text-[15px] md:text-base"
-                >
-                  {/* Year + Present badge column */}
-                  <div className="py-1.5 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
-                    <span className="font-normal font-mono text-xs md:text-sm">{exp.year}</span>
-                    {exp.present && (
-                      <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 text-[11px] md:text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                        Present
-                      </span>
-                    )}
+                <div key={idx} className="space-y-1">
+                  {/* Desktop Layout (sm and up) */}
+                  <div className="hidden sm:grid sm:grid-cols-[100px_1fr] md:grid-cols-[110px_1fr] gap-x-3 md:gap-x-4 items-start text-[15px] md:text-base">
+                    {/* Year + Present badge column */}
+                    <div className="py-1.5 flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                      <span className="font-normal font-mono text-xs md:text-sm">{exp.year}</span>
+                      {exp.present && (
+                        <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 text-[11px] md:text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                          Present
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Accordion Container */}
+                    <div
+                      className={`overflow-hidden rounded-lg transition-colors min-w-0 ${
+                        isOpen
+                          ? "bg-zinc-100/80 dark:bg-zinc-900/60"
+                          : "hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleExperience(idx)}
+                        className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all min-w-0"
+                      >
+                        <ChevronRight
+                          size={15}
+                          className={`text-zinc-400 transition-transform duration-200 shrink-0 ${
+                            isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
+                          }`}
+                        />
+                        <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-[15px] md:text-base">
+                          {exp.company}
+                        </span>
+                        <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[16px] shrink-0" />
+                        <span className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm shrink-0">
+                          {exp.role}
+                        </span>
+                      </button>
+
+                      {/* Animated Dropdown Content */}
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key="content-desktop"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{
+                              duration: 0.22,
+                              ease: [0.04, 0.62, 0.23, 0.98],
+                            }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-6 pb-3 pt-1 space-y-2 text-xs md:text-sm text-zinc-600 dark:text-zinc-400">
+                              <p className="leading-relaxed text-xs md:text-sm text-zinc-600 dark:text-zinc-400">
+                                {exp.description}
+                              </p>
+                              {exp.projects && exp.projects.length > 0 && (
+                                <div className="space-y-1 pt-1">
+                                  {exp.projects.map((proj) => (
+                                    <div key={proj.name}>
+                                      {proj.internal ? (
+                                        <Link
+                                          to={proj.url}
+                                          className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
+                                        >
+                                          {proj.name}
+                                        </Link>
+                                      ) : (
+                                        <a
+                                          href={proj.url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
+                                        >
+                                          {proj.name}
+                                        </a>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
 
-                  {/* Accordion Container */}
-                  <div
-                    className={`overflow-hidden rounded-lg transition-colors min-w-0 ${
-                      isOpen
-                        ? "bg-zinc-100/80 dark:bg-zinc-900/60"
-                        : "hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => toggleExperience(idx)}
-                      className="w-full flex items-center gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all min-w-0"
+                  {/* Mobile Layout (< sm) */}
+                  <div className="block sm:hidden">
+                    <div
+                      className={`overflow-hidden rounded-lg transition-colors min-w-0 ${
+                        isOpen
+                          ? "bg-zinc-100/80 dark:bg-zinc-900/60"
+                          : "hover:bg-zinc-100/50 dark:hover:bg-zinc-900/30"
+                      }`}
                     >
-                      <ChevronRight
-                        size={15}
-                        className={`text-zinc-400 transition-transform duration-200 shrink-0 ${
-                          isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
-                        }`}
-                      />
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-[15px] md:text-base">
-                        {exp.company}
-                      </span>
-                      <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[16px] shrink-0" />
-                      <span className="text-zinc-500 dark:text-zinc-400 text-xs md:text-sm shrink-0">
-                        {exp.role}
-                      </span>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleExperience(idx)}
+                        className="w-full flex items-center justify-between gap-2 py-2 px-2 text-left cursor-pointer select-none active:scale-[0.99] transition-all min-w-0"
+                      >
+                        <div className="flex items-center gap-1.5 min-w-0 truncate">
+                          <ChevronRight
+                            size={14}
+                            className={`text-zinc-400 transition-transform duration-200 shrink-0 ${
+                              isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
+                            }`}
+                          />
+                          <span className="font-medium text-zinc-900 dark:text-zinc-100 text-sm truncate">
+                            {exp.company}
+                          </span>
+                          <span className="text-zinc-500 dark:text-zinc-400 text-sm truncate font-normal">
+                            , {exp.role}
+                          </span>
+                        </div>
+                        <div className="flex-1 h-px bg-zinc-200/60 dark:bg-zinc-800/60 min-w-[12px] shrink-0" />
+                        <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400 shrink-0 select-none">
+                          {exp.present ? "Present" : exp.year}
+                        </span>
+                      </button>
 
-                    {/* Animated Dropdown Content */}
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          key="content"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{
-                            duration: 0.22,
-                            ease: [0.04, 0.62, 0.23, 0.98],
-                          }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-6 pb-3 pt-1 space-y-2 text-xs md:text-sm text-zinc-600 dark:text-zinc-400">
-                            <p className="leading-relaxed text-xs md:text-sm text-zinc-600 dark:text-zinc-400">
-                              {exp.description}
-                            </p>
-                            {exp.projects && exp.projects.length > 0 && (
-                              <div className="space-y-1 pt-1">
-                                {exp.projects.map((proj) => (
-                                  <div key={proj.name}>
-                                    {proj.internal ? (
-                                      <Link
-                                        to={proj.url}
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
-                                      >
-                                        {proj.name}
-                                      </Link>
-                                    ) : (
-                                      <a
-                                        href={proj.url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
-                                      >
-                                        {proj.name}
-                                      </a>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                      {/* Animated Dropdown Content (Mobile) */}
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            key="content-mobile"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{
+                              duration: 0.22,
+                              ease: [0.04, 0.62, 0.23, 0.98],
+                            }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-4 pb-3 pt-1 space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                              <p className="leading-relaxed text-xs text-zinc-600 dark:text-zinc-400">
+                                {exp.description}
+                              </p>
+                              {exp.projects && exp.projects.length > 0 && (
+                                <div className="space-y-1 pt-1">
+                                  {exp.projects.map((proj) => (
+                                    <div key={proj.name}>
+                                      {proj.internal ? (
+                                        <Link
+                                          to={proj.url}
+                                          className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs"
+                                        >
+                                          {proj.name}
+                                        </Link>
+                                      ) : (
+                                        <a
+                                          href={proj.url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs"
+                                        >
+                                          {proj.name}
+                                        </a>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </div>
               );
@@ -328,13 +418,13 @@ export default function Index() {
                 <div key={post.slug} className="group">
                   <Link
                     to={`/blog/${post.slug}`}
-                    className="flex items-center justify-between py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-3 min-w-0"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 sm:py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-1 sm:gap-3 min-w-0"
                     title={post.title}
                   >
-                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-base md:text-lg truncate min-w-0">
+                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-[15px] sm:text-base md:text-lg min-w-0 sm:truncate">
                       {post.title}
                     </span>
-                    <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
+                    <div className="hidden sm:block flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
                     <span className="font-mono text-xs md:text-sm text-zinc-400 dark:text-zinc-500 shrink-0 select-none">
                       {post.displayDate}
                     </span>
@@ -388,14 +478,18 @@ export default function Index() {
         )}
 
       {/* Elsewhere Section */}
-      {profileInfo.socialLinks && profileInfo.socialLinks.length > 0 && (
+      {profileInfo.sectionsVisibility?.elsewhere !== false &&
+        profileInfo.socialLinks &&
+        profileInfo.socialLinks.filter((item) => item && typeof item.href === "string" && item.href.trim().length > 0).length > 0 && (
         <section className="space-y-3 pt-2">
           <h2 className="section-heading">Elsewhere</h2>
           <div className="space-y-2">
-            {profileInfo.socialLinks.map((item) => (
+            {profileInfo.socialLinks
+              .filter((item) => item && typeof item.href === "string" && item.href.trim().length > 0)
+              .map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between py-1 text-sm md:text-base gap-3"
+                className="flex items-center justify-between py-1.5 sm:py-1 text-sm md:text-base gap-3"
               >
                 <span className="text-zinc-500 dark:text-zinc-400 font-mono text-xs md:text-sm shrink-0">
                   {item.label}
@@ -405,7 +499,7 @@ export default function Index() {
                   href={item.href}
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
-                  className="group text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-2 py-0.5 rounded-md transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-1.5 font-mono text-xs md:text-sm shrink-0"
+                  className="group text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-2 py-0.5 rounded-md transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-1.5 font-mono text-xs md:text-sm shrink-0"
                 >
                   <span>{item.display}</span>
                   {item.external && (

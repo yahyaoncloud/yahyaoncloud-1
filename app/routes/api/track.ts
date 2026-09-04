@@ -1,8 +1,6 @@
 import { json, type ActionFunctionArgs } from "@remix-run/node";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "~/utils/prisma.server";
 import crypto from "crypto";
-
-const prisma = new PrismaClient();
 
 export async function loader() {
   return json({ message: "Tracking API" }, { status: 200 });

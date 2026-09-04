@@ -1,4 +1,13 @@
-import type { IPost } from '../models';
+export interface ArticleJsonLdInput {
+  title: string;
+  summary?: string | null;
+  coverImage?: string | null;
+  date?: string | Date;
+  updatedAt?: string | Date;
+  slug: string;
+  content?: string | null;
+  minuteRead?: number;
+}
 
 interface SEOData {
   title: string;
@@ -66,15 +75,18 @@ export function generateMetaTags(seo: SEOData) {
 /**
  * Generate JSON-LD structured data for blog posts
  */
-export function generateArticleJsonLd(post: IPost, authorName: string, siteUrl: string) {
+export function generateArticleJsonLd(post: ArticleJsonLdInput, authorName: string, siteUrl: string) {
+  const publishedDate = post.date ? new Date(post.date).toISOString() : new Date().toISOString();
+  const modifiedDate = post.updatedAt ? new Date(post.updatedAt).toISOString() : publishedDate;
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
-    description: post.summary,
-    image: post.coverImage,
-    datePublished: post.date.toISOString(),
-    dateModified: post.updatedAt.toISOString(),
+    description: post.summary || '',
+    image: post.coverImage || undefined,
+    datePublished: publishedDate,
+    dateModified: modifiedDate,
     author: {
       '@type': 'Person',
       name: authorName

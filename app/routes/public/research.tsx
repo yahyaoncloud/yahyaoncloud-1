@@ -14,11 +14,11 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
 
   return (
     <article className="space-y-2 pb-6 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0">
-      <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1">
-        <span className="font-mono text-[11px] md:text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+      <div className="flex items-baseline justify-between gap-2 min-w-0">
+        <span className="font-mono text-[11px] md:text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate">
           {paper.venue}
         </span>
-        <span className="font-mono text-[11px] md:text-xs text-zinc-400 dark:text-zinc-500">
+        <span className="font-mono text-[11px] md:text-xs text-zinc-400 dark:text-zinc-500 shrink-0">
           {paper.year}
         </span>
       </div>
@@ -50,13 +50,13 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-4 pt-2 text-xs md:text-sm font-mono">
+      <div className="flex flex-wrap items-center gap-4 pt-2 text-xs md:text-sm font-mono">
         {paper.content && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:underline cursor-pointer transition-colors"
+            className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer transition-colors"
           >
-            {isExpanded ? "Hide Findings" : "Read Full Findings"}
+            {isExpanded ? "Hide Findings" : "Read Full Findings →"}
           </button>
         )}
         {paper.pdfUrl && (
@@ -64,7 +64,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
             href={paper.pdfUrl}
             target="_blank"
             rel="noreferrer"
-            className="group text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1"
+            className="group text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1"
           >
             <span>PDF Document</span>
             <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">

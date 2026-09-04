@@ -202,7 +202,7 @@ interface IAuthor extends Document {
 
 // Draft interface
 export interface IDraftDoc extends Document {
-  _id: string;
+  _id: any;
   title: string;
   summary?: string;
   content?: string;

@@ -45,10 +45,10 @@ export default function ProjectsIndex() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs md:text-sm px-2.5 py-1 rounded-md transition-all duration-150 active:scale-95 cursor-pointer font-mono ${
+              className={`text-xs md:text-sm px-2.5 py-0.5 rounded-md transition-all duration-150 active:scale-95 cursor-pointer font-mono ${
                 selectedCategory === cat
-                  ? "bg-indigo-600 text-white font-medium shadow-xs"
-                  : "bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/80 dark:border-zinc-800/80"
+                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-medium shadow-xs"
+                  : "bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200/80 dark:border-zinc-800/80"
               }`}
             >
               {cat}
@@ -68,7 +68,7 @@ export default function ProjectsIndex() {
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
                 <Link
                   to={`/projects/${project.slug}`}
-                  className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:underline underline-offset-4 text-base md:text-lg transition-colors"
+                  className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:underline underline-offset-4 text-base md:text-lg transition-colors"
                 >
                   {project.title}
                 </Link>
@@ -99,7 +99,7 @@ export default function ProjectsIndex() {
               )}
 
               {/* Links */}
-              <div className="flex items-center gap-4 pt-1 text-xs md:text-sm">
+              <div className="flex flex-wrap items-center gap-4 pt-1 text-xs md:text-sm font-mono">
                 <Link
                   to={`/projects/${project.slug}`}
                   className="text-zinc-900 dark:text-zinc-100 font-medium hover:underline"

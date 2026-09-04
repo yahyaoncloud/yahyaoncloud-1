@@ -51,8 +51,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       SUPABASE_ID: process.env.SUPABASE_ID || "",
       SUPABASE_ANON: process.env.SUPABASE_ANON || "",
       SUPABASE_URL: process.env.SUPABASE_ID ? `https://${process.env.SUPABASE_ID}.supabase.co` : "",
-      CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || "",
-      CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "",
       NODE_ENV: process.env.NODE_ENV || "development",
       FIREBASE_CONFIG: {
         apiKey: process.env.FIREBASE_API_KEY || process.env.VITE_PUBLIC_FIREBASE_API_KEY,

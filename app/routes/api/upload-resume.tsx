@@ -1,72 +1,45 @@
-// API endpoint for resume PDF upload to Supabase
-import { json, type ActionFunction } from "@remix-run/node";
-import { createClient } from '@supabase/supabase-js';
+// API endpoint for resume PDF upload to Supabase (Server-side authenticated)
+import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { requireAdmin } from "~/utils/admin-auth.server";
+import { uploadToSupabase } from "~/utils/supabase.server";
 
-const supabaseUrl = `https://${process.env.SUPABASE_ID}.supabase.co` || '';
-const supabaseKey = process.env.SUPABASE_ANON || '';
+export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
 
-// Only create client if env vars are set
-const supabase = supabaseUrl && supabaseKey 
-  ? createClient(supabaseUrl, supabaseKey)
-  : null;
-
-export const action: ActionFunction = async ({ request }) => {
   try {
-    // Check if Supabase is configured
-    if (!supabase) {
-      return json({ 
-        success: false, 
-        message: "Supabase is not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file." 
-      });
-    }
-    
     const formData = await request.formData();
     const file = formData.get("file") as File;
     
     if (!file) {
-      return json({ success: false, message: "No file provided" });
+      return json({ success: false, message: "No file provided" }, { status: 400 });
     }
     
     // Validate file type
-    if (file.type !== 'application/pdf') {
-      return json({ success: false, message: "Only PDF files are allowed" });
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      return json({ success: false, message: "Only PDF files are allowed" }, { status: 400 });
     }
     
     // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
-      return json({ success: false, message: "File size must be less than 5MB" });
+      return json({ success: false, message: "File size must be less than 5MB" }, { status: 400 });
     }
     
-    // Convert File to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    
-    // Generate unique filename
+    // Generate sanitized unique filename
     const timestamp = Date.now();
-    const fileName = `${timestamp}-${file.name}`;
+    const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const fileName = `${timestamp}-${cleanName}`;
     
-    // Upload to Supabase
-    const { data, error } = await supabase.storage
-      .from('resumes')
-      .upload(fileName, buffer, {
-        contentType: 'application/pdf',
-        cacheControl: '3600',
-        upsert: false,
-      });
+    // Upload via server-side Supabase admin client
+    const { url, error } = await uploadToSupabase('resumes', fileName, file);
     
-    if (error) {
+    if (error || !url) {
       console.error('Supabase upload error:', error);
-      return json({ success: false, message: error.message });
+      return json({ success: false, message: error || "Upload failed" }, { status: 500 });
     }
-    
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('resumes')
-      .getPublicUrl(fileName);
     
     return json({ 
       success: true, 
-      url: publicUrl,
+      url,
       fileName: file.name,
       fileSize: file.size
     });

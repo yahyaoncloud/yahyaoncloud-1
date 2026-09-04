@@ -71,7 +71,7 @@ export async function generateResumePdf(resumeId: string) {
     const page = await browser.newPage();
     await page.setViewport({ width: 1200, height: 1600 });
     const content = resume.htmlContent || "<h1>No Content</h1>";
-    await page.setContent(content, { waitUntil: 'networkidle0' });
+    await page.setContent(content, { waitUntil: 'networkidle0' as any });
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
@@ -84,7 +84,7 @@ export async function generateResumePdf(resumeId: string) {
     // Upload to Supabase
     const userId = resume.userId?.toString() || 'default';
     const path = `resumes/${userId}/${resumeId}.pdf`;
-    const file = new Blob([pdfBuffer], { type: 'application/pdf' });
+    const file = new Blob([pdfBuffer as any], { type: 'application/pdf' });
 
     const { url, error } = await uploadToSupabase('resumes', path, file);
 
@@ -128,7 +128,7 @@ export async function generateResumeQr(resumeId: string) {
     // Upload to Supabase
     const userId = resume.userId?.toString() || 'default';
     const path = `resumes/${userId}/qr-${resumeId}.png`;
-    const file = new Blob([qrBuffer], { type: 'image/png' });
+    const file = new Blob([qrBuffer as any], { type: 'image/png' });
 
     const { url, error } = await uploadToSupabase('resumes', path, file);
 
