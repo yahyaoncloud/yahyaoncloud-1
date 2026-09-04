@@ -13,7 +13,7 @@ import {
 } from "~/Services/content.server";
 
 export const headers = () => ({
-  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+  "Cache-Control": "public, max-age=0, must-revalidate",
 });
 
 export async function loader() {
@@ -33,7 +33,7 @@ export async function loader() {
     },
     {
       headers: {
-        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+        "Cache-Control": "public, max-age=0, must-revalidate",
       },
     }
   );
@@ -320,58 +320,59 @@ export default function Index() {
       {/* Skills Section */}
       {profileInfo.sectionsVisibility?.skills !== false &&
         profileInfo.skills &&
-        profileInfo.skills.length > 0 && (
-          <section className="space-y-3 pt-2">
-            <h2 className="section-heading">Skills</h2>
+        profileInfo.skills.length > 0 && (() => {
+          const mode = (profileInfo.skillsDisplayMode || "both").toLowerCase().trim();
+          return (
+            <section className="space-y-3 pt-2">
+              <h2 className="section-heading">Skills</h2>
 
-            {/* Icons-Only Mode */}
-            {profileInfo.skillsDisplayMode === "icons" && (
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 pt-1">
-                {profileInfo.skills.map((skill, idx) => (
-                  <div
-                    key={idx}
-                    className="group relative flex flex-col items-center justify-center p-2.5 rounded-lg bg-zinc-100/70 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900 transition-all hover:scale-105"
-                    title={skill}
-                  >
-                    <TechIcon name={skill} size={24} useBrandColor />
-                    <span className="mt-1.5 text-xs font-mono text-zinc-600 dark:text-zinc-400 text-center truncate max-w-full">
-                      {skill.replace(/\s*\([^)]*\)/g, "").split("&")[0].trim()}
+              {/* Icons-Only Mode */}
+              {mode === "icons" && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {profileInfo.skills.map((skill, idx) => (
+                    <div
+                      key={idx}
+                      className="group relative flex items-center justify-center p-2.5 rounded-lg bg-zinc-100/80 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900 transition-all hover:scale-110 shadow-xs cursor-default"
+                      title={skill}
+                      aria-label={skill}
+                    >
+                      <TechIcon name={skill} size={22} useBrandColor />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Text-Only Mode */}
+              {mode === "text" && (
+                <div className="flex flex-wrap gap-1.5">
+                  {profileInfo.skills.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                    >
+                      {skill}
                     </span>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
 
-            {/* Text-Only Mode */}
-            {profileInfo.skillsDisplayMode === "text" && (
-              <div className="flex flex-wrap gap-1.5">
-                {profileInfo.skills.map((skill, idx) => (
-                  <span
-                    key={idx}
-                    className="text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Default / Badges Mode (Both Icons & Text) */}
-            {(!profileInfo.skillsDisplayMode || profileInfo.skillsDisplayMode === "both") && (
-              <div className="flex flex-wrap gap-1.5">
-                {profileInfo.skills.map((skill, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
-                  >
-                    <TechIcon name={skill} size={15} useBrandColor />
-                    <span>{skill}</span>
-                  </span>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
+              {/* Default / Badges Mode (Both Icons & Text) */}
+              {mode !== "icons" && mode !== "text" && (
+                <div className="flex flex-wrap gap-1.5">
+                  {profileInfo.skills.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1.5 text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                    >
+                      <TechIcon name={skill} size={15} useBrandColor />
+                      <span>{skill}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        })()}
 
       {/* Selected Work Section */}
       {profileInfo.sectionsVisibility?.selectedWork !== false &&
