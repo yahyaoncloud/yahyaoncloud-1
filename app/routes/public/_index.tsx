@@ -509,21 +509,22 @@ export default function Index() {
               .map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between py-1.5 sm:py-1 text-sm md:text-base gap-3"
+                className="flex items-center justify-between py-1.5 sm:py-1 text-sm md:text-base gap-2 sm:gap-3 min-w-0"
               >
                 <span className="text-zinc-500 dark:text-zinc-400 font-mono text-xs md:text-sm shrink-0">
                   {item.label}
                 </span>
-                <div className="flex-1 h-px bg-zinc-200/60 dark:bg-zinc-800/60 min-w-[16px]" />
+                <div className="flex-1 h-px bg-zinc-200/60 dark:bg-zinc-800/60 min-w-[8px] sm:min-w-[16px]" />
                 <a
                   href={item.href}
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
-                  className="group text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-2 py-0.5 rounded-md transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-1.5 font-mono text-xs md:text-sm shrink-0"
+                  title={item.display}
+                  className="group text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-2 py-0.5 rounded-md transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-1.5 font-mono text-xs md:text-sm min-w-0 max-w-[62%] sm:max-w-[75%]"
                 >
-                  <span>{item.display}</span>
+                  <span className="truncate">{item.display}</span>
                   {item.external && (
-                    <span className="inline-block opacity-60 group-hover:opacity-100 transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
+                    <span className="inline-block shrink-0 opacity-60 group-hover:opacity-100 transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
                       →
                     </span>
                   )}

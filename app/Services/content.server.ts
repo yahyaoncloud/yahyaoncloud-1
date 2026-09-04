@@ -116,10 +116,53 @@ function formatDateToDisplay(dateStr: string): string {
 }
 
 // ----------------------------------------------------
+// In-Memory Fast Cache with Auto-Invalidation & Timeout Guard
+// ----------------------------------------------------
+const memoryCache = new Map<string, { value: unknown; expiresAt: number }>();
+const CACHE_TTL_MS = 120 * 1000; // 2 minutes
+
+function getFromMemoryCache<T>(key: string): T | null {
+  const item = memoryCache.get(key);
+  if (item && Date.now() < item.expiresAt) {
+    return item.value as T;
+  }
+  return null;
+}
+
+function setToMemoryCache<T>(key: string, value: T, ttlMs = CACHE_TTL_MS): void {
+  memoryCache.set(key, { value, expiresAt: Date.now() + ttlMs });
+}
+
+export function invalidateContentCache(): void {
+  memoryCache.clear();
+}
+
+async function withDbTimeout<T>(promise: Promise<T>, fallback: T, timeoutMs = 2500): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<T>((resolve) => {
+    timeoutHandle = setTimeout(() => {
+      resolve(fallback);
+    }, timeoutMs);
+  });
+
+  try {
+    const result = await Promise.race([promise, timeoutPromise]);
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+    return result;
+  } catch {
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+    return fallback;
+  }
+}
+
+// ----------------------------------------------------
 // Blog Posts (Prisma + Markdown Fallback/Sync)
 // ----------------------------------------------------
 
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
+  const cached = getFromMemoryCache<BlogPost[]>("all_blog_posts");
+  if (cached) return cached;
+
   const postsMap = new Map<string, BlogPost>();
 
   // 1. Read local markdown files
@@ -153,13 +196,16 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
     console.error("Error reading blog posts from disk:", error);
   }
 
-  // 2. Read from Prisma DB and overlay/add
+  // 2. Read from Prisma DB with timeout guarantee
   try {
-    const dbPosts = await prisma.post.findMany({
-      where: { status: "published" },
-      orderBy: { date: "desc" },
-      include: { author: true, tags: true },
-    }).catch(() => []);
+    const dbPosts = await withDbTimeout(
+      prisma.post.findMany({
+        where: { status: "published" },
+        orderBy: { date: "desc" },
+        include: { author: true, tags: true },
+      }),
+      []
+    );
 
     if (dbPosts && dbPosts.length > 0) {
       for (const p of dbPosts) {
@@ -181,20 +227,30 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
     console.warn("DB posts retrieval notice:", err);
   }
 
-  return Array.from(postsMap.values()).sort(
+  const result = Array.from(postsMap.values()).sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
+
+  setToMemoryCache("all_blog_posts", result);
+  return result;
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const cacheKey = `blog_post_${slug}`;
+  const cached = getFromMemoryCache<BlogPost>(cacheKey);
+  if (cached) return cached;
+
   try {
-    const p = await prisma.post.findUnique({
-      where: { slug },
-      include: { author: true, tags: true },
-    }).catch(() => null);
+    const p = await withDbTimeout(
+      prisma.post.findUnique({
+        where: { slug },
+        include: { author: true, tags: true },
+      }),
+      null
+    );
 
     if (p) {
-      return {
+      const result: BlogPost = {
         title: p.title,
         slug: p.slug,
         date: p.date.toISOString().split("T")[0],
@@ -206,6 +262,8 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
         order: 1,
         content: p.content,
       };
+      setToMemoryCache(cacheKey, result);
+      return result;
     }
   } catch (err) {
     console.warn("DB single post retrieval notice:", err);
@@ -219,7 +277,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
       const fileContent = fs.readFileSync(filePath, "utf-8");
       const { data, content } = matter(fileContent);
       const rawDate = data.date ? String(data.date) : "2024-01-01";
-      return {
+      const result: BlogPost = {
         title: data.title || "Untitled Article",
         slug,
         date: rawDate,
@@ -231,17 +289,24 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
         order: Number(data.order) || 99,
         content: content.trim(),
       };
+      setToMemoryCache(cacheKey, result);
+      return result;
     }
   } catch (err) {
     console.warn("Local post retrieval notice:", err);
   }
 
   const all = await getAllBlogPosts();
-  return all.find((p) => p.slug === slug) || null;
+  const matched = all.find((p) => p.slug === slug) || null;
+  if (matched) {
+    setToMemoryCache(cacheKey, matched);
+  }
+  return matched;
 }
 
 export async function saveBlogPost(post: BlogPost): Promise<boolean> {
   try {
+    invalidateContentCache();
     ensureDirectoryExists(BLOG_DIR);
     const filePath = path.join(BLOG_DIR, `${post.slug}.md`);
 
@@ -268,6 +333,7 @@ export async function saveBlogPost(post: BlogPost): Promise<boolean> {
 
 export async function deleteBlogPost(slug: string): Promise<boolean> {
   try {
+    invalidateContentCache();
     const filePath = path.join(BLOG_DIR, `${slug}.md`);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
@@ -284,35 +350,15 @@ export async function deleteBlogPost(slug: string): Promise<boolean> {
 // ----------------------------------------------------
 
 export async function getAllProjects(): Promise<ProjectCaseStudy[]> {
-  try {
-    const dbProjects = await prisma.projectCaseStudy.findMany({
-      orderBy: { order: "asc" },
-    }).catch(() => []);
+  const cached = getFromMemoryCache<ProjectCaseStudy[]>("all_projects");
+  if (cached) return cached;
 
-    if (dbProjects && dbProjects.length > 0) {
-      return dbProjects.map((p) => ({
-        title: p.title,
-        slug: p.slug,
-        summary: p.summary,
-        period: p.period,
-        role: p.role,
-        category: p.category,
-        techStack: p.techStack,
-        demoUrl: p.demoUrl || undefined,
-        githubUrl: p.githubUrl || undefined,
-        featured: p.featured,
-        order: p.order,
-        content: p.content,
-      }));
-    }
-  } catch (err) {
-    console.warn("DB projects retrieval notice:", err);
-  }
+  const projectsMap = new Map<string, ProjectCaseStudy>();
 
+  // 1. Read local markdown files
   try {
     ensureDirectoryExists(PROJECTS_DIR);
     const files = fs.readdirSync(PROJECTS_DIR).filter((f) => f.endsWith(".md"));
-    const projects: ProjectCaseStudy[] = [];
 
     for (const file of files) {
       const filePath = path.join(PROJECTS_DIR, file);
@@ -321,7 +367,7 @@ export async function getAllProjects(): Promise<ProjectCaseStudy[]> {
 
       const defaultSlug = file.replace(/\.md$/, "");
 
-      projects.push({
+      projectsMap.set(data.slug || defaultSlug, {
         title: data.title || "Untitled Project",
         slug: data.slug || defaultSlug,
         summary: data.summary || "",
@@ -336,22 +382,64 @@ export async function getAllProjects(): Promise<ProjectCaseStudy[]> {
         content: content.trim(),
       });
     }
-
-    return projects.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
   } catch (error) {
     console.error("Error reading projects:", error);
-    return [];
   }
+
+  // 2. Read from Prisma DB with timeout guarantee
+  try {
+    const dbProjects = await withDbTimeout(
+      prisma.projectCaseStudy.findMany({
+        orderBy: { order: "asc" },
+      }),
+      []
+    );
+
+    if (dbProjects && dbProjects.length > 0) {
+      for (const p of dbProjects) {
+        projectsMap.set(p.slug, {
+          title: p.title,
+          slug: p.slug,
+          summary: p.summary,
+          period: p.period,
+          role: p.role,
+          category: p.category,
+          techStack: p.techStack,
+          demoUrl: p.demoUrl || undefined,
+          githubUrl: p.githubUrl || undefined,
+          featured: p.featured,
+          order: p.order,
+          content: p.content,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("DB projects retrieval notice:", err);
+  }
+
+  const result = Array.from(projectsMap.values()).sort(
+    (a, b) => (a.order ?? 99) - (b.order ?? 99)
+  );
+
+  setToMemoryCache("all_projects", result);
+  return result;
 }
 
 export async function getProjectBySlug(slug: string): Promise<ProjectCaseStudy | null> {
+  const cacheKey = `project_${slug}`;
+  const cached = getFromMemoryCache<ProjectCaseStudy>(cacheKey);
+  if (cached) return cached;
+
   try {
-    const p = await prisma.projectCaseStudy.findUnique({
-      where: { slug },
-    }).catch(() => null);
+    const p = await withDbTimeout(
+      prisma.projectCaseStudy.findUnique({
+        where: { slug },
+      }),
+      null
+    );
 
     if (p) {
-      return {
+      const result: ProjectCaseStudy = {
         title: p.title,
         slug: p.slug,
         summary: p.summary,
@@ -365,13 +453,19 @@ export async function getProjectBySlug(slug: string): Promise<ProjectCaseStudy |
         order: p.order,
         content: p.content,
       };
+      setToMemoryCache(cacheKey, result);
+      return result;
     }
   } catch (err) {
     console.warn("DB single project retrieval notice:", err);
   }
 
   const all = await getAllProjects();
-  return all.find((p) => p.slug === slug) || null;
+  const matched = all.find((p) => p.slug === slug) || null;
+  if (matched) {
+    setToMemoryCache(cacheKey, matched);
+  }
+  return matched;
 }
 
 export async function getFeaturedProjects(): Promise<ProjectCaseStudy[]> {
@@ -381,6 +475,7 @@ export async function getFeaturedProjects(): Promise<ProjectCaseStudy[]> {
 
 export async function saveProject(project: ProjectCaseStudy): Promise<boolean> {
   try {
+    invalidateContentCache();
     // Save to DB
     await prisma.projectCaseStudy.upsert({
       where: { slug: project.slug },
@@ -442,6 +537,7 @@ export async function saveProject(project: ProjectCaseStudy): Promise<boolean> {
 
 export async function deleteProject(slug: string): Promise<boolean> {
   try {
+    invalidateContentCache();
     await prisma.projectCaseStudy.delete({
       where: { slug },
     }).catch(() => null);
@@ -462,35 +558,15 @@ export async function deleteProject(slug: string): Promise<boolean> {
 // ----------------------------------------------------
 
 export async function getAllResearchPapers(): Promise<ResearchPaper[]> {
-  try {
-    const dbPapers = await prisma.researchPaper.findMany({
-      orderBy: { order: "asc" },
-    }).catch(() => []);
+  const cached = getFromMemoryCache<ResearchPaper[]>("all_research");
+  if (cached) return cached;
 
-    if (dbPapers && dbPapers.length > 0) {
-      return dbPapers.map((p) => ({
-        title: p.title,
-        slug: p.slug,
-        authors: p.authors,
-        venue: p.venue,
-        year: p.year,
-        pdfUrl: p.pdfUrl || undefined,
-        doi: p.doi || undefined,
-        tags: p.tags,
-        abstract: p.abstract,
-        featured: p.featured,
-        order: p.order,
-        content: p.content || undefined,
-      }));
-    }
-  } catch (err) {
-    console.warn("DB research retrieval notice:", err);
-  }
+  const papersMap = new Map<string, ResearchPaper>();
 
+  // 1. Read local markdown files
   try {
     ensureDirectoryExists(RESEARCH_DIR);
     const files = fs.readdirSync(RESEARCH_DIR).filter((f) => f.endsWith(".md"));
-    const papers: ResearchPaper[] = [];
 
     for (const file of files) {
       const filePath = path.join(RESEARCH_DIR, file);
@@ -499,7 +575,7 @@ export async function getAllResearchPapers(): Promise<ResearchPaper[]> {
 
       const defaultSlug = file.replace(/\.md$/, "");
 
-      papers.push({
+      papersMap.set(data.slug || defaultSlug, {
         title: data.title || "Untitled Paper",
         slug: data.slug || defaultSlug,
         authors: Array.isArray(data.authors) ? data.authors : ["Yahya"],
@@ -514,22 +590,64 @@ export async function getAllResearchPapers(): Promise<ResearchPaper[]> {
         content: content.trim() || undefined,
       });
     }
-
-    return papers.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
   } catch (error) {
     console.error("Error reading research papers:", error);
-    return [];
   }
+
+  // 2. Read from Prisma DB with timeout guarantee
+  try {
+    const dbPapers = await withDbTimeout(
+      prisma.researchPaper.findMany({
+        orderBy: { order: "asc" },
+      }),
+      []
+    );
+
+    if (dbPapers && dbPapers.length > 0) {
+      for (const p of dbPapers) {
+        papersMap.set(p.slug, {
+          title: p.title,
+          slug: p.slug,
+          authors: p.authors,
+          venue: p.venue,
+          year: p.year,
+          pdfUrl: p.pdfUrl || undefined,
+          doi: p.doi || undefined,
+          tags: p.tags,
+          abstract: p.abstract,
+          featured: p.featured,
+          order: p.order,
+          content: p.content || undefined,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("DB research retrieval notice:", err);
+  }
+
+  const result = Array.from(papersMap.values()).sort(
+    (a, b) => (a.order ?? 99) - (b.order ?? 99)
+  );
+
+  setToMemoryCache("all_research", result);
+  return result;
 }
 
 export async function getResearchBySlug(slug: string): Promise<ResearchPaper | null> {
+  const cacheKey = `research_${slug}`;
+  const cached = getFromMemoryCache<ResearchPaper>(cacheKey);
+  if (cached) return cached;
+
   try {
-    const p = await prisma.researchPaper.findUnique({
-      where: { slug },
-    }).catch(() => null);
+    const p = await withDbTimeout(
+      prisma.researchPaper.findUnique({
+        where: { slug },
+      }),
+      null
+    );
 
     if (p) {
-      return {
+      const result: ResearchPaper = {
         title: p.title,
         slug: p.slug,
         authors: p.authors,
@@ -543,13 +661,19 @@ export async function getResearchBySlug(slug: string): Promise<ResearchPaper | n
         order: p.order,
         content: p.content || undefined,
       };
+      setToMemoryCache(cacheKey, result);
+      return result;
     }
   } catch (err) {
     console.warn("DB single research retrieval notice:", err);
   }
 
   const all = await getAllResearchPapers();
-  return all.find((p) => p.slug === slug) || null;
+  const matched = all.find((p) => p.slug === slug) || null;
+  if (matched) {
+    setToMemoryCache(cacheKey, matched);
+  }
+  return matched;
 }
 
 export async function getFeaturedResearch(): Promise<ResearchPaper[]> {
@@ -559,6 +683,7 @@ export async function getFeaturedResearch(): Promise<ResearchPaper[]> {
 
 export async function saveResearchPaper(paper: ResearchPaper): Promise<boolean> {
   try {
+    invalidateContentCache();
     // Save to DB
     await prisma.researchPaper.upsert({
       where: { slug: paper.slug },
@@ -620,6 +745,7 @@ export async function saveResearchPaper(paper: ResearchPaper): Promise<boolean> 
 
 export async function deleteResearchPaper(slug: string): Promise<boolean> {
   try {
+    invalidateContentCache();
     await prisma.researchPaper.delete({
       where: { slug },
     }).catch(() => null);
@@ -659,14 +785,20 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
 };
 
 export async function getProfileInfo(): Promise<ProfileInfoData> {
+  const cached = getFromMemoryCache<ProfileInfoData>("homepage_profile");
+  if (cached) return cached;
+
   try {
-    const profile = await prisma.profileInfo.findUnique({
-      where: { key: "homepage_profile" },
-    }).catch(() => null);
+    const profile = await withDbTimeout(
+      prisma.profileInfo.findUnique({
+        where: { key: "homepage_profile" },
+      }),
+      null
+    );
 
     if (profile) {
       const dbVisibility = profile.sectionsVisibility as unknown as SectionVisibility | undefined;
-      return {
+      const result: ProfileInfoData = {
         headline: profile.headline || "",
         bio: profile.bio || [],
         skills: profile.skills || [],
@@ -688,6 +820,8 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
           research: dbVisibility?.research !== undefined ? Boolean(dbVisibility.research) : true,
         },
       };
+      setToMemoryCache("homepage_profile", result);
+      return result;
     }
   } catch (err) {
     console.warn("DB profile info query notice:", err);
@@ -698,6 +832,7 @@ export async function getProfileInfo(): Promise<ProfileInfoData> {
 
 export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {
   try {
+    invalidateContentCache();
     const visibilityToSave = {
       summary: data.sectionsVisibility?.summary !== undefined ? Boolean(data.sectionsVisibility.summary) : true,
       experience: data.sectionsVisibility?.experience !== undefined ? Boolean(data.sectionsVisibility.experience) : true,
