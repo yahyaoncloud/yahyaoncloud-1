@@ -162,7 +162,7 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
   const sanitizedContent = content.replace(/^#\s+[^\n]+\n*/, "");
 
   return (
-    <div className={`space-y-4 text-base md:text-[17px] leading-relaxed text-zinc-700 dark:text-zinc-300 [&>*:first-child]:mt-0 ${className}`}>
+    <div className={`space-y-4 text-[15px] sm:text-base md:text-[17px] leading-relaxed text-zinc-700 dark:text-zinc-300 [&>*:first-child]:mt-0 ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -170,47 +170,57 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
           pre: ({ children }) => <>{children}</>,
           code: CodeBlock as any,
           h1: ({ children }) => (
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-7 mb-3">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-6 sm:mt-7 mb-2.5 sm:mb-3 break-words">
               {children}
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-lg md:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mt-6 mb-2.5">
+            <h2 className="text-base sm:text-lg md:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mt-5 sm:mt-6 mb-2 sm:mb-2.5 break-words">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-base md:text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-5 mb-2">
+            <h3 className="text-[15px] sm:text-base md:text-lg font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-4 sm:mt-5 mb-1.5 sm:mb-2 break-words">
               {children}
             </h3>
           ),
           h4: ({ children }) => (
-            <h4 className="text-[15px] md:text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-4 mb-1.5">
+            <h4 className="text-sm sm:text-[15px] md:text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mt-3.5 sm:mt-4 mb-1.5 break-words">
               {children}
             </h4>
           ),
           p: ({ children }) => (
-            <p className="text-base md:text-[17px] leading-relaxed my-3.5 text-zinc-700 dark:text-zinc-300">
+            <p className="text-[15px] sm:text-base md:text-[17px] leading-relaxed my-3 sm:my-3.5 text-zinc-700 dark:text-zinc-300 break-words">
               {children}
             </p>
           ),
           ul: ({ children }) => (
-            <ul className="list-disc pl-5 my-3.5 space-y-1.5 text-base md:text-[17px] text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
+            <ul className="list-disc pl-5 my-3 sm:my-3.5 space-y-1.5 text-[15px] sm:text-base md:text-[17px] text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal pl-5 my-3.5 space-y-1.5 text-base md:text-[17px] text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
+            <ol className="list-decimal pl-5 my-3 sm:my-3.5 space-y-1.5 text-[15px] sm:text-base md:text-[17px] text-zinc-700 dark:text-zinc-300 marker:text-zinc-400 dark:marker:text-zinc-600">
               {children}
             </ol>
           ),
           li: ({ children }) => (
-            <li className="leading-relaxed text-base md:text-[17px] my-0.5 text-zinc-700 dark:text-zinc-300">{children}</li>
+            <li className="leading-relaxed text-[15px] sm:text-base md:text-[17px] my-0.5 text-zinc-700 dark:text-zinc-300 break-words">{children}</li>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="my-4 pl-3.5 border-l-2 border-zinc-300 dark:border-zinc-700 italic text-zinc-600 dark:text-zinc-400 py-0.5 text-base md:text-[17px]">
+            <blockquote className="my-3 sm:my-4 pl-3 sm:pl-3.5 border-l-2 border-zinc-300 dark:border-zinc-700 italic text-zinc-600 dark:text-zinc-400 py-0.5 text-[15px] sm:text-base md:text-[17px]">
               {children}
             </blockquote>
+          ),
+          img: ({ src, alt }) => (
+            <span className="block my-4 overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-800/80">
+              <img
+                src={src}
+                alt={alt || ""}
+                loading="lazy"
+                className="w-full h-auto object-cover max-h-[500px]"
+              />
+            </span>
           ),
           a: ({ href, children }) => {
             const isExternal = href?.startsWith("http");
@@ -219,16 +229,16 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
                 href={href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noreferrer noopener" : undefined}
-                className="text-zinc-900 dark:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 hover:decoration-zinc-900 dark:hover:decoration-zinc-100 transition-colors"
+                className="text-zinc-900 dark:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 hover:decoration-zinc-900 dark:hover:decoration-zinc-100 transition-colors break-words"
               >
                 {children}
               </a>
             );
           },
-          hr: () => <hr className="my-7 border-zinc-200 dark:border-zinc-800" />,
+          hr: () => <hr className="my-6 sm:my-7 border-zinc-200 dark:border-zinc-800" />,
           table: ({ children }) => (
-            <div className="my-5 overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
-              <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs md:text-sm">
+            <div className="my-4 sm:my-5 overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800 -mx-1 sm:mx-0">
+              <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-xs sm:text-sm">
                 {children}
               </table>
             </div>
@@ -245,10 +255,10 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
           ),
           tr: ({ children }) => <tr>{children}</tr>,
           th: ({ children }) => (
-            <th className="px-3 py-2 text-left font-medium">{children}</th>
+            <th className="px-2.5 sm:px-3 py-2 text-left font-medium">{children}</th>
           ),
           td: ({ children }) => (
-            <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">{children}</td>
+            <td className="px-2.5 sm:px-3 py-2 text-zinc-700 dark:text-zinc-300">{children}</td>
           ),
         }}
       >
