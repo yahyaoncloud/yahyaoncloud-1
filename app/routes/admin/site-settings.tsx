@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { Settings, Globe, Save, Loader2, Mail, Share2, AlertTriangle } from "lucide-react";
+import { LuSettings as Settings, LuGlobe as Globe, LuSave as Save, LuLoaderCircle as Loader2, LuMail as Mail, LuShare2 as Share2, LuTriangleAlert as AlertTriangle } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Linktree } from "@prisma/client";
-import { Linkedin, Github, Twitter, Instagram, Mail, Globe } from "lucide-react";
+import { LuLinkedin as Linkedin, LuGithub as Github, LuTwitter as Twitter, LuInstagram as Instagram, LuMail as Mail, LuGlobe as Globe } from "react-icons/lu";
 
 type Serialized<T> = {
   [P in keyof T]: T[P] extends Date ? string | Date : T[P];

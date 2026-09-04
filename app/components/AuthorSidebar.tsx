@@ -1,13 +1,5 @@
-import {
-  Home,
-  FileText,
-  Image,
-  User,
-  PlusCircle,
-  ChevronDown,
-  ChevronRight,
-  type LucideIcon,
-} from "lucide-react";
+import { LuHouse as Home, LuFileText as FileText, LuImage as Image, LuUser as User, LuCirclePlus as PlusCircle, LuChevronDown as ChevronDown, LuChevronRight as ChevronRight } from "react-icons/lu";
+import type { IconType as LucideIcon } from "react-icons";
 import { NavLink, useLocation } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";

@@ -1,6 +1,6 @@
 // Image Upload Component for Homepage Cards
 import { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { LuUpload as Upload, LuX as X, LuImage as ImageIcon } from "react-icons/lu";
 import { uploadFile, validateFileType, validateFileSize } from '~/utils/supabase-storage.client';
 
 interface ImageUploadProps {

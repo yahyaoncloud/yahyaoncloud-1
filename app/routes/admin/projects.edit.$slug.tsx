@@ -1,6 +1,6 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { ArrowLeft, Save } from "lucide-react";
+import { LuArrowLeft as ArrowLeft, LuSave as Save } from "react-icons/lu";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { saveProject, getProjectBySlug, type ProjectCaseStudy } from "~/Services/content.server";
 

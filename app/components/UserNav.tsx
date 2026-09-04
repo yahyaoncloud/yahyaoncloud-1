@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { User, Settings, LogOut, CreditCard } from "lucide-react";
+import { LuUser as User, LuSettings as Settings, LuLogOut as LogOut, LuCreditCard as CreditCard } from "react-icons/lu";
 
 export function UserNav() {
   return (

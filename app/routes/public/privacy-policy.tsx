@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { Shield, Clock, Lock, ArrowLeft } from "lucide-react";
+import { LuShield as Shield, LuClock as Clock, LuLock as Lock, LuArrowLeft as ArrowLeft } from "react-icons/lu";
 
 export default function PrivacyPolicyPage() {
   return (

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, LogOut, Sparkles, MessageSquare, CornerDownLeft } from "lucide-react";
+import { LuSend as Send, LuLogOut as LogOut, LuSparkles as Sparkles, LuMessageSquare as MessageSquare, LuCornerDownLeft as CornerDownLeft } from "react-icons/lu";
 import { FaGithub } from "react-icons/fa";
 import { FaSquareXTwitter, FaGoogle } from "react-icons/fa6";
 import {

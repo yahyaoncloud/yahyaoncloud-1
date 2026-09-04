@@ -1,5 +1,5 @@
 import React from "react";
-import { Globe, Smartphone, Monitor, Clock, Activity } from "lucide-react";
+import { LuGlobe as Globe, LuSmartphone as Smartphone, LuMonitor as Monitor, LuClock as Clock, LuActivity as Activity } from "react-icons/lu";
 import { cn } from "~/lib/utils";
 
 export interface ActivityVisit {

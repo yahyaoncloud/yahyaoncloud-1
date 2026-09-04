@@ -1,22 +1,6 @@
 import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData, useFetcher, useRouteError, isRouteErrorResponse } from "@remix-run/react";
-import {
-  Briefcase,
-  FileText,
-  Settings,
-  Users,
-  Eye,
-  LayoutGrid,
-  Sparkles,
-  Layers,
-  Globe,
-  ExternalLink,
-  Code,
-  Award,
-  BookOpen,
-  Share2,
-  TrendingUp,
-} from "lucide-react";
+import { LuBriefcase as Briefcase, LuFileText as FileText, LuSettings as Settings, LuUsers as Users, LuEye as Eye, LuLayoutGrid as LayoutGrid, LuSparkles as Sparkles, LuLayers as Layers, LuGlobe as Globe, LuExternalLink as ExternalLink, LuCode as Code, LuAward as Award, LuBookOpen as BookOpen, LuShare2 as Share2, LuTrendingUp as TrendingUp } from "react-icons/lu";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { getAnalyticsSummary } from "~/Services/analytics.server";

@@ -7,7 +7,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
-import { Save, Globe, AlertTriangle, Loader2 } from "lucide-react";
+import { LuSave as Save, LuGlobe as Globe, LuTriangleAlert as AlertTriangle, LuLoaderCircle as Loader2 } from "react-icons/lu";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAdmin(request);

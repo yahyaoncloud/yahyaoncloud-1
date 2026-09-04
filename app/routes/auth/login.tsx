@@ -2,7 +2,7 @@ import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from
 import { Form, useActionData, useNavigation, useSearchParams, useSubmit, Link } from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { FaGoogle, FaGithub, FaDiscord } from "react-icons/fa";
-import { Sun, Moon, Lock, ArrowRight } from "lucide-react";
+import { LuSun as Sun, LuMoon as Moon, LuLock as Lock, LuArrowRight as ArrowRight } from "react-icons/lu";
 import { useTheme } from "~/Contexts/ThemeContext";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

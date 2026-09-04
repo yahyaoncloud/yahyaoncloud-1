@@ -5,7 +5,7 @@ import { getAdminByUsername, updateAdmin } from "~/Services/admin.prisma.server"
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { User, Shield, Save, Loader2, Layout, Sidebar as SidebarIcon } from "lucide-react";
+import { LuUser as User, LuShield as Shield, LuSave as Save, LuLoaderCircle as Loader2, LuLayoutDashboard as Layout, LuPanelLeft as SidebarIcon } from "react-icons/lu";
 import { useUIStore } from "~/store/uiStore";
 import { toast } from "sonner";
 

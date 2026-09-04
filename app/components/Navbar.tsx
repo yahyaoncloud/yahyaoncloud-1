@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { Sun, Moon, User, ChevronDown, Menu } from "lucide-react";
+import { LuSun as Sun, LuMoon as Moon, LuUser as User, LuChevronDown as ChevronDown, LuMenu as Menu } from "react-icons/lu";
 import { useTheme } from "../Contexts/ThemeContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";

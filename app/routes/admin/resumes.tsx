@@ -13,15 +13,7 @@ import {
   TableHeader, 
   TableRow 
 } from "~/components/ui/table";
-import { 
-  Plus, 
-  Trash2, 
-  Eye, 
-  EyeOff, 
-  FileText, 
-  Upload, 
-  Download
-} from "lucide-react";
+import { LuPlus as Plus, LuTrash2 as Trash2, LuEye as Eye, LuEyeOff as EyeOff, LuFileText as FileText, LuUpload as Upload, LuDownload as Download } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 

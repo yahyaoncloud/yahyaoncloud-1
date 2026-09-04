@@ -3,7 +3,7 @@ import Sidebar from "~/components/Sidebar";
 import Navbar from "~/components/Navbar";
 import { useUIStore } from "~/store/uiStore";
 import { useEffect } from "react";
-import { AlertTriangle, RefreshCw, LayoutDashboard, Home } from "lucide-react";
+import { LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw, LuLayoutDashboard as LayoutDashboard, LuHouse as Home } from "react-icons/lu";
 import { Button } from "~/components/ui/button";
 
 import { json, type LoaderFunctionArgs } from "@remix-run/node";

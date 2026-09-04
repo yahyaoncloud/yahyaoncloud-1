@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
 import { Link, useRouteLoaderData } from "@remix-run/react";
-import { Mail, ChevronRight } from "lucide-react";
+import { LuMail as Mail, LuChevronRight as ChevronRight } from "react-icons/lu";
 import { useState, useMemo } from "react";
 import { Author, ContactDetails, Post } from "../Types/types";
 import {

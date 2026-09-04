@@ -3,7 +3,7 @@ import { useTheme } from "~/Contexts/ThemeContext";
 import { Link, useLoaderData, Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Edit, Trash2, Eye, Clock, Calendar, Save, ArrowLeft, Image as ImageIcon, Plus, Copy, FileJson, AlertTriangle } from "lucide-react";
+import { LuPencil as Edit, LuTrash2 as Trash2, LuEye as Eye, LuClock as Clock, LuCalendar as Calendar, LuSave as Save, LuArrowLeft as ArrowLeft, LuImage as ImageIcon, LuPlus as Plus, LuCopy as Copy, LuFileJson as FileJson, LuTriangleAlert as AlertTriangle } from "react-icons/lu";
 import { marked } from "marked";
 import { useEffect, useState, useRef } from "react";
 import { requireAdmin } from "~/utils/admin-auth.server";

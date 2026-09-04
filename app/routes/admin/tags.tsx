@@ -6,7 +6,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { AdminDataTable, type Column } from "~/components/AdminDataTable";
-import { Tag, Pencil, Trash2 } from "lucide-react";
+import { LuTag as Tag, LuPencil as Pencil, LuTrash2 as Trash2 } from "react-icons/lu";
 import { 
   getTags, 
   createTag, 

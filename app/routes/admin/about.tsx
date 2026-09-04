@@ -9,7 +9,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Plus, Trash2, Save, User, Briefcase, Code, Award, Share2, Layers, LayoutGrid, CheckCircle2, Sparkles, AlertTriangle, RefreshCw } from "lucide-react";
+import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuUser as User, LuBriefcase as Briefcase, LuCode as Code, LuAward as Award, LuShare2 as Share2, LuLayers as Layers, LuLayoutGrid as LayoutGrid, LuCircleCheck as CheckCircle2, LuSparkles as Sparkles, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ImageUpload from "~/components/ImageUpload";

@@ -3,7 +3,7 @@ import { useTheme } from "~/Contexts/ThemeContext";
 import { Link, useActionData, useNavigation, Form, useFetcher, useSubmit, useLoaderData } from "@remix-run/react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { ArrowLeft, Plus, Image as ImageIcon, Save, Eye, Loader2, Copy, Check, Upload, Tag } from "lucide-react";
+import { LuArrowLeft as ArrowLeft, LuPlus as Plus, LuImage as ImageIcon, LuSave as Save, LuEye as Eye, LuLoaderCircle as Loader2, LuCopy as Copy, LuCheck as Check, LuUpload as Upload, LuTag as Tag } from "react-icons/lu";
 import { marked } from "marked";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { requireAdmin } from "~/utils/admin-auth.server";

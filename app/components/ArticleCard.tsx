@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 import { motion } from "framer-motion";
-import { Calendar, ArrowRight } from "lucide-react";
+import { LuCalendar as Calendar, LuArrowRight as ArrowRight } from "react-icons/lu";
 import { useTheme } from "../Contexts/ThemeContext";
 
 interface ArticleCardProps {

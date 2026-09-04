@@ -10,19 +10,8 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
-import {
-  Search,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Inbox,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { LuSearch as Search, LuArrowUpDown as ArrowUpDown, LuArrowUp as ArrowUp, LuArrowDown as ArrowDown, LuChevronLeft as ChevronLeft, LuChevronRight as ChevronRight, LuChevronsLeft as ChevronsLeft, LuChevronsRight as ChevronsRight, LuInbox as Inbox, LuX as X } from "react-icons/lu";
+import type { IconType as LucideIcon } from "react-icons";
 import { cn } from "~/lib/utils";
 
 export interface Column<T> {

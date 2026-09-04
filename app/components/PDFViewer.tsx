@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { X } from 'lucide-react';
+import { LuX as X } from "react-icons/lu";
 
 // Import styles
 import '@react-pdf-viewer/core/lib/styles/index.css';

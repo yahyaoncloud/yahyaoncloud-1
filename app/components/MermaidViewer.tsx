@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useId, useCallback } from "react";
-import { ZoomIn, ZoomOut, RotateCcw, Maximize2, X, Move } from "lucide-react";
+import { LuZoomIn as ZoomIn, LuZoomOut as ZoomOut, LuRotateCcw as RotateCcw, LuMaximize2 as Maximize2, LuX as X, LuMove as Move } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "~/Contexts/ThemeContext";
 

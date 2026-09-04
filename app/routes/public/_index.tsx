@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { ChevronRight } from "lucide-react";
+import { LuChevronRight as ChevronRight } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import profilePhoto from "~/assets/profile.jpg";
 import {

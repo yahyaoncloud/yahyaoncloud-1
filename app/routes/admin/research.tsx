@@ -1,6 +1,6 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData, useSubmit } from "@remix-run/react";
-import { Plus, Edit2, Trash2, ExternalLink } from "lucide-react";
+import { LuPlus as Plus, LuPencil as Edit2, LuTrash2 as Trash2, LuExternalLink as ExternalLink } from "react-icons/lu";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { getAllResearchPapers, deleteResearchPaper, type ResearchPaper } from "~/Services/content.server";
 

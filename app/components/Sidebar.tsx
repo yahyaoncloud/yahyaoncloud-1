@@ -1,25 +1,5 @@
-import {
-  Home,
-  FileText,
-  Tags,
-  Image,
-  Settings,
-  User,
-  MessageSquare,
-  PlusCircle,
-  Briefcase,
-  Tag,
-  Share2,
-  ChevronDown,
-  Layout,
-  LayoutGrid,
-  Globe,
-  Mail,
-  Sparkles,
-  ChevronRight,
-  BookOpen,
-  type LucideIcon,
-} from "lucide-react";
+import { LuHouse as Home, LuFileText as FileText, LuTags as Tags, LuImage as Image, LuSettings as Settings, LuUser as User, LuMessageSquare as MessageSquare, LuCirclePlus as PlusCircle, LuBriefcase as Briefcase, LuTag as Tag, LuShare2 as Share2, LuChevronDown as ChevronDown, LuLayoutDashboard as Layout, LuLayoutGrid as LayoutGrid, LuGlobe as Globe, LuMail as Mail, LuSparkles as Sparkles, LuChevronRight as ChevronRight, LuBookOpen as BookOpen } from "react-icons/lu";
+import type { IconType as LucideIcon } from "react-icons";
 import { NavLink, useLocation } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";

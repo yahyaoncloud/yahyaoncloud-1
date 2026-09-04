@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "@remix-run/react";
-import type { LucideIcon } from "lucide-react";
+import type { IconType as LucideIcon } from "react-icons";
 import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
-import { ArrowUpRight, Loader2 } from "lucide-react";
+import { LuArrowUpRight as ArrowUpRight, LuLoaderCircle as Loader2 } from "react-icons/lu";
 import { cn } from "~/lib/utils";
 
 export interface AdminSectionToggleCardProps {

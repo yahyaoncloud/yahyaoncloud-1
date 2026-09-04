@@ -24,17 +24,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "~/components/ui/dropdown-menu";
-import { 
-  Plus, 
-  Trash2, 
-  Edit, 
-  MoreVertical, 
-  Eye, 
-  EyeOff, 
-  Search,
-  FileText,
-  Filter
-} from "lucide-react";
+import { LuPlus as Plus, LuTrash2 as Trash2, LuPencil as Edit, LuEllipsisVertical as MoreVertical, LuEye as Eye, LuEyeOff as EyeOff, LuSearch as Search, LuFileText as FileText, LuFilter as Filter } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { requireAdmin } from "~/utils/admin-auth.server";

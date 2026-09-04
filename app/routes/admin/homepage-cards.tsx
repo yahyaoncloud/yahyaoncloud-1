@@ -7,7 +7,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
-import { Layers, Save, Plus, ExternalLink, Trash2, Edit, MoreVertical, LayoutGrid, AlertTriangle, RefreshCw } from "lucide-react";
+import { LuLayers as Layers, LuSave as Save, LuPlus as Plus, LuExternalLink as ExternalLink, LuTrash2 as Trash2, LuPencil as Edit, LuEllipsisVertical as MoreVertical, LuLayoutGrid as LayoutGrid, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw } from "react-icons/lu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
 import { requireAdmin } from "~/utils/admin-auth.server";

@@ -1,19 +1,6 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useActionData, useNavigation, Form, Link } from "@remix-run/react";
-import {
-  User,
-  Shield,
-  KeyRound,
-  Mail,
-  Lock,
-  Save,
-  Loader2,
-  CheckCircle2,
-  LogOut,
-  Clock,
-  Sparkles,
-  ShieldCheck,
-} from "lucide-react";
+import { LuUser as User, LuShield as Shield, LuKeyRound as KeyRound, LuMail as Mail, LuLock as Lock, LuSave as Save, LuLoaderCircle as Loader2, LuCircleCheck as CheckCircle2, LuLogOut as LogOut, LuClock as Clock, LuSparkles as Sparkles, LuShieldCheck as ShieldCheck } from "react-icons/lu";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { getAdminByUsername, updateAdmin } from "~/Services/admin.prisma.server";
 import { verifyPassword } from "~/utils/password.server";

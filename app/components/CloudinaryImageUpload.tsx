@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useFetcher } from "@remix-run/react";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
+import { LuUpload as Upload, LuX as X, LuImage as ImageIcon, LuLoaderCircle as Loader2 } from "react-icons/lu";
 import toast from "react-hot-toast";
 
 interface CloudinaryImageUploadProps {

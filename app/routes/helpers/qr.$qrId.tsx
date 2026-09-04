@@ -5,7 +5,7 @@
 import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { useEffect } from "react";
-import { QrCode, AlertTriangle } from "lucide-react";
+import { LuQrCode as QrCode, LuTriangleAlert as AlertTriangle } from "react-icons/lu";
 import {
   getQRByQrId,
   recordScan,

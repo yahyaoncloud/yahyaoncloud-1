@@ -2,23 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Button } from './ui/button';
-import { 
-  Bold, 
-  Italic, 
-  Code, 
-  Link as LinkIcon, 
-  List, 
-  ListOrdered, 
-  Quote, 
-  Heading1, 
-  Heading2, 
-  Heading3,
-  Image as ImageIcon,
-  Eye,
-  EyeOff,
-  Maximize2,
-  Minimize2
-} from 'lucide-react';
+import { LuBold as Bold, LuItalic as Italic, LuCode as Code, LuLink as LinkIcon, LuList as List, LuListOrdered as ListOrdered, LuQuote as Quote, LuHeading1 as Heading1, LuHeading2 as Heading2, LuHeading3 as Heading3, LuImage as ImageIcon, LuEye as Eye, LuEyeOff as EyeOff, LuMaximize2 as Maximize2, LuMinimize2 as Minimize2 } from "react-icons/lu";
 
 interface MarkdownEditorProps {
   value: string;

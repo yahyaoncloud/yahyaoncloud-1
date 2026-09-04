@@ -1,6 +1,6 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData, useSubmit, useNavigation } from "@remix-run/react";
-import { Plus, Edit2, Trash2, ExternalLink, Briefcase, Eye } from "lucide-react";
+import { LuPlus as Plus, LuPencil as Edit2, LuTrash2 as Trash2, LuExternalLink as ExternalLink, LuBriefcase as Briefcase, LuEye as Eye } from "react-icons/lu";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { getAllProjects, deleteProject, type ProjectCaseStudy } from "~/Services/content.server";
 import { AdminPageHeader, AdminDataTable, type Column } from "~/components/admin";

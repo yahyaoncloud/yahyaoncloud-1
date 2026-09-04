@@ -1,6 +1,6 @@
 import { Outlet, Link } from "@remix-run/react";
 import { ThemeProvider } from "~/Contexts/ThemeContext";
-import { ArrowLeft } from "lucide-react";
+import { LuArrowLeft as ArrowLeft } from "react-icons/lu";
 
 export default function AuthLayout() {
   return (

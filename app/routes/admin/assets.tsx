@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, json, LoaderFunctionArgs, unstable_composeUploadHandlers, unstable_createMemoryUploadHandler, unstable_parseMultipartFormData } from "@remix-run/node";
 import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
-import { Copy, Trash2, Upload, FileText, AlertCircle, CheckCircle, Image as ImageIcon, FileVideo, FileAudio, File } from "lucide-react";
+import { LuCopy as Copy, LuTrash2 as Trash2, LuUpload as Upload, LuFileText as FileText, LuCircleAlert as AlertCircle, LuCircleCheck as CheckCircle, LuImage as ImageIcon, LuFileVideo as FileVideo, LuFileAudio as FileAudio, LuFile as File } from "react-icons/lu";
 import { useState } from "react";
 import { deleteFromSupabase, listSupabaseFiles, uploadToSupabase } from "~/utils/supabase.server";
 import { Button } from "~/components/ui/button";
