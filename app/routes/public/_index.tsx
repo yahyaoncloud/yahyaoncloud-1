@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { LuChevronRight as ChevronRight } from "react-icons/lu";
+import {
+  LuChevronRight as ChevronRight,
+  LuSparkles as Sparkles,
+  LuLayers as Layers,
+  LuCode as Code,
+} from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import profilePhoto from "~/assets/profile.jpg";
+import { TechIcon } from "~/components/TechIcon";
 import {
   getProfileInfo,
   getFeaturedProjects,
@@ -42,6 +48,7 @@ export default function Index() {
   const { profileInfo, featuredProjects, featuredResearch, recentPosts } =
     useLoaderData<typeof loader>();
   const [openExperienceIndex, setOpenExperienceIndex] = useState<number | null>(null);
+  const [skillsView, setSkillsView] = useState<"badges" | "icons" | "text">("badges");
 
   const toggleExperience = (idx: number) => {
     setOpenExperienceIndex(openExperienceIndex === idx ? null : idx);
@@ -321,17 +328,98 @@ export default function Index() {
         profileInfo.skills &&
         profileInfo.skills.length > 0 && (
           <section className="space-y-3 pt-2">
-            <h2 className="section-heading">Skills</h2>
-            <div className="flex flex-wrap gap-1.5">
-              {profileInfo.skills.map((skill, idx) => (
-                <span
-                  key={idx}
-                  className="text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80"
+            <div className="flex items-center justify-between">
+              <h2 className="section-heading">Skills</h2>
+              {/* View Switcher: Both | Icons | Text */}
+              <div className="inline-flex items-center gap-0.5 p-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 text-[11px] sm:text-xs">
+                <button
+                  type="button"
+                  onClick={() => setSkillsView("badges")}
+                  className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
+                    skillsView === "badges"
+                      ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium"
+                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+                  }`}
+                  title="Show both icons and text badges"
                 >
-                  {skill}
-                </span>
-              ))}
+                  <Layers size={11} className={skillsView === "badges" ? "text-blue-500" : ""} />
+                  <span>Both</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSkillsView("icons")}
+                  className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
+                    skillsView === "icons"
+                      ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium"
+                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+                  }`}
+                  title="Show brand icons grid"
+                >
+                  <Sparkles size={11} className={skillsView === "icons" ? "text-amber-500" : ""} />
+                  <span>Icons</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSkillsView("text")}
+                  className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
+                    skillsView === "text"
+                      ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm font-medium"
+                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+                  }`}
+                  title="Show text only"
+                >
+                  <Code size={11} className={skillsView === "text" ? "text-emerald-500" : ""} />
+                  <span>Text</span>
+                </button>
+              </div>
             </div>
+
+            {/* Icons-Only Mode */}
+            {skillsView === "icons" && (
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 pt-1">
+                {profileInfo.skills.map((skill, idx) => (
+                  <div
+                    key={idx}
+                    className="group relative flex flex-col items-center justify-center p-2.5 rounded-lg bg-zinc-100/70 dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900 transition-all hover:scale-105"
+                    title={skill}
+                  >
+                    <TechIcon name={skill} size={24} useBrandColor />
+                    <span className="mt-1.5 text-[10.5px] font-mono text-zinc-600 dark:text-zinc-400 text-center truncate max-w-full">
+                      {skill.replace(/\s*\([^)]*\)/g, "").split("&")[0].trim()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Badges Mode (Icons + Text) */}
+            {skillsView === "badges" && (
+              <div className="flex flex-wrap gap-1.5">
+                {profileInfo.skills.map((skill, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                  >
+                    <TechIcon name={skill} size={15} useBrandColor />
+                    <span>{skill}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Text-Only Mode */}
+            {skillsView === "text" && (
+              <div className="flex flex-wrap gap-1.5">
+                {profileInfo.skills.map((skill, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs md:text-[14.5px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            )}
           </section>
         )}
 

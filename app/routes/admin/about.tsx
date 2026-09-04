@@ -13,6 +13,7 @@ import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuUser as User, LuB
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ImageUpload from "~/components/ImageUpload";
+import { TechIcon } from "~/components/TechIcon";
 import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -787,8 +788,11 @@ export default function AdminAbout() {
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {skills.map((skill, i) => (
-                        <div key={i} className="flex gap-2">
-                            <Input className="bg-white dark:bg-zinc-950" value={skill} onChange={(e) => updateSkill(i, e.target.value)} placeholder="Skill name" />
+                        <div key={i} className="flex gap-2 items-center">
+                            <div className="flex items-center gap-2 flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md px-2.5 py-1 focus-within:ring-2 focus-within:ring-zinc-950 dark:focus-within:ring-zinc-300">
+                                <TechIcon name={skill} size={16} useBrandColor />
+                                <Input className="border-0 shadow-none p-0 h-8 focus-visible:ring-0 bg-transparent text-sm" value={skill} onChange={(e) => updateSkill(i, e.target.value)} placeholder="Skill name" />
+                            </div>
                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSkill(i)} className="text-red-500 shrink-0">
                                 <Trash2 size={14} />
                             </Button>

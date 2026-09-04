@@ -2,6 +2,7 @@ import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getProjectBySlug, type ProjectCaseStudy } from "~/Services/content.server";
 import MarkdownViewer from "~/components/MarkdownViewer";
+import { TechIcon } from "~/components/TechIcon";
 
 export const headers = () => ({
   "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
@@ -85,9 +86,10 @@ export default function ProjectDetail() {
             {project.techStack.map((tech, i) => (
               <span
                 key={i}
-                className="text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
+                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
               >
-                {tech}
+                <TechIcon name={tech} size={13} useBrandColor />
+                <span>{tech}</span>
               </span>
             ))}
           </div>

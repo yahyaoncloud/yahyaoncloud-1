@@ -2,6 +2,7 @@ import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAllProjects, type ProjectCaseStudy } from "~/Services/content.server";
+import { TechIcon } from "~/components/TechIcon";
 
 export const headers = () => ({
   "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
@@ -102,9 +103,10 @@ export default function ProjectsIndex() {
                   {tags.map((tag: string, idx: number) => (
                     <span
                       key={idx}
-                      className="text-[11px] md:text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800/80"
+                      className="inline-flex items-center gap-1 text-[11px] md:text-xs font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800/80"
                     >
-                      {tag}
+                      <TechIcon name={tag} size={12} useBrandColor />
+                      <span>{tag}</span>
                     </span>
                   ))}
                 </div>

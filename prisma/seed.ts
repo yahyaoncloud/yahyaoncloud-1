@@ -24,6 +24,13 @@ async function main() {
       "Python & Bash Scripting",
       "Cloud Architecture & SRE",
       "Remix / TypeScript",
+      "Golang",
+      "PostgreSQL",
+      "MongoDB",
+      "Redis",
+      "Prometheus & Grafana",
+      "Ansible & Helm",
+      "Cloudflare",
     ],
     certifications: [
       {
