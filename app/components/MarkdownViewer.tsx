@@ -72,7 +72,7 @@ function CodeBlock({
   if (isInline) {
     return (
       <code
-        className="px-1.5 py-0.5 rounded text-[13.5px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
+        className="px-1.5 py-0.5 rounded text-[13px] sm:text-[13.5px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-700/60"
         {...props}
       >
         {children}
@@ -94,17 +94,15 @@ function CodeBlock({
     }
   };
 
-  const activeTheme = isDark ? themes.vsDark : themes.vsLight;
-
   return (
-    <div className="my-5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/70 overflow-hidden shadow-xs">
+    <div className="my-5 rounded-lg border border-zinc-800/90 bg-zinc-900 dark:bg-zinc-950 overflow-hidden shadow-xs w-full max-w-full">
       {/* Code Snippet Header with Filename & Copy Button */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/90 dark:bg-zinc-800/70 text-xs font-mono select-none">
-        <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 font-medium truncate">
+      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-zinc-800 bg-zinc-800/60 dark:bg-zinc-900/90 text-xs font-mono select-none">
+        <div className="flex items-center gap-2 text-zinc-300 font-medium truncate">
           {isShell ? (
-            <Terminal size={13} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
+            <Terminal size={13} className="text-zinc-400 shrink-0" />
           ) : (
-            <FileCode size={13} className="text-zinc-500 dark:text-zinc-400 shrink-0" />
+            <FileCode size={13} className="text-zinc-400 shrink-0" />
           )}
           <span className="truncate text-xs">{displayTitle}</span>
         </div>
@@ -112,14 +110,14 @@ function CodeBlock({
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700/50 transition-colors cursor-pointer"
           title="Copy code"
           aria-label="Copy code to clipboard"
         >
           {copied ? (
             <>
-              <Check size={12} className="text-emerald-500" />
-              <span className="text-[11px] text-emerald-500 font-sans font-medium">Copied</span>
+              <Check size={12} className="text-emerald-400" />
+              <span className="text-[11px] text-emerald-400 font-sans font-medium">Copied</span>
             </>
           ) : (
             <>
@@ -132,16 +130,16 @@ function CodeBlock({
 
       {/* Syntax Highlighted Code Content */}
       <Highlight
-        theme={activeTheme}
+        theme={themes.vsDark}
         code={codeString}
         language={lang || "bash"}
       >
         {({ className: highlightClass, style, tokens, getLineProps, getTokenProps }) => (
           <pre
-            className={`p-3.5 sm:p-4 overflow-x-auto font-mono text-[13.5px] md:text-[14px] leading-relaxed text-zinc-900 dark:text-zinc-100 custom-scroll ${highlightClass}`}
+            className={`p-3.5 sm:p-4 overflow-x-auto font-mono text-[13px] sm:text-[13.5px] md:text-[14px] leading-relaxed text-zinc-100 custom-scroll w-full max-w-full m-0 !bg-transparent ${highlightClass}`}
             style={{ ...style, backgroundColor: "transparent" }}
           >
-            <code className="block">
+            <code className="block w-full !bg-transparent !p-0 !rounded-none !border-0 font-mono text-inherit whitespace-pre">
               {tokens.map((line, i) => (
                 <div key={i} {...getLineProps({ line })}>
                   {line.map((token, key) => (

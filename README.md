@@ -35,9 +35,7 @@ project-root/
 
 ## Snapshot
 
-Blog homepage:
-
-![Blog Homepage](./app/assets/sample.png)
+Yahya's personal engineering platform & cloud portfolio.
 
 ## Features
 

@@ -203,9 +203,6 @@ export default function Index() {
                           <span className="font-medium text-zinc-900 dark:text-zinc-100 text-sm truncate">
                             {exp.company}
                           </span>
-                          <span className="text-zinc-500 dark:text-zinc-400 text-sm truncate font-normal">
-                            , {exp.role}
-                          </span>
                         </div>
                         <div className="flex-1 h-px bg-zinc-200/60 dark:bg-zinc-800/60 min-w-[12px] shrink-0" />
                         <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400 shrink-0 select-none">
@@ -227,7 +224,12 @@ export default function Index() {
                             }}
                             className="overflow-hidden"
                           >
-                            <div className="px-4 pb-3 pt-1 space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                            <div className="px-5 pb-3 pt-1 space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                              {exp.role && (
+                                <div className="font-medium text-zinc-800 dark:text-zinc-200 text-xs">
+                                  {exp.role}
+                                </div>
+                              )}
                               <p className="leading-relaxed text-xs text-zinc-600 dark:text-zinc-400">
                                 {exp.description}
                               </p>
