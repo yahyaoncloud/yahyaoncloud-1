@@ -124,7 +124,8 @@ export default function Navbar({
             </motion.button>
 
             {/* Profile Menu (Radix UI) */}
-            <DropdownMenu open={isProfileMenuOpen} onOpenChange={setIsProfileMenuOpen}>
+            <DropdownMenu modal={false} open={isProfileMenuOpen} onOpenChange={setIsProfileMenuOpen}>
+
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"

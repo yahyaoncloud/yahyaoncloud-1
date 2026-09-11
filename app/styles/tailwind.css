@@ -66,12 +66,15 @@
   }
 
   html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
     scroll-behavior: smooth;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 16px;
   }
+
 
   body {
     @apply bg-background text-foreground;
