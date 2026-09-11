@@ -461,6 +461,7 @@ export async function getAllProjects(forceRefresh = false): Promise<ProjectCaseS
 
       if (dbProjects && dbProjects.length > 0) {
         for (const p of dbProjects) {
+          const existing = projectsMap.get(p.slug);
           projectsMap.set(p.slug, {
             title: p.title,
             slug: p.slug,
@@ -471,9 +472,10 @@ export async function getAllProjects(forceRefresh = false): Promise<ProjectCaseS
             techStack: p.techStack,
             demoUrl: p.demoUrl || undefined,
             githubUrl: p.githubUrl || undefined,
+            coverImage: existing?.coverImage,
             featured: p.featured,
             order: p.order,
-            content: p.content,
+            content: existing?.content && existing.content.length > (p.content?.length || 0) ? existing.content : (p.content || existing?.content || ""),
           });
         }
       }
@@ -515,6 +517,21 @@ export async function getProjectBySlug(slug: string): Promise<ProjectCaseStudy |
       );
 
       if (p) {
+        let content = p.content;
+        let coverImage: string | undefined;
+        try {
+          ensureDirectoryExists(PROJECTS_DIR);
+          const filePath = path.join(PROJECTS_DIR, `${slug}.md`);
+          if (fs.existsSync(filePath)) {
+            const raw = fs.readFileSync(filePath, "utf-8");
+            const { data, content: mdContent } = matter(raw);
+            if (mdContent && mdContent.trim().length > (content?.length || 0)) {
+              content = mdContent.trim();
+            }
+            coverImage = data.coverImage || data.thumbnail;
+          }
+        } catch {}
+
         const result: ProjectCaseStudy = {
           title: p.title,
           slug: p.slug,
@@ -525,9 +542,10 @@ export async function getProjectBySlug(slug: string): Promise<ProjectCaseStudy |
           techStack: p.techStack,
           demoUrl: p.demoUrl || undefined,
           githubUrl: p.githubUrl || undefined,
+          coverImage,
           featured: p.featured,
           order: p.order,
-          content: p.content,
+          content,
         };
         setToMemoryCache(cacheKey, result);
         return result;
@@ -685,6 +703,7 @@ export async function getAllResearchPapers(forceRefresh = false): Promise<Resear
 
       if (dbPapers && dbPapers.length > 0) {
         for (const p of dbPapers) {
+          const existing = papersMap.get(p.slug);
           papersMap.set(p.slug, {
             title: p.title,
             slug: p.slug,
@@ -697,7 +716,7 @@ export async function getAllResearchPapers(forceRefresh = false): Promise<Resear
             abstract: p.abstract,
             featured: p.featured,
             order: p.order,
-            content: p.content || undefined,
+            content: existing?.content && existing.content.length > (p.content?.length || 0) ? existing.content : (p.content || existing?.content || undefined),
           });
         }
       }
@@ -723,7 +742,7 @@ export async function getResearchBySlug(slug: string): Promise<ResearchPaper | n
   const allResearch = getFromMemoryCache<ResearchPaper[]>("all_research");
   if (allResearch) {
     const found = allResearch.find((r) => r.slug === slug);
-    if (found) {
+    if (found && found.content) {
       setToMemoryCache(cacheKey, found);
       return found;
     }
@@ -739,6 +758,19 @@ export async function getResearchBySlug(slug: string): Promise<ResearchPaper | n
       );
 
       if (p) {
+        let content = p.content || undefined;
+        try {
+          ensureDirectoryExists(RESEARCH_DIR);
+          const filePath = path.join(RESEARCH_DIR, `${slug}.md`);
+          if (fs.existsSync(filePath)) {
+            const raw = fs.readFileSync(filePath, "utf-8");
+            const { content: mdContent } = matter(raw);
+            if (mdContent && mdContent.trim().length > (content?.length || 0)) {
+              content = mdContent.trim();
+            }
+          }
+        } catch {}
+
         const result: ResearchPaper = {
           title: p.title,
           slug: p.slug,
@@ -751,7 +783,7 @@ export async function getResearchBySlug(slug: string): Promise<ResearchPaper | n
           abstract: p.abstract,
           featured: p.featured,
           order: p.order,
-          content: p.content || undefined,
+          content,
         };
         setToMemoryCache(cacheKey, result);
         return result;

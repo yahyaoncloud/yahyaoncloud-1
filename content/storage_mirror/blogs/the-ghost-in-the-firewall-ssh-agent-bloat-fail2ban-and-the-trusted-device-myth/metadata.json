@@ -1,0 +1,24 @@
+{
+  "slug": "the-ghost-in-the-firewall-ssh-agent-bloat-fail2ban-and-the-trusted-device-myth",
+  "title": "The Ghost in the Firewall: SSH-Agent Bloat, Fail2ban, and the 'Trusted Device' Myth",
+  "summary": "A deep-dive SRE forensic investigation into an unexpected SSH lockout on a Rocky Linux edge node, uncovering the cascade between ssh-agent key proliferation, MaxAuthTries limits, firewalld rich rules, and Fail2ban automated enforcement.",
+  "date": "2026-09-11",
+  "displayDate": "Sep 11, 2026",
+  "author": "@yahyaoncloud",
+  "tags": [
+    "Linux",
+    "SSH",
+    "Security",
+    "Fail2ban",
+    "Networking",
+    "SRE",
+    "DevOps",
+    "Rocky Linux"
+  ],
+  "categories": [],
+  "minuteRead": 10,
+  "featured": true,
+  "order": 3,
+  "assets": [],
+  "syncedAt": "2026-09-11T12:35:53.895Z"
+}
