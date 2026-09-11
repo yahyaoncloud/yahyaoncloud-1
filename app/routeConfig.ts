@@ -13,6 +13,7 @@ export const routes = (defineRoutes: any) => {
       route("research", "routes/public/research.tsx");
       route("guestbook", "routes/public/guestbook.tsx");
       route("about", "routes/public/_index.tsx", { id: "public-about-alias" });
+      route("contact", "routes/public/contact.tsx");
       
       // Policies
       route("privacy-policy", "routes/public/privacy-policy.tsx");
@@ -44,6 +45,8 @@ export const routes = (defineRoutes: any) => {
       route("guestbook", "routes/admin/guestbook.tsx");
       route("messages", "routes/admin/messages.tsx");
       route("linktree", "routes/admin/linktree.tsx");
+      route("business-card", "routes/admin/business-card.tsx");
+      route("resumes", "routes/admin/resumes.tsx");
       route("homepage-cards", "routes/admin/homepage-cards.tsx");
       route("announcements", "routes/admin/announcements.tsx");
       route("media", "routes/admin/media.tsx");

@@ -9,11 +9,10 @@ import { Switch } from "~/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
 import { LuLayers as Layers, LuSave as Save, LuPlus as Plus, LuExternalLink as ExternalLink, LuTrash2 as Trash2, LuPencil as Edit, LuEllipsisVertical as MoreVertical, LuLayoutGrid as LayoutGrid, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw } from "react-icons/lu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
 import { requireAdmin } from "~/utils/admin-auth.server";
 
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAdmin(request);

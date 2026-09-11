@@ -15,14 +15,17 @@ import {
 } from "~/components/ui/table";
 import { LuPlus as Plus, LuTrash2 as Trash2, LuEye as Eye, LuEyeOff as EyeOff, LuFileText as FileText, LuUpload as Upload, LuDownload as Download } from "react-icons/lu";
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAdmin(request);
   const resumes = await getAllResumes();
   return json({ resumes });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const contentType = request.headers.get("Content-Type") || "";
   
   try {

@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const adminPayload = await requireAdmin(request);
 
   // Query MongoDB record for admin
-  let admin = await getAdminByUsername(adminPayload.username);
+  const admin = await getAdminByUsername(adminPayload.username);
 
   if (!admin) {
     return json({

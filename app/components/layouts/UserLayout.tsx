@@ -3,6 +3,7 @@ import { useLocation } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "../Header";
 import Footer from "../Footer";
+import { Tracker } from "../Tracker";
 
 interface UserLayoutProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export default function UserLayout({ children }: UserLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-zinc-200 dark:selection:bg-zinc-800">
+      <Tracker />
       <div className="mx-auto px-5 sm:px-6 md:px-0 pt-2 sm:pt-4 pb-12 sm:pb-16 w-full max-w-[640px] flex flex-col min-h-screen">
         <Header />
         <AnimatePresence mode="wait" initial={false}>

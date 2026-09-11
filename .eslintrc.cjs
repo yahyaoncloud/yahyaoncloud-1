@@ -48,6 +48,14 @@ module.exports = {
           typescript: {},
         },
       },
+      rules: {
+        "react/prop-types": "off",
+        "jsx-a11y/label-has-associated-control": "warn",
+        "jsx-a11y/click-events-have-key-events": "warn",
+        "jsx-a11y/no-static-element-interactions": "warn",
+        "jsx-a11y/no-noninteractive-element-interactions": "warn",
+        "jsx-a11y/heading-has-content": "warn",
+      },
     },
 
     // Typescript
@@ -71,6 +79,20 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+            caughtErrorsIgnorePattern: "^_",
+          },
+        ],
+        "react/no-unescaped-entities": "off",
+        "@typescript-eslint/ban-ts-comment": "warn",
+        "import/no-named-as-default-member": "off",
+      },
     },
 
     // Node

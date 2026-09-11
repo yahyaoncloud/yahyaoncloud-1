@@ -1,5 +1,5 @@
 import { type LoaderFunctionArgs } from "@remix-run/node";
-import { getAllBlogPosts, getAllProjects, getAllResearchPapers } from "~/Services/content.server";
+import { getAllBlogPosts, getAllProjects } from "~/Services/content.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const host =
@@ -9,10 +9,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const protocol = host.includes("localhost") ? "http" : "https";
   const baseUrl = `${protocol}://${host}`;
 
-  const [posts, projects, papers] = await Promise.all([
+  const [posts, projects] = await Promise.all([
     getAllBlogPosts(),
     getAllProjects(),
-    getAllResearchPapers(),
   ]);
 
   const staticPages = [
@@ -20,6 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     { url: "/blog", priority: "0.9", changefreq: "weekly" },
     { url: "/projects", priority: "0.9", changefreq: "monthly" },
     { url: "/research", priority: "0.8", changefreq: "monthly" },
+    { url: "/guestbook", priority: "0.7", changefreq: "daily" },
     { url: "/contact", priority: "0.7", changefreq: "monthly" },
     { url: "/privacy-policy", priority: "0.3", changefreq: "yearly" },
     { url: "/terms-and-conditions", priority: "0.3", changefreq: "yearly" },
@@ -42,7 +42,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       (post) => `
   <url>
     <loc>${baseUrl}/blog/${post.slug}</loc>
-    <lastmod>${new Date((post as any).createdAt || post.date || Date.now()).toISOString().split("T")[0]}</lastmod>
+    <lastmod>${new Date(post.date || Date.now()).toISOString().split("T")[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`

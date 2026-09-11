@@ -375,8 +375,6 @@ export async function getAllTags() {
 }
 
 // ==================== PORTFOLIO OPERATIONS ====================
-// Note: Portfolio model is currently missing in schema.prisma, returning empty array to prevent crash.
-// TODO: Add Portfolio model to schema.prisma
 export async function getAllPortfolios() {
   try {
     const portfolios = await prisma.portfolio.findMany({

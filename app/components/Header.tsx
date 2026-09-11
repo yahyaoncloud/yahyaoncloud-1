@@ -1,8 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "@remix-run/react";
 import { LuSun as Sun, LuMoon as Moon, LuMenu as Menu, LuX as X, LuChevronDown as ChevronDown } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
 
 export default function Header() {
   const { theme, toggleTheme, isDark } = useTheme();
@@ -12,35 +18,12 @@ export default function Header() {
   const [workDropdownOpen, setWorkDropdownOpen] = useState(false);
   const [miscDropdownOpen, setMiscDropdownOpen] = useState(false);
 
-  const workDropdownRef = useRef<HTMLDivElement>(null);
-  const miscDropdownRef = useRef<HTMLDivElement>(null);
-
   // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setWorkDropdownOpen(false);
     setMiscDropdownOpen(false);
   }, [location.pathname]);
-
-  // Click outside to close dropdowns
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        workDropdownRef.current &&
-        !workDropdownRef.current.contains(event.target as Node)
-      ) {
-        setWorkDropdownOpen(false);
-      }
-      if (
-        miscDropdownRef.current &&
-        !miscDropdownRef.current.contains(event.target as Node)
-      ) {
-        setMiscDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -113,108 +96,95 @@ export default function Header() {
           </Link>
 
           {/* Work Dropdown (Projects & Research) */}
-          <div
-            ref={workDropdownRef}
-            className="relative"
-            onMouseEnter={() => setWorkDropdownOpen(true)}
-            onMouseLeave={() => setWorkDropdownOpen(false)}
-          >
-            <button
-              type="button"
-              onClick={() => setWorkDropdownOpen(!workDropdownOpen)}
-              className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 cursor-pointer inline-flex items-center gap-1 ${
-                isWorkActive
-                  ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 font-normal"
-              }`}
+          <DropdownMenu open={workDropdownOpen} onOpenChange={setWorkDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 cursor-pointer inline-flex items-center gap-1 outline-none ${
+                  isWorkActive
+                    ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 font-normal"
+                }`}
+              >
+                <span>Work</span>
+                <ChevronDown
+                  size={13}
+                  className={`transition-transform duration-150 opacity-60 ${workDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              sideOffset={6}
+              className="w-36 p-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg shadow-black/5 dark:shadow-black/30"
             >
-              <span>Work</span>
-              <ChevronDown size={13} className={`transition-transform duration-150 opacity-60 ${workDropdownOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            <AnimatePresence>
-              {workDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 3, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 3, scale: 0.98 }}
-                  transition={{ duration: 0.12 }}
-                  className="absolute right-0 mt-1 w-36 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg shadow-black/5 dark:shadow-black/30 z-30 overflow-hidden text-sm"
+              <DropdownMenuItem asChild>
+                <Link
+                  to="/projects"
+                  prefetch="intent"
+                  className={`flex items-center px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors ${
+                    isProjectsActive
+                      ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  }`}
                 >
-                  <Link
-                    to="/projects"
-                    prefetch="intent"
-                    onClick={() => setWorkDropdownOpen(false)}
-                    className={`flex items-center px-3 py-1.5 transition-colors ${
-                      isProjectsActive
-                        ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
-                    }`}
-                  >
-                    Projects
-                  </Link>
-                  <Link
-                    to="/research"
-                    prefetch="intent"
-                    onClick={() => setWorkDropdownOpen(false)}
-                    className={`flex items-center px-3 py-1.5 transition-colors ${
-                      isResearchActive
-                        ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
-                    }`}
-                  >
-                    Research
-                  </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  Projects
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  to="/research"
+                  prefetch="intent"
+                  className={`flex items-center px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors ${
+                    isResearchActive
+                      ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  }`}
+                >
+                  Research
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Misc Dropdown (Guestbook) */}
-          <div
-            ref={miscDropdownRef}
-            className="relative"
-            onMouseEnter={() => setMiscDropdownOpen(true)}
-            onMouseLeave={() => setMiscDropdownOpen(false)}
-          >
-            <button
-              type="button"
-              onClick={() => setMiscDropdownOpen(!miscDropdownOpen)}
-              className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 cursor-pointer inline-flex items-center gap-1 ${
-                isMiscActive
-                  ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 font-normal"
-              }`}
+          <DropdownMenu open={miscDropdownOpen} onOpenChange={setMiscDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 cursor-pointer inline-flex items-center gap-1 outline-none ${
+                  isMiscActive
+                    ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 font-normal"
+                }`}
+              >
+                <span>Misc</span>
+                <ChevronDown
+                  size={13}
+                  className={`transition-transform duration-150 opacity-60 ${miscDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              sideOffset={6}
+              className="w-36 p-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg shadow-black/5 dark:shadow-black/30"
             >
-              <span>Misc</span>
-              <ChevronDown size={13} className={`transition-transform duration-150 opacity-60 ${miscDropdownOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            <AnimatePresence>
-              {miscDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 3, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 3, scale: 0.98 }}
-                  transition={{ duration: 0.12 }}
-                  className="absolute right-0 mt-1 w-36 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg shadow-black/5 dark:shadow-black/30 z-30 overflow-hidden text-sm"
+              <DropdownMenuItem asChild>
+                <Link
+                  to="/guestbook"
+                  prefetch="intent"
+                  className={`flex items-center px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors ${
+                    isGuestbookActive
+                      ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  }`}
                 >
-                  <Link
-                    to="/guestbook"
-                    prefetch="intent"
-                    onClick={() => setMiscDropdownOpen(false)}
-                    className={`flex items-center px-3 py-1.5 transition-colors ${
-                      isGuestbookActive
-                        ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
-                    }`}
-                  >
-                    Guestbook
-                  </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  Guestbook
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Theme Switcher */}
           <button

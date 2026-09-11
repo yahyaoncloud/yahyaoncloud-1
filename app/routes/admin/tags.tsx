@@ -14,9 +14,11 @@ import {
   deleteTag,
   getTagsWithCount 
 } from "~/Services/tag.prisma.server";
-import { useToast } from "~/hooks/use-toast";
+import { requireAdmin } from "~/utils/admin-auth.server";
+import { toast } from "sonner";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAdmin(request);
   try {
     const tags = await getTagsWithCount();
     return json({ tags });
@@ -27,6 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
 
@@ -61,18 +64,17 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Tags() {
   const { tags } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>() as { success?: boolean; message?: string; error?: string } | undefined;
-  const { toast } = useToast();
   const navigation = useNavigation();
   const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (actionData?.success && actionData?.message) {
-      toast({ title: "Success", description: actionData.message });
+      toast.success(actionData.message);
       setEditingId(null);
     } else if (actionData?.error) {
-      toast({ title: "Error", description: actionData.error, variant: "destructive" });
+      toast.error(actionData.error);
     }
-  }, [actionData, toast]);
+  }, [actionData]);
 
   const columns: Column<any>[] = [
     { header: "Name", accessorKey: "name", cell: (item) => <span className="font-medium">#{item.name}</span> },

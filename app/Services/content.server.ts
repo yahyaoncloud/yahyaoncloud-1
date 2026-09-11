@@ -932,3 +932,29 @@ export async function getContactMessages() {
     return [];
   }
 }
+
+export async function deleteContactMessage(id: string) {
+  try {
+    return await prisma.contactMessage.delete({
+      where: { id },
+    });
+  } catch (err) {
+    console.warn("DB delete contact message warning:", err);
+    return null;
+  }
+}
+
+export async function toggleContactMessageRead(id: string, read?: boolean) {
+  try {
+    const existing = await prisma.contactMessage.findUnique({ where: { id } });
+    if (!existing) return null;
+    return await prisma.contactMessage.update({
+      where: { id },
+      data: { read: read !== undefined ? read : !existing.read },
+    });
+  } catch (err) {
+    console.warn("DB toggle contact message read warning:", err);
+    return null;
+  }
+}
+

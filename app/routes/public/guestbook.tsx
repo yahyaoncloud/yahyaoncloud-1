@@ -163,6 +163,7 @@ export default function MinimalistGuestbook() {
         method: "POST",
         body: JSON.stringify({
           token: idToken,
+          scope: "guest",
           uid: result.user.uid,
           displayName: result.user.displayName,
           photoURL: result.user.photoURL,

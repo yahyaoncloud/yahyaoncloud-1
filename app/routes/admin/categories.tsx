@@ -14,8 +14,10 @@ import {
 import { toast } from "sonner";
 import { AdminDataTable, type Column } from "~/components/AdminDataTable";
 import { LuPlus as Plus, LuPencil as Pencil, LuTrash2 as Trash2, LuTag as Tag } from "react-icons/lu";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAdmin(request);
   try {
     const categories = await getCategoriesWithCount();
     return json({ categories });
@@ -26,6 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
 

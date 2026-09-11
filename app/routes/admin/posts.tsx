@@ -26,7 +26,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { LuPlus as Plus, LuTrash2 as Trash2, LuPencil as Edit, LuEllipsisVertical as MoreVertical, LuEye as Eye, LuEyeOff as EyeOff, LuSearch as Search, LuFileText as FileText, LuFilter as Filter } from "react-icons/lu";
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -295,31 +295,37 @@ export default function AdminPosts() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <Link to={`/admin/post/edit/${post.slug}`}>
-                          <DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to={`/admin/post/edit/${post.slug}`} className="flex items-center w-full cursor-pointer">
                             <Edit size={14} className="mr-2" /> Edit
-                          </DropdownMenuItem>
-                        </Link>
-                        <a href={`/blog/post/${post.slug}`} target="_blank" rel="noreferrer">
-                          <DropdownMenuItem>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <a href={`/blog/post/${post.slug}`} target="_blank" rel="noreferrer" className="flex items-center w-full cursor-pointer">
                             <FileText size={14} className="mr-2" /> View Public
-                          </DropdownMenuItem>
-                        </a>
+                          </a>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <Form method="post">
                           <input type="hidden" name="id" value={post.id} />
                           {post.status === 'published' ? (
-                            <button type="submit" name="intent" value="unpublish" className="w-full">
-                              <DropdownMenuItem className="cursor-pointer">
-                                <EyeOff size={14} className="mr-2" /> Unpublish
+                            <>
+                              <input type="hidden" name="intent" value="unpublish" />
+                              <DropdownMenuItem asChild>
+                                <button type="submit" className="flex items-center w-full cursor-pointer">
+                                  <EyeOff size={14} className="mr-2" /> Unpublish
+                                </button>
                               </DropdownMenuItem>
-                            </button>
+                            </>
                           ) : (
-                            <button type="submit" name="intent" value="publish" className="w-full">
-                              <DropdownMenuItem className="cursor-pointer">
-                                <Eye size={14} className="mr-2" /> Publish
+                            <>
+                              <input type="hidden" name="intent" value="publish" />
+                              <DropdownMenuItem asChild>
+                                <button type="submit" className="flex items-center w-full cursor-pointer">
+                                  <Eye size={14} className="mr-2" /> Publish
+                                </button>
                               </DropdownMenuItem>
-                            </button>
+                            </>
                           )}
                         </Form>
                         <DropdownMenuSeparator />
@@ -329,11 +335,11 @@ export default function AdminPosts() {
                         >
                           <input type="hidden" name="intent" value="delete" />
                           <input type="hidden" name="id" value={post.id} />
-                          <button type="submit" className="w-full">
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600 cursor-pointer">
+                          <DropdownMenuItem asChild>
+                            <button type="submit" className="flex items-center w-full text-red-600 focus:text-red-600 cursor-pointer">
                               <Trash2 size={14} className="mr-2" /> Delete
-                            </DropdownMenuItem>
-                          </button>
+                            </button>
+                          </DropdownMenuItem>
                         </Form>
                       </DropdownMenuContent>
                     </DropdownMenu>

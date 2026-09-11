@@ -4,8 +4,10 @@ import { getLinktree, getLinktreeUrl } from '~/Services/linktree.prisma.server';
 import fs from 'fs/promises';
 import path from 'path';
 import QRCode from 'qrcode';
+import { requireAdmin } from '~/utils/admin-auth.server';
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  await requireAdmin(request);
   try {
     // Get linktree data
     const linktree = await getLinktree();
@@ -16,26 +18,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     let svgContent = await fs.readFile(svgPath, 'utf-8');
 
     // Process SVG (same as in the page loader) - Clean up static paths
-    svgContent = svgContent.replace(/\<path\s+d=\"M467\\.581[^\>]+\>/g, '');
-    svgContent = svgContent.replace(/\<path\s+d=\"M776\\.478[^\>]+\>/g, '');
-    svgContent = svgContent.replace(/\<path\s+d=\"M375\\.029[^\>]+\>/g, '');
-    svgContent = svgContent.replace(/\<path\s+d=\"M120\\.806[^\>]+\>/g, '');
-    svgContent = svgContent.replace(/\<path\s+d=\"M823\\.596[^\>]+\>/g, '');
-    svgContent = svgContent.replace(/\<path\s+d=\"M729\\.029[^\>]+\>/g, '');
-    svgContent = svgContent.replace(/\<path\s+d=\"M885\\.834[^\>]+\>/g, '');
+    svgContent = svgContent.replace(/<path\s+d="M467\.581[^>]+>/g, '');
+    svgContent = svgContent.replace(/<path\s+d="M776\.478[^>]+>/g, '');
+    svgContent = svgContent.replace(/<path\s+d="M375\.029[^>]+>/g, '');
+    svgContent = svgContent.replace(/<path\s+d="M120\.806[^>]+>/g, '');
+    svgContent = svgContent.replace(/<path\s+d="M823\.596[^>]+>/g, '');
+    svgContent = svgContent.replace(/<path\s+d="M729\.029[^>]+>/g, '');
+    svgContent = svgContent.replace(/<path\s+d="M885\.834[^>]+>/g, '');
     
     // Remove placeholders
-    svgContent = svgContent.replace(/\<rect\s+[^\>]*x=\"403\"[^\>]*y=\"64\"[^\>]*\>/g, '');
-    svgContent = svgContent.replace(/\<rect\s+[^\>]*x=\"73\\.5\"[^\>]*y=\"830\\.5\"[^\>]*\>/g, '');
-    svgContent = svgContent.replace(/\<rect\s+[^\>]*x=\"751\"[^\>]*\>/g, '');
+    svgContent = svgContent.replace(/<rect\s+[^>]*x="403"[^>]*y="64"[^>]*>/g, '');
+    svgContent = svgContent.replace(/<rect\s+[^>]*x="73\.5"[^>]*y="830\.5"[^>]*>/g, '');
+    svgContent = svgContent.replace(/<rect\s+[^>]*x="751"[^>]*>/g, '');
 
     // Namespace IDs
     const uniqueId = `bc_${Date.now()}_`;
-    svgContent = svgContent.replace(/id=\"([^\"]+)\"/g, `id=\"${uniqueId}$1\"`);
-    svgContent = svgContent.replace(/url\\(#([^)]+)\\)/g, `url(#${uniqueId}$1)`);
-    svgContent = svgContent.replace(/xlink:href=\"#([^\"]+)\"/g, `xlink:href=\"#${uniqueId}$1\"`);
-    svgContent = svgContent.replace(/width=\"\\d+\"/, 'width=\"100%\"');
-    svgContent = svgContent.replace(/height=\"\\d+\"/, 'height=\"100%\"');
+    svgContent = svgContent.replace(/id="([^"]+)"/g, `id="${uniqueId}$1"`);
+    svgContent = svgContent.replace(/url\(#([^)]+)\)/g, `url(#${uniqueId}$1)`);
+    svgContent = svgContent.replace(/xlink:href="#([^"]+)"/g, `xlink:href="#${uniqueId}$1"`);
+    svgContent = svgContent.replace(/width="\d+"/, 'width="100%"');
+    svgContent = svgContent.replace(/height="\d+"/, 'height="100%"');
 
     // Generate QR code (Dark Mode: White on Black)
     let qrCodeDataUri = linktree.qrCodeUrl;

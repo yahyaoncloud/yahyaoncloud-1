@@ -16,14 +16,17 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuImage as ImageIcon, LuCalendar as Calendar, LuNewspaper as Newspaper, LuEye as Eye, LuEyeOff as EyeOff, LuPencil as Edit, LuX as X } from "react-icons/lu";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await requireAdmin(request);
   const announcements = await getAllAnnouncements();
   return json({ announcements });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await request.formData();
   const intent = formData.get("intent") as string;
 

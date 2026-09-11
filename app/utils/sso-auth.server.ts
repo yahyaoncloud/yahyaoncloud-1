@@ -1,22 +1,16 @@
 import { Authenticator } from "remix-auth";
 import { GitHubStrategy } from "remix-auth-github";
-import { sessionStorage } from "~/utils/session.server";
-import { createAdmin, getAdminByUsername } from "~/Services/admin.prisma.server";
 
-// We'll define a User type that can represent either an Admin or Author locally
-// or just the profile returned from the provider
+// User type representing OAuth profile
 export interface User {
-  id: string; // db id (optional if just valid profile)
+  id: string;
   email: string;
   name: string;
   photoUrl: string;
   provider: string;
 }
 
-// @ts-ignore - The types say 0 arguments but runtime might expect sessionStorage. Keeping it safe or removing if v4 pattern differs.
-// actually, let's try removing it as TS insists.
-export const authenticator = new Authenticator<User>(); 
-// If this fails at runtime, we might need to cast: new Authenticator<User>(sessionStorage as any);
+export const authenticator = new Authenticator<User>();
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || "";
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || "";

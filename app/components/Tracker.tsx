@@ -6,22 +6,22 @@ export function Tracker() {
   const fetcher = useFetcher();
 
   useEffect(() => {
-    // Basic client-side info gathering
+    if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/api") || location.pathname.startsWith("/auth")) {
+      return;
+    }
+
     const data = {
       path: location.pathname,
       referrer: document.referrer,
       userAgent: navigator.userAgent,
-      // Minimal fingerprinting or just UA parsing could happen here or server side
-      // For simplicity sending raw basic data
     };
 
-    // Use fetcher to submit without navigation
     fetcher.submit(data, {
       method: "post",
       action: "/api/track",
       encType: "application/json",
     });
-  }, [location.pathname]); // Trigger on path change
+  }, [location.pathname]);
 
   return null;
 }

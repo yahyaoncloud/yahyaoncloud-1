@@ -1,7 +1,7 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { getActiveResume } from "~/Services/resume.server";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
   const activeResume = await getActiveResume();
 
   if (!activeResume) {
@@ -9,6 +9,5 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   // Redirect to the secure proxy route which serves the PDF inline (viewer mode)
-  // The ID is dynamic, so we fetch it from the active resume.
-  return redirect(`/resources/download/resume/${activeResume.id || activeResume._id}`);
+  return redirect(`/resources/download/resume/${activeResume.id}`);
 }

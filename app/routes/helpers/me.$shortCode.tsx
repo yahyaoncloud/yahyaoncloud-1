@@ -1,11 +1,9 @@
 // Public Linktree Page - Minimalist Design
-import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getActiveResume } from "~/Services/resume.server";
 import { getLinktreeByShortCode } from "~/Services/linktree.prisma.server";
-import { LuFileText as FileText, LuLinkedin as Linkedin, LuInstagram as Instagram, LuTwitter as Twitter, LuGithub as Github, LuMail as Mail, LuExternalLink as ExternalLink, LuCloud as Cloud, LuArrowUpRight as ArrowUpRight, LuDownload as Download } from "react-icons/lu";
-
-// ... (meta remains same)
+import { LuFileText as FileText, LuLinkedin as Linkedin, LuInstagram as Instagram, LuTwitter as Twitter, LuGithub as Github, LuMail as Mail, LuArrowUpRight as ArrowUpRight, LuDownload as Download, LuLink as LinkIcon } from "react-icons/lu";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { shortCode } = params;
@@ -27,7 +25,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export default function LinktreePage() {
-  const { linktree, activeResume } = useLoaderData<typeof loader>() as { linktree: any; activeResume: any };
+  const { linktree, activeResume } = useLoaderData<typeof loader>();
   
   const showcaseItems = (linktree.showcaseItems as { name: string; url: string; description?: string; icon?: string }[]) || [];
   const customLinks = (linktree.customLinks as { title: string; url: string; icon?: string; color?: string }[]) || [];
@@ -118,7 +116,7 @@ export default function LinktreePage() {
                         
                         {/* Download Action */}
                         <a 
-                            href={`/resources/download/resume/${activeResume.id || activeResume._id}?download=true`}
+                            href={`/resources/download/resume/${activeResume.id}?download=true`}
                             className="p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-md transition-colors z-10"
                             title="Download PDF"
                             onClick={(e) => e.stopPropagation()}
@@ -130,6 +128,31 @@ export default function LinktreePage() {
                  {link.key === "resume" && !activeResume?.pdfUrl && (
                      <ArrowUpRight size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-600 group-hover:text-zinc-400 transition-colors pointer-events-none" />
                  )}
+            </div>
+          ))}
+
+          {/* Custom Dynamic Links */}
+          {customLinks.map((custom, index) => (
+            <div key={`custom-${index}`} className="relative group">
+              <a
+                href={ensureAbsoluteUrl(custom.url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  flex items-center justify-between p-4 rounded-xl
+                  bg-zinc-900/50 border border-zinc-800/50
+                  hover:bg-zinc-900 hover:border-zinc-700
+                  transition-all duration-200
+                "
+              >
+                <div className="flex items-center gap-3 text-zinc-300 group-hover:text-white transition-colors">
+                  <LinkIcon size={18} strokeWidth={2} />
+                  <span className="text-sm font-medium relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-white after:transition-all after:duration-300 group-hover:after:w-full">
+                    {custom.title}
+                  </span>
+                </div>
+                <ArrowUpRight size={16} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+              </a>
             </div>
           ))}
         </div>

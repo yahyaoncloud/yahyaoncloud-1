@@ -40,6 +40,8 @@ const navItems: NavItem[] = [
       { name: "Homepage Sections", icon: LayoutGrid, href: "/admin/about?tab=sections" },
       { name: "Homepage Cards", icon: Layout, href: "/admin/homepage-cards" },
       { name: "Linktree", icon: Share2, href: "/admin/linktree" },
+      { name: "Business Card QR", icon: Sparkles, href: "/admin/business-card" },
+      { name: "Resumes & CVs", icon: FileText, href: "/admin/resumes" },
       { name: "Media Assets", icon: Image, href: "/admin/media" },
     ],
   },

@@ -267,6 +267,84 @@ Incident triage in cloud infrastructure requires rapid correlation across hetero
     });
   }
 
+  // 4. Seed Categories, Tags, and Published Blog Post
+  console.log("Seeding Categories & Tags...");
+  const devopsCategory = await prisma.category.upsert({
+    where: { slug: "cloud-devops" },
+    update: {},
+    create: {
+      catID: "cat-cloud-devops",
+      name: "Cloud & DevOps",
+      slug: "cloud-devops",
+    },
+  });
+
+  const k8sTag = await prisma.tag.upsert({
+    where: { name: "Kubernetes" },
+    update: {},
+    create: {
+      tagID: "tag-kubernetes",
+      name: "Kubernetes",
+    },
+  });
+
+  const terraformTag = await prisma.tag.upsert({
+    where: { name: "Terraform" },
+    update: {},
+    create: {
+      tagID: "tag-terraform",
+      name: "Terraform",
+    },
+  });
+
+  console.log("Seeding Default Author & Blog Post...");
+  let author = await prisma.author.findFirst({ where: { username: "yahya" } });
+  if (!author) {
+    author = await prisma.author.create({
+      data: {
+        authorId: "yahya-owner",
+        username: "yahya",
+        authorName: "Yahya",
+        authorProfession: "Cloud DevOps & Infrastructure Engineer",
+        role: "superadmin",
+      },
+    });
+  }
+
+  await prisma.post.upsert({
+    where: { slug: "building-observable-resilient-cloud-infrastructure" },
+    update: {},
+    create: {
+      slug: "building-observable-resilient-cloud-infrastructure",
+      title: "Architecting Observable & Resilient Cloud Infrastructure with GitOps",
+      summary: "A practical deep-dive into establishing declarative Kubernetes clusters with ArgoCD, Terraform IaC, and zero-drift GitOps pipelines.",
+      content: `## Introduction
+
+Operating high-reliability infrastructure at scale requires treating every component of your architecture as code. Declarative configuration, automated reconciliation, and continuous observability form the bedrock of resilient cloud systems.
+
+## Declarative State with GitOps
+
+By storing the entire cluster topology within Git repositories, teams achieve:
+- **Auditability**: Every infrastructure mutation is recorded with author and rationale.
+- **Automated Drift Detection**: Controllers continuously align live cluster state with desired state.
+- **Rapid Disaster Recovery**: Restoring an entire environment takes minutes via declarative manifests.
+
+## Key Observability Pillars
+
+1. **Metrics**: Prometheus & Grafana capturing real-time latency (P50, P95, P99) and resource saturation.
+2. **Logs**: Centralized structured JSON logging with distributed tracing identifiers.
+3. **Automated Runbooks**: Self-healing loops verifying cluster health and executing progressive rollouts.`,
+      status: "published",
+      featured: true,
+      minuteRead: 5,
+      views: 120,
+      likes: 24,
+      authorId: author.id,
+      categoryIds: [devopsCategory.id],
+      tagIds: [k8sTag.id, terraformTag.id],
+    },
+  });
+
   console.log("✅ Database seeding completed successfully!");
 }
 

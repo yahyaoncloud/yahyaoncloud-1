@@ -50,4 +50,4 @@ export async function action({ request }: ActionFunctionArgs) {
       message: error instanceof Error ? error.message : 'Upload failed' 
     });
   }
-};
+}

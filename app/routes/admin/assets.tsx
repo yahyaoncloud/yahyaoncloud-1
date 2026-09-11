@@ -5,10 +5,22 @@ import { useState } from "react";
 import { deleteFromSupabase, listSupabaseFiles, uploadToSupabase } from "~/utils/supabase.server";
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
+import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  // List files from 'documents' bucket, 'assets' folder
-  const { files, error } = await listSupabaseFiles("documents", "assets");
+  await requireAdmin(request);
+  // List files from 'portfolio-assets' (with 'documents' fallback)
+  let { files, error } = await listSupabaseFiles("portfolio-assets", "assets");
+  let bucketName = "portfolio-assets";
+
+  if (error || !files || files.length === 0) {
+    const docFallback = await listSupabaseFiles("documents", "assets");
+    if (docFallback.files && docFallback.files.length > 0) {
+      files = docFallback.files;
+      bucketName = "documents";
+      error = docFallback.error;
+    }
+  }
 
   if (error) {
      console.error("Supabase List Error:", error);
@@ -19,7 +31,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const filesWithUrl = files?.map(file => {
       const path = `assets/${file.name}`;
       const supabaseId = process.env.SUPABASE_ID;
-      const url = `https://${supabaseId}.supabase.co/storage/v1/object/public/documents/${path}`;
+      const url = `https://${supabaseId}.supabase.co/storage/v1/object/public/${bucketName}/${path}`;
       
       if (file.metadata?.size) {
         totalSizeBytes += file.metadata.size;
@@ -45,6 +57,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireAdmin(request);
   const formData = await unstable_parseMultipartFormData(
     request,
     unstable_composeUploadHandlers(

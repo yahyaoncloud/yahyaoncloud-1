@@ -364,7 +364,7 @@ export function getTechIcon(name: string): { Icon: IconType; color?: string } {
   if (full) return { Icon: full.icon, color: full.color };
 
   // 2. Try compound token split
-  const tokens = name.split(/[\(\)&/+,|\-]+/).map((t) => t.trim()).filter(Boolean);
+  const tokens = name.split(/[()&/+|-]+/).map((t) => t.trim()).filter(Boolean);
   for (const t of tokens) {
     const sub = matchSingle(t);
     if (sub) return { Icon: sub.icon, color: sub.color };

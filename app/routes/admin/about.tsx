@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuUser as User, LuBriefcase as Briefcase, LuCode as Code, LuAward as Award, LuShare2 as Share2, LuLayers as Layers, LuLayoutGrid as LayoutGrid, LuCircleCheck as CheckCircle2, LuSparkles as Sparkles, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw, LuLoaderCircle as Loader2 } from "react-icons/lu";
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import ImageUpload from "~/components/ImageUpload";
 import { TechIcon } from "~/components/TechIcon";
 import { requireAdmin } from "~/utils/admin-auth.server";
