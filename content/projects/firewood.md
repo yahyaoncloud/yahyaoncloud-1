@@ -1,7 +1,7 @@
 ---
 title: "Firewood — Zero-Knowledge Offline Password & Secret Vault"
 slug: "firewood"
-summary: "Local-first offline password and credentials manager built with Flutter, Riverpod, and Isar. Implements zero-knowledge manual field-level encryption using Argon2id key derivation and XChaCha20-Poly1305 AEAD authenticated encryption."
+summary: "Offline-first zero-knowledge secrets vault built with Flutter and Dart. Features Argon2id key derivation (64MB, 3 iterations) and XChaCha20-Poly1305 AEAD field-level authenticated encryption with zero remote footprint."
 period: "2024 - 2025"
 role: "Creator / Mobile & Security Engineer"
 category: "Security"

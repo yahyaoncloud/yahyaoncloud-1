@@ -1,7 +1,7 @@
 ---
 title: "HormuzWatch — Gulf Intelligence Platform"
 slug: "hormuzwatch"
-summary: "Real-time geospatial surveillance, multi-source news intelligence, and ensemble anomaly detection for strategic maritime regions in the Gulf. Combines AIS vessel tracking, aviation telemetry, and 16-news-source RSS pipeline with ML-powered threat scoring."
+summary: "Real-time maritime and aviation surveillance platform for strategic Gulf waterways. Combines live AIS kinematic feeds, OpenSky telemetry, and a 16-source OSINT news pipeline with ensemble ML anomaly detection (IsolationForest + LOF + XGBoost) and WebSocket streaming."
 period: "2024 - 2026"
 role: "Architect / Full-stack Developer"
 category: "AI & Observability"

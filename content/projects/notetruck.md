@@ -1,7 +1,7 @@
 ---
 title: "NoteTruck — Personal Certification Notes & Authoring Studio"
 slug: "notetruck"
-summary: "High-performance single-port personal authoring studio and knowledge repository for cloud, networking, and security certification notes (AWS, Kubernetes, Azure, Cisco). Features Go backend with SQLite FTS5 search, live SSE sync, JWT auth, and embedded React Router v7/Vite frontend with Shadcn UI."
+summary: "Single-binary documentation studio and knowledge repository for cloud certifications. Features Go embedded runtime, SQLite FTS5 full-text search, real-time SSE multi-tab sync, and LUKS2 AES-XTS 512-bit encrypted partition."
 period: "2024 - 2025"
 role: "Architect / Full-stack Developer"
 category: "Cloud & DevOps"

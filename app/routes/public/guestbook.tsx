@@ -256,32 +256,128 @@ export default function MinimalistGuestbook() {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl">
-      {/* 1. Header Section with SSO Card placed on the right */}
+    <div className="space-y-7 max-w-2xl">
+      {/* 1. Header Section */}
       <motion.div
-        className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-2"
+        className="space-y-2"
         variants={fadeIn}
         initial="hidden"
         animate="visible"
       >
-        <div className="space-y-1.5 flex-1 pr-2">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
             Guestbook
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            {!user
-              ? "Share reflections, drop a note, or say hello. Sign in with GitHub, Google, or X to post a message."
-              : `Signed in as ${user.displayName || user.email || "Guest"}. Write your message below to join the guestbook.`}
-          </p>
+          <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+            {messages.length} {messages.length === 1 ? "entry" : "entries"}
+          </span>
         </div>
+        <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xl font-normal">
+          Leave a thought, share feedback, or say hello. A public ledger of friends, collaborators, and visitors.
+        </p>
+      </motion.div>
 
-        {/* Header Right: SSO Auth Pill or User Session Badge */}
-        <div className="shrink-0 self-start sm:self-center">
-          {!user ? (
-            <div className="flex items-center gap-1.5 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 shadow-2xs">
-              <span className="text-[11px] font-medium text-zinc-500 px-2 select-none hidden xs:inline">
-                Sign in:
-              </span>
+      {/* 2. Soft Minimalist Composer & SSO Bar */}
+      <motion.div
+        className="w-full"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+      >
+        {user ? (
+          <form
+            onSubmit={handleSubmit}
+            className="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 shadow-xs focus-within:border-zinc-400 dark:focus-within:border-zinc-600 focus-within:bg-white dark:focus-within:bg-zinc-900/80 transition-all space-y-3"
+          >
+            {/* Header: User details & Sign Out */}
+            <div className="flex items-center justify-between pb-1 border-b border-zinc-100 dark:border-zinc-800/60">
+              <div className="flex items-center gap-2.5">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "User"}
+                    className="w-6 h-6 rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">
+                    {getInitials(user.displayName || "U")}
+                  </div>
+                )}
+                <span className="text-xs sm:text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                  {user.displayName || "Guest"}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-zinc-400 hover:text-red-500 transition-colors cursor-pointer"
+                title="Sign out"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>Sign out</span>
+              </button>
+            </div>
+
+            {/* Big Font Textarea */}
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Write your note, feedback, or greeting..."
+              rows={3}
+              className="w-full bg-transparent text-sm sm:text-base text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 resize-none focus:outline-hidden leading-relaxed font-normal"
+              maxLength={500}
+            />
+
+            {/* Bottom bar: Counter & Post button */}
+            <div className="flex items-center justify-between pt-1 text-xs text-zinc-400 dark:text-zinc-500 font-mono">
+              <div className="flex items-center gap-1.5 text-[11px]">
+                <span className="hidden sm:inline">Press Enter</span>
+                <CornerDownLeft className="h-3 w-3 hidden sm:inline opacity-70" />
+                <span className="hidden sm:inline">to post</span>
+                <span className="sm:hidden">{newMessage.length}/500</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline text-[11px]">{newMessage.length}/500</span>
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim() || isSubmitting}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                    !newMessage.trim() || isSubmitting
+                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
+                      : "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white cursor-pointer shadow-xs active:scale-[0.98]"
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      <span>Posting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Post</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+        ) : (
+          <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                Sign in to leave a message
+              </p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Choose a provider to authenticate instantly.
+              </p>
+            </div>
+
+            {/* SSO Pill Buttons */}
+            <div className="flex items-center gap-2 shrink-0">
               {[
                 {
                   name: "Google",
@@ -306,124 +402,13 @@ export default function MinimalistGuestbook() {
                   key={name}
                   type="button"
                   onClick={() => handleSignIn(provider)}
-                  className="p-1.5 px-2.5 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60 transition-all cursor-pointer shadow-xs flex items-center gap-1.5 text-xs font-medium"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/70 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5 text-xs font-medium hover:scale-[1.02] active:scale-[0.98]"
                   title={`Sign in with ${name}`}
                 >
                   <Icon className={`w-3.5 h-3.5 ${color}`} />
-                  <span className="text-[11px] font-medium">{name}</span>
+                  <span>{name}</span>
                 </button>
               ))}
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 p-1.5 pl-2.5 pr-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/90 shadow-2xs">
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || "User"}
-                  className="w-5 h-5 rounded-full object-cover border border-zinc-200 dark:border-zinc-700"
-                />
-              ) : (
-                <div className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">
-                  {getInitials(user.displayName || "U")}
-                </div>
-              )}
-              <span className="text-xs font-medium text-zinc-800 dark:text-zinc-200 max-w-[120px] truncate">
-                {user.displayName || "Guest"}
-              </span>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="p-1 rounded-full text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
-                title="Sign out"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-        </div>
-      </motion.div>
-
-      {/* 2. Compact, Polished Chatbox */}
-      <motion.div
-        className="w-full"
-        variants={fadeIn}
-        initial="hidden"
-        animate="visible"
-      >
-        {user ? (
-          <form
-            onSubmit={handleSubmit}
-            className="flex gap-3 p-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 shadow-xs focus-within:border-zinc-300 dark:focus-within:border-zinc-700 focus-within:ring-2 focus-within:ring-zinc-900/5 dark:focus-within:ring-zinc-100/5 transition-all"
-          >
-            {/* Logo / Avatar on the left */}
-            <div className="shrink-0 pt-0.5">
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || "User"}
-                  className="w-8 h-8 rounded-xl object-cover border border-zinc-200 dark:border-zinc-800 shadow-2xs"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  {getInitials(user.displayName || "U")}
-                </div>
-              )}
-            </div>
-
-            {/* Input & Controls */}
-            <div className="flex-1 min-w-0 space-y-2">
-              <textarea
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Write your note, feedback, or say hello..."
-                rows={2}
-                className="w-full bg-transparent text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 resize-none focus:outline-hidden leading-relaxed"
-                maxLength={500}
-              />
-
-              <div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800/80 text-[11px] text-zinc-400 font-mono">
-                <div className="flex items-center gap-1.5">
-                  <span className="hidden sm:inline">Press Enter</span>
-                  <CornerDownLeft className="h-3 w-3 hidden sm:inline" />
-                  <span className="hidden sm:inline">to send</span>
-                  <span className="sm:hidden">{newMessage.length}/500</span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <span className="hidden sm:inline">{newMessage.length}/500</span>
-                  <button
-                    type="submit"
-                    disabled={!newMessage.trim() || isSubmitting}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      !newMessage.trim() || isSubmitting
-                        ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
-                        : "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 cursor-pointer shadow-2xs"
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        <span>Sending</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3 h-3" />
-                        <span>Post</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
-        ) : (
-          <div className="flex items-center gap-3.5 p-3.5 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40">
-            <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-center shrink-0">
-              <img src={yocLogo} alt="Logo" className="w-5 h-5 object-contain" />
-            </div>
-            <div className="flex-1 min-w-0 text-xs text-zinc-500 dark:text-zinc-400">
-              Sign in via the SSO options in the top right to leave a note.
             </div>
           </div>
         )}
@@ -436,39 +421,29 @@ export default function MinimalistGuestbook() {
         initial="hidden"
         animate="visible"
       >
-        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
-          <div className="flex items-center gap-2 text-xs font-mono font-medium text-zinc-500 uppercase tracking-wider">
-            <MessageSquare className="h-3.5 w-3.5" />
-            <span>Community Messages</span>
-          </div>
-          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
-            {messages.length} {messages.length === 1 ? "entry" : "entries"}
-          </span>
-        </div>
-
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {/* Pinned Author Message */}
-          <div className="p-3.5 rounded-xl border border-indigo-100 dark:border-indigo-950/60 bg-indigo-50/30 dark:bg-indigo-950/20 flex items-start gap-3">
+          <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/90 bg-zinc-100/50 dark:bg-zinc-900/60 flex items-start gap-3.5">
             <img
               src={pinnedMessage.user.photo}
               alt="Yahya"
-              className="w-7 h-7 rounded-lg object-cover border border-indigo-200 dark:border-indigo-800 shrink-0 mt-0.5"
+              className="w-8 h-8 rounded-full object-cover border border-zinc-200 dark:border-zinc-700 shrink-0 mt-0.5"
             />
-            <div className="flex-1 min-w-0 space-y-1">
+            <div className="flex-1 min-w-0 space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm sm:text-[15px] font-semibold text-zinc-900 dark:text-zinc-100">
                     {pinnedMessage.user.name}
                   </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-medium">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium">
                     Host
                   </span>
                 </div>
-                <span className="text-[10px] text-zinc-400 font-mono shrink-0">
+                <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono shrink-0">
                   Pinned
                 </span>
               </div>
-              <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+              <p className="text-sm sm:text-[15px] text-zinc-700 dark:text-zinc-300 leading-relaxed font-normal">
                 {pinnedMessage.message}
               </p>
             </div>
@@ -476,37 +451,37 @@ export default function MinimalistGuestbook() {
 
           {/* User Messages Stream */}
           {visibleMessages.length === 0 ? (
-            <div className="text-center py-10 text-xs text-zinc-400 font-mono border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
+            <div className="text-center py-12 text-sm text-zinc-400 font-mono border border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl">
               No entries recorded yet. Be the first to leave a message!
             </div>
           ) : (
             visibleMessages.map((msg) => (
               <div
                 key={msg.id}
-                className="p-3.5 rounded-xl border border-zinc-200/70 dark:border-zinc-800/70 bg-white dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex items-start gap-3"
+                className="p-4 sm:p-5 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/40 dark:bg-zinc-900/30 hover:border-zinc-300 dark:hover:border-zinc-700/80 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/60 transition-all duration-200 flex items-start gap-3.5"
               >
                 {msg.user.photo ? (
                   <img
                     src={msg.user.photo}
                     alt={msg.user.name}
-                    className="w-7 h-7 rounded-lg object-cover border border-zinc-200 dark:border-zinc-800 shrink-0 mt-0.5"
+                    className="w-8 h-8 rounded-full object-cover border border-zinc-200/80 dark:border-zinc-700/80 shrink-0 mt-0.5"
                   />
                 ) : (
-                  <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 text-[10px] font-mono font-medium shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-300 text-xs font-mono font-medium shrink-0 mt-0.5">
                     {getInitials(msg.user.name)}
                   </div>
                 )}
 
-                <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex-1 min-w-0 space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                    <span className="text-sm sm:text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 truncate">
                       {msg.user.name}
                     </span>
-                    <span className="text-[10px] text-zinc-400 font-mono shrink-0">
+                    <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono shrink-0">
                       {formatTime(msg.timestamp)}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed break-words whitespace-pre-wrap">
+                  <p className="text-sm sm:text-[15px] text-zinc-700 dark:text-zinc-300 leading-relaxed break-words whitespace-pre-wrap font-normal">
                     {msg.message}
                   </p>
                 </div>
@@ -517,8 +492,8 @@ export default function MinimalistGuestbook() {
           {hasMore && (
             <div ref={observerRef} className="text-center py-3">
               {isLoadingMore && (
-                <div className="flex items-center justify-center gap-1.5 text-zinc-400 text-xs font-mono">
-                  <div className="w-3 h-3 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-900 dark:border-t-zinc-100 rounded-full animate-spin" />
+                <div className="flex items-center justify-center gap-2 text-zinc-400 text-xs font-mono">
+                  <div className="w-3.5 h-3.5 border-2 border-zinc-300 dark:border-zinc-600 border-t-zinc-900 dark:border-t-zinc-100 rounded-full animate-spin" />
                   <span>Loading more messages...</span>
                 </div>
               )}
@@ -529,3 +504,4 @@ export default function MinimalistGuestbook() {
     </div>
   );
 }
+

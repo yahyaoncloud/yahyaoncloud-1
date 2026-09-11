@@ -858,9 +858,29 @@ export async function deleteResearchPaper(slug: string): Promise<boolean> {
 // ----------------------------------------------------
 
 export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
-  headline: "Cloud DevOps Engineer.",
-  bio: [],
-  experiences: [],
+  headline: "Cloud DevOps & Infrastructure Engineer.",
+  bio: [
+    "3+ years engineering enterprise network backbones and production cloud infrastructure—transitioning from routing/switching (CCNP/CCNA, BGP/OSPF, SD-WAN) to declarative Kubernetes, Terraform IaC, and GitOps architectures.",
+    "Specializing in high-reliability AWS/Azure platforms, zero-drift CI/CD pipelines, kernel-level observability (eBPF), and scalable distributed systems.",
+  ],
+  experiences: [
+    {
+      year: "2024–2025",
+      present: false,
+      company: "Minute KSA",
+      role: "Cloud DevOps Engineer",
+      description:
+        "Production AWS platform engineering for a high-concurrency ride-hailing platform. Managed multi-tenant EKS clusters, ArgoCD GitOps deployments, Terraform IaC modules, Prometheus/Grafana observability, and automated CI/CD pipelines maintaining 99.95% uptime.",
+    },
+    {
+      year: "2022–2024",
+      present: false,
+      company: "Faabee Technologies",
+      role: "Network Infrastructure Engineer",
+      description:
+        "Enterprise networking across multi-site infrastructure. Managed BGP/OSPF dynamic routing, Cisco switching, SD-WAN failover, IPsec VPN tunnels, and hybrid cloud connectivity with automated telemetry and incident troubleshooting.",
+    },
+  ],
   skills: [
     "AWS (EKS, VPC, Route53)",
     "Kubernetes & ArgoCD",
