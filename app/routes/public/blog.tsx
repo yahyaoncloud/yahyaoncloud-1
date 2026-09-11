@@ -3,16 +3,21 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { getAllBlogPosts, type BlogPost } from "~/Services/content.server";
 
 export const headers = () => ({
-  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+  "Cache-Control": "public, max-age=120, s-maxage=600, stale-while-revalidate=86400",
 });
 
 export async function loader() {
   const posts = await getAllBlogPosts();
+  const summaryPosts = posts.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    displayDate: p.displayDate,
+  }));
   return json(
-    { posts },
+    { posts: summaryPosts },
     {
       headers: {
-        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+        "Cache-Control": "public, max-age=120, s-maxage=600, stale-while-revalidate=86400",
       },
     }
   );
@@ -25,7 +30,7 @@ export default function BlogIndex() {
     <div className="space-y-8 text-[15px] md:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
       {/* Blog Posts List with Hairline Connectors */}
       <div className="space-y-3.5">
-        {posts.map((post: BlogPost) => (
+        {posts.map((post) => (
           <div key={post.slug} className="group">
             <Link
               to={`/blog/${post.slug}`}

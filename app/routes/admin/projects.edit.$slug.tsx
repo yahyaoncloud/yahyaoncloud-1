@@ -1,6 +1,6 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { LuArrowLeft as ArrowLeft, LuSave as Save } from "react-icons/lu";
+import { LuArrowLeft as ArrowLeft, LuSave as Save } from "~/components/ui/icons";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { saveProject, getProjectBySlug, type ProjectCaseStudy } from "~/Services/content.server";
 
@@ -126,8 +126,14 @@ export default function AdminProjectEdit() {
               className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm focus:outline-none focus:border-zinc-400"
             >
               <option value="Cloud & DevOps">Cloud & DevOps</option>
+              <option value="Developer Tools">Developer Tools</option>
+              <option value="AI & Observability">AI & Observability</option>
+              <option value="Security">Security</option>
               <option value="Networking & SDN">Networking & SDN</option>
               <option value="Observability & SRE">Observability & SRE</option>
+              {project.category && !["Cloud & DevOps", "Developer Tools", "AI & Observability", "Security", "Networking & SDN", "Observability & SRE"].includes(project.category) && (
+                <option value={project.category}>{project.category}</option>
+              )}
             </select>
           </div>
 

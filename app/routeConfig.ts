@@ -44,6 +44,7 @@ export const routes = (defineRoutes: any) => {
       route("guestbook", "routes/admin/guestbook.tsx");
       route("messages", "routes/admin/messages.tsx");
       route("linktree", "routes/admin/linktree.tsx");
+      route("resumes", "routes/admin/resumes.tsx");
       route("homepage-cards", "routes/admin/homepage-cards.tsx");
       route("announcements", "routes/admin/announcements.tsx");
       route("media", "routes/admin/media.tsx");

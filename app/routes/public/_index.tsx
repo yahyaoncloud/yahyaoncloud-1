@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { LuChevronRight as ChevronRight } from "react-icons/lu";
+import { LuChevronRight as ChevronRight } from "~/components/ui/icons";
 import { AnimatePresence, motion } from "framer-motion";
-import profilePhoto from "~/assets/profile.jpg";
+import profilePhoto from "~/assets/profile.webp";
 import { TechIcon } from "~/components/TechIcon";
 import {
   getProfileInfo,
@@ -13,7 +13,7 @@ import {
 } from "~/Services/content.server";
 
 export const headers = () => ({
-  "Cache-Control": "public, max-age=0, must-revalidate",
+  "Cache-Control": "public, max-age=120, s-maxage=600, stale-while-revalidate=86400",
 });
 
 export async function loader() {
@@ -24,16 +24,39 @@ export async function loader() {
     getAllBlogPosts(),
   ]);
 
+  // Strip massive markdown contents so they do not bloat initial SSR HTML payload
+  const minimalPosts = allPosts.slice(0, 3).map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    displayDate: p.displayDate,
+  }));
+
+  const minimalProjects = featuredProjects.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    category: p.category,
+    summary: p.summary,
+    githubUrl: p.githubUrl,
+    demoUrl: p.demoUrl,
+  }));
+
+  const minimalResearch = featuredResearch.map((r) => ({
+    slug: r.slug,
+    title: r.title,
+    year: r.year,
+    abstract: r.abstract,
+  }));
+
   return json(
     {
       profileInfo,
-      featuredProjects,
-      featuredResearch,
-      recentPosts: allPosts.slice(0, 3),
+      featuredProjects: minimalProjects,
+      featuredResearch: minimalResearch,
+      recentPosts: minimalPosts,
     },
     {
       headers: {
-        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Cache-Control": "public, max-age=120, s-maxage=600, stale-while-revalidate=86400",
       },
     }
   );
@@ -58,6 +81,10 @@ export default function Index() {
               <img
                 src={profilePhoto}
                 alt="Yahya"
+                width={128}
+                height={128}
+                loading="eager"
+                decoding="async"
                 className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 ring-1 ring-inset ring-black/5 dark:ring-white/10 rounded-2xl sm:rounded-3xl pointer-events-none" />

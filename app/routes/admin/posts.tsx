@@ -24,9 +24,9 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "~/components/ui/dropdown-menu";
-import { LuPlus as Plus, LuTrash2 as Trash2, LuPencil as Edit, LuEllipsisVertical as MoreVertical, LuEye as Eye, LuEyeOff as EyeOff, LuSearch as Search, LuFileText as FileText, LuFilter as Filter } from "react-icons/lu";
+import { LuPlus as Plus, LuTrash2 as Trash2, LuPencil as Edit, LuEllipsisVertical as MoreVertical, LuEye as Eye, LuEyeOff as EyeOff, LuSearch as Search, LuFileText as FileText, LuFilter as Filter } from "~/components/ui/icons";
 import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {

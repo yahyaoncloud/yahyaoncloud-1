@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Highlight, themes } from "prism-react-renderer";
-import { LuFileCode as FileCode, LuTerminal as Terminal, LuCopy as Copy, LuCheck as Check } from "react-icons/lu";
+import { LuFileCode as FileCode, LuTerminal as Terminal, LuCopy as Copy, LuCheck as Check } from "~/components/ui/icons";
 import { useTheme } from "~/Contexts/ThemeContext";
 import MermaidViewer from "./MermaidViewer";
 

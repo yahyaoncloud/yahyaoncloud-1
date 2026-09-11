@@ -25,16 +25,14 @@ import {
   getQRUrl,
 } from "~/Services/linktree-qr.prisma.server";
 import { uploadImage, uploadDocument } from "~/utils/cloudinary.server";
-import { initMongoDB } from "~/utils/db.server";
 import { getAllResumes } from "~/Services/resume.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { LuSave as Save, LuLinkedin as Linkedin, LuInstagram as Instagram, LuTwitter as Twitter, LuGithub as Github, LuMail as Mail, LuFileText as FileText, LuCloud as Cloud, LuPlus as Plus, LuTrash2 as Trash2, LuExternalLink as ExternalLink, LuUser as User, LuShare2 as Share2, LuBriefcase as Briefcase, LuUpload as Upload, LuCamera as Camera, LuLink as LinkIcon, LuPalette as Palette, LuQrCode as QrCode, LuDownload as Download, LuRefreshCw as RefreshCw, LuCopy as Copy, LuCheck as Check, LuChartBar as BarChart3, LuSmartphone as Smartphone, LuMonitor as Monitor, LuTablet as Tablet, LuClock as Clock, LuTriangleAlert as AlertTriangle } from "react-icons/lu";
+import { LuSave as Save, LuLinkedin as Linkedin, LuInstagram as Instagram, LuTwitter as Twitter, LuGithub as Github, LuMail as Mail, LuFileText as FileText, LuCloud as Cloud, LuPlus as Plus, LuTrash2 as Trash2, LuExternalLink as ExternalLink, LuUser as User, LuShare2 as Share2, LuBriefcase as Briefcase, LuUpload as Upload, LuCamera as Camera, LuLink as LinkIcon, LuPalette as Palette, LuQrCode as QrCode, LuDownload as Download, LuRefreshCw as RefreshCw, LuCopy as Copy, LuCheck as Check, LuChartBar as BarChart3, LuSmartphone as Smartphone, LuMonitor as Monitor, LuTablet as Tablet, LuClock as Clock, LuTriangleAlert as AlertTriangle } from "~/components/ui/icons";
 import QRCode from "qrcode";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await initMongoDB();
   const [linktree, resumes] = await Promise.all([
     getLinktree(),
     getAllResumes(),

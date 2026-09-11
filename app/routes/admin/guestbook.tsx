@@ -1,7 +1,7 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useActionData, useFetcher, Link } from "@remix-run/react";
 import { useState, useEffect } from "react";
-import { LuSend as Send, LuClock as Clock, LuTrash2 as Trash2, LuCheck as Check, LuShield as Shield, LuRefreshCw as RefreshCw, LuCircleAlert as AlertCircle, LuExternalLink as ExternalLink } from "react-icons/lu";
+import { LuSend as Send, LuClock as Clock, LuTrash2 as Trash2, LuCheck as Check, LuShield as Shield, LuRefreshCw as RefreshCw, LuCircleAlert as AlertCircle, LuExternalLink as ExternalLink } from "~/components/ui/icons";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { 
   getGuestbookFromRTDB, 

@@ -1,13 +1,12 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useActionData, useNavigation, useSearchParams, useSubmit, Link } from "@remix-run/react";
 import { useState, useEffect } from "react";
-import { FaGoogle, FaGithub, FaDiscord } from "react-icons/fa";
-import { LuSun as Sun, LuMoon as Moon, LuLock as Lock, LuArrowRight as ArrowRight } from "react-icons/lu";
+import { FaGoogle, FaGithub, FaDiscord, LuSun as Sun, LuMoon as Moon, LuLock as Lock, LuArrowRight as ArrowRight } from "~/components/ui/icons";
 import { useTheme } from "~/Contexts/ThemeContext";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import YOC from "~/assets/yoc-logo5.png";
+import YOC from "~/assets/yoc-logo5.webp";
 import GraffitiBg from "~/assets/tech-blog-graffiti-bg.jpg";
 import { authenticateAdmin, createAdminSession, generateAdminToken, getAdminFromRequest } from "~/utils/admin-auth.server";
 import { signInWithPopup } from "firebase/auth";

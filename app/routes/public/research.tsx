@@ -1,15 +1,25 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { getAllResearchPapers, type ResearchPaper } from "~/Services/content.server";
-import MarkdownViewer from "~/components/MarkdownViewer";
+import { getAllResearchPapers, getProfileInfo, type ResearchPaper } from "~/Services/content.server";
+
+const MarkdownViewer = React.lazy(() => import("~/components/MarkdownViewer"));
 
 export const headers = () => ({
-  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+  "Cache-Control": "public, max-age=120, s-maxage=600, stale-while-revalidate=86400",
 });
 
 export async function loader() {
-  const papers = await getAllResearchPapers();
+  const [papers, profileInfo] = await Promise.all([
+    getAllResearchPapers(),
+    getProfileInfo(),
+  ]);
+
+  const isResearchVisible = profileInfo?.sectionsVisibility?.research !== false;
+  if (!papers || papers.length === 0 || !isResearchVisible) {
+    throw new Response("Research and publications not found", { status: 404 });
+  }
+
   return json(
     { papers },
     {
@@ -89,7 +99,15 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
 
       {isExpanded && paper.content && (
         <div className="mt-4 pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 overflow-x-hidden">
-          <MarkdownViewer content={paper.content} />
+          <React.Suspense
+            fallback={
+              <div className="py-6 flex items-center justify-center text-xs font-mono text-zinc-400">
+                Loading analysis...
+              </div>
+            }
+          >
+            <MarkdownViewer content={paper.content} />
+          </React.Suspense>
         </div>
       )}
     </article>
@@ -98,6 +116,10 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
 
 export default function ResearchIndex() {
   const { papers } = useLoaderData<typeof loader>();
+
+  if (!papers || papers.length === 0) {
+    return null;
+  }
 
   return (
     <div className="space-y-8 sm:space-y-10">

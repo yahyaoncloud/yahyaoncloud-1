@@ -51,10 +51,20 @@ export default function ProjectDetail() {
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 font-mono text-[11px] sm:text-xs text-zinc-400 dark:text-zinc-500">
             {project.category && (
-              <>
-                <span>{project.category}</span>
-                {project.period && <span>/</span>}
-              </>
+              <div className="inline-flex items-center gap-1">
+                {project.category.split(",").map((c) => c.trim()).filter(Boolean).map((cat, idx, arr) => (
+                  <span key={idx} className="inline-flex items-center">
+                    <Link
+                      to={`/projects?category=${encodeURIComponent(cat)}`}
+                      className="hover:underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                    >
+                      {cat}
+                    </Link>
+                    {idx < arr.length - 1 && <span className="mx-1 text-zinc-300 dark:text-zinc-700">·</span>}
+                  </span>
+                ))}
+                {project.period && <span className="ml-1">/</span>}
+              </div>
             )}
             {project.period && <span>{project.period}</span>}
           </div>
@@ -83,15 +93,19 @@ export default function ProjectDetail() {
         {/* Tech Badges */}
         {project.techStack && project.techStack.length > 0 && (
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {project.techStack.map((tech, i) => (
-              <span
-                key={i}
-                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-800/60"
-              >
-                <TechIcon name={tech} size={13} useBrandColor />
-                <span>{tech}</span>
-              </span>
-            ))}
+            {(project.techStack || [])
+              .flatMap((t: string) => t.split(/[,+]/).map((s) => s.trim().replace(/^\(+|\)+$/g, "")).filter(Boolean))
+              .map((tech, i) => (
+                <Link
+                  key={i}
+                  to={`/projects?skill=${encodeURIComponent(tech)}`}
+                  className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-mono px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 border border-zinc-200/60 dark:border-zinc-800/60 hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors"
+                  title={`View all projects using ${tech}`}
+                >
+                  <TechIcon name={tech} size={13} useBrandColor />
+                  <span>{tech}</span>
+                </Link>
+              ))}
           </div>
         )}
 

@@ -1,6 +1,6 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { LuMail as Mail, LuClock as Clock } from "react-icons/lu";
+import { LuMail as Mail, LuClock as Clock } from "~/components/ui/icons";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { getContactMessages } from "~/Services/content.server";
 

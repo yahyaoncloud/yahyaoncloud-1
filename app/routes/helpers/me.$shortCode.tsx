@@ -3,7 +3,7 @@ import { json, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getActiveResume } from "~/Services/resume.server";
 import { getLinktreeByShortCode } from "~/Services/linktree.prisma.server";
-import { LuFileText as FileText, LuLinkedin as Linkedin, LuInstagram as Instagram, LuTwitter as Twitter, LuGithub as Github, LuMail as Mail, LuExternalLink as ExternalLink, LuCloud as Cloud, LuArrowUpRight as ArrowUpRight, LuDownload as Download } from "react-icons/lu";
+import { LuFileText as FileText, LuLinkedin as Linkedin, LuInstagram as Instagram, LuTwitter as Twitter, LuGithub as Github, LuMail as Mail, LuExternalLink as ExternalLink, LuCloud as Cloud, LuArrowUpRight as ArrowUpRight, LuDownload as Download } from "~/components/ui/icons";
 
 // ... (meta remains same)
 

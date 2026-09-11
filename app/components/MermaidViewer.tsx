@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useId, useCallback } from "react";
-import { LuZoomIn as ZoomIn, LuZoomOut as ZoomOut, LuRotateCcw as RotateCcw, LuMaximize2 as Maximize2, LuX as X, LuMove as Move } from "react-icons/lu";
+import { LuZoomIn as ZoomIn, LuZoomOut as ZoomOut, LuRotateCcw as RotateCcw, LuMaximize2 as Maximize2, LuX as X, LuMove as Move } from "~/components/ui/icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "~/Contexts/ThemeContext";
 

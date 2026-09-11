@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useFetcher } from "@remix-run/react";
-import { LuUpload as Upload, LuX as X, LuImage as ImageIcon, LuLoaderCircle as Loader2 } from "react-icons/lu";
-import toast from "react-hot-toast";
+import { LuUpload as Upload, LuX as X, LuImage as ImageIcon, LuLoaderCircle as Loader2 } from "~/components/ui/icons";
+import { toast } from "sonner";
 
 interface CloudinaryImageUploadProps {
   slug: string;

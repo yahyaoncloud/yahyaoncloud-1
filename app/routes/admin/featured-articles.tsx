@@ -4,7 +4,7 @@ import { requireAdmin } from "~/utils/admin-auth.server";
 import { prisma } from "~/utils/prisma.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { LuSparkles as Sparkles, LuFileText as FileText, LuBriefcase as Briefcase, LuBookOpen as BookOpen, LuStar as Star, LuEye as Eye } from "react-icons/lu";
+import { LuSparkles as Sparkles, LuFileText as FileText, LuBriefcase as Briefcase, LuBookOpen as BookOpen, LuStar as Star, LuEye as Eye } from "~/components/ui/icons";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 

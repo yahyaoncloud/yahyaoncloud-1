@@ -1,5 +1,5 @@
 import { type LoaderFunctionArgs } from "@remix-run/node";
-import { getAllBlogPosts, getAllProjects, getAllResearchPapers } from "~/Services/content.server";
+import { getAllBlogPosts, getAllProjects, getAllResearchPapers, getProfileInfo } from "~/Services/content.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const host =
@@ -9,17 +9,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const protocol = host.includes("localhost") ? "http" : "https";
   const baseUrl = `${protocol}://${host}`;
 
-  const [posts, projects, papers] = await Promise.all([
+  const [posts, projects, papers, profileInfo] = await Promise.all([
     getAllBlogPosts(),
     getAllProjects(),
     getAllResearchPapers(),
+    getProfileInfo(),
   ]);
+
+  const hasResearch = papers.length > 0 && profileInfo?.sectionsVisibility?.research !== false;
 
   const staticPages = [
     { url: "/", priority: "1.0", changefreq: "weekly" },
     { url: "/blog", priority: "0.9", changefreq: "weekly" },
     { url: "/projects", priority: "0.9", changefreq: "monthly" },
-    { url: "/research", priority: "0.8", changefreq: "monthly" },
+    ...(hasResearch ? [{ url: "/research", priority: "0.8", changefreq: "monthly" }] : []),
     { url: "/contact", priority: "0.7", changefreq: "monthly" },
     { url: "/privacy-policy", priority: "0.3", changefreq: "yearly" },
     { url: "/terms-and-conditions", priority: "0.3", changefreq: "yearly" },

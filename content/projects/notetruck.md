@@ -4,13 +4,14 @@ slug: "notetruck"
 summary: "High-performance single-port personal authoring studio and knowledge repository for cloud, networking, and security certification notes (AWS, Kubernetes, Azure, Cisco). Features Go backend with SQLite FTS5 search, live SSE sync, JWT auth, and embedded React Router v7/Vite frontend with Shadcn UI."
 period: "2024 - 2025"
 role: "Architect / Full-stack Developer"
-category: "Developer Tool, SaaS, Observability"
+category: "Cloud & DevOps"
 techStack:
-  - Go 1.22+ (SQLite FTS5, SSE, JWT, Embedded SPA)
-  - React Router v7 + Vite + Tailwind CSS v4 + Shadcn UI
-  - SQLite with FTS5 Full-Text Search
-  - Encrypted LUKS2 Storage Partition (AES-XTS 512-bit)
-  - Docker Multi-stage Builds + Systemd
+  - Go
+  - SQLite
+  - React
+  - Docker
+  - Tailwind CSS
+  - Vite
 demoUrl: "https://notetruck.aburcloud.com"
 githubUrl: "https://github.com/yahyaoncloud/notetruck"
 featured: true

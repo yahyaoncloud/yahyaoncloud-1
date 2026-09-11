@@ -280,3 +280,22 @@ model LinktreeScan {
   referrer  String?
   createdAt DateTime   @default(now())
 }
+
+model Resume {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String?  @db.ObjectId
+  title       String   @default("My Resume")
+  htmlContent String?
+  pdfUrl      String?
+  pdfData     Bytes?
+  contentType String?  @default("application/pdf")
+  qrCodeUrl   String?
+  fileName    String?
+  version     Int      @default(1)
+  isActive    Boolean  @default(true)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("resumes")
+}
