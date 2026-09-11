@@ -1,14 +1,13 @@
 import { json, type LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getProjectBySlug, type ProjectCaseStudy } from "~/Services/content.server";
+import { getResearchBySlug, type ResearchPaper } from "~/Services/content.server";
 import MarkdownViewer from "~/components/MarkdownViewer";
-import { TechIcon } from "~/components/TechIcon";
 import {
   LuArrowLeft,
   LuArrowUp,
   LuArrowUpRight,
-  LuGlobe,
-  LuGithub,
+  LuFileText,
+  LuLink,
 } from "~/components/ui/icons";
 
 export const headers = () => ({
@@ -16,28 +15,28 @@ export const headers = () => ({
 });
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data?.project) {
-    return [{ title: "Project Not Found — Yahya" }];
+  if (!data?.paper) {
+    return [{ title: "Research Paper Not Found — Yahya" }];
   }
   return [
-    { title: `${data.project.title} — Case Study | Yahya` },
-    { name: "description", content: data.project.summary },
+    { title: `${data.paper.title} — Research | Yahya` },
+    { name: "description", content: data.paper.abstract },
   ];
 };
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { slug } = params;
   if (!slug) {
-    throw new Response("Project slug is required", { status: 400 });
+    throw new Response("Research slug is required", { status: 400 });
   }
 
-  const project = await getProjectBySlug(slug);
-  if (!project) {
-    throw new Response("Project case study not found", { status: 404 });
+  const paper = await getResearchBySlug(slug);
+  if (!paper) {
+    throw new Response("Research paper not found", { status: 404 });
   }
 
   return json(
-    { project },
+    { paper },
     {
       headers: {
         "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
@@ -46,8 +45,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   );
 }
 
-export default function ProjectDetail() {
-  const { project } = useLoaderData<{ project: ProjectCaseStudy }>();
+export default function ResearchPaperDetail() {
+  const { paper } = useLoaderData<{ paper: ResearchPaper }>();
 
   return (
     <article className="space-y-6 sm:space-y-8 text-sm sm:text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
@@ -58,124 +57,98 @@ export default function ProjectDetail() {
       >
         <div className="flex items-center gap-2 min-w-0">
           <Link
-            to="/projects"
+            to="/research"
             prefetch="intent"
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 border border-zinc-200/70 dark:border-zinc-800/70 transition-colors"
           >
             <LuArrowLeft size={13} />
-            <span>Projects</span>
+            <span>Research</span>
           </Link>
           <span className="text-zinc-300 dark:text-zinc-700 select-none text-base">/</span>
           <span className="text-zinc-800 dark:text-zinc-200 font-medium truncate max-w-[200px] sm:max-w-sm">
-            {project.slug}
+            {paper.slug}
           </span>
         </div>
 
-        {project.period && (
+        {paper.year && (
           <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-zinc-100/70 dark:bg-zinc-900/70 text-zinc-500 dark:text-zinc-400 text-xs border border-zinc-200/60 dark:border-zinc-800/60">
-            {project.period}
+            {paper.year}
           </span>
         )}
       </nav>
 
-      {/* Case Study Header Card (Navbar Surface Styling Reference) */}
+      {/* Research Paper Header Card (Navbar Surface Styling Reference) */}
       <header className="space-y-4 pb-6 border-b border-zinc-200/80 dark:border-zinc-800/80">
         <div className="space-y-2.5">
-          {/* Categories & Metadata row */}
+          {/* Venue & Metadata Row */}
           <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-zinc-500 dark:text-zinc-400">
-            {project.category && (
-              <div className="flex flex-wrap items-center gap-1.5">
-                {project.category
-                  .split(",")
-                  .map((c) => c.trim())
-                  .filter(Boolean)
-                  .map((cat, idx) => (
-                    <Link
-                      key={idx}
-                      to={`/projects?category=${encodeURIComponent(cat)}`}
-                      className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-                    >
-                      {cat}
-                    </Link>
-                  ))}
-              </div>
+            {paper.venue && (
+              <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/60 font-medium">
+                {paper.venue}
+              </span>
             )}
-            {project.role && (
-              <>
-                <span className="text-zinc-300 dark:text-zinc-700 select-none">•</span>
-                <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                  {project.role}
-                </span>
-              </>
-            )}
-            {project.period && (
+            {paper.year && (
               <span className="sm:hidden font-mono text-zinc-400 dark:text-zinc-500">
-                • {project.period}
+                • {paper.year}
               </span>
             )}
           </div>
 
           {/* Title */}
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight break-words">
-            {project.title}
+            {paper.title}
           </h1>
 
-          {/* Summary */}
-          {project.summary && (
-            <p className="text-zinc-600 dark:text-zinc-300 text-sm sm:text-base leading-relaxed max-w-3xl pt-0.5">
-              {project.summary}
+          {/* Authors */}
+          {paper.authors && paper.authors.length > 0 && (
+            <p className="text-xs sm:text-sm font-mono text-zinc-500 dark:text-zinc-400 pt-0.5">
+              By {paper.authors.join(", ")}
             </p>
           )}
         </div>
 
-        {/* Tech Badges */}
-        {project.techStack && project.techStack.length > 0 && (
+        {/* Tags */}
+        {paper.tags && paper.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {(project.techStack || [])
-              .flatMap((t: string) =>
-                t
-                  .split(/[,+]/)
-                  .map((s) => s.trim().replace(/^\(+|\)+$/g, ""))
-                  .filter(Boolean)
-              )
-              .map((tech, i) => (
-                <Link
-                  key={i}
-                  to={`/projects?skill=${encodeURIComponent(tech)}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md bg-zinc-100/80 dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/70 dark:border-zinc-800/70 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
-                  title={`View all projects using ${tech}`}
-                >
-                  <TechIcon name={tech} size={14} useBrandColor />
-                  <span>{tech}</span>
-                </Link>
-              ))}
+            {paper.tags.map((tag, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center text-xs font-mono px-2.5 py-1 rounded-md bg-zinc-100/80 dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/70 dark:border-zinc-800/70"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         )}
 
         {/* Action Buttons (Navbar Button UI Reference) */}
-        {(project.demoUrl || project.githubUrl) && (
+        {(paper.pdfUrl || paper.doi) && (
           <div className="flex flex-wrap items-center gap-2.5 pt-2 text-xs sm:text-sm font-mono">
-            {project.demoUrl && (
+            {paper.pdfUrl && (
               <a
-                href={project.demoUrl}
+                href={paper.pdfUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-xs active:scale-[0.98] transition-all"
               >
-                <LuGlobe size={14} />
-                <span>Live Demo</span>
+                <LuFileText size={14} />
+                <span>PDF Document</span>
                 <LuArrowUpRight size={13} className="opacity-70" />
               </a>
             )}
-            {project.githubUrl && (
+            {paper.doi && (
               <a
-                href={project.githubUrl}
+                href={
+                  paper.doi.startsWith("http")
+                    ? paper.doi
+                    : `https://doi.org/${paper.doi}`
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-2xs active:scale-[0.98] transition-all"
               >
-                <LuGithub size={14} />
-                <span>Source Code</span>
+                <LuLink size={14} />
+                <span>DOI: {paper.doi}</span>
                 <LuArrowUpRight size={13} className="opacity-60" />
               </a>
             )}
@@ -183,20 +156,34 @@ export default function ProjectDetail() {
         )}
       </header>
 
-      {/* Case Study Content */}
-      <main className="pt-1 sm:pt-2">
-        <MarkdownViewer content={project.content} />
-      </main>
+      {/* Abstract Callout Card */}
+      {paper.abstract && (
+        <section className="rounded-xl p-5 sm:p-6 bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800/70 space-y-2">
+          <div className="font-mono text-xs uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
+            Abstract
+          </div>
+          <p className="text-zinc-700 dark:text-zinc-300 text-sm sm:text-base leading-relaxed">
+            {paper.abstract}
+          </p>
+        </section>
+      )}
+
+      {/* Full Findings / Paper Content */}
+      {paper.content && (
+        <main className="pt-1 sm:pt-2">
+          <MarkdownViewer content={paper.content} />
+        </main>
+      )}
 
       {/* Footer Navigation Bar (Navbar UI Reference) */}
       <footer className="pt-8 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs sm:text-sm font-mono">
         <Link
-          to="/projects"
+          to="/research"
           prefetch="intent"
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-zinc-50 border border-zinc-200/70 dark:border-zinc-800/70 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60 transition-colors"
         >
           <LuArrowLeft size={13} />
-          <span>All projects</span>
+          <span>All research</span>
         </Link>
         <a
           href="#top"

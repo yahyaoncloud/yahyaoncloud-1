@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { getAllResearchPapers, getProfileInfo, type ResearchPaper } from "~/Services/content.server";
 
 const MarkdownViewer = React.lazy(() => import("~/components/MarkdownViewer"));
@@ -45,7 +45,13 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
       </div>
 
       <h3 className="font-medium text-base sm:text-lg text-zinc-900 dark:text-zinc-100 leading-snug break-words">
-        {paper.title}
+        <Link
+          to={`/research/${paper.slug}`}
+          prefetch="intent"
+          className="hover:underline decoration-zinc-400 underline-offset-4 hover:text-zinc-950 dark:hover:text-white transition-colors"
+        >
+          {paper.title}
+        </Link>
       </h3>
 
       <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 break-words">
@@ -71,15 +77,23 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
       )}
 
       {/* Actions */}
-      <div className="flex flex-wrap items-center gap-3.5 sm:gap-5 pt-2 text-xs sm:text-sm font-mono">
+      <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 pt-2 text-xs sm:text-sm font-mono">
+        <Link
+          to={`/research/${paper.slug}`}
+          prefetch="intent"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-2xs transition-all active:scale-95"
+        >
+          <span>Read Paper</span>
+          <span className="text-xs">→</span>
+        </Link>
         {paper.content && (
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline cursor-pointer transition-colors py-1 inline-flex items-center gap-1"
+            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:underline cursor-pointer transition-colors py-1 inline-flex items-center gap-1"
           >
-            <span>{isExpanded ? "Hide Findings" : "Read Full Findings"}</span>
-            <span className="text-xs">{isExpanded ? "↑" : "→"}</span>
+            <span>{isExpanded ? "Hide Inline" : "Quick Preview"}</span>
+            <span className="text-xs">{isExpanded ? "↑" : "↓"}</span>
           </button>
         )}
         {paper.pdfUrl && (

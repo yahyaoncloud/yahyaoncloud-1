@@ -461,7 +461,7 @@ export default function Index() {
                 <div key={paper.slug} className="space-y-1">
                   <div className="flex items-baseline justify-between gap-2 min-w-0">
                     <Link
-                      to="/research"
+                      to={`/research/${paper.slug}`}
                       prefetch="intent"
                       className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm md:text-base truncate"
                       title={paper.title}
