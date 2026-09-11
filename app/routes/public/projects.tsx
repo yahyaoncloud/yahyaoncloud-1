@@ -30,6 +30,7 @@ export async function loader() {
     techStack: p.techStack,
     githubUrl: p.githubUrl,
     demoUrl: p.demoUrl,
+    coverImage: p.coverImage,
   }));
   return json(
     { projects: summaryProjects },
@@ -137,10 +138,10 @@ export default function ProjectsIndex() {
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
-                  className={`text-xs md:text-sm px-2.5 py-0.5 rounded-md transition-all duration-150 active:scale-95 cursor-pointer font-mono ${
+                  className={`text-xs md:text-sm px-2.5 py-0.5 rounded-md transition-colors cursor-pointer font-mono border ${
                     isSelected
-                      ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-medium shadow-xs"
-                      : "bg-zinc-100 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 border border-zinc-200/80 dark:border-zinc-800/80"
+                      ? "border-zinc-900 dark:border-zinc-100 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-medium shadow-xs"
+                      : "border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/70 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white"
                   }`}
                 >
                   {cat}
@@ -169,7 +170,7 @@ export default function ProjectsIndex() {
             <button
               type="button"
               onClick={clearAllFilters}
-              className="text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 underline underline-offset-2 ml-1 cursor-pointer"
+              className="text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 ml-1 cursor-pointer transition-colors"
             >
               clear all
             </button>
@@ -195,44 +196,62 @@ export default function ProjectsIndex() {
         ) : (
           filteredProjects.map((project) => {
             const desc = project.summary || "";
-            // Clean up and split any composite tags if present
             const tags = (project.techStack || []).flatMap((t: string) =>
               t.split(/[,+]/).map((s) => s.trim().replace(/^\(+|\)+$/g, "")).filter(Boolean)
             );
 
-            // Split and trim categories
             const categories = project.category
               ? project.category.split(",").map((c) => c.trim()).filter(Boolean)
               : [];
 
             return (
-              <article key={project.slug} className="space-y-2 group">
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+              <article
+                key={project.slug}
+                className="group rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/40 dark:bg-zinc-900/30 p-4 sm:p-5 transition-all space-y-3.5 hover:border-zinc-300 dark:hover:border-zinc-700"
+              >
+                {/* Thumbnail Image (Supabase / Local) */}
+                {project.coverImage && (
                   <Link
                     to={`/projects/${project.slug}`}
                     prefetch="intent"
-                    className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:underline underline-offset-4 text-base md:text-lg transition-colors"
+                    className="block overflow-hidden rounded-lg border border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-100 dark:bg-zinc-900/80 aspect-[16/9] sm:aspect-[21/9] max-h-48"
+                  >
+                    <img
+                      src={project.coverImage}
+                      alt={project.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover object-center group-hover:scale-[1.01] transition-transform duration-300"
+                    />
+                  </Link>
+                )}
+
+                {/* Header: Title & Categories */}
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1.5 min-w-0">
+                  <Link
+                    to={`/projects/${project.slug}`}
+                    prefetch="intent"
+                    className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-base sm:text-lg transition-colors leading-snug"
                   >
                     {project.title}
                   </Link>
                   {categories.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1 text-[11px] md:text-xs font-mono text-zinc-400 dark:text-zinc-500 shrink-0">
+                    <div className="flex flex-wrap items-center gap-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500 shrink-0">
                       {categories.map((cat, idx, arr) => (
                         <span key={idx} className="inline-flex items-center">
                           <button
                             type="button"
                             onClick={() => setCategory(cat)}
-                            className={`hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer ${
+                            className={`px-1.5 py-0.5 rounded border transition-colors cursor-pointer ${
                               selectedCategory.toLowerCase() === cat.toLowerCase()
-                                ? "text-indigo-600 dark:text-indigo-400 font-medium underline underline-offset-2"
-                                : ""
+                                ? "border-indigo-500/30 bg-indigo-50/80 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-medium"
+                                : "border-transparent text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400"
                             }`}
                             title={`Filter by category ${cat}`}
                           >
                             {cat}
                           </button>
                           {idx < arr.length - 1 && (
-                            <span className="mx-1 text-zinc-300 dark:text-zinc-700">·</span>
+                            <span className="mx-0.5 text-zinc-300 dark:text-zinc-700">·</span>
                           )}
                         </span>
                       ))}
@@ -240,14 +259,16 @@ export default function ProjectsIndex() {
                   )}
                 </div>
 
+                {/* Concise Summary */}
                 {desc && (
-                  <p className="text-zinc-600 dark:text-zinc-400 text-[15px] md:text-base line-clamp-2">
+                  <p className="text-zinc-600 dark:text-zinc-400 text-xs sm:text-sm line-clamp-2 leading-relaxed">
                     {desc}
                   </p>
                 )}
 
+                {/* Tech Tags */}
                 {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
                     {tags.map((tag: string, idx: number) => {
                       const isSkillSelected = selectedSkill?.toLowerCase() === tag.toLowerCase();
                       return (
@@ -256,13 +277,13 @@ export default function ProjectsIndex() {
                           type="button"
                           onClick={() => setSkill(tag)}
                           title={`Filter projects using ${tag}`}
-                          className={`inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md transition-all duration-150 cursor-pointer ${
+                          className={`inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md transition-colors cursor-pointer border ${
                             isSkillSelected
-                              ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-medium shadow-xs border border-zinc-900 dark:border-zinc-100"
-                              : "bg-zinc-100/80 dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/70 dark:border-zinc-800/70 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30"
+                              ? "border-zinc-900 dark:border-zinc-100 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-medium shadow-xs"
+                              : "border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/70 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white"
                           }`}
                         >
-                          <TechIcon name={tag} size={13} useBrandColor={!isSkillSelected} />
+                          <TechIcon name={tag} size={12} useBrandColor={!isSkillSelected} />
                           <span>{tag}</span>
                         </button>
                       );
@@ -270,14 +291,14 @@ export default function ProjectsIndex() {
                   </div>
                 )}
 
-                {/* Links with subtle indigo hover */}
-                <div className="flex flex-wrap items-center gap-4 pt-1 text-xs md:text-sm font-mono">
+                {/* Actions Row */}
+                <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs font-mono">
                   <Link
                     to={`/projects/${project.slug}`}
                     prefetch="intent"
-                    className="text-zinc-900 dark:text-zinc-100 font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline inline-flex items-center gap-1 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium border border-zinc-900/10 dark:border-zinc-100/10 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white shadow-2xs active:scale-95 transition-all"
                   >
-                    <span>Read Case Study</span>
+                    <span>Read Thesis</span>
                     <span className="text-xs">→</span>
                   </Link>
                   {project.githubUrl && (
@@ -285,10 +306,10 @@ export default function ProjectsIndex() {
                       href={project.githubUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-colors"
                     >
                       <span>GitHub</span>
-                      <LuArrowUpRight size={11} className="opacity-60" />
+                      <LuArrowUpRight size={11} className="opacity-70" />
                     </a>
                   )}
                   {project.demoUrl && (
@@ -296,10 +317,10 @@ export default function ProjectsIndex() {
                       href={project.demoUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-colors"
                     >
                       <span>Demo</span>
-                      <LuArrowUpRight size={11} className="opacity-60" />
+                      <LuArrowUpRight size={11} className="opacity-70" />
                     </a>
                   )}
                 </div>

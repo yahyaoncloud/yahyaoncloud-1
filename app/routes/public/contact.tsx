@@ -82,7 +82,7 @@ export default function ContactPage() {
           Have an inquiry, project consultation, or research collaboration in mind? Drop a message below or write directly to{" "}
           <a
             href="mailto:hello@yahyaoncloud.com"
-            className="text-indigo-600 dark:text-indigo-400 hover:underline font-mono font-medium"
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-mono font-medium transition-colors"
           >
             hello@yahyaoncloud.com
           </a>.

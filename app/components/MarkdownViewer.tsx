@@ -227,7 +227,7 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
                 href={href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noreferrer noopener" : undefined}
-                className="text-zinc-900 dark:text-zinc-100 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 hover:decoration-zinc-900 dark:hover:decoration-zinc-100 transition-colors break-words"
+                className="text-zinc-900 dark:text-zinc-100 no-underline hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors break-words"
               >
                 {children}
               </a>

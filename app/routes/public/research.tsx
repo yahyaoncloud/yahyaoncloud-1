@@ -60,7 +60,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
         <Link
           to={`/research/${paper.slug}`}
           prefetch="intent"
-          className="hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline decoration-zinc-400 underline-offset-4 transition-colors"
+          className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           {paper.title}
         </Link>
@@ -102,7 +102,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline cursor-pointer transition-colors py-1 inline-flex items-center gap-1"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-colors cursor-pointer"
           >
             <span>{isExpanded ? "Hide Inline" : "Quick Preview"}</span>
             <span className="text-xs">{isExpanded ? "↑" : "↓"}</span>
@@ -113,7 +113,7 @@ function PaperItem({ paper }: { paper: ResearchPaper }) {
             href={paper.pdfUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors py-1"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-colors"
           >
             <LuFileText size={13} />
             <span>PDF Document</span>

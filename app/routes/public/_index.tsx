@@ -187,7 +187,7 @@ export default function Index() {
                                     {proj.internal ? (
                                       <Link
                                         to={proj.url}
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-zinc-300 dark:decoration-zinc-700 hover:decoration-indigo-400 underline-offset-4 text-xs md:text-sm transition-colors"
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs md:text-sm transition-colors"
                                       >
                                         {proj.name}
                                       </Link>
@@ -196,7 +196,7 @@ export default function Index() {
                                         href={proj.url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-zinc-300 dark:decoration-zinc-700 hover:decoration-indigo-400 underline-offset-4 text-xs md:text-sm transition-colors"
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 text-xs md:text-sm transition-colors"
                                       >
                                         {proj.name}
                                       </a>
@@ -238,7 +238,7 @@ export default function Index() {
                         className="font-normal text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 no-underline text-sm md:text-base flex items-center gap-1 min-w-0"
                         title={cert.name}
                       >
-                        <span className="truncate group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4">
+                        <span className="truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           {cert.name}
                         </span>
                         <span className="inline-block shrink-0 text-xs opacity-50 group-hover:opacity-100 transition-transform duration-200 group-hover:-rotate-45 origin-center select-none no-underline">
@@ -345,7 +345,7 @@ export default function Index() {
                     <Link
                       to={`/projects/${project.slug}`}
                       prefetch="intent"
-                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline decoration-zinc-400 hover:decoration-indigo-400 underline-offset-4 text-base md:text-lg truncate transition-colors"
+                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 text-base md:text-lg truncate transition-colors"
                       title={project.title}
                     >
                       {project.title}
@@ -361,7 +361,7 @@ export default function Index() {
                     <Link
                       to={`/projects/${project.slug}`}
                       prefetch="intent"
-                      className="group/btn text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium hover:underline inline-flex items-center gap-1.5 transition-colors"
+                      className="group/btn text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium inline-flex items-center gap-1.5 transition-colors"
                     >
                       <span>Case Study</span>
                       <span className="inline-block transition-transform duration-200 group-hover/btn:-rotate-45 origin-center text-sm">
@@ -423,7 +423,7 @@ export default function Index() {
                     className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 sm:py-1 text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors gap-1 sm:gap-3 min-w-0"
                     title={post.title}
                   >
-                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 hover:decoration-indigo-400 underline-offset-4 text-sm md:text-base min-w-0 sm:truncate transition-colors">
+                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:text-sm md:text-base min-w-0 sm:truncate transition-colors">
                       {post.title}
                     </span>
                     <div className="hidden sm:block flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
@@ -463,7 +463,7 @@ export default function Index() {
                     <Link
                       to={`/research/${paper.slug}`}
                       prefetch="intent"
-                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline decoration-zinc-400 hover:decoration-indigo-400 underline-offset-4 text-sm md:text-base truncate transition-colors"
+                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm md:text-base truncate transition-colors"
                       title={paper.title}
                     >
                       {paper.title}

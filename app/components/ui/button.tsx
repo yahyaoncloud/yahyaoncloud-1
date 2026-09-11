@@ -10,15 +10,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-indigo-600 text-white shadow hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700",
+          "border border-zinc-900/10 dark:border-zinc-100/10 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white",
         destructive:
-          "bg-red-500 text-white shadow-sm hover:bg-red-600 dark:bg-red-900 dark:text-red-100 dark:hover:bg-red-800",
+          "border border-red-500/20 bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800",
         outline:
-          "border border-zinc-200 bg-transparent shadow-sm hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
+          "border border-zinc-200/80 dark:border-zinc-800/80 bg-transparent text-zinc-800 dark:text-zinc-200 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white",
         secondary:
-          "bg-zinc-100 text-zinc-900 shadow-sm hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
-        ghost: "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
-        link: "text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400",
+          "border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white",
+        ghost:
+          "border border-transparent text-zinc-700 dark:text-zinc-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white",
+        link: "text-indigo-600 no-underline hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300",
       },
       size: {
         default: "h-9 px-4 py-2",

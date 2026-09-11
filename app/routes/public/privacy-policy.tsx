@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
           <Link
             to="/"
             prefetch="intent"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 border border-zinc-200/70 dark:border-zinc-800/70 transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-700 dark:text-zinc-300 bg-zinc-100/60 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-colors"
           >
             <LuArrowLeft size={13} />
             <span>Home</span>
@@ -94,7 +94,7 @@ export default function PrivacyPolicyPage() {
             You may request immediate manual deletion of any guestbook entry or contact message at any time by emailing{" "}
             <a
               href="mailto:hello@yahyaoncloud.com"
-              className="text-indigo-600 dark:text-indigo-400 font-medium underline underline-offset-4 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+              className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
             >
               hello@yahyaoncloud.com
             </a>

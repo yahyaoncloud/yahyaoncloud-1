@@ -346,7 +346,7 @@ export function AdminDataTable<T extends Record<string, any>>({
             <button
               type="button"
               onClick={clearSelection}
-              className="text-indigo-600 dark:text-indigo-400 hover:underline ml-2"
+              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 ml-2 transition-colors"
             >
               Clear selection
             </button>

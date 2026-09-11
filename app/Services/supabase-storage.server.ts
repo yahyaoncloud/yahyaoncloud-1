@@ -218,3 +218,43 @@ export async function uploadAssetToSupabase(
   const path = `${folder}/${Date.now()}-${cleanName}`;
   return uploadToSupabase(BUCKET_ASSETS, path, file);
 }
+
+/**
+ * Project asset storage helpers (Supabase Storage integration)
+ */
+export const BUCKET_PROJECTS = BUCKET_ASSETS;
+
+export async function uploadProjectThumbnailToSupabase(
+  slug: string,
+  file: File | Buffer,
+  filename = "thumbnail.png",
+  contentType = "image/png"
+): Promise<{ url: string; error?: string }> {
+  const path = `projects/${slug}/${filename}`;
+  if (Buffer.isBuffer(file)) {
+    return uploadBufferToSupabase(BUCKET_PROJECTS, path, file, contentType);
+  }
+  return uploadToSupabase(BUCKET_PROJECTS, path, file);
+}
+
+export async function uploadProjectMediaToSupabase(
+  slug: string,
+  file: File | Buffer,
+  filename: string,
+  contentType = "image/png"
+): Promise<{ url: string; error?: string }> {
+  const cleanName = filename.replace(/[^a-zA-Z0-9.-]/g, "-");
+  const path = `projects/${slug}/media/${Date.now()}-${cleanName}`;
+  if (Buffer.isBuffer(file)) {
+    return uploadBufferToSupabase(BUCKET_PROJECTS, path, file, contentType);
+  }
+  return uploadToSupabase(BUCKET_PROJECTS, path, file);
+}
+
+export function getProjectAssetPublicUrl(path: string): string {
+  const supabaseId = process.env.SUPABASE_ID;
+  if (!supabaseId) return path.startsWith("/") ? path : `/${path}`;
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  if (cleanPath.startsWith("http")) return cleanPath;
+  return `https://${supabaseId}.supabase.co/storage/v1/object/public/${BUCKET_PROJECTS}/${cleanPath}`;
+}

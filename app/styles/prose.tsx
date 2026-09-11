@@ -31,8 +31,7 @@ export const proseClasses = [
 
   // Links
   "prose-a:text-zinc-900 dark:prose-a:text-zinc-100",
-  "prose-a:underline prose-a:decoration-zinc-300 dark:prose-a:decoration-zinc-700 prose-a:underline-offset-4",
-  "hover:prose-a:decoration-zinc-800 dark:hover:prose-a:decoration-zinc-200",
+  "prose-a:no-underline hover:prose-a:text-indigo-600 dark:hover:prose-a:text-indigo-400 font-medium",
   "transition-colors duration-150",
 
   // Inline code

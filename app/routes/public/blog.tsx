@@ -58,7 +58,7 @@ export default function BlogIndex() {
           <div className="flex items-center gap-2 shrink-0 font-mono text-xs">
             <a
               href="/rss.xml"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-all shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all shadow-2xs active:scale-95"
               title="RSS Feed"
             >
               <LuRss size={12} />
@@ -66,7 +66,7 @@ export default function BlogIndex() {
             </a>
             <a
               href="/atom.xml"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-all shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all shadow-2xs active:scale-95"
               title="Atom Feed"
             >
               <span>Atom</span>
@@ -90,7 +90,7 @@ export default function BlogIndex() {
                 className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4 min-w-0"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-medium text-base sm:text-lg text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:underline decoration-zinc-400 dark:decoration-zinc-600 underline-offset-4 transition-colors">
+                  <span className="font-medium text-base sm:text-lg text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                     {post.title}
                   </span>
                   <span className="inline-block opacity-0 group-hover:opacity-100 text-indigo-600 dark:text-indigo-400 transition-all duration-150 transform group-hover:translate-x-0.5 text-xs">

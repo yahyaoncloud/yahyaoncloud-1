@@ -124,7 +124,7 @@ export function AdminSectionToggleCard({
           {manageHref && (
             <Link
               to={manageHref}
-              className="inline-flex items-center gap-1 font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline"
+              className="inline-flex items-center gap-1 font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
             >
               <span>Manage</span>
               <ArrowUpRight className="h-3.5 w-3.5" />

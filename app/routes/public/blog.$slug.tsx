@@ -53,7 +53,7 @@ export default function BlogPostDetail() {
           <Link
             to="/blog"
             prefetch="intent"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 border border-zinc-200/70 dark:border-zinc-800/70 transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-700 dark:text-zinc-300 bg-zinc-100/60 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-colors"
           >
             <LuArrowLeft size={13} />
             <span>Blog</span>

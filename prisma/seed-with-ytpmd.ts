@@ -167,29 +167,7 @@ HormuzWatch is a unified real-time maritime and aviation surveillance platform p
 
 Firewood is a high-security, local-first, and completely offline password and credentials manager built with Flutter and Dart. Designed around a strict zero-knowledge security architecture, Firewood ensures that sensitive user secrets never touch remote servers or unencrypted persistent storage.`,
     },
-    {
-      slug: "notetruck",
-      title: "NoteTruck — Personal Certification Notes & Authoring Studio",
-      category: "Cloud & DevOps",
-      period: "2024 - 2025",
-      role: "Architect / Full-stack Developer",
-      summary: "High-performance single-port personal authoring studio and knowledge repository for cloud, networking, and security certification notes (AWS, Kubernetes, Azure, Cisco). Features Go backend with SQLite FTS5 search, live SSE sync, JWT auth, and embedded React Router v7/Vite frontend with Shadcn UI.",
-      techStack: [
-        "Go",
-        "SQLite",
-        "React",
-        "Docker",
-        "Tailwind CSS",
-        "Vite",
-      ],
-      demoUrl: "https://notetruck.aburcloud.com",
-      githubUrl: "https://github.com/yahyaoncloud/notetruck",
-      featured: true,
-      order: 4,
-      content: `## Executive Summary
-
-NoteTruck is a high-performance single-binary authoring studio and structured knowledge repository engineered for cloud, network, and security certification preparation. It provides an encrypted, zero-latency local-first workspace with real-time multi-tab synchronization and lightning-fast full-text search.`,
-    },
+    
     {
       slug: "ytpmd",
       title: "ytpMD — High-Performance PDF-to-Markdown CLI & AI-Ready Tool",

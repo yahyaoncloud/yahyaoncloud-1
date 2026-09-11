@@ -440,6 +440,7 @@ export async function getAllProjects(forceRefresh = false): Promise<ProjectCaseS
           techStack: Array.isArray(data.techStack) ? data.techStack : [],
           demoUrl: data.demoUrl || undefined,
           githubUrl: data.githubUrl || undefined,
+          coverImage: data.coverImage || data.thumbnail || undefined,
           featured: Boolean(data.featured),
           order: Number(data.order) || 99,
           content: content.trim(),
