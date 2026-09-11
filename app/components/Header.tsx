@@ -119,7 +119,8 @@ export default function Header() {
           </Link>
 
           {/* Work Dropdown (Projects & Research) */}
-          <DropdownMenu open={workDropdownOpen} onOpenChange={setWorkDropdownOpen}>
+          <DropdownMenu modal={false} open={workDropdownOpen} onOpenChange={setWorkDropdownOpen}>
+
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
@@ -171,7 +172,8 @@ export default function Header() {
           </DropdownMenu>
 
           {/* Misc Dropdown (Guestbook, Resume) */}
-          <DropdownMenu open={miscDropdownOpen} onOpenChange={setMiscDropdownOpen}>
+          <DropdownMenu modal={false} open={miscDropdownOpen} onOpenChange={setMiscDropdownOpen}>
+
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
