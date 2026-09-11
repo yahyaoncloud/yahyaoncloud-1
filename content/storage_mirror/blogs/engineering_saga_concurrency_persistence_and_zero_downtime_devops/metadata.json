@@ -1,0 +1,50 @@
+{
+  "slug": "engineering_saga_concurrency_persistence_and_zero_downtime_devops",
+  "title": "Hardening Real-Time Maritime Geointelligence: An End-to-End Architectural Audit, Concurrency Overhaul, and Zero-Downtime DevOps Saga",
+  "summary": "A forensic architectural audit and production engineering postmortem covering Go WebSocket concurrency overhaul, micro-batched PostgreSQL telemetry ingestion, cryptographic ML model verification, and zero-downtime CI/CD automated deployment gates.",
+  "date": "2026-09-11",
+  "displayDate": "Sep 11, 2026",
+  "author": "@yahyaoncloud",
+  "tags": [
+    "DevOps",
+    "Concurrency",
+    "SRE",
+    "CI/CD",
+    "Go",
+    "PostgreSQL",
+    "MLOps",
+    "Geointelligence"
+  ],
+  "categories": [],
+  "minuteRead": 19,
+  "featured": true,
+  "order": 1,
+  "assets": [
+    {
+      "filename": "01_db_persistence_throughput_benchmark.png",
+      "remotePath": "blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/01_db_persistence_throughput_benchmark.png",
+      "url": "https://fyqryhffbvffsewdiapj.supabase.co/storage/v1/object/public/blog-content/blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/01_db_persistence_throughput_benchmark.png"
+    },
+    {
+      "filename": "02_ml_inference_latency_distribution.png",
+      "remotePath": "blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/02_ml_inference_latency_distribution.png",
+      "url": "https://fyqryhffbvffsewdiapj.supabase.co/storage/v1/object/public/blog-content/blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/02_ml_inference_latency_distribution.png"
+    },
+    {
+      "filename": "03_security_vulnerability_remediation.png",
+      "remotePath": "blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/03_security_vulnerability_remediation.png",
+      "url": "https://fyqryhffbvffsewdiapj.supabase.co/storage/v1/object/public/blog-content/blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/03_security_vulnerability_remediation.png"
+    },
+    {
+      "filename": "04_cicd_pipeline_stages_breakdown.png",
+      "remotePath": "blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/04_cicd_pipeline_stages_breakdown.png",
+      "url": "https://fyqryhffbvffsewdiapj.supabase.co/storage/v1/object/public/blog-content/blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/04_cicd_pipeline_stages_breakdown.png"
+    },
+    {
+      "filename": "05_concurrency_eviction_benchmark.png",
+      "remotePath": "blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/05_concurrency_eviction_benchmark.png",
+      "url": "https://fyqryhffbvffsewdiapj.supabase.co/storage/v1/object/public/blog-content/blogs/engineering_saga_concurrency_persistence_and_zero_downtime_devops/assets/05_concurrency_eviction_benchmark.png"
+    }
+  ],
+  "syncedAt": "2026-09-11T02:27:57.894Z"
+}

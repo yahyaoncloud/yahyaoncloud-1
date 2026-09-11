@@ -10,7 +10,9 @@
     "seed": "bun run prisma/seed.ts",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/server/index.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "sync:blogs": "tsx scripts/push_blog_to_supabase.ts",
+    "sync:projects": "tsx scripts/upload_projects_to_supabase.ts"
   },
   "prisma": {
     "seed": "bun run prisma/seed.ts"

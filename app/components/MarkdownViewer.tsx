@@ -211,14 +211,21 @@ export default function MarkdownViewer({ content, className = "" }: MarkdownView
             </blockquote>
           ),
           img: ({ src, alt }) => (
-            <span className="block my-4 overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-800/80">
-              <img
-                src={src}
-                alt={alt || ""}
-                loading="lazy"
-                className="w-full h-auto object-cover max-h-[500px]"
-              />
-            </span>
+            <figure className="my-6">
+              <div className="overflow-hidden rounded-lg border border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-950/40 p-1 flex items-center justify-center">
+                <img
+                  src={src}
+                  alt={alt || ""}
+                  loading="lazy"
+                  className="w-full h-auto object-contain max-h-[600px] rounded"
+                />
+              </div>
+              {alt && (
+                <figcaption className="mt-2 text-center text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+                  {alt}
+                </figcaption>
+              )}
+            </figure>
           ),
           a: ({ href, children }) => {
             const isExternal = href?.startsWith("http");

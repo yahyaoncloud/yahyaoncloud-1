@@ -1,0 +1,21 @@
+{
+  "slug": "building-observable-resilient-cloud-infrastructure",
+  "title": "Architecting Observable & Resilient Cloud Infrastructure with GitOps",
+  "summary": "A practical deep-dive into establishing declarative Kubernetes clusters with ArgoCD, Terraform IaC, and zero-drift GitOps pipelines.",
+  "date": "2026-08-15",
+  "displayDate": "Aug 15, 2026",
+  "author": "@yahyaoncloud",
+  "tags": [
+    "Kubernetes",
+    "Terraform",
+    "GitOps",
+    "SRE",
+    "Cloud Infrastructure"
+  ],
+  "categories": [],
+  "minuteRead": 3,
+  "featured": true,
+  "order": 2,
+  "assets": [],
+  "syncedAt": "2026-09-11T02:27:57.885Z"
+}
