@@ -60,26 +60,37 @@ export default function ContactPage() {
 
   return (
     <div className="space-y-8 max-w-xl mx-auto">
-      <div className="space-y-2">
+      {/* Breadcrumb Navigation Bar (Navbar UI Reference) */}
+      <nav aria-label="Breadcrumb">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          prefetch="intent"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-all shadow-2xs"
         >
-          <ArrowLeft size={14} /> Back to home
+          <ArrowLeft size={13} />
+          <span>Back home</span>
         </Link>
+      </nav>
+
+      {/* Header Section */}
+      <header className="space-y-2 pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2.5">
           <Mail className="text-indigo-600 dark:text-indigo-400" size={26} />
           Contact & Inquiries
         </h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           Have an inquiry, project consultation, or research collaboration in mind? Drop a message below or write directly to{" "}
-          <a href="mailto:hello@yahyaoncloud.com" className="text-indigo-600 dark:text-indigo-400 hover:underline font-mono">
+          <a
+            href="mailto:hello@yahyaoncloud.com"
+            className="text-indigo-600 dark:text-indigo-400 hover:underline font-mono font-medium"
+          >
             hello@yahyaoncloud.com
           </a>.
         </p>
-      </div>
+      </header>
 
-      <Form ref={formRef} method="post" className="space-y-5 pt-2">
+      {/* Form */}
+      <Form ref={formRef} method="post" className="space-y-5 pt-1">
         <div className="space-y-1.5">
           <Label htmlFor="name" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
             Your Name
@@ -89,7 +100,7 @@ export default function ContactPage() {
             name="name"
             placeholder="Jane Doe"
             required
-            className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-sm"
+            className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-sm focus-visible:ring-indigo-500/30 focus-visible:border-indigo-500"
           />
         </div>
 
@@ -103,7 +114,7 @@ export default function ContactPage() {
             type="email"
             placeholder="jane@example.com"
             required
-            className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-sm"
+            className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-sm focus-visible:ring-indigo-500/30 focus-visible:border-indigo-500"
           />
         </div>
 
@@ -117,14 +128,14 @@ export default function ContactPage() {
             rows={5}
             placeholder="Write your note or collaboration details here..."
             required
-            className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-sm"
+            className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-sm focus-visible:ring-indigo-500/30 focus-visible:border-indigo-500"
           />
         </div>
 
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl font-medium transition-colors shadow-sm"
+          className="w-full bg-zinc-900 dark:bg-zinc-100 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white text-white dark:text-zinc-900 py-2.5 rounded-xl font-medium transition-all shadow-sm active:scale-[0.98] cursor-pointer"
         >
           {isSubmitting ? "Sending..." : "Send Message"}
         </Button>

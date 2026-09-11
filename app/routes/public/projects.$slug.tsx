@@ -60,7 +60,7 @@ export default function ProjectDetail() {
           <Link
             to="/projects"
             prefetch="intent"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 border border-zinc-200/70 dark:border-zinc-800/70 transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 border border-zinc-200/70 dark:border-zinc-800/70 transition-colors"
           >
             <LuArrowLeft size={13} />
             <span>Projects</span>
@@ -93,7 +93,7 @@ export default function ProjectDetail() {
                     <Link
                       key={idx}
                       to={`/projects?category=${encodeURIComponent(cat)}`}
-                      className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                      className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-800/60 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors"
                     >
                       {cat}
                     </Link>
@@ -142,7 +142,7 @@ export default function ProjectDetail() {
                 <Link
                   key={i}
                   to={`/projects?skill=${encodeURIComponent(tech)}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md bg-zinc-100/80 dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/70 dark:border-zinc-800/70 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md bg-zinc-100/80 dark:bg-zinc-900/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200/70 dark:border-zinc-800/70 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-colors"
                   title={`View all projects using ${tech}`}
                 >
                   <TechIcon name={tech} size={14} useBrandColor />
@@ -152,7 +152,7 @@ export default function ProjectDetail() {
           </div>
         )}
 
-        {/* Action Buttons (Navbar Button UI Reference) */}
+        {/* Action Buttons (Navbar Button UI Reference with subtle indigo hover) */}
         {(project.demoUrl || project.githubUrl) && (
           <div className="flex flex-wrap items-center gap-2.5 pt-2 text-xs sm:text-sm font-mono">
             {project.demoUrl && (
@@ -160,7 +160,7 @@ export default function ProjectDetail() {
                 href={project.demoUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-xs active:scale-[0.98] transition-all"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white shadow-xs active:scale-[0.98] transition-all"
               >
                 <LuGlobe size={14} />
                 <span>Live Demo</span>
@@ -172,7 +172,7 @@ export default function ProjectDetail() {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 hover:text-zinc-900 dark:hover:text-zinc-100 shadow-2xs active:scale-[0.98] transition-all"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-[0.98] transition-all"
               >
                 <LuGithub size={14} />
                 <span>Source Code</span>
@@ -193,14 +193,14 @@ export default function ProjectDetail() {
         <Link
           to="/projects"
           prefetch="intent"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-zinc-50 border border-zinc-200/70 dark:border-zinc-800/70 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/70 dark:border-zinc-800/70 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-colors"
         >
           <LuArrowLeft size={13} />
           <span>All projects</span>
         </Link>
         <a
           href="#top"
-          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 transition-colors"
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors"
         >
           <span>Top</span>
           <LuArrowUp size={13} />

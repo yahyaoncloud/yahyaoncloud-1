@@ -164,7 +164,7 @@ export default function Header() {
             className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 ${
               isBlogActive
                 ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 font-normal"
+                : "text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 font-normal"
             }`}
           >
             Blog
@@ -184,7 +184,7 @@ export default function Header() {
                   className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 cursor-pointer inline-flex items-center gap-1 outline-none ${
                     isWorkActive
                       ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 font-normal"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 font-normal"
                   }`}
                 >
                   <span>Work</span>
@@ -208,7 +208,7 @@ export default function Header() {
                     className={`flex items-center px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors ${
                       isProjectsActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        : "text-zinc-600 dark:text-zinc-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400"
                     }`}
                   >
                     Projects
@@ -221,7 +221,7 @@ export default function Header() {
                     className={`flex items-center px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors ${
                       isResearchActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        : "text-zinc-600 dark:text-zinc-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400"
                     }`}
                   >
                     Research
@@ -245,7 +245,7 @@ export default function Header() {
                   className={`px-2.5 py-1 rounded-md text-sm transition-all duration-150 cursor-pointer inline-flex items-center gap-1 outline-none ${
                     isMiscActive
                       ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 font-normal"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 font-normal"
                   }`}
                 >
                   <span>Misc</span>
@@ -269,7 +269,7 @@ export default function Header() {
                     className={`flex items-center px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors ${
                       isGuestbookActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/70 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        : "text-zinc-600 dark:text-zinc-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400"
                     }`}
                   >
                     Guestbook
@@ -280,7 +280,7 @@ export default function Header() {
                     href="/resume"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    className="flex items-center justify-between px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors text-zinc-600 dark:text-zinc-400 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400"
                   >
                     <span>Resume</span>
                     <span className="text-[10px] font-mono text-zinc-400">PDF</span>
@@ -290,12 +290,11 @@ export default function Header() {
             </DropdownMenu>
           </div>
 
-
           {/* Theme Switcher */}
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-1.5 ml-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer shrink-0"
+            className="p-1.5 ml-1 rounded-md text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-colors cursor-pointer shrink-0"
             aria-label="Switch theme"
             title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
@@ -343,7 +342,7 @@ export default function Header() {
                 className={`px-3.5 py-2 rounded-lg transition-colors ${
                   isBlogActive
                     ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30"
                 }`}
               >
                 Blog
@@ -362,7 +361,7 @@ export default function Header() {
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-colors ${
                       isProjectsActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30"
                     }`}
                   >
                     <Briefcase size={16} className="opacity-70 shrink-0" />
@@ -375,7 +374,7 @@ export default function Header() {
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-colors ${
                       isResearchActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30"
                     }`}
                   >
                     <FileText size={16} className="opacity-70 shrink-0" />
@@ -397,7 +396,7 @@ export default function Header() {
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-colors ${
                       isGuestbookActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
-                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
+                        : "text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30"
                     }`}
                   >
                     <MessageSquare size={16} className="opacity-70 shrink-0" />
@@ -408,7 +407,7 @@ export default function Header() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-colors"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <Download size={16} className="opacity-70 shrink-0" />

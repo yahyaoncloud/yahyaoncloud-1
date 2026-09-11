@@ -303,6 +303,9 @@ export const LuRefreshCw = RefreshCw;
 export const RotateCcw = createHugeIcon(Core.RotateLeft01Icon, "RotateCcw");
 export const LuRotateCcw = RotateCcw;
 
+export const Rss = createHugeIcon(Core.RssIcon, "Rss");
+export const LuRss = Rss;
+
 export const Save = createHugeIcon(Core.FloppyDiskIcon, "Save");
 export const LuSave = Save;
 

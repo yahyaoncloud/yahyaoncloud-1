@@ -10,21 +10,21 @@ export default function Footer() {
         <span className="text-zinc-300 dark:text-zinc-700">•</span>
         <Link
           to="/privacy-policy"
-          className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors"
+          className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           Privacy
         </Link>
         <span className="text-zinc-300 dark:text-zinc-700">•</span>
         <Link
           to="/terms-and-conditions"
-          className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors"
+          className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           Terms
         </Link>
         <span className="text-zinc-300 dark:text-zinc-700">•</span>
         <Link
           to="/contact"
-          className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors"
+          className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           Contact
         </Link>
@@ -33,7 +33,7 @@ export default function Footer() {
       <div className="flex items-center gap-4">
         <Link
           to="/admin"
-          className="text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors text-xs font-mono"
+          className="text-zinc-400 dark:text-zinc-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-xs font-mono"
           title="Management Portal"
         >
           Portal

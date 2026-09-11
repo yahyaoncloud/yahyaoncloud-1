@@ -140,16 +140,16 @@ export default function Index() {
                         type="button"
                         onClick={() => toggleExperience(idx)}
                         aria-expanded={isOpen}
-                        className="w-full flex items-center justify-between sm:justify-start gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 select-none group active:scale-[0.99] transition-all min-w-0"
+                        className="w-full flex items-center justify-between sm:justify-start gap-2 py-1.5 px-2 text-left cursor-pointer text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 select-none group active:scale-[0.99] transition-all min-w-0"
                       >
                         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 truncate">
                           <ChevronRight
                             size={15}
                             className={`text-zinc-400 transition-transform duration-200 shrink-0 ${
-                              isOpen ? "rotate-90 text-zinc-800 dark:text-zinc-200" : ""
+                              isOpen ? "rotate-90 text-indigo-600 dark:text-indigo-400" : "group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
                             }`}
                           />
-                          <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-sm md:text-base">
+                          <span className="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate text-sm md:text-base">
                             {exp.company}
                           </span>
                         </div>
@@ -187,7 +187,7 @@ export default function Index() {
                                     {proj.internal ? (
                                       <Link
                                         to={proj.url}
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-zinc-300 dark:decoration-zinc-700 hover:decoration-indigo-400 underline-offset-4 text-xs md:text-sm transition-colors"
                                       >
                                         {proj.name}
                                       </Link>
@@ -196,7 +196,7 @@ export default function Index() {
                                         href={proj.url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-xs md:text-sm"
+                                        className="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-zinc-300 dark:decoration-zinc-700 hover:decoration-indigo-400 underline-offset-4 text-xs md:text-sm transition-colors"
                                       >
                                         {proj.name}
                                       </a>
@@ -293,7 +293,7 @@ export default function Index() {
                   {profileInfo.skills.map((skill, idx) => (
                     <span
                       key={idx}
-                      className="text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                      className="text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-colors"
                     >
                       {skill}
                     </span>
@@ -307,7 +307,7 @@ export default function Index() {
                   {profileInfo.skills.map((skill, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1.5 text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                      className="inline-flex items-center gap-1.5 text-xs md:text-sm font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-900/70 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-colors"
                     >
                       <TechIcon name={skill} size={15} useBrandColor />
                       <span>{skill}</span>
@@ -329,7 +329,7 @@ export default function Index() {
               <Link
                 to="/projects"
                 prefetch="intent"
-                className="group text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+                className="group text-xs md:text-sm text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All projects</span>
                 <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
@@ -345,7 +345,7 @@ export default function Index() {
                     <Link
                       to={`/projects/${project.slug}`}
                       prefetch="intent"
-                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-base md:text-lg truncate"
+                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline decoration-zinc-400 hover:decoration-indigo-400 underline-offset-4 text-base md:text-lg truncate transition-colors"
                       title={project.title}
                     >
                       {project.title}
@@ -361,7 +361,7 @@ export default function Index() {
                     <Link
                       to={`/projects/${project.slug}`}
                       prefetch="intent"
-                      className="group/btn text-zinc-900 dark:text-zinc-100 font-medium hover:underline inline-flex items-center gap-1.5"
+                      className="group/btn text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium hover:underline inline-flex items-center gap-1.5 transition-colors"
                     >
                       <span>Case Study</span>
                       <span className="inline-block transition-transform duration-200 group-hover/btn:-rotate-45 origin-center text-sm">
@@ -373,7 +373,7 @@ export default function Index() {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                        className="text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                       >
                         GitHub
                       </a>
@@ -383,7 +383,7 @@ export default function Index() {
                         href={project.demoUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                        className="text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                       >
                         Demo
                       </a>
@@ -405,7 +405,7 @@ export default function Index() {
               <Link
                 to="/blog"
                 prefetch="intent"
-                className="group text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+                className="group text-xs md:text-sm text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All articles</span>
                 <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
@@ -420,10 +420,10 @@ export default function Index() {
                   <Link
                     to={`/blog/${post.slug}`}
                     prefetch="intent"
-                    className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 sm:py-1 text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors gap-1 sm:gap-3 min-w-0"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 sm:py-1 text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors gap-1 sm:gap-3 min-w-0"
                     title={post.title}
                   >
-                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 underline-offset-4 text-sm md:text-base min-w-0 sm:truncate">
+                    <span className="font-normal text-zinc-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:underline decoration-zinc-300 dark:decoration-zinc-700 hover:decoration-indigo-400 underline-offset-4 text-sm md:text-base min-w-0 sm:truncate transition-colors">
                       {post.title}
                     </span>
                     <div className="hidden sm:block flex-1 h-px bg-zinc-200 dark:bg-zinc-800 min-w-[20px] shrink-0" />
@@ -447,7 +447,7 @@ export default function Index() {
               <Link
                 to="/research"
                 prefetch="intent"
-                className="group text-xs md:text-sm text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors inline-flex items-center gap-1.5"
+                className="group text-xs md:text-sm text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1.5"
               >
                 <span>All papers</span>
                 <span className="inline-block transition-transform duration-200 group-hover:-rotate-45 origin-center text-xs">
@@ -463,7 +463,7 @@ export default function Index() {
                     <Link
                       to={`/research/${paper.slug}`}
                       prefetch="intent"
-                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:underline decoration-zinc-400 underline-offset-4 text-sm md:text-base truncate"
+                      className="font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline decoration-zinc-400 hover:decoration-indigo-400 underline-offset-4 text-sm md:text-base truncate transition-colors"
                       title={paper.title}
                     >
                       {paper.title}
@@ -504,7 +504,7 @@ export default function Index() {
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
                   title={item.display}
-                  className="group text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 px-2 py-0.5 rounded-md transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-1.5 font-mono text-xs md:text-sm min-w-0 max-w-[62%] sm:max-w-[75%]"
+                  className="group text-zinc-800 dark:text-zinc-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 px-2 py-0.5 rounded-md transition-all duration-150 active:scale-[0.98] inline-flex items-center gap-1.5 font-mono text-xs md:text-sm min-w-0 max-w-[62%] sm:max-w-[75%]"
                 >
                   <span className="truncate">{item.display}</span>
                   {item.external && (

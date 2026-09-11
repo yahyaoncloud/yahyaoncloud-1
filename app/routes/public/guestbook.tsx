@@ -5,7 +5,7 @@ import {
   type LoaderFunction,
   type ActionFunction,
 } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import {
   auth,
   googleProvider,
@@ -347,7 +347,7 @@ export default function MinimalistGuestbook() {
                   className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                     !newMessage.trim() || isSubmitting
                       ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
-                      : "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white cursor-pointer shadow-xs active:scale-[0.98]"
+                      : "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white cursor-pointer shadow-xs active:scale-[0.98]"
                   }`}
                 >
                   {isSubmitting ? (
@@ -402,7 +402,7 @@ export default function MinimalistGuestbook() {
                   key={name}
                   type="button"
                   onClick={() => handleSignIn(provider)}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/70 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5 text-xs font-medium hover:scale-[1.02] active:scale-[0.98]"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 hover:bg-indigo-50/70 dark:hover:bg-indigo-950/40 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/70 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5 text-xs font-medium hover:scale-[1.02] active:scale-[0.98]"
                   title={`Sign in with ${name}`}
                 >
                   <Icon className={`w-3.5 h-3.5 ${color}`} />
@@ -501,6 +501,23 @@ export default function MinimalistGuestbook() {
           )}
         </div>
       </motion.div>
+
+      {/* Footer Navigation Bar (Navbar UI Reference) */}
+      <footer className="pt-8 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between text-xs sm:text-sm font-mono">
+        <Link
+          to="/"
+          prefetch="intent"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/70 dark:border-zinc-800/70 hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/30 transition-colors"
+        >
+          <span>← Back home</span>
+        </Link>
+        <a
+          href="#top"
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors"
+        >
+          <span>Top ↑</span>
+        </a>
+      </footer>
     </div>
   );
 }
