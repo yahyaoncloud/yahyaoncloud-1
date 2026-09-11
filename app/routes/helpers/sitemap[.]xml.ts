@@ -17,14 +17,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
   ]);
 
   const hasResearch = papers.length > 0 && profileInfo?.sectionsVisibility?.research !== false;
-  const hasGuestbook = profileInfo?.sectionsVisibility?.guestbook !== false;
 
   const staticPages = [
     { url: "/", priority: "1.0", changefreq: "weekly" },
     { url: "/blog", priority: "0.9", changefreq: "weekly" },
     { url: "/projects", priority: "0.9", changefreq: "monthly" },
     ...(hasResearch ? [{ url: "/research", priority: "0.8", changefreq: "monthly" }] : []),
-    ...(hasGuestbook ? [{ url: "/guestbook", priority: "0.7", changefreq: "daily" }] : []),
+    { url: "/guestbook", priority: "0.7", changefreq: "daily" },
     { url: "/contact", priority: "0.7", changefreq: "monthly" },
     { url: "/privacy-policy", priority: "0.3", changefreq: "yearly" },
     { url: "/terms-and-conditions", priority: "0.3", changefreq: "yearly" },

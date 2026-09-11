@@ -56,8 +56,8 @@ import {
   SiSupabase,
   SiPytorch,
   SiTensorflow,
-  SiOpenai,
 } from "react-icons/si";
+
 
 // VS Code / Cloud / Lucide Icons
 import { VscAzure } from "react-icons/vsc";
@@ -73,7 +73,9 @@ import {
   LuNetwork,
   LuCheck,
   LuLayoutGrid,
+  LuSparkles,
 } from "~/components/ui/icons";
+
 
 type TechIconType = React.ComponentType<{
   size?: number | string;
@@ -162,7 +164,7 @@ const REGISTRY: TechMap[] = [
   // AI, ML & Security
   { keywords: ["pytorch", "rocm"], icon: SiPytorch, color: "text-[#EE4C2C]" },
   { keywords: ["tensorflow", "keras"], icon: SiTensorflow, color: "text-[#FF6F00]" },
-  { keywords: ["openai", "chatgpt", "gpt"], icon: SiOpenai, color: "text-emerald-500" },
+  { keywords: ["openai", "chatgpt", "gpt"], icon: LuSparkles, color: "text-emerald-500" },
   { keywords: ["xgboost", "machine learning", "ml", "ai/ml", "ai", "deep learning", "llm", "langchain", "ollama"], icon: LuCpu, color: "text-purple-400" },
   { keywords: ["security", "cryptography", "zero-knowledge", "auth", "oauth", "jwt", "argon2id", "xchacha20"], icon: LuShield, color: "text-emerald-400" },
 
