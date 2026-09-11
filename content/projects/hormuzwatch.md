@@ -4,13 +4,17 @@ slug: "hormuzwatch"
 summary: "Real-time geospatial surveillance, multi-source news intelligence, and ensemble anomaly detection for strategic maritime regions in the Gulf. Combines AIS vessel tracking, aviation telemetry, and 16-news-source RSS pipeline with ML-powered threat scoring."
 period: "2024 - 2026"
 role: "Architect / Full-stack Developer"
-category: "SaaS, Security, AI/ML, Observability, Infrastructure"
+category: "AI & Observability"
 techStack:
-  - Go 1.23 (Gin, gRPC, WebSocket, JWT)
-  - Python 3.11 (FastAPI, PyTorch ROCm, XGBoost, scikit-learn, CuPy)
-  - React 19 + TypeScript + React Router v8 + Tailwind CSS v4 + Leaflet
-  - PostgreSQL (Supabase) + Event Hubs
-  - Terraform (Azure) + Cloudflare Tunnel + GitHub Actions + systemd
+  - Go
+  - Python
+  - PyTorch
+  - XGBoost
+  - React
+  - TypeScript
+  - PostgreSQL
+  - Terraform
+  - Azure
 demoUrl: "https://hormuzwatch.aburcloud.com"
 githubUrl: "https://github.com/yahyaoncloud/hormuzwatch"
 featured: true

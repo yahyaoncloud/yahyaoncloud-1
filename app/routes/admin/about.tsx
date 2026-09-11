@@ -9,7 +9,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { Switch } from "~/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuUser as User, LuBriefcase as Briefcase, LuCode as Code, LuAward as Award, LuShare2 as Share2, LuLayers as Layers, LuLayoutGrid as LayoutGrid, LuCircleCheck as CheckCircle2, LuSparkles as Sparkles, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw, LuLoaderCircle as Loader2 } from "react-icons/lu";
+import { LuPlus as Plus, LuTrash2 as Trash2, LuSave as Save, LuUser as User, LuBriefcase as Briefcase, LuCode as Code, LuAward as Award, LuShare2 as Share2, LuLayers as Layers, LuLayoutGrid as LayoutGrid, LuCircleCheck as CheckCircle2, LuSparkles as Sparkles, LuTriangleAlert as AlertTriangle, LuRefreshCw as RefreshCw, LuLoaderCircle as Loader2 } from "~/components/ui/icons";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import ImageUpload from "~/components/ImageUpload";
@@ -49,6 +49,26 @@ export async function action({ request }: ActionFunctionArgs) {
         success: true,
         skillsDisplayMode: mode,
         message: `Homepage skills display mode changed to ${modeLabels[mode] || mode}.`,
+        error: undefined,
+      });
+    }
+
+    if (intent === "update-section-visibility") {
+      const sectionKey = formData.get("section") as keyof SectionVisibility;
+      const visible = formData.get("visible") === "true";
+      const profile = await getProfileInfo();
+      const updatedVisibility: SectionVisibility = {
+        ...profile.sectionsVisibility,
+        [sectionKey]: visible,
+      };
+      await saveProfileInfo({
+        ...profile,
+        sectionsVisibility: updatedVisibility,
+      });
+      return json({
+        success: true,
+        message: `Homepage section "${sectionKey}" is now ${visible ? "visible" : "hidden"}.`,
+        sectionsVisibility: updatedVisibility,
         error: undefined,
       });
     }
@@ -134,6 +154,32 @@ export default function AdminAbout() {
     message?: string;
     error?: string;
   }>();
+  const sectionFetcher = useFetcher<{
+    success?: boolean;
+    message?: string;
+    sectionsVisibility?: SectionVisibility;
+    error?: string;
+  }>();
+
+  useEffect(() => {
+    if (sectionFetcher.data?.success && sectionFetcher.data.message) {
+      toast.success(sectionFetcher.data.message);
+    } else if (sectionFetcher.data?.error) {
+      toast.error(sectionFetcher.data.error);
+    }
+  }, [sectionFetcher.data]);
+
+  const handleToggleSection = (key: keyof SectionVisibility, val: boolean) => {
+    setSectionsVisibility((prev) => ({ ...prev, [key]: val }));
+    sectionFetcher.submit(
+      {
+        intent: "update-section-visibility",
+        section: key,
+        visible: String(val),
+      },
+      { method: "post" }
+    );
+  };
 
   // Initial State Setup - Prefer live ProfileInfo data
   const [headline, setHeadline] = useState<string>(profileInfo?.headline || "Cloud DevOps & Infrastructure Engineer.");
@@ -496,9 +542,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-summary"
                         checked={sectionsVisibility.summary !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, summary: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("summary", val)}
                       />
                     </div>
 
@@ -524,9 +568,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-experience"
                         checked={sectionsVisibility.experience !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, experience: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("experience", val)}
                       />
                     </div>
 
@@ -552,9 +594,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-elsewhere"
                         checked={sectionsVisibility.elsewhere !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, elsewhere: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("elsewhere", val)}
                       />
                     </div>
                   </div>
@@ -590,9 +630,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-work"
                         checked={sectionsVisibility.selectedWork !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, selectedWork: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("selectedWork", val)}
                       />
                     </div>
 
@@ -618,9 +656,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-writing"
                         checked={sectionsVisibility.writing !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, writing: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("writing", val)}
                       />
                     </div>
 
@@ -646,9 +682,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-research"
                         checked={sectionsVisibility.research !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, research: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("research", val)}
                       />
                     </div>
 
@@ -674,9 +708,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-skills"
                         checked={sectionsVisibility.skills !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, skills: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("skills", val)}
                       />
                     </div>
 
@@ -702,9 +734,7 @@ export default function AdminAbout() {
                       <Switch
                         id="toggle-certs"
                         checked={sectionsVisibility.certifications !== false}
-                        onCheckedChange={(val) =>
-                          setSectionsVisibility({ ...sectionsVisibility, certifications: val })
-                        }
+                        onCheckedChange={(val) => handleToggleSection("certifications", val)}
                       />
                     </div>
                   </div>
@@ -713,8 +743,9 @@ export default function AdminAbout() {
 
               <CardFooter className="border-t border-zinc-100 dark:border-zinc-800 py-4 px-6 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-50/50 dark:bg-zinc-950/20">
                 <div className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>
+                    Auto-saved instantly on toggle &bull;{" "}
                     {[
                       sectionsVisibility.summary !== false,
                       sectionsVisibility.experience !== false,
@@ -725,7 +756,7 @@ export default function AdminAbout() {
                       sectionsVisibility.skills !== false,
                       sectionsVisibility.certifications !== false,
                     ].filter(Boolean).length}{" "}
-                    of 8 sections visible on homepage
+                    of 8 sections active
                   </span>
                 </div>
 
@@ -736,7 +767,7 @@ export default function AdminAbout() {
                   className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                   <Save size={15} className="mr-2" />
-                  {navigation.state === "submitting" ? "Saving Changes..." : "Save Homepage Sections"}
+                  {navigation.state === "submitting" ? "Saving Changes..." : "Save All Sections"}
                 </Button>
               </CardFooter>
             </Card>

@@ -1,6 +1,7 @@
 import { json, type LoaderFunctionArgs, type ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useFetcher } from "@remix-run/react";
-import { LuMail as Mail, LuClock as Clock, LuTrash2 as Trash2, LuCheck as Check, LuMailOpen as MailOpen, LuSend as Send } from "react-icons/lu";
+import { LuMail as Mail, LuClock as Clock, LuTrash2 as Trash2, LuCheck as Check, LuMailOpen as MailOpen, LuSend as Send } from "~/components/ui/icons";
+
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { getContactMessages, deleteContactMessage, toggleContactMessageRead } from "~/Services/content.server";
 import { Button } from "~/components/ui/button";

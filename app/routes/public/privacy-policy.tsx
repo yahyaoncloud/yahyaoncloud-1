@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { LuShield as Shield, LuClock as Clock, LuLock as Lock, LuArrowLeft as ArrowLeft } from "react-icons/lu";
+import { LuShield as Shield, LuClock as Clock, LuLock as Lock, LuArrowLeft as ArrowLeft } from "~/components/ui/icons";
 
 export default function PrivacyPolicyPage() {
   return (

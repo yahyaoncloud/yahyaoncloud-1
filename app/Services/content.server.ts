@@ -117,28 +117,71 @@ function formatDateToDisplay(dateStr: string): string {
 }
 
 // ----------------------------------------------------
-// In-Memory Fast Cache with Auto-Invalidation & Timeout Guard
+// In-Memory Fast Cache with Stale-While-Revalidate & Request Deduplication
 // ----------------------------------------------------
-const memoryCache = new Map<string, { value: unknown; expiresAt: number }>();
-const CACHE_TTL_MS = 120 * 1000; // 2 minutes
+interface CacheEntry<T> {
+  value: T;
+  cachedAt: number;
+  expiresAt: number;
+}
+
+const memoryCache = new Map<string, CacheEntry<unknown>>();
+const inFlightRequests = new Map<string, Promise<unknown>>();
+
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const STALE_TTL_MS = 15 * 60 * 1000;       // 15 minutes before background refresh
 
 function getFromMemoryCache<T>(key: string): T | null {
   const item = memoryCache.get(key);
   if (item && Date.now() < item.expiresAt) {
+    if (Date.now() - item.cachedAt > STALE_TTL_MS) {
+      triggerBackgroundRevalidation(key);
+    }
     return item.value as T;
   }
   return null;
 }
 
 function setToMemoryCache<T>(key: string, value: T, ttlMs = CACHE_TTL_MS): void {
-  memoryCache.set(key, { value, expiresAt: Date.now() + ttlMs });
+  memoryCache.set(key, {
+    value,
+    cachedAt: Date.now(),
+    expiresAt: Date.now() + ttlMs,
+  });
 }
 
 export function invalidateContentCache(): void {
   memoryCache.clear();
+  warmContentCache().catch(() => {});
 }
 
-async function withDbTimeout<T>(promise: Promise<T>, fallback: T, timeoutMs = 2500): Promise<T> {
+async function dedupeFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  const existing = inFlightRequests.get(key);
+  if (existing) {
+    return existing as Promise<T>;
+  }
+  const promise = fetcher().finally(() => {
+    inFlightRequests.delete(key);
+  });
+  inFlightRequests.set(key, promise);
+  return promise;
+}
+
+function triggerBackgroundRevalidation(key: string): void {
+  if (inFlightRequests.has(key)) return;
+
+  if (key === "all_blog_posts") {
+    getAllBlogPosts(true).catch(() => {});
+  } else if (key === "all_projects") {
+    getAllProjects(true).catch(() => {});
+  } else if (key === "all_research") {
+    getAllResearchPapers(true).catch(() => {});
+  } else if (key === "homepage_profile") {
+    getProfileInfo(true).catch(() => {});
+  }
+}
+
+async function withDbTimeout<T>(promise: Promise<T>, fallback: T, timeoutMs = 1500): Promise<T> {
   let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<T>((resolve) => {
     timeoutHandle = setTimeout(() => {
@@ -160,53 +203,56 @@ async function withDbTimeout<T>(promise: Promise<T>, fallback: T, timeoutMs = 25
 // Blog Posts (Prisma + Markdown Fallback/Sync)
 // ----------------------------------------------------
 
-export async function getAllBlogPosts(): Promise<BlogPost[]> {
-  const cached = getFromMemoryCache<BlogPost[]>("all_blog_posts");
-  if (cached) return cached;
-
-  const postsMap = new Map<string, BlogPost>();
-
-  // 1. Read local markdown files
-  try {
-    ensureDirectoryExists(BLOG_DIR);
-    const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
-
-    for (const file of files) {
-      const filePath = path.join(BLOG_DIR, file);
-      const fileContent = fs.readFileSync(filePath, "utf-8");
-      const { data, content } = matter(fileContent);
-
-      const defaultSlug = file.replace(/\.md$/, "");
-      const rawDate = data.date ? String(data.date) : "2024-01-01";
-      const slug = data.slug || defaultSlug;
-
-      postsMap.set(slug, {
-        title: data.title || "Untitled Article",
-        slug,
-        date: rawDate,
-        displayDate: data.displayDate || formatDateToDisplay(rawDate),
-        summary: data.summary || "",
-        tags: Array.isArray(data.tags) ? data.tags : [],
-        author: data.author || "@yahyaoncloud",
-        featured: Boolean(data.featured),
-        order: Number(data.order) || 99,
-        content: content.trim(),
-      });
-    }
-  } catch (error) {
-    console.error("Error reading blog posts from disk:", error);
+export async function getAllBlogPosts(forceRefresh = false): Promise<BlogPost[]> {
+  if (!forceRefresh) {
+    const cached = getFromMemoryCache<BlogPost[]>("all_blog_posts");
+    if (cached) return cached;
   }
 
-  // 2. Read from Prisma DB with timeout guarantee
-  try {
-    const dbPosts = await withDbTimeout(
-      prisma.post.findMany({
-        where: { status: "published" },
-        orderBy: { date: "desc" },
-        include: { author: true, tags: true },
-      }),
-      []
-    );
+  return dedupeFetch("all_blog_posts", async () => {
+    const postsMap = new Map<string, BlogPost>();
+
+    // 1. Read local markdown files
+    try {
+      ensureDirectoryExists(BLOG_DIR);
+      const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md"));
+
+      for (const file of files) {
+        const filePath = path.join(BLOG_DIR, file);
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const { data, content } = matter(fileContent);
+
+        const defaultSlug = file.replace(/\.md$/, "");
+        const rawDate = data.date ? String(data.date) : "2024-01-01";
+        const slug = data.slug || defaultSlug;
+
+        postsMap.set(slug, {
+          title: data.title || "Untitled Article",
+          slug,
+          date: rawDate,
+          displayDate: data.displayDate || formatDateToDisplay(rawDate),
+          summary: data.summary || "",
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          author: data.author || "@yahyaoncloud",
+          featured: Boolean(data.featured),
+          order: Number(data.order) || 99,
+          content: content.trim(),
+        });
+      }
+    } catch (error) {
+      console.error("Error reading blog posts from disk:", error);
+    }
+
+    // 2. Read from Prisma DB with timeout guarantee
+    try {
+      const dbPosts = await withDbTimeout(
+        prisma.post.findMany({
+          where: { status: "published" },
+          orderBy: { date: "desc" },
+          include: { author: true, tags: true },
+        }),
+        []
+      );
 
     if (dbPosts && dbPosts.length > 0) {
       for (const p of dbPosts) {
@@ -228,12 +274,13 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
     console.warn("DB posts retrieval notice:", err);
   }
 
-  const result = Array.from(postsMap.values()).sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+    const result = Array.from(postsMap.values()).sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 
-  setToMemoryCache("all_blog_posts", result);
-  return result;
+    setToMemoryCache("all_blog_posts", result);
+    return result;
+  });
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
@@ -241,68 +288,80 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   const cached = getFromMemoryCache<BlogPost>(cacheKey);
   if (cached) return cached;
 
-  try {
-    const p = await withDbTimeout(
-      prisma.post.findUnique({
-        where: { slug },
-        include: { author: true, tags: true },
-      }),
-      null
-    );
-
-    if (p) {
-      const result: BlogPost = {
-        title: p.title,
-        slug: p.slug,
-        date: p.date.toISOString().split("T")[0],
-        displayDate: formatDateToDisplay(p.date.toISOString()),
-        summary: p.summary || "",
-        tags: p.tags.map((t) => t.name),
-        author: p.author?.authorName || "@yahyaoncloud",
-        featured: p.featured,
-        order: 1,
-        content: p.content,
-      };
-      setToMemoryCache(cacheKey, result);
-      return result;
+  // Check if available in already cached blog posts list
+  const allPosts = getFromMemoryCache<BlogPost[]>("all_blog_posts");
+  if (allPosts) {
+    const found = allPosts.find((p) => p.slug === slug);
+    if (found && found.content) {
+      setToMemoryCache(cacheKey, found);
+      return found;
     }
-  } catch (err) {
-    console.warn("DB single post retrieval notice:", err);
   }
 
-  // Fallback to local markdown file
-  try {
-    ensureDirectoryExists(BLOG_DIR);
-    const filePath = path.join(BLOG_DIR, `${slug}.md`);
-    if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, "utf-8");
-      const { data, content } = matter(fileContent);
-      const rawDate = data.date ? String(data.date) : "2024-01-01";
-      const result: BlogPost = {
-        title: data.title || "Untitled Article",
-        slug,
-        date: rawDate,
-        displayDate: data.displayDate || formatDateToDisplay(rawDate),
-        summary: data.summary || "",
-        tags: Array.isArray(data.tags) ? data.tags : [],
-        author: data.author || "@yahyaoncloud",
-        featured: Boolean(data.featured),
-        order: Number(data.order) || 99,
-        content: content.trim(),
-      };
-      setToMemoryCache(cacheKey, result);
-      return result;
+  return dedupeFetch(cacheKey, async () => {
+    try {
+      const p = await withDbTimeout(
+        prisma.post.findUnique({
+          where: { slug },
+          include: { author: true, tags: true },
+        }),
+        null
+      );
+
+      if (p) {
+        const result: BlogPost = {
+          title: p.title,
+          slug: p.slug,
+          date: p.date.toISOString().split("T")[0],
+          displayDate: formatDateToDisplay(p.date.toISOString()),
+          summary: p.summary || "",
+          tags: p.tags.map((t) => t.name),
+          author: p.author?.authorName || "@yahyaoncloud",
+          featured: p.featured,
+          order: 1,
+          content: p.content,
+        };
+        setToMemoryCache(cacheKey, result);
+        return result;
+      }
+    } catch (err) {
+      console.warn("DB single post retrieval notice:", err);
     }
-  } catch (err) {
-    console.warn("Local post retrieval notice:", err);
-  }
 
-  const all = await getAllBlogPosts();
-  const matched = all.find((p) => p.slug === slug) || null;
-  if (matched) {
-    setToMemoryCache(cacheKey, matched);
-  }
-  return matched;
+    // Fallback to local markdown file
+    try {
+      ensureDirectoryExists(BLOG_DIR);
+      const filePath = path.join(BLOG_DIR, `${slug}.md`);
+      if (fs.existsSync(filePath)) {
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const { data, content } = matter(fileContent);
+        const rawDate = data.date ? String(data.date) : "2024-01-01";
+        const result: BlogPost = {
+          title: data.title || "Untitled Article",
+          slug,
+          date: rawDate,
+          displayDate: data.displayDate || formatDateToDisplay(rawDate),
+          summary: data.summary || "",
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          author: data.author || "@yahyaoncloud",
+          featured: Boolean(data.featured),
+          order: Number(data.order) || 99,
+          content: content.trim(),
+        };
+        setToMemoryCache(cacheKey, result);
+        return result;
+      }
+    } catch (err) {
+      console.warn("Local post retrieval notice:", err);
+    }
+
+    const all = await getAllBlogPosts();
+    const matched = all.find((p) => p.slug === slug) || null;
+    if (matched) {
+      setToMemoryCache(cacheKey, matched);
+    }
+    return matched;
+  });
 }
 
 export async function saveBlogPost(post: BlogPost): Promise<boolean> {
@@ -350,55 +409,112 @@ export async function deleteBlogPost(slug: string): Promise<boolean> {
 // Projects (Prisma + Markdown)
 // ----------------------------------------------------
 
-export async function getAllProjects(): Promise<ProjectCaseStudy[]> {
-  const cached = getFromMemoryCache<ProjectCaseStudy[]>("all_projects");
-  if (cached) return cached;
-
-  const projectsMap = new Map<string, ProjectCaseStudy>();
-
-  // 1. Read local markdown files
-  try {
-    ensureDirectoryExists(PROJECTS_DIR);
-    const files = fs.readdirSync(PROJECTS_DIR).filter((f) => f.endsWith(".md"));
-
-    for (const file of files) {
-      const filePath = path.join(PROJECTS_DIR, file);
-      const fileContent = fs.readFileSync(filePath, "utf-8");
-      const { data, content } = matter(fileContent);
-
-      const defaultSlug = file.replace(/\.md$/, "");
-
-      projectsMap.set(data.slug || defaultSlug, {
-        title: data.title || "Untitled Project",
-        slug: data.slug || defaultSlug,
-        summary: data.summary || "",
-        period: data.period || "2024",
-        role: data.role || "Lead Cloud Engineer",
-        category: data.category || "Cloud & DevOps",
-        techStack: Array.isArray(data.techStack) ? data.techStack : [],
-        demoUrl: data.demoUrl || undefined,
-        githubUrl: data.githubUrl || undefined,
-        featured: Boolean(data.featured),
-        order: Number(data.order) || 99,
-        content: content.trim(),
-      });
-    }
-  } catch (error) {
-    console.error("Error reading projects:", error);
+export async function getAllProjects(forceRefresh = false): Promise<ProjectCaseStudy[]> {
+  if (!forceRefresh) {
+    const cached = getFromMemoryCache<ProjectCaseStudy[]>("all_projects");
+    if (cached) return cached;
   }
 
-  // 2. Read from Prisma DB with timeout guarantee
-  try {
-    const dbProjects = await withDbTimeout(
-      prisma.projectCaseStudy.findMany({
-        orderBy: { order: "asc" },
-      }),
-      []
+  return dedupeFetch("all_projects", async () => {
+    const projectsMap = new Map<string, ProjectCaseStudy>();
+
+    // 1. Read local markdown files
+    try {
+      ensureDirectoryExists(PROJECTS_DIR);
+      const files = fs.readdirSync(PROJECTS_DIR).filter((f) => f.endsWith(".md"));
+
+      for (const file of files) {
+        const filePath = path.join(PROJECTS_DIR, file);
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const { data, content } = matter(fileContent);
+
+        const defaultSlug = file.replace(/\.md$/, "");
+
+        projectsMap.set(data.slug || defaultSlug, {
+          title: data.title || "Untitled Project",
+          slug: data.slug || defaultSlug,
+          summary: data.summary || "",
+          period: data.period || "2024",
+          role: data.role || "Lead Cloud Engineer",
+          category: data.category || "Cloud & DevOps",
+          techStack: Array.isArray(data.techStack) ? data.techStack : [],
+          demoUrl: data.demoUrl || undefined,
+          githubUrl: data.githubUrl || undefined,
+          featured: Boolean(data.featured),
+          order: Number(data.order) || 99,
+          content: content.trim(),
+        });
+      }
+    } catch (error) {
+      console.error("Error reading projects:", error);
+    }
+
+    // 2. Read from Prisma DB with timeout guarantee
+    try {
+      const dbProjects = await withDbTimeout(
+        prisma.projectCaseStudy.findMany({
+          orderBy: { order: "asc" },
+        }),
+        []
+      );
+
+      if (dbProjects && dbProjects.length > 0) {
+        for (const p of dbProjects) {
+          projectsMap.set(p.slug, {
+            title: p.title,
+            slug: p.slug,
+            summary: p.summary,
+            period: p.period,
+            role: p.role,
+            category: p.category,
+            techStack: p.techStack,
+            demoUrl: p.demoUrl || undefined,
+            githubUrl: p.githubUrl || undefined,
+            featured: p.featured,
+            order: p.order,
+            content: p.content,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("DB projects retrieval notice:", err);
+    }
+
+    const result = Array.from(projectsMap.values()).sort(
+      (a, b) => (a.order ?? 99) - (b.order ?? 99)
     );
 
-    if (dbProjects && dbProjects.length > 0) {
-      for (const p of dbProjects) {
-        projectsMap.set(p.slug, {
+    setToMemoryCache("all_projects", result);
+    return result;
+  });
+}
+
+export async function getProjectBySlug(slug: string): Promise<ProjectCaseStudy | null> {
+  const cacheKey = `project_${slug}`;
+  const cached = getFromMemoryCache<ProjectCaseStudy>(cacheKey);
+  if (cached) return cached;
+
+  // Check if available in already cached projects list
+  const allProjects = getFromMemoryCache<ProjectCaseStudy[]>("all_projects");
+  if (allProjects) {
+    const found = allProjects.find((p) => p.slug === slug);
+    if (found && found.content) {
+      setToMemoryCache(cacheKey, found);
+      return found;
+    }
+  }
+
+  return dedupeFetch(cacheKey, async () => {
+    try {
+      const p = await withDbTimeout(
+        prisma.projectCaseStudy.findUnique({
+          where: { slug },
+        }),
+        null
+      );
+
+      if (p) {
+        const result: ProjectCaseStudy = {
           title: p.title,
           slug: p.slug,
           summary: p.summary,
@@ -411,62 +527,21 @@ export async function getAllProjects(): Promise<ProjectCaseStudy[]> {
           featured: p.featured,
           order: p.order,
           content: p.content,
-        });
+        };
+        setToMemoryCache(cacheKey, result);
+        return result;
       }
+    } catch (err) {
+      console.warn("DB single project retrieval notice:", err);
     }
-  } catch (err) {
-    console.warn("DB projects retrieval notice:", err);
-  }
 
-  const result = Array.from(projectsMap.values()).sort(
-    (a, b) => (a.order ?? 99) - (b.order ?? 99)
-  );
-
-  setToMemoryCache("all_projects", result);
-  return result;
-}
-
-export async function getProjectBySlug(slug: string): Promise<ProjectCaseStudy | null> {
-  const cacheKey = `project_${slug}`;
-  const cached = getFromMemoryCache<ProjectCaseStudy>(cacheKey);
-  if (cached) return cached;
-
-  try {
-    const p = await withDbTimeout(
-      prisma.projectCaseStudy.findUnique({
-        where: { slug },
-      }),
-      null
-    );
-
-    if (p) {
-      const result: ProjectCaseStudy = {
-        title: p.title,
-        slug: p.slug,
-        summary: p.summary,
-        period: p.period,
-        role: p.role,
-        category: p.category,
-        techStack: p.techStack,
-        demoUrl: p.demoUrl || undefined,
-        githubUrl: p.githubUrl || undefined,
-        featured: p.featured,
-        order: p.order,
-        content: p.content,
-      };
-      setToMemoryCache(cacheKey, result);
-      return result;
+    const all = await getAllProjects();
+    const matched = all.find((p) => p.slug === slug) || null;
+    if (matched) {
+      setToMemoryCache(cacheKey, matched);
     }
-  } catch (err) {
-    console.warn("DB single project retrieval notice:", err);
-  }
-
-  const all = await getAllProjects();
-  const matched = all.find((p) => p.slug === slug) || null;
-  if (matched) {
-    setToMemoryCache(cacheKey, matched);
-  }
-  return matched;
+    return matched;
+  });
 }
 
 export async function getFeaturedProjects(): Promise<ProjectCaseStudy[]> {
@@ -558,55 +633,112 @@ export async function deleteProject(slug: string): Promise<boolean> {
 // Research Papers (Prisma + Markdown)
 // ----------------------------------------------------
 
-export async function getAllResearchPapers(): Promise<ResearchPaper[]> {
-  const cached = getFromMemoryCache<ResearchPaper[]>("all_research");
-  if (cached) return cached;
-
-  const papersMap = new Map<string, ResearchPaper>();
-
-  // 1. Read local markdown files
-  try {
-    ensureDirectoryExists(RESEARCH_DIR);
-    const files = fs.readdirSync(RESEARCH_DIR).filter((f) => f.endsWith(".md"));
-
-    for (const file of files) {
-      const filePath = path.join(RESEARCH_DIR, file);
-      const fileContent = fs.readFileSync(filePath, "utf-8");
-      const { data, content } = matter(fileContent);
-
-      const defaultSlug = file.replace(/\.md$/, "");
-
-      papersMap.set(data.slug || defaultSlug, {
-        title: data.title || "Untitled Paper",
-        slug: data.slug || defaultSlug,
-        authors: Array.isArray(data.authors) ? data.authors : ["Yahya"],
-        venue: data.venue || "Technical Whitepaper",
-        year: data.year ? String(data.year) : "2024",
-        pdfUrl: data.pdfUrl || undefined,
-        doi: data.doi || undefined,
-        tags: Array.isArray(data.tags) ? data.tags : [],
-        abstract: data.abstract || "",
-        featured: Boolean(data.featured),
-        order: Number(data.order) || 99,
-        content: content.trim() || undefined,
-      });
-    }
-  } catch (error) {
-    console.error("Error reading research papers:", error);
+export async function getAllResearchPapers(forceRefresh = false): Promise<ResearchPaper[]> {
+  if (!forceRefresh) {
+    const cached = getFromMemoryCache<ResearchPaper[]>("all_research");
+    if (cached) return cached;
   }
 
-  // 2. Read from Prisma DB with timeout guarantee
-  try {
-    const dbPapers = await withDbTimeout(
-      prisma.researchPaper.findMany({
-        orderBy: { order: "asc" },
-      }),
-      []
+  return dedupeFetch("all_research", async () => {
+    const papersMap = new Map<string, ResearchPaper>();
+
+    // 1. Read local markdown files
+    try {
+      ensureDirectoryExists(RESEARCH_DIR);
+      const files = fs.readdirSync(RESEARCH_DIR).filter((f) => f.endsWith(".md"));
+
+      for (const file of files) {
+        const filePath = path.join(RESEARCH_DIR, file);
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const { data, content } = matter(fileContent);
+
+        const defaultSlug = file.replace(/\.md$/, "");
+
+        papersMap.set(data.slug || defaultSlug, {
+          title: data.title || "Untitled Paper",
+          slug: data.slug || defaultSlug,
+          authors: Array.isArray(data.authors) ? data.authors : ["Yahya"],
+          venue: data.venue || "Technical Whitepaper",
+          year: data.year ? String(data.year) : "2024",
+          pdfUrl: data.pdfUrl || undefined,
+          doi: data.doi || undefined,
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          abstract: data.abstract || "",
+          featured: Boolean(data.featured),
+          order: Number(data.order) || 99,
+          content: content.trim() || undefined,
+        });
+      }
+    } catch (error) {
+      console.error("Error reading research papers:", error);
+    }
+
+    // 2. Read from Prisma DB with timeout guarantee
+    try {
+      const dbPapers = await withDbTimeout(
+        prisma.researchPaper.findMany({
+          orderBy: { order: "asc" },
+        }),
+        []
+      );
+
+      if (dbPapers && dbPapers.length > 0) {
+        for (const p of dbPapers) {
+          papersMap.set(p.slug, {
+            title: p.title,
+            slug: p.slug,
+            authors: p.authors,
+            venue: p.venue,
+            year: p.year,
+            pdfUrl: p.pdfUrl || undefined,
+            doi: p.doi || undefined,
+            tags: p.tags,
+            abstract: p.abstract,
+            featured: p.featured,
+            order: p.order,
+            content: p.content || undefined,
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("DB research retrieval notice:", err);
+    }
+
+    const result = Array.from(papersMap.values()).sort(
+      (a, b) => (a.order ?? 99) - (b.order ?? 99)
     );
 
-    if (dbPapers && dbPapers.length > 0) {
-      for (const p of dbPapers) {
-        papersMap.set(p.slug, {
+    setToMemoryCache("all_research", result);
+    return result;
+  });
+}
+
+export async function getResearchBySlug(slug: string): Promise<ResearchPaper | null> {
+  const cacheKey = `research_${slug}`;
+  const cached = getFromMemoryCache<ResearchPaper>(cacheKey);
+  if (cached) return cached;
+
+  // Check if available in already cached research list
+  const allResearch = getFromMemoryCache<ResearchPaper[]>("all_research");
+  if (allResearch) {
+    const found = allResearch.find((r) => r.slug === slug);
+    if (found) {
+      setToMemoryCache(cacheKey, found);
+      return found;
+    }
+  }
+
+  return dedupeFetch(cacheKey, async () => {
+    try {
+      const p = await withDbTimeout(
+        prisma.researchPaper.findUnique({
+          where: { slug },
+        }),
+        null
+      );
+
+      if (p) {
+        const result: ResearchPaper = {
           title: p.title,
           slug: p.slug,
           authors: p.authors,
@@ -619,62 +751,21 @@ export async function getAllResearchPapers(): Promise<ResearchPaper[]> {
           featured: p.featured,
           order: p.order,
           content: p.content || undefined,
-        });
+        };
+        setToMemoryCache(cacheKey, result);
+        return result;
       }
+    } catch (err) {
+      console.warn("DB single research retrieval notice:", err);
     }
-  } catch (err) {
-    console.warn("DB research retrieval notice:", err);
-  }
 
-  const result = Array.from(papersMap.values()).sort(
-    (a, b) => (a.order ?? 99) - (b.order ?? 99)
-  );
-
-  setToMemoryCache("all_research", result);
-  return result;
-}
-
-export async function getResearchBySlug(slug: string): Promise<ResearchPaper | null> {
-  const cacheKey = `research_${slug}`;
-  const cached = getFromMemoryCache<ResearchPaper>(cacheKey);
-  if (cached) return cached;
-
-  try {
-    const p = await withDbTimeout(
-      prisma.researchPaper.findUnique({
-        where: { slug },
-      }),
-      null
-    );
-
-    if (p) {
-      const result: ResearchPaper = {
-        title: p.title,
-        slug: p.slug,
-        authors: p.authors,
-        venue: p.venue,
-        year: p.year,
-        pdfUrl: p.pdfUrl || undefined,
-        doi: p.doi || undefined,
-        tags: p.tags,
-        abstract: p.abstract,
-        featured: p.featured,
-        order: p.order,
-        content: p.content || undefined,
-      };
-      setToMemoryCache(cacheKey, result);
-      return result;
+    const all = await getAllResearchPapers();
+    const matched = all.find((p) => p.slug === slug) || null;
+    if (matched) {
+      setToMemoryCache(cacheKey, matched);
     }
-  } catch (err) {
-    console.warn("DB single research retrieval notice:", err);
-  }
-
-  const all = await getAllResearchPapers();
-  const matched = all.find((p) => p.slug === slug) || null;
-  if (matched) {
-    setToMemoryCache(cacheKey, matched);
-  }
-  return matched;
+    return matched;
+  });
 }
 
 export async function getFeaturedResearch(): Promise<ResearchPaper[]> {
@@ -803,51 +894,76 @@ export const DEFAULT_PROFILE_INFO: ProfileInfoData = {
   },
 };
 
-export async function getProfileInfo(): Promise<ProfileInfoData> {
-  const cached = getFromMemoryCache<ProfileInfoData>("homepage_profile");
-  if (cached) return cached;
-
-  try {
-    const profile = await withDbTimeout(
-      prisma.profileInfo.findUnique({
-        where: { key: "homepage_profile" },
-      }),
-      null
-    );
-
-    if (profile) {
-      const dbVisibility = profile.sectionsVisibility as unknown as SectionVisibility | undefined;
-      const result: ProfileInfoData = {
-        headline: profile.headline || "",
-        bio: profile.bio || [],
-        skills: profile.skills || [],
-        skillsDisplayMode: (profile.skillsDisplayMode as "both" | "icons" | "text") || "both",
-        experiences: Array.isArray(profile.experiences) ? (profile.experiences as unknown as ProfileInfoData["experiences"]) : [],
-        certifications: Array.isArray(profile.certifications) ? (profile.certifications as unknown as ProfileInfoData["certifications"]) : [],
-        socialLinks: Array.isArray(profile.socialLinks)
-          ? (profile.socialLinks as unknown as ProfileInfoData["socialLinks"]).filter(
-              (item) => item && typeof item.href === "string" && item.href.trim().length > 0
-            )
-          : [],
-        sectionsVisibility: {
-          summary: dbVisibility?.summary !== undefined ? Boolean(dbVisibility.summary) : true,
-          experience: dbVisibility?.experience !== undefined ? Boolean(dbVisibility.experience) : true,
-          elsewhere: dbVisibility?.elsewhere !== undefined ? Boolean(dbVisibility.elsewhere) : true,
-          certifications: dbVisibility?.certifications !== undefined ? Boolean(dbVisibility.certifications) : true,
-          skills: dbVisibility?.skills !== undefined ? Boolean(dbVisibility.skills) : true,
-          selectedWork: dbVisibility?.selectedWork !== undefined ? Boolean(dbVisibility.selectedWork) : true,
-          writing: dbVisibility?.writing !== undefined ? Boolean(dbVisibility.writing) : true,
-          research: dbVisibility?.research !== undefined ? Boolean(dbVisibility.research) : true,
-        },
-      };
-      setToMemoryCache("homepage_profile", result);
-      return result;
-    }
-  } catch (err) {
-    console.warn("DB profile info query notice:", err);
+export async function getProfileInfo(forceRefresh = false): Promise<ProfileInfoData> {
+  if (!forceRefresh) {
+    const cached = getFromMemoryCache<ProfileInfoData>("homepage_profile");
+    if (cached) return cached;
   }
 
-  return DEFAULT_PROFILE_INFO;
+  return dedupeFetch("homepage_profile", async () => {
+    try {
+      const profile = await withDbTimeout(
+        prisma.profileInfo.findUnique({
+          where: { key: "homepage_profile" },
+        }),
+        null
+      );
+
+      if (profile) {
+        const dbVisibility = profile.sectionsVisibility as unknown as SectionVisibility | undefined;
+        const result: ProfileInfoData = {
+          headline: profile.headline || "",
+          bio: profile.bio || [],
+          skills: profile.skills || [],
+          skillsDisplayMode: (profile.skillsDisplayMode as "both" | "icons" | "text") || "both",
+          experiences: Array.isArray(profile.experiences) ? (profile.experiences as unknown as ProfileInfoData["experiences"]) : [],
+          certifications: Array.isArray(profile.certifications) ? (profile.certifications as unknown as ProfileInfoData["certifications"]) : [],
+          socialLinks: Array.isArray(profile.socialLinks)
+            ? (profile.socialLinks as unknown as ProfileInfoData["socialLinks"]).filter(
+                (item) => item && typeof item.href === "string" && item.href.trim().length > 0
+              )
+            : [],
+          sectionsVisibility: {
+            summary: dbVisibility?.summary !== undefined ? Boolean(dbVisibility.summary) : true,
+            experience: dbVisibility?.experience !== undefined ? Boolean(dbVisibility.experience) : true,
+            elsewhere: dbVisibility?.elsewhere !== undefined ? Boolean(dbVisibility.elsewhere) : true,
+            certifications: dbVisibility?.certifications !== undefined ? Boolean(dbVisibility.certifications) : true,
+            skills: dbVisibility?.skills !== undefined ? Boolean(dbVisibility.skills) : true,
+            selectedWork: dbVisibility?.selectedWork !== undefined ? Boolean(dbVisibility.selectedWork) : true,
+            writing: dbVisibility?.writing !== undefined ? Boolean(dbVisibility.writing) : true,
+            research: dbVisibility?.research !== undefined ? Boolean(dbVisibility.research) : true,
+          },
+        };
+        setToMemoryCache("homepage_profile", result);
+        return result;
+      }
+    } catch (err) {
+      console.warn("DB profile info query notice:", err);
+    }
+
+    setToMemoryCache("homepage_profile", DEFAULT_PROFILE_INFO);
+    return DEFAULT_PROFILE_INFO;
+  });
+}
+
+export async function warmContentCache(): Promise<void> {
+  try {
+    await Promise.allSettled([
+      getAllProjects(),
+      getAllResearchPapers(),
+      getProfileInfo(),
+      getAllBlogPosts(),
+    ]);
+  } catch (err) {
+    console.warn("Background cache warming notice:", err);
+  }
+}
+
+// Automatically warm cache in background shortly after server initialization
+if (typeof process !== "undefined") {
+  setTimeout(() => {
+    warmContentCache().catch(() => {});
+  }, 100);
 }
 
 export async function saveProfileInfo(data: ProfileInfoData): Promise<boolean> {

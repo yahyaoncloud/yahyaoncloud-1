@@ -13,10 +13,11 @@ import {
   TableHeader, 
   TableRow 
 } from "~/components/ui/table";
-import { LuPlus as Plus, LuTrash2 as Trash2, LuEye as Eye, LuEyeOff as EyeOff, LuFileText as FileText, LuUpload as Upload, LuDownload as Download } from "react-icons/lu";
+import { LuPlus as Plus, LuTrash2 as Trash2, LuEye as Eye, LuEyeOff as EyeOff, LuFileText as FileText, LuUpload as Upload, LuDownload as Download } from "~/components/ui/icons";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { requireAdmin } from "~/utils/admin-auth.server";
+
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await requireAdmin(request);

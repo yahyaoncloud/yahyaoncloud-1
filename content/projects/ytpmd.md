@@ -7,16 +7,13 @@ role: "Creator / Developer"
 category: "Developer Tools"
 techStack:
   - Go
-  - PDF Processing
-  - Markdown
-  - YAML
   - MCP
-  - JSON-RPC 2.0
   - AI Agents
   - RAG
   - React
   - Vite
-  - Firebase Hosting
+  - Firebase
+  - Debian
 demoUrl: "https://ytpmd.aburcloud.com"
 githubUrl: "https://github.com/ytp24/ytpmd"
 coverImage: "/images/projects/ytpmd.webp"

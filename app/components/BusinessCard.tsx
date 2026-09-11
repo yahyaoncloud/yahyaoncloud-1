@@ -1,5 +1,5 @@
 import type { Linktree } from "@prisma/client";
-import { LuLinkedin as Linkedin, LuGithub as Github, LuTwitter as Twitter, LuInstagram as Instagram } from "react-icons/lu";
+import { LuLinkedin as Linkedin, LuGithub as Github, LuTwitter as Twitter, LuInstagram as Instagram } from "~/components/ui/icons";
 
 type Serialized<T> = {
   [P in keyof T]: T[P] extends Date ? string | Date : T[P];

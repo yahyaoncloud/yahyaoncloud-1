@@ -13,7 +13,7 @@ import {
 } from "~/Services/category.prisma.server";
 import { toast } from "sonner";
 import { AdminDataTable, type Column } from "~/components/AdminDataTable";
-import { LuPlus as Plus, LuPencil as Pencil, LuTrash2 as Trash2, LuTag as Tag } from "react-icons/lu";
+import { LuPlus as Plus, LuPencil as Pencil, LuTrash2 as Trash2, LuTag as Tag } from "~/components/ui/icons";
 import { requireAdmin } from "~/utils/admin-auth.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {

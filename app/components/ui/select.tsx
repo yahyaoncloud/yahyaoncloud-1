@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { LuCheck as Check, LuChevronDown as ChevronDown, LuChevronUp as ChevronUp } from "react-icons/lu";
+import { LuCheck as Check, LuChevronDown as ChevronDown, LuChevronUp as ChevronUp } from "./icons";
 
 import { cn } from "../../lib/utils"
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "@remix-run/react";
-import type { IconType as LucideIcon } from "react-icons";
+import type { LucideIcon } from "~/components/ui/icons";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 

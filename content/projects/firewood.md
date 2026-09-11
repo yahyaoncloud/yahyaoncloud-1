@@ -4,16 +4,15 @@ slug: "firewood"
 summary: "Local-first offline password and credentials manager built with Flutter, Riverpod, and Isar. Implements zero-knowledge manual field-level encryption using Argon2id key derivation and XChaCha20-Poly1305 AEAD authenticated encryption."
 period: "2024 - 2025"
 role: "Creator / Mobile & Security Engineer"
-category: "Mobile, Security, Cryptography"
+category: "Security"
 techStack:
-  - Flutter 3.22+
+  - Flutter
   - Dart
-  - Argon2id KDF
-  - XChaCha20-Poly1305 AEAD
-  - Isar Database
-  - Riverpod 2.5
+  - Argon2id
   - Cryptography
-  - Linux Desktop / Android
+  - Isar Database
+  - Android
+  - Linux
 demoUrl: ""
 githubUrl: "https://github.com/yahyaoncloud/firewood"
 coverImage: "/images/projects/firewood.webp"

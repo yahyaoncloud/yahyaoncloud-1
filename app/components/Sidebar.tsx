@@ -1,9 +1,9 @@
-import { LuHouse as Home, LuFileText as FileText, LuTags as Tags, LuImage as Image, LuSettings as Settings, LuUser as User, LuMessageSquare as MessageSquare, LuCirclePlus as PlusCircle, LuBriefcase as Briefcase, LuTag as Tag, LuShare2 as Share2, LuChevronDown as ChevronDown, LuLayoutDashboard as Layout, LuLayoutGrid as LayoutGrid, LuGlobe as Globe, LuMail as Mail, LuSparkles as Sparkles, LuChevronRight as ChevronRight, LuBookOpen as BookOpen } from "react-icons/lu";
-import type { IconType as LucideIcon } from "react-icons";
+import { LuHouse as Home, LuFileText as FileText, LuTags as Tags, LuImage as Image, LuSettings as Settings, LuUser as User, LuMessageSquare as MessageSquare, LuCirclePlus as PlusCircle, LuBriefcase as Briefcase, LuTag as Tag, LuShare2 as Share2, LuChevronDown as ChevronDown, LuLayoutDashboard as Layout, LuLayoutGrid as LayoutGrid, LuGlobe as Globe, LuMail as Mail, LuSparkles as Sparkles, LuChevronRight as ChevronRight, LuBookOpen as BookOpen } from "~/components/ui/icons";
+import type { LucideIcon } from "~/components/ui/icons";
 import { NavLink, useLocation } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import Logo from "../assets/yoc-logo.png";
+import Logo from "../assets/yoc-logo.webp";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -27,7 +27,6 @@ const navItems: NavItem[] = [
       { name: "Create Article", icon: PlusCircle, href: "/admin/post/create" },
       { name: "Projects", icon: Briefcase, href: "/admin/projects" },
       { name: "Research Papers", icon: BookOpen, href: "/admin/research" },
-      { name: "Featured Spotlight", icon: Sparkles, href: "/admin/featured-articles" },
       { name: "Categories", icon: Tag, href: "/admin/categories" },
       { name: "Tags", icon: Tags, href: "/admin/tags" },
     ],
@@ -38,11 +37,12 @@ const navItems: NavItem[] = [
     children: [
       { name: "About & Bio", icon: User, href: "/admin/about" },
       { name: "Homepage Sections", icon: LayoutGrid, href: "/admin/about?tab=sections" },
-      { name: "Homepage Cards", icon: Layout, href: "/admin/homepage-cards" },
+      { name: "Featured Spotlight", icon: Sparkles, href: "/admin/featured-articles" },
       { name: "Linktree", icon: Share2, href: "/admin/linktree" },
       { name: "Business Card QR", icon: Sparkles, href: "/admin/business-card" },
       { name: "Resumes & CVs", icon: FileText, href: "/admin/resumes" },
       { name: "Media Assets", icon: Image, href: "/admin/media" },
+      { name: "Supabase Assets", icon: FileText, href: "/admin/assets" },
     ],
   },
   {
@@ -54,13 +54,13 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    name: "Settings & Profile",
+    name: "Settings & System",
     icon: Settings,
     children: [
-      { name: "Admin Profile", icon: User, href: "/admin/profile" },
-      { name: "Interface Preferences", icon: Layout, href: "/admin/settings" },
-      { name: "Site & SEO Settings", icon: Globe, href: "/admin/site-settings" },
-      { name: "Blog Config", icon: Settings, href: "/admin/blog-settings" },
+      { name: "Account & Security", icon: User, href: "/admin/settings?tab=profile" },
+      { name: "Site & SEO Defaults", icon: Globe, href: "/admin/settings?tab=seo" },
+      { name: "Interface Preferences", icon: Layout, href: "/admin/settings?tab=preferences" },
+      { name: "System & Telemetry", icon: Sparkles, href: "/admin/settings?tab=system" },
     ],
   },
 ];

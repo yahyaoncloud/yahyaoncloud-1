@@ -296,4 +296,6 @@ model Resume {
   metadata    Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@map("resumes")
 }

@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "@remix-run/react";
-import { LuSun as Sun, LuMoon as Moon, LuMenu as Menu, LuX as X, LuChevronDown as ChevronDown } from "react-icons/lu";
+import {
+  LuSun as Sun,
+  LuMoon as Moon,
+  LuMenu as Menu,
+  LuX as X,
+  LuChevronDown as ChevronDown,
+  LuBriefcase as Briefcase,
+  LuFileText as FileText,
+  LuMessageSquare as MessageSquare,
+  LuDownload as Download,
+} from "~/components/ui/icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../Contexts/ThemeContext";
 import {
@@ -25,6 +35,19 @@ export default function Header() {
     setMiscDropdownOpen(false);
   }, [location.pathname]);
 
+  // Close menus on Escape key
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+        setWorkDropdownOpen(false);
+        setMiscDropdownOpen(false);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -37,7 +60,7 @@ export default function Header() {
   }, []);
 
   const isBlogActive = location.pathname.startsWith("/blog");
-  const isProjectsActive = location.pathname.startsWith("/projects");
+  const isProjectsActive = location.pathname.startsWith("/projects") || location.pathname.startsWith("/work");
   const isResearchActive = location.pathname.startsWith("/research");
   const isWorkActive = isProjectsActive || isResearchActive;
   const isGuestbookActive = location.pathname.startsWith("/guestbook");
@@ -147,7 +170,7 @@ export default function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Misc Dropdown (Guestbook) */}
+          {/* Misc Dropdown (Guestbook, Resume) */}
           <DropdownMenu open={miscDropdownOpen} onOpenChange={setMiscDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button
@@ -183,11 +206,23 @@ export default function Header() {
                   Guestbook
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a
+                  href="/resume"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-md text-sm cursor-pointer transition-colors text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100"
+                >
+                  <span>Resume</span>
+                  <span className="text-[10px] font-mono text-zinc-400">PDF</span>
+                </a>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           {/* Theme Switcher */}
           <button
+            type="button"
             onClick={toggleTheme}
             className="p-1.5 ml-1 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer shrink-0"
             aria-label="Switch theme"
@@ -200,14 +235,16 @@ export default function Header() {
         {/* Mobile Actions: Theme + Burger Toggle */}
         <div className="flex sm:hidden items-center gap-1 ml-auto">
           <button
+            type="button"
             onClick={toggleTheme}
-            className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors"
+            className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
             aria-label="Switch theme"
           >
             {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-1.5 rounded-md text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
@@ -232,7 +269,7 @@ export default function Header() {
                 to="/blog"
                 prefetch="intent"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`px-3 py-1.5 rounded-md transition-colors ${
+                className={`px-3.5 py-2 rounded-lg transition-colors ${
                   isBlogActive
                     ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
                     : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
@@ -242,56 +279,72 @@ export default function Header() {
               </Link>
 
               {/* Work Group */}
-              <div className="pt-1">
-                <div className="px-3 py-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+              <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60 mt-1">
+                <div className="px-3.5 pb-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   Work
                 </div>
-                <div className="flex flex-col gap-0.5 pl-2">
+                <div className="flex flex-col gap-0.5">
                   <Link
                     to="/projects"
                     prefetch="intent"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`px-3 py-1.5 rounded-md transition-colors ${
+                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-colors ${
                       isProjectsActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
                         : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
                     }`}
                   >
-                    Projects
+                    <Briefcase size={16} className="opacity-70 shrink-0" />
+                    <span>Projects</span>
                   </Link>
                   <Link
                     to="/research"
                     prefetch="intent"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`px-3 py-1.5 rounded-md transition-colors ${
+                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-colors ${
                       isResearchActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
                         : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
                     }`}
                   >
-                    Research
+                    <FileText size={16} className="opacity-70 shrink-0" />
+                    <span>Research</span>
                   </Link>
                 </div>
               </div>
 
-              {/* Misc Group */}
-              <div className="pt-1">
-                <div className="px-3 py-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                  Misc
+              {/* Community & Links Section */}
+              <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/60 mt-1">
+                <div className="px-3.5 pb-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                  Community & Links
                 </div>
-                <div className="flex flex-col gap-0.5 pl-2">
+                <div className="flex flex-col gap-0.5">
                   <Link
                     to="/guestbook"
                     prefetch="intent"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`px-3 py-1.5 rounded-md transition-colors ${
+                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-colors ${
                       isGuestbookActive
                         ? "text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800/80 font-medium"
                         : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40"
                     }`}
                   >
-                    Guestbook
+                    <MessageSquare size={16} className="opacity-70 shrink-0" />
+                    <span>Guestbook</span>
                   </Link>
+                  <a
+                    href="/resume"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Download size={16} className="opacity-70 shrink-0" />
+                      <span>Resume / CV</span>
+                    </div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 px-1.5 py-0.5 rounded">PDF</span>
+                  </a>
                 </div>
               </div>
             </nav>

@@ -23,13 +23,16 @@ import { json } from "@remix-run/node";
 import { Toaster } from "sonner";
 import "./styles/tailwind.css";
 import { ThemeProvider, useTheme } from "./Contexts/ThemeContext";
+import { getAllResearchPapers, getProfileInfo } from "~/Services/content.server";
 
 export const headers = () => ({
-  "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+  "Cache-Control": "public, max-age=120, s-maxage=600, stale-while-revalidate=86400",
 });
 
 export const links: LinksFunction = () => {
   return [
+    { rel: "dns-prefetch", href: "https://fonts.googleapis.com" },
+    { rel: "dns-prefetch", href: "https://fonts.gstatic.com" },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
       rel: "preconnect",
@@ -38,7 +41,7 @@ export const links: LinksFunction = () => {
     },
     {
       rel: "stylesheet",
-      href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
     },
   ];
 };
@@ -61,9 +64,19 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const [papers, profileInfo] = await Promise.all([
+    getAllResearchPapers().catch(() => []),
+    getProfileInfo().catch(() => null),
+  ]);
+
+  const isResearchVisible = profileInfo?.sectionsVisibility?.research !== false;
+  const hasResearch = Boolean(papers.length > 0 && isResearchVisible);
+
   return json(
     {
       theme: "dark",
+      hasResearch,
+      researchCount: papers.length,
       ENV: {
         SUPABASE_ID: process.env.SUPABASE_ID || "",
         SUPABASE_ANON: process.env.SUPABASE_ANON || "",

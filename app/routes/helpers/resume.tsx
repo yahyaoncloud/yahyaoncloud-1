@@ -8,6 +8,7 @@ export async function loader() {
     throw new Response("Resume not found", { status: 404 });
   }
 
-  // Redirect to the secure proxy route which serves the PDF inline (viewer mode)
+  // The ID is dynamic, so we fetch it from the active resume.
   return redirect(`/resources/download/resume/${activeResume.id}`);
+
 }

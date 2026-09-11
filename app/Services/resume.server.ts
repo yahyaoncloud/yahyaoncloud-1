@@ -4,6 +4,7 @@ import QRCode from 'qrcode';
 import type { Resume } from '@prisma/client';
 
 export type { Resume };
+export type IResume = Resume;
 
 /**
  * Save a new resume

@@ -1,6 +1,6 @@
 import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { LuArrowLeft as ArrowLeft, LuSave as Save } from "react-icons/lu";
+import { LuArrowLeft as ArrowLeft, LuSave as Save } from "~/components/ui/icons";
 import { requireAdmin } from "~/utils/admin-auth.server";
 import { saveResearchPaper, getResearchBySlug, type ResearchPaper } from "~/Services/content.server";
 

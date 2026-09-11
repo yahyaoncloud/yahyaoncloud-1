@@ -1,4 +1,4 @@
-import LOGO from "../assets/yoc-logo.png";
+import LOGO from "../assets/yoc-logo.webp";
 import React from "react";
 import "../styles/tailwind.css";
 

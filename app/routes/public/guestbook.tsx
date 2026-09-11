@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { LuSend as Send, LuLogOut as LogOut, LuSparkles as Sparkles, LuMessageSquare as MessageSquare, LuCornerDownLeft as CornerDownLeft } from "react-icons/lu";
-import { FaGithub } from "react-icons/fa";
-import { FaSquareXTwitter, FaGoogle } from "react-icons/fa6";
+import { LuSend as Send, LuLogOut as LogOut, LuSparkles as Sparkles, LuMessageSquare as MessageSquare, LuCornerDownLeft as CornerDownLeft, FaGithub, FaSquareXTwitter, FaGoogle } from "~/components/ui/icons";
 import {
   json,
   type LoaderFunction,
@@ -20,8 +18,8 @@ import { addGuestbookToRTDB } from "~/utils/firebase-rtdb.server";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { onValue, push, ref } from "firebase/database";
 import { motion } from "framer-motion";
-import yocLogo from "~/assets/yoc-logo.png";
-import profilePhoto from "~/assets/profile.jpg";
+import yocLogo from "~/assets/yoc-logo.webp";
+import profilePhoto from "~/assets/profile.webp";
 
 // Interface
 interface Message {

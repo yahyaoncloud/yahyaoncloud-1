@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "@remix-run/react";
-import type { IconType as LucideIcon } from "react-icons";
-import { LuArrowRight as ArrowRight } from "react-icons/lu";
+import type { LucideIcon } from "~/components/ui/icons";
+import { LuArrowRight as ArrowRight } from "~/components/ui/icons";
 import { cn } from "~/lib/utils";
 
 export interface QuickActionItem {

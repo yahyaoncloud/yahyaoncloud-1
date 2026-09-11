@@ -17,13 +17,13 @@ export default function UserLayout({ children }: UserLayoutProps) {
       <Tracker />
       <div className="mx-auto px-5 sm:px-6 md:px-0 pt-2 sm:pt-4 pb-12 sm:pb-16 w-full max-w-[640px] flex flex-col min-h-screen">
         <Header />
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait">
           <motion.main
             key={location.pathname}
             initial={{ opacity: 0, y: 3 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -3 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
             className="flex-1 space-y-8 md:space-y-10 pt-2 sm:pt-4"
           >
             {children}
